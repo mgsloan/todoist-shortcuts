@@ -1,0 +1,10 @@
+{
+  "extends": "eslint-config-es5",
+  "rules": {
+    "func-names": "off",
+    "no-use-before-define": "off",
+    "spaced-comment": "off",
+    "guard-for-in": "off",
+    "no-else-return": "off",
+  }
+}

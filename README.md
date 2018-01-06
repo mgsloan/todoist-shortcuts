@@ -72,3 +72,8 @@ When scheduling is opened via "t", the following keybindings will apply:
 TODO: How to disallow escape?
 
 `hjklxvtqaAuspr1234noO`
+
+# Linting
+
+npm install eslint eslint-config-es5
+./node_modules/eslint/bin/eslint.js todoist-shortcuts.js
