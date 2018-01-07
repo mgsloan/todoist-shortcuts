@@ -2,8 +2,8 @@
 // @name        todoist-shortcuts
 // @namespace   http://mgsloan.com
 // @description Todoist keyboard shortcuts
-// @include     https://todoist.com/*
-// @include     http://todoist.com/*
+// @include     https://todoist.com/app*
+// @include     http://todoist.com/app*
 // @version     1
 // @grant       none
 // ==/UserScript==
@@ -17,25 +17,28 @@
   var bindings = [
 
     // Navigation
-    ['j', moveDown],
-    ['k', moveUp],
+    ['j', cursorDown],
+    ['k', cursorUp],
     ['h', collapse],
     ['l', expand],
     // TODO [["g g", "ctrl+k"], switch_project],
     ['g i', goToInbox],
     ['g t', goToToday],
-    ['g w', goToNext7],
+    // TODO: g n is more intuitive I think. One or both?
+    [['g w', 'g n'], goToNext7],
 
     // Manipulation of tasks at cursor
     ['enter', edit],
     ['O', addAbove],
     ['o', addBelow],
+    ['J', moveDown],
+    ['K', moveUp],
     // TODO ["ctrl+right", indent],
     // TODO ["ctrl+left", dedent],
 
     // Selection
     ['x', toggleSelect],
-    ['* a', [selectAll, cancelEmptyAdd]],
+    ['* a', sequence([selectAll, cancelEmptyAdd])],
     ['* n', deselectAll],
     // NOTE: these are a bit different than gmail's "select unread" and similar,
     // as they add to the current selection. I think this is more useful.
@@ -45,9 +48,16 @@
     ['* 4', selectPriority('4')],
 
     // Manipulation of selected items
-    ['t', schedule],
+    ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
     ['v', moveToProject],
+    // TODO: Other possibilities, don't need to follow gmail.
+    // d (done)
+    // c (completed)
     ['e', archive],
+    // TODO: Similarly, should we follow gmail here?
+    // d (delete)
+    // r (remove)
+    // delete
     ['#', deleteTasks],
     ['1', setPriority('1')],
     ['2', setPriority('2')],
@@ -55,14 +65,16 @@
     ['4', setPriority('4')],
 
     // Scheduling keybindings (requires schedule to be open)
-    ['t', scheduleTomorrow],
+    //
+    // The following binding is handled earlier ['t', scheduleTomorrow]
     ['n', scheduleToday],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
-    ['r', unschedule]
+    ['r', unschedule],
 
     // Misc
     // TODO: ["?", show_keybindings]
+    ['escape', closeContextMenus]
   ];
 
   // Which selection-oriented commands to apply to the cursor if there is no
@@ -98,7 +110,7 @@
 
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
-  var MOREMENU_ITEMS =
+  var MORE_MENU_ITEMS =
     [ARCHIVE_TEXT, 'Duplicate', DELETE_TEXT, 'Add label', 'Remove label'];
   var TASKMENU_ITEMS =
     [ADD_ABOVE_TEXT, ADD_BELOW_TEXT];
@@ -126,18 +138,61 @@
   // * What is postpone?
   //
   // * Enter day of month + move between months.
+  //
+  // * Should j and k step into expanded trees? probably keep it that way
+  //
+  // * l should step out even if not focused on the collapser
+  //
+  // * h should also move cursor down after opening
+  //
+  // * In "today" / "next 7 days" view, o and O should add to the same day.
+  //   Should also scroll so the add box is in view.
+  //
+  // * Should it match append / insert? 'a' would edit at the end of task text,
+  //   'i' would edit at beginning of task text.
+  //
+  // * When items are removed or moved, and the cursor is on one, should move
+  //   cursor to the right spot.
+
+  /*****************************************************************************
+   * Action combiners
+   */
+
+  // Take multiple actions (functions that take no arguments), and run them in
+  // sequence.
+  function sequence(actions) {
+    return function() {
+      for (var i = 0; i < actions.length; i++) {
+        actions[i]();
+      }
+    };
+  }
+
+  // TODO: Use something other than mousetrap or augment it to allow enabling
+  // different keymaps under different conditions?
+
+  // If the condition is true, runs the first action, otherwise runs the second.
+  function ifThenElse(condition, calendarAction, normalAction) {
+    return function() {
+      if (condition()) {
+        calendarAction();
+      } else {
+        normalAction();
+      }
+    };
+  }
 
   /*****************************************************************************
    * Actions
    */
 
   // Move the cursor up and down.
-  function moveDown() { modifyCursorIndex(function(ix) { return ix + 1; });}
-  function moveUp() { modifyCursorIndex(function(ix) { return ix - 1; }); }
+  function cursorDown() { modifyCursorIndex(function(ix) { return ix + 1; }); }
+  function cursorUp() { modifyCursorIndex(function(ix) { return ix - 1; }); }
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, function(content) {
+    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, unconditional, function(content) {
       content.dispatchEvent(new Event('mousedown'));
     });
   }
@@ -159,69 +214,58 @@
     }
   }
 
-  // Clicks the "schedule" link when items are selected.
+  // Clicks the 'schedule' link when items are selected.
   function schedule() {
-    // Only open calendar if it isn't already open. This allows "t" to also be
-    // used for selecting "tomorrow".
+    // Only open calendar if it isn't already open. This allows 't' to also be
+    // used for selecting 'tomorrow'.
     if (getUniqueClass(document, CALENDAR_CLASS)) {
       debug('Not opening schedule because it is already open.');
     } else {
+      debug('Attempting to open schedule.');
       withId(ACTIONS_BAR_CLASS, function(parent) {
         clickLink(parent, SCHEDULE_TEXT);
       });
     }
   }
 
-  // Click "today" in schedule. Only does anything if schedule is open.
+  // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
-    withCalendar(function(calendar) {
-      withUniqueTagAndText(calendar, 'span', '2', function(el) {
-        el.click();
-      });
+    withCalendar('scheduleToday', function(calendar) {
+      withUniqueClass(calendar, 'today_icon', notMatchingText('X'), click);
     });
   }
 
-  // Click "tomorrow" in schedule. Only does anything if schedule is open.
+  // Click 'tomorrow' in schedule. Only does anything if schedule is open.
   function scheduleTomorrow() {
-    withCalendar(function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', function(el) {
-        el.click();
-      });
+    withCalendar('scheduleTomorrow', function(calendar) {
+      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', unconditional, click);
     });
   }
 
-  // Click "next week" in schedule. Only does anything if schedule is open.
+  // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
-    withCalendar(function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_next_week', function(el) {
-        el.click();
-      });
+    withCalendar('scheduleNextWeek', function(calendar) {
+      withUniqueClass(calendar, 'cmp_scheduler_next_week', unconditional, click);
     });
   }
 
-  // Click "next month" in schedule. Only does anything if schedule is open.
+  // Click 'next month' in schedule. Only does anything if schedule is open.
   function scheduleNextMonth() {
-    withCalendar(function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_month', function(el) {
-        el.click();
-      });
+    withCalendar('scheduleNextMonth', function(calendar) {
+      withUniqueClass(calendar, 'cmp_scheduler_month', unconditional, click);
     });
   }
 
-  // Click "no due date" in schedule. Only does anything if schedule is open.
+  // Click 'no due date' in schedule. Only does anything if schedule is open.
   function unschedule() {
-    withCalendar(function(calendar) {
-      withUniqueTagAndText(calendar, 'span', 'X', function(el) {
-        el.click();
-      });
+    withCalendar('unschedule', function(calendar) {
+      withUniqueClass(calendar, 'today_icon', matchingText('X'), click);
     });
   }
 
-  // Clicks the "Move to project" link when items are selected.
+  // Clicks the 'Move to project' link when items are selected.
   function moveToProject() {
-    withId(ACTIONS_BAR_CLASS, function(parent) {
-      clickLink(parent, MOVE_TEXT);
-    });
+    withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
     // The keyboard shortcut used to invoke this also ends up in the completion
     // box. I thought stopPropagation would fix this, but it doesn't. So, empty
     // the completion input.
@@ -230,8 +274,8 @@
 
   // Fills in the text of the project selection completion.
   function fillProjectInput(text) {
-    withUniqueClass(document, PROJECT_COMPLETE_CLASS, function(complete) {
-      withUniqueTag(complete, 'input', function(input) {
+    withUniqueClass(document, PROJECT_COMPLETE_CLASS, unconditional, function(complete) {
+      withUniqueTag(complete, 'input', unconditional, function(input) {
         input.value = text;
         // FIXME: Initially doesn't show projects list because setting 'value'
         // doesn't trigger any events. However, neither a bare keydown or change
@@ -248,9 +292,9 @@
   // keybindings.
   function setPriority(level) {
     return function() {
-      withUniqueClass(document, 'priority_menu', function(menu) {
-        withUniqueClass(menu, 'cmp_priority' + level, function(img) {
-          withRestoredSelections(function() { img.click(); });
+      withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
+        withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
+          withRestoredSelections(click(img));
         });
       });
     };
@@ -304,9 +348,7 @@
 
   // Toggles collapse / expand task under the cursor, if it has children.
   function toggleCollapse() {
-    withUniqueClass(getCursor(), ARROW_CLASS, function(el) {
-      el.click();
-    });
+    withUniqueClass(getCursor(), ARROW_CLASS, unconditional, click);
   }
 
   // Expands or collapses task under the cursor, that have children. Does
@@ -334,7 +376,7 @@
   // FIXME: Instead figure out a way to suppress the event.
   function cancelEmptyAdd() {
     setTimeout(function() {
-      withUniqueClass(document, 'richtext_editor', function(editor) {
+      withUniqueClass(document, 'richtext_editor', unconditional, function(editor) {
         if (editor.textContent === '') {
           cancelAdd();
         } else {
@@ -346,9 +388,7 @@
 
   // Clicks "cancel" on inline add of a task.
   function cancelAdd() {
-    withUniqueClass(document, 'cancel', function(cancel) {
-      cancel.click();
-    });
+    withUniqueClass(document, 'cancel', unconditional, click);
   }
 
   // Add a tasks above / below cursor.
@@ -357,17 +397,23 @@
 
   // Navigate to inbox.
   function goToInbox() {
-    withUniqueClass(document, 'cmp_filter_inbox', function(img) { img.click(); });
+    withUniqueClass(document, 'cmp_filter_inbox', unconditional, click);
   }
 
   // Navigate to today.
   function goToToday() {
-    withUniqueClass(document, 'cmp_filter_today', function(img) { img.click(); });
+    withUniqueClass(document, 'cmp_filter_today', unconditional, click);
   }
 
   // Navigate to today.
   function goToNext7() {
-    withUniqueClass(document, 'cmp_filter_days', function(img) { img.click(); });
+    withUniqueClass(document, 'cmp_filter_days', unconditional, click);
+  }
+
+  // Click somewhere on the page that shouldn't do anything in particular except
+  // closing context menus.
+  function closeContextMenus() {
+    click(document.body);
   }
 
   /** ***************************************************************************
@@ -387,6 +433,9 @@
   // To work around this, when selecting a previously deselected item,
   // 'setSelections' is used.
   function shiftClickTask(el) {
+    // NOTE: Intentionally doesn't simulate full click like the 'click'
+    // function. This function gets called a lot, so best to just trigger one
+    // event.
     var mde = new Event('mousedown');
     mde.shiftKey = true;
     el.dispatchEvent(mde);
@@ -463,9 +512,7 @@
 
   // Finds a <a> element with the specified text and clicks it.
   function clickLink(parent, text) {
-    withUniqueTagAndText(parent, 'a', text, function(matched) {
-      matched.click();
-    });
+    withUniqueTag(parent, 'a', matchingText(text), click);
   }
 
   // Finds a menu element. These do not have any unique class or ID, so instead
@@ -475,7 +522,7 @@
     withClass(document, 'ist_menu', function(menu) {
       var matches = true;
       for (var i = 0; i < expectedItems.length; i++) {
-        if (!getUniqueTagAndText(menu, 'span', expectedItems[i])) {
+        if (!getUniqueTag(menu, 'span', matchingText(expectedItems[i]))) {
           matches = false;
           break;
         }
@@ -494,13 +541,11 @@
 
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
-  var moreMenu = findMenu("'More...'", MOREMENU_ITEMS);
+  var moreMenu = findMenu("'More...'", MORE_MENU_ITEMS);
 
   function clickMenu(menu, text) {
     if (menu) {
-      withUniqueTagAndText(menu, 'span', text, function(el) {
-        el.click();
-      });
+      withUniqueTag(menu, 'span', matchingText(text), click);
     } else {
       error("Can't perform action due to not finding menu element.");
     }
@@ -519,17 +564,88 @@
   // Opens up the task's contextual menu and clicks an item via text match.
   function clickTaskMenu(text) {
     var menu = getFirstClass(getCursor(), 'menu');
-    menu.click();
+    click(menu);
     var taskMenu = findMenu('task', TASKMENU_ITEMS);
     clickMenu(taskMenu, text);
   }
 
-  function withCalendar(f) {
-    var calendar = getUniqueClass(document, CALENDAR_CLASS);
+  function checkCalendarOpen() {
+    return findCalendar() !== null;
+  }
+
+  function findCalendar() {
+    return getUniqueClass(document, CALENDAR_CLASS);
+  }
+
+  function withCalendar(name, f) {
+    var calendar = findCalendar();
     if (calendar) {
       f(calendar);
     } else {
-      debug('Calendar is not open');
+      warn('Not performing action', name, 'because calendar is not open');
+    }
+  }
+
+  // Simulate a mouse click.
+  function click(el) {
+    el.dispatchEvent(new Event('mousedown'));
+    el.dispatchEvent(new Event('mouseup'));
+    el.click();
+  }
+
+  function moveUp() {
+    var task = getCursor();
+    var taskId = task.id;
+    task.dispatchEvent(new Event('mouseover'));
+    try {
+      withCursorDragHandle(function(el, x, y) {
+        el.dispatchEvent(new MouseEvent('mousedown', {
+          screenX: x,
+          screenY: y,
+          clientX: x,
+          clientY: y
+        }));
+        // FIXME: In order to jump between sections, should use previous task position
+        //
+        // NOTE: Would be nice to not need this 0ms timeout as it makes it a
+        // little laggier. Seems to be needed though.
+        setTimeout(function() {
+          var params = {
+            bubbles: true,
+            screenX: x,
+            screenY: y - task.clientHeight + 20,
+            clientX: x,
+            clientY: y - task.clientHeight + 20
+          };
+          el.dispatchEvent(new MouseEvent('mousemove', params));
+          el.dispatchEvent(new MouseEvent('mouseup', params));
+        }, 0);
+      });
+    } finally {
+      withId(taskId, function(el) { el.dispatchEvent(new Event('mouseout')); });
+    }
+  }
+
+  function withCursorDragHandle(f) {
+    withUniqueClass(getCursor(), 'drag_and_drop_handler', unconditional, function(el) {
+      var x = el.offsetLeft - window.scrollX;
+      var y = el.offsetTop - window.scrollY;
+      f(el, x, y);
+    });
+  }
+
+  function moveDown() {
+    withDragHandle(getCursor(), function(el) {
+    });
+  }
+
+  function withDragHandle(task, f) {
+    var taskId = task.id;
+    task.dispatchEvent(new Event('mouseover'));
+    try {
+      withUniqueClass(task, 'drag_and_drop_handler', unconditional, f);
+    } finally {
+      withId(taskId, function(el) { el.dispatchEvent(new Event('mouseout')); });
     }
   }
 
@@ -738,7 +854,9 @@
   }
 
   // Alias for document.getElementById
-  function getId(id) { return document.getElementById(id); }
+  function getId(id) {
+    return document.getElementById(id);
+  }
 
   // Invokes the function for the matching id, or logs a warning.
   function withId(id, f) {
@@ -755,92 +873,51 @@
   function withClass(parent, cls, f) {
     var els = parent.getElementsByClassName(cls);
     for (var i = 0; i < els.length; i++) {
-      f(els[i]);
+      var el = els[i];
+      f(el);
     }
   }
 
-  // Returns first child that matches the specified class.
-  function getFirstClass(parent, cls) {
-    var els = parent.getElementsByClassName(cls);
-    if (els.length > 1) {
-      return els[0];
-    } else {
-      return null;
-    }
+  // Returns first child that matches the specified class and predicate.
+  function getFirstClass(parent, cls, predicate) {
+    return findFirst(predicate, parent.getElementsByClassName(cls));
   }
 
-  // Checks that there is only one child element that matches the class name,
-  // and returns it.  Returns null if it is not found or not unique.
-  function getUniqueClass(parent, cls) {
-    var els = parent.getElementsByClassName(cls);
-    if (els.length === 1) {
-      return els[0];
-    } else {
-      return null;
-    }
+  // Checks that there is only one child element that matches the class name and
+  // predicate, and returns it. Returns null if it is not found or not unique.
+  function getUniqueClass(parent, cls, predicate) {
+    return findUnique(predicate, parent.getElementsByClassName(cls));
   }
 
   // Checks that there is only one child element that matches the class name,
   // and invokes the function on it. Logs a warning if there isn't exactly one.
-  function withUniqueClass(parent, cls, f) {
-    var result = getUniqueClass(parent, cls);
+  function withUniqueClass(parent, cls, predicate, f) {
+    var result = getUniqueClass(parent, cls, predicate);
     if (result) {
       return f(result);
     } else {
+      // TODO: This warning doesn't make it clear that the predicate could also
+      // be the cause.
       warn("Couldn't find unique child with class", cls, 'instead got', result);
       return null;
     }
   }
 
-  // Checks that there is only one child element that matches the tag, and
-  // returns it. Returns null if it is not found or not unique.
-  function getUniqueTag(parent, tag) {
-    var els = parent.getElementsByTagName(tag);
-    if (els.length === 1) {
-      return els[0];
-    } else {
-      return null;
-    }
+  // Checks that there is only one child element that matches the tag and
+  // predicate, and returns it. Returns null if it is not found or not unique.
+  function getUniqueTag(parent, tag, predicate) {
+    return findUnique(predicate, parent.getElementsByTagName(tag));
   }
 
   // Checks that there is only one child element that matches the tag, and
   // invokes the function on it. Logs a warning if there isn't exactly one.
-  function withUniqueTag(parent, tag, f) {
-    var result = getUniqueTag(parent, tag);
+  function withUniqueTag(parent, tag, predicate, f) {
+    var result = getUniqueTag(parent, tag, predicate);
     if (result) {
       return f(result);
-    }
-    warn("Couldn't find unique child with tag", tag, 'instead got', result);
-    return null;
-  }
-
-  // Attempts to find an element with the specified tag and textContent. Returns
-  // null if it is not not found or not unique.
-  function getUniqueTagAndText(parent, tag, text) {
-    var result = null;
-    var els = parent.getElementsByTagName(tag);
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      if (el.textContent === text) {
-        if (!result) {
-          result = el;
-        } else {
-          // Not a unique result, return null.
-          return null;
-        }
-      }
-    }
-    return result;
-  }
-
-  // Attempts to find an element with the specified tag and textContent, and
-  // invoked the function on it. Logs a warning if there isn't exactly one.
-  function withUniqueTagAndText(parent, tag, text, f) {
-    var el = getUniqueTagAndText(parent, tag, text);
-    if (el) {
-      f(el);
     } else {
-      warn("Couldn't find", tag, 'element matching the text', text);
+      warn("Couldn't find unique child with tag", tag, 'instead got', result);
+      return null;
     }
   }
 
@@ -852,6 +929,60 @@
       }
     }
     return true;
+  }
+
+  // Given a predicate, returns the first element that matches. If predicate is
+  // null, then it is treated like 'unconditional'.
+  function findFirst(predicate, array) {
+    for (var i = 0; i < array.length; i++) {
+      var element = array[i];
+      if (!predicate || predicate(element)) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  // Given a predicate, returns the only element that matches. If no elements
+  // match, or multiple elements match, then nothing gets returned. If predicate
+  // is null, then it is treated like 'unconditional'.
+  function findUnique(predicate, array) {
+    var result = null;
+    for (var i = 0; i < array.length; i++) {
+      var element = array[i];
+      if (!predicate || predicate(element)) {
+        if (result === null) {
+          result = element;
+        } else {
+          // Not unique, so return null.
+          return null;
+        }
+      }
+    }
+    return result;
+  }
+
+  /*****************************************************************************
+   * Predicates (for use with get / with functions above)
+   */
+
+  // Always returns 'true'.
+  function unconditional() {
+    return true;
+  }
+
+  // Returns 'true' if text content matches wanted text.
+  function matchingText(text) {
+    return function(el) {
+      return el.textContent === text;
+    };
+  }
+
+  // Returns 'true' if text content doesn't match text.
+  function notMatchingText(text) {
+    return function(el) {
+      return el.textContent !== text;
+    };
   }
 
   /*****************************************************************************
@@ -907,7 +1038,6 @@
     arguments)}}(b))};c.init();r.Mousetrap=c;"undefined"!==typeof module&&module.exports&&(module.exports=c);"function"===typeof define&&define.amd&&define(function(){return c})}})("undefined"!==typeof window?window:null,"undefined"!==typeof window?document:null);
   /* eslint-enable */
 
-
   /*****************************************************************************
    * Run todoist-shortcuts!
    */
@@ -920,21 +1050,40 @@
   // Register key bindings
   for (var i = 0; i < bindings.length; i++) {
     if (bindings[i].length === 2) {
-      var action = bindings[i][1];
-      // Allow a list of functions to call.
-      if (action instanceof Array) {
-        var actions = action;
-        // eslint-disable-next-line no-loop-func
-        action = function() {
-          for (var j = 0; j < actions.length; j++) {
-            actions[j]();
-          }
-        };
-      }
       // eslint-disable-next-line no-undef
-      Mousetrap.bind(bindings[i][0], action);
+      Mousetrap.bind(bindings[i][0], bindings[i][1]);
     } else {
       error('Improper binding entry at index', i, 'value is', bindings[i]);
     }
   }
+
+  // Override some keybindings that interfere.  Specifically:
+  //
+  // * Ignore escape, because it deselects stuff, but we want to use it to close
+  //   context menus and such.
+  //
+  // TODO: Is there a better way?
+  setTimeout(function() {
+    var oldHandler = document.onkeydown;
+    if (oldHandler) {
+      document.onkeydown = function(ev) {
+        if (ev.keyCode !== 27) {
+          /* TODO: This is an attempt at detecting when an item is inserted via
+          enter. Use mutation observer instead?
+
+          if (ev.keyCode === 13) {
+            var oldTasks = getTasks();
+            oldHandler(ev);
+            var newTasks = getTasks();
+            console.log("oldTasks", oldTasks.length, "newTasks", newTasks.length);
+          } else {
+          */
+            oldHandler(ev);
+          // }
+        }
+      };
+    } else {
+      error('old document keydown handler was not set.');
+    }
+  }, 0);
 })();
