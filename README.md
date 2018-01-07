@@ -63,9 +63,15 @@ When scheduling is opened via "t", the following keybindings will apply:
 
 # Todoist bugs
 
-## Undo will not work for multiple completions or deletions
+* Undo will not work for multiple completions or deletions
 
-## In agenda mode, ids get duplicated
+* In agenda mode, ids get duplicated
+
+* In agenda mode, if you shift click a task that is in two spots, shift click
+  should probably select both.
+
+  - If you move the tasks so they are in the same day, they do not recombine!
+    Another bug.
 
 # Vimium
 

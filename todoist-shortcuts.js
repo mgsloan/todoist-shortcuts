@@ -95,6 +95,7 @@
 
   // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
   var TODOIST_ROOT_ID = 'todoist_app';
+  var AGENDA_VIEW_ID = 'agenda_view';
   var EDIT_CLICK_CLASS = 'content';
   var ACTIONS_BAR_CLASS = 'item_selecter';
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
@@ -153,6 +154,11 @@
   //
   // * When items are removed or moved, and the cursor is on one, should move
   //   cursor to the right spot.
+  //
+  // * o / O should work even when no items exist or when none selected
+  //
+  // * Could get some efficiency by not doing id / class searches from the
+  //   document root.
 
   /*****************************************************************************
    * Action combiners
@@ -199,15 +205,15 @@
 
   // Toggles selection of the task focused by the cursor.
   function toggleSelect() {
-    var selected = getSelectedTaskIds();
-    if (cursorId) {
-      // See the docs for shiftClickTask for why deselection is so much easier
-      // than selection.
-      if (selected[cursorId]) {
-        shiftClickTask(getCursor());
+    var cursor = getCursor();
+    if (cursor) {
+      // NOTE: todoist's shift-click actually only does one element at a time,
+      // even if they have the same id. This intentionally deviates from that
+      // behavior.
+      if (checkTaskIsSelected(cursor)) {
+        deselectTaskId(cursor.id);
       } else {
-        selected[cursorId] = true;
-        setSelections(selected);
+        selectTaskId(cursor.id);
       }
     } else {
       warn("No cursor, so can't select");
@@ -294,7 +300,8 @@
     return function() {
       withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
         withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
-          withRestoredSelections(click(img));
+          var isAgenda = checkIsAgendaMode();
+          withRestoredSelections(isAgenda, click(img));
         });
       });
     };
@@ -322,19 +329,20 @@
       } else {
         error('Unrecognized level in selectPriority', level);
       }
+      var isAgenda = checkIsAgendaMode();
       var allTasks = getTasks(true);
       var classToMatch = 'priority_' + actualLevel;
-      var selected = getSelectedTaskIds();
+      var selected = getSelectedTaskKeys(isAgenda);
       var modified = false;
       for (var i = 0; i < allTasks.length; i++) {
         var task = allTasks[i];
         if (task.classList.contains(classToMatch)) {
-          selected[task.id] = true;
+          selected[getTaskKey(task, isAgenda)] = true;
           modified = true;
         }
       }
       if (modified) {
-        setSelections(selected);
+        setSelections(selected, isAgenda);
       }
     };
   }
@@ -358,9 +366,10 @@
 
   // Clears all selections.
   function deselectAll() {
-    var selected = getSelectedTaskIds();
-    for (var id in selected) {
-      withId(id, shiftClickTask);
+    var isAgenda = checkIsAgendaMode();
+    var selected = getSelectedTaskKeys(isAgenda);
+    for (var key in selected) {
+      withTaskByKey(key, shiftClickTask);
     }
   }
 
@@ -420,7 +429,10 @@
    * Utilities for manipulating the UI
    */
 
+  // FIXME: lastShiftClicked should probably also be set when user actually
+  // shift clicks, instead of just simulated ones.
   var lastShiftClicked = null;
+  var lastShiftClickedIndent = null;
 
   // Given a task element, shift-clicks it. Unfortunately, todoist currently has
   // quite strange behavior:
@@ -432,16 +444,39 @@
   //
   // To work around this, when selecting a previously deselected item,
   // 'setSelections' is used.
-  function shiftClickTask(el) {
+  function shiftClickTask(task) {
     // NOTE: Intentionally doesn't simulate full click like the 'click'
     // function. This function gets called a lot, so best to just trigger one
     // event.
     var mde = new Event('mousedown');
     mde.shiftKey = true;
-    el.dispatchEvent(mde);
+    task.dispatchEvent(mde);
     // TODO: Should handle this via a mousedown handler, so that it keeps track
     // of mouseclicks too.  Otherwise could get wonky behavior in
-    lastShiftClicked = el.id;
+    lastShiftClicked = task.id;
+    lastShiftClickedIndent = getTaskIndentClass(task);
+  }
+
+  // Selects all tasks that have the specified id.
+  function selectTaskId(id) {
+    var isAgenda = checkIsAgendaMode();
+    var selected = getSelectedTaskKeys(isAgenda);
+    withClass(document, id, function(task) {
+      selected[getTaskKey(task, isAgenda)] = true;
+    });
+    setSelections(selected);
+  }
+
+  // Deselects all tasks that have the specified id.
+  //
+  // See the docs for shiftClickTask for why deselection is so much easier than
+  // selecting a task id.
+  function deselectTaskId(id) {
+    withClass(document, id, function(task) {
+      if (checkTaskIsSelected(task)) {
+        shiftClickTask(task);
+      }
+    });
   }
 
   // Like select_all, but returns the list of task elements.
@@ -460,13 +495,15 @@
   // Ensures that the specified task ids are selected (specified by a set-like
   // object). The algorithm for this is quite ugly and inefficient, due to the
   // strange todoist behavior mentioned above.
-  function setSelections(ids) {
+  function setSelections(selections) {
+    var isAgenda = checkIsAgendaMode();
     var startTime = Date.now();
     var allTasks = selectAllInternal();
     // Then deselect all of the things that shouldn't be selected.
     for (var i = 0; i < allTasks.length; i++) {
       var task = allTasks[i];
-      if (!ids[task.id] && taskIsSelected(task)) {
+      var key = getTaskKey(task, isAgenda);
+      if (!selections[key] && checkTaskIsSelected(task)) {
         shiftClickTask(task);
       }
     }
@@ -478,9 +515,10 @@
       // If there are selections but the top bar isn't visible, then toggle the
       // last clicked item.
       if (!getId(ACTIONS_BAR_CLASS)) {
-        var selections = getSelectedTaskIds();
+        var isAgenda = checkIsAgendaMode();
+        var selections = getSelectedTaskKeys(isAgenda);
         if (!isEmptyMap(selections)) {
-          var last = document.getElementById(lastShiftClicked);
+          var last = getTaskById(lastShiftClicked, lastShiftClickedIndent);
           if (last) {
             debug("Detected that top bar isn't visible when it should be.  Attempting workaround.");
             shiftClickTask(last);
@@ -501,12 +539,12 @@
 
   // For some reason todoist clears the selections even after applying things
   // like priority changes. This restores the selections.
-  function withRestoredSelections(f) {
-    var oldSelections = getSelectedTaskIds();
+  function withRestoredSelections(isAgenda, f) {
+    var oldSelections = getSelectedTaskKeys();
     try {
       f();
     } finally {
-      setSelections(oldSelections);
+      setSelections(oldSelections, isAgenda);
     }
   }
 
@@ -594,8 +632,9 @@
   }
 
   function moveUp() {
+    var isAgenda = checkIsAgendaMode();
     var task = getCursor();
-    var taskId = task.id;
+    var startCursorKey = getCursorKey(isAgenda);
     task.dispatchEvent(new Event('mouseover'));
     try {
       withCursorDragHandle(function(el, x, y) {
@@ -622,7 +661,9 @@
         }, 0);
       });
     } finally {
-      withId(taskId, function(el) { el.dispatchEvent(new Event('mouseout')); });
+      withTaskByKey(startCursorKey, function(el) {
+        el.dispatchEvent(new Event('mouseout'));
+      });
     }
   }
 
@@ -640,12 +681,12 @@
   }
 
   function withDragHandle(task, f) {
-    var taskId = task.id;
+    var key = getTaskKey(task);
     task.dispatchEvent(new Event('mouseover'));
     try {
       withUniqueClass(task, 'drag_and_drop_handler', unconditional, f);
     } finally {
-      withId(taskId, function(el) { el.dispatchEvent(new Event('mouseout')); });
+      withTaskByKey(key, function(el) { el.dispatchEvent(new Event('mouseout')); });
     }
   }
 
@@ -678,7 +719,7 @@
     var should_apply = WHAT_CURSOR_APPLIES_TO == "all" ||
                          (WHAT_CURSOR_APPLIES_TO == "most" && !dangerous);
     if (should_apply) {
-      var selections = getSelectedTaskIds();
+      var selections = getSelectedTaskKeys();
       if (isEmptyMap(selections)) {
         var prev_cursor_id = cursor_id;
         var cursor = getCursor();
@@ -689,7 +730,7 @@
           } finally {
             // Deselect the task so that it's like
             prev_cursor = getId(prev_cursor_id);
-            if (taskIsSelected(prev_cursor)) {
+            if (checkTaskIsSelected(prev_cursor)) {
               shiftClickTask(prev_cursor);
             }
           }
@@ -724,20 +765,95 @@
   }
 
   // This returns the ids of all the selected items as a set-like object.
-  function getSelectedTaskIds() {
+  //
+  // When in agenda mode, also includes the indent level in the key. See
+  // 'getTaskById' for why.
+  function getSelectedTaskKeys(isAgenda) {
     var results = {};
     var tasks = getTasks(true);
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
-      if (taskIsSelected(task)) {
-        results[task.id] = true;
+      if (checkTaskIsSelected(task)) {
+        var key = getTaskKey(task, isAgenda);
+        results[key] = true;
       }
     }
     return results;
   }
 
-  function taskIsSelected(task) {
+  // Get key used for the cursor, in the getSelectedTaskKeys map.
+  function getTaskKey(task, isAgenda) {
+    if (isAgenda === true) {
+      return task.id + ' ' + getTaskIndentClass(task);
+    } else if (isAgenda === false) {
+      return task.id;
+    } else {
+      error('getTaskKey called with wrong number of arguments');
+      return null;
+    }
+  }
+
+  function makeTaskKey(id, indent, isAgenda) {
+    if (isAgenda) {
+      return id + ' ' + indent;
+    } else {
+      return id;
+    }
+  }
+
+  function checkTaskIsSelected(task) {
     return task.classList.contains('selected');
+  }
+
+  function getTaskIndentClass(task) {
+    return findUnique(isIndentClass, task.classList);
+  }
+
+  function isIndentClass(cls) {
+    return cls.startsWith('indent_');
+  }
+
+  function withTaskByKey(key, f) {
+    var task = getTaskByKey(key, f);
+    if (task) {
+      f(task);
+    } else {
+      warn('Couldn\'t find task key', key);
+    }
+  }
+
+  function getTaskByKey(key) {
+    var arr = key.split(' ');
+    return getTaskById(arr[0], arr[1]);
+  }
+
+  // Given a task id, returns a task element. If an indent is also given and
+  // todoist is in agenda mode, then it will use this to select the right
+  // element.  The purpose of this is explained below:
+  //
+  // This is a workaround for todoist using duplicate 'id' values for tasks in
+  // the case that they are nested in a tree, but different parts of the tree
+  // are scheduled for different days. Since a task will only appear once at a
+  // given indent, this is sufficient to distinguish different. Also, this is
+  // stable because you can't adjust indent level in agenda mode.
+  function getTaskById(id, indent) {
+    if (checkIsAgendaMode()) {
+      // In agenda mode, can't rely on uniqueness of ids. So, search for
+      // matching 'indent'. Turns out todoist also uses the ids as classes.
+      var els = document.getElementsByClassName(id);
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (!indent) {
+          warn('getTaskById called in agenda mode but with no indent value.');
+          return el;
+        } else if (el.classList.contains(indent)) {
+          return el;
+        }
+      }
+      return null;
+    } else {
+      return document.getElementById(id);
+    }
   }
 
   /** ***************************************************************************
@@ -746,6 +862,10 @@
 
   // The id of the task that the cursor is on.
   var cursorId = null;
+
+  // The indent class of the task that the cursor is on. See 'getTaskById' for
+  // detailed explanation.
+  var cursorIndent = null;
 
   // Class used on the single task that the cursor is on.
   var CURSOR_CLASS = 'userscript_cursor';
@@ -759,26 +879,29 @@
   }
 
   // Given the element for a task, set it as the current selection.
-  function setCursor(itemElement) {
+  function setCursor(task) {
     withClass(document, CURSOR_CLASS, function(oldCursor) {
       oldCursor.classList.remove(CURSOR_CLASS);
     });
-    if (itemElement) {
-      cursorId = itemElement.id;
+    if (task) {
+      cursorId = task.id;
+      cursorIndent = getTaskIndentClass(task);
       updateCursorStyle();
-      verticalScrollIntoView(itemElement);
+      verticalScrollIntoView(task);
     } else {
       cursorId = null;
     }
   }
 
-
   // Given a list of task elements (yielded by getTasks), returns the index
   // that corresponds to cursorId.
   function getCursorIndex(tasks) {
     if (cursorId) {
+      var isAgenda = checkIsAgendaMode();
       for (var i = 0; i < tasks.length; i++) {
-        if (tasks[i].id ===  cursorId) {
+        var task = tasks[i];
+        if (task.id === cursorId &&
+            (!isAgenda || task.classList.contains(cursorIndent))) {
           return i;
         }
       }
@@ -786,9 +909,13 @@
     return null;
   }
 
+  function getCursorKey(isAgenda) {
+    return makeTaskKey(cursorId, cursorIndent, isAgenda);
+  }
+
   // Returns the <li> element which corresponds to the current cursorId.
   function getCursor() {
-    return document.getElementById(cursorId);
+    return getTaskById(cursorId, cursorIndent);
   }
 
   // A functional-ish idiom to reduce boilerplate.
@@ -802,6 +929,12 @@
       newIndex = tasks.length - 1;
     }
     setCursor(tasks[newIndex]);
+  }
+
+  // TODO: Should this be cached in a variable? It often gets called multiple
+  // times in an action.
+  function checkIsAgendaMode() {
+    return getId(AGENDA_VIEW_ID) !== null;
   }
 
   /*****************************************************************************
@@ -873,8 +1006,7 @@
   function withClass(parent, cls, f) {
     var els = parent.getElementsByClassName(cls);
     for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      f(el);
+      f(els[i]);
     }
   }
 
@@ -1007,15 +1139,22 @@
   // different IDs. However, this is a nice hack in this case, because todoist
   // frequently re-creates elements.
   function updateCursorStyle() {
+    var selecter = null;
+    // See comment on 'getTaskById' for explanation
+    if (checkIsAgendaMode() && cursorIndent !== null) {
+      selecter = '#' + cursorId + '.' + cursorIndent;
+    } else {
+      selecter = '#' + cursorId;
+    }
     style.textContent = [
-      '#' + cursorId + ' {',
+      selecter + ' {',
       '  border-left: 2px solid #4d90f0;',
       '  margin-left: -4px;',
       '}',
-      '#' + cursorId + ' .sel_checkbox_td {',
+      selecter + ' .sel_checkbox_td {',
       '  padding-left: 2px;',
       '}',
-      '#' + cursorId + ' .arrow, #' + cursorId + ' .drag_and_drop_handler {',
+      selecter + ' .arrow, ' + selecter + ' .drag_and_drop_handler {',
       '  margin-left: -16px;',
       '}'
     ].join('\n');
