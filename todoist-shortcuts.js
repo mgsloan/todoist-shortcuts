@@ -21,7 +21,7 @@
     ['k', cursorUp],
     ['h', collapse],
     ['l', expand],
-    // TODO [["g g", "ctrl+k"], switch_project],
+    [['g g', 'ctrl+k'], goToProject],
     ['g i', goToInbox],
     ['g t', goToToday],
     // TODO: g n is more intuitive I think. One or both?
@@ -105,7 +105,10 @@
   var SCHEDULE_TEXT = 'Schedule';
   var MOVE_TEXT = 'Move to project';
   var ARCHIVE_TEXT = 'Archive';
+  var ARCHIVE_TASK_TEXT = 'Archive task';
   var DELETE_TEXT = 'Delete';
+  var DELETE_CONFIRM_TEXT = 'Delete';
+  var DELETE_TASK_TEXT = 'Delete task';
   var ADD_ABOVE_TEXT = 'Add task above';
   var ADD_BELOW_TEXT = 'Add task below';
 
@@ -114,7 +117,11 @@
   var MORE_MENU_ITEMS =
     [ARCHIVE_TEXT, 'Duplicate', DELETE_TEXT, 'Add label', 'Remove label'];
   var TASKMENU_ITEMS =
-    [ADD_ABOVE_TEXT, ADD_BELOW_TEXT];
+    [ARCHIVE_TASK_TEXT, MOVE_TEXT, DELETE_TASK_TEXT];
+
+  // TODO: add issue tracker link.
+  var TEMP_ITEM_TEXT =
+      'todoist-shortcuts temporary item.  It\'s a bug if this sticks around.';
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
@@ -275,7 +282,7 @@
     // The keyboard shortcut used to invoke this also ends up in the completion
     // box. I thought stopPropagation would fix this, but it doesn't. So, empty
     // the completion input.
-    setTimeout(function() { fillProjectInput(''); }, 0);
+    setTimeout(function() { fillProjectInput(''); });
   }
 
   // Fills in the text of the project selection completion.
@@ -354,6 +361,11 @@
   // Delete selected tasks. Todoist will prompt for deletion.
   function deleteTasks() { clickMenu(moreMenu, DELETE_TEXT); }
 
+  // Press delete confirm button.
+  function confirmDelete() {
+    withUniqueClass(document, 'ist_button_red', matchingText('Delete'), click);
+  }
+
   // Toggles collapse / expand task under the cursor, if it has children.
   function toggleCollapse() {
     withUniqueClass(getCursor(), ARROW_CLASS, unconditional, click);
@@ -401,8 +413,8 @@
   }
 
   // Add a tasks above / below cursor.
-  function addAbove() { clickTaskMenu(ADD_ABOVE_TEXT); }
-  function addBelow() { clickTaskMenu(ADD_BELOW_TEXT); }
+  function addAbove() { clickTaskMenu(getCursor(), ADD_ABOVE_TEXT); }
+  function addBelow() { clickTaskMenu(getCursor(), ADD_BELOW_TEXT); }
 
   // Navigate to inbox.
   function goToInbox() {
@@ -417,6 +429,12 @@
   // Navigate to today.
   function goToNext7() {
     withUniqueClass(document, 'cmp_filter_days', unconditional, click);
+  }
+
+  // Navigate to a project.
+  function goToProject() {
+    var isAgenda = checkIsAgendaMode();
+    withProjectSelection(isAgenda);
   }
 
   // Click somewhere on the page that shouldn't do anything in particular except
@@ -464,7 +482,7 @@
     withClass(document, id, function(task) {
       selected[getTaskKey(task, isAgenda)] = true;
     });
-    setSelections(selected);
+    setSelections(selected, isAgenda);
   }
 
   // Deselects all tasks that have the specified id.
@@ -495,8 +513,7 @@
   // Ensures that the specified task ids are selected (specified by a set-like
   // object). The algorithm for this is quite ugly and inefficient, due to the
   // strange todoist behavior mentioned above.
-  function setSelections(selections) {
-    var isAgenda = checkIsAgendaMode();
+  function setSelections(selections, isAgenda) {
     var startTime = Date.now();
     var allTasks = selectAllInternal();
     // Then deselect all of the things that shouldn't be selected.
@@ -555,31 +572,37 @@
 
   // Finds a menu element. These do not have any unique class or ID, so instead
   // need to do it by looking at text content of the options.
-  function findMenu(name, expectedItems) {
+  function findMenu(name, expectedItems, predicate0, expectedCount0) {
+    var predicate = predicate0 ? predicate0 : unconditional;
+    var expectedCount = expectedCount0 ? expectedCount0 : 1;
     var results = [];
     withClass(document, 'ist_menu', function(menu) {
-      var matches = true;
-      for (var i = 0; i < expectedItems.length; i++) {
-        if (!getUniqueTag(menu, 'span', matchingText(expectedItems[i]))) {
-          matches = false;
-          break;
+      if (predicate(menu)) {
+        var matches = true;
+        for (var i = 0; i < expectedItems.length; i++) {
+          if (!getUniqueTag(menu, 'span', matchingText(expectedItems[i]))) {
+            matches = false;
+            break;
+          }
+        }
+        if (matches) {
+          results.push(menu);
         }
       }
-      if (matches) {
-        results.push(menu);
-      }
     });
-    if (results.length === 1) {
+    if (results.length === expectedCount) {
       return results[0];
     } else {
-      warn('Couldn\'t find ' + name + ' menu element.');
+      warn('Couldn\'t find unique \'' + name + '\' menu element, found:', results);
       return null;
     }
   }
 
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
-  var moreMenu = findMenu("'More...'", MORE_MENU_ITEMS);
+  var moreMenu = findMenu('More...', MORE_MENU_ITEMS);
+  var taskMenu = findMenu('task', TASKMENU_ITEMS, unconditional, 2);
+  var agendaTaskMenu = findMenu('agenda task', TASKMENU_ITEMS, function(el) { return el !== taskMenu; });
 
   function clickMenu(menu, text) {
     if (menu) {
@@ -600,11 +623,22 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  function clickTaskMenu(text) {
-    var menu = getFirstClass(getCursor(), 'menu');
-    click(menu);
-    var taskMenu = findMenu('task', TASKMENU_ITEMS);
-    clickMenu(taskMenu, text);
+  function clickTaskMenu(task, text, isAgenda) {
+    withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
+      var menu = isAgenda ? agendaTaskMenu : taskMenu;
+      if (menu.style.display === 'none') {
+        click(openMenu);
+      } else {
+        // If it's already visible, it might be for the wrong task.
+        click(openMenu);
+        // If it hides after clicking, then it was already associated with the
+        // right task, click it again.
+        if (menu.style.display === 'none') {
+          click(openMenu);
+        }
+      }
+      clickMenu(menu, text);
+    });
   }
 
   function checkCalendarOpen() {
@@ -658,7 +692,7 @@
           };
           el.dispatchEvent(new MouseEvent('mousemove', params));
           el.dispatchEvent(new MouseEvent('mouseup', params));
-        }, 0);
+        });
       });
     } finally {
       withTaskByKey(startCursorKey, function(el) {
@@ -687,6 +721,98 @@
       withUniqueClass(task, 'drag_and_drop_handler', unconditional, f);
     } finally {
       withTaskByKey(key, function(el) { el.dispatchEvent(new Event('mouseout')); });
+    }
+  }
+
+  function withProjectSelection(isAgenda) {
+    withTempTask(isAgenda, function(task) {
+      clickTaskMenu(task, MOVE_TEXT);
+      withId('GB_window', function(modal) {
+        withUniqueTag(modal, 'input', function(input) {
+          // TODO: Center window
+          //
+          // FIXME: what happened to up / down arrows?
+          var oldOnkeydown = input.onkeydown;
+          input.onkeydown = function(ev) {
+            if (ev.keyCode === 13) {
+              console.log('Caught enter!');
+              var match = getUniqueClass(modal, 'current_match');
+              console.log(match);
+            } else {
+              oldOnkeydown(ev);
+            }
+          };
+        });
+      });
+    });
+  }
+
+  function withTempTask(isAgenda, f) {
+    var addClass = isAgenda ? 'agenda_add_task' : 'action_add_item';
+    var addEls = document.getElementsByClassName(addClass);
+    if (addEls.length > 0) {
+      withHidden('.manager', function() {
+        var addEl = addEls[addEls.length - 1];
+        click(addEl);
+        withUniqueClass(document, 'submit_btn', matchingText('Add Task'), function(submit) {
+          withUniqueClass(document, 'richtext_editor', unconditional, function(editor) {
+            // Create a CSS rule to hide the new task before it's even added.
+            var hideSelecter = null;
+            /* FIXME This got hairy doesn't work right, and probably won't be able to
+            if (isAgenda) {
+            } else {
+              withUniqueClass(document, 'list_editor', unconditional, function(listEditor) {
+                withUniqueClass(listEditor, 'items', unconditional, function(list) {
+                  var items = listEditor.getElementsByTagName('li');
+                  hideSelecter = [
+                    '.list_editor > ul > li.item_task:last-child',
+                    '.list_editor > ul > li.item_task:nth-last-child(2)'
+                    ].join(', ');
+                });
+              });
+            }
+            */
+            hide(hideSelecter);
+            try {
+              // Enter some text in and create the new item.
+              editor.textContent = TEMP_ITEM_TEXT;
+              click(submit);
+              var allTasks = getTasks(true);
+              if (allTasks.length === 0) {
+                error('Expected to find tasks after adding temporary task');
+                return;
+              }
+              var tempTask = allTasks[allTasks.length - 1];
+              var tempTaskId = tempTask.id;
+              cancelEmptyAdd();
+            } catch (e) {
+              show(hideSelecter);
+              throw(e);
+            }
+            // TODO: Ideally could skip this timeout, but it seems that without
+            // it, the task won't be initialized yet. (but verify this when
+            // rechecking this)
+            setTimeout(function() {
+              try {
+                f(tempTask);
+              } finally {
+                try {
+                  withUniqueClass(tempTask, 'sel_item_content', function(content) {
+                    // Sanity check to ensure we aren't deleting a user's task.
+                    content.textContent = TEMP_ITEM_TEXT;
+                    clickTaskMenu(tempTask, DELETE_TASK_TEXT);
+                    confirmDelete();
+                  });
+                } finally {
+                  show(hideSelecter);
+                }
+              }
+            });
+          });
+        });
+      });
+    } else {
+      warn('Couldn\'t find button to add task');
     }
   }
 
@@ -957,6 +1083,7 @@
     console.warn.apply(null, args);
   }
 
+  // TODO: add issue tracker link?  What about warning?
   function error() {
     var args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
@@ -1098,23 +1225,35 @@
    * Predicates (for use with get / with functions above)
    */
 
-  // Always returns 'true'.
+  // Predicate which always returns 'true'.
   function unconditional() {
     return true;
   }
 
-  // Returns 'true' if text content matches wanted text.
+  // Returns predicate which returns 'true' if text content matches wanted text.
   function matchingText(text) {
     return function(el) {
       return el.textContent === text;
     };
   }
 
-  // Returns 'true' if text content doesn't match text.
+  // Returns predicate which returns 'true' if text content doesn't match text.
   function notMatchingText(text) {
     return function(el) {
       return el.textContent !== text;
     };
+  }
+
+  // Returns predicate which returns 'true' if the element has the specified class.
+  function matchingClass(cls) {
+    return function(el) {
+      return el.classList.contains(cls);
+    };
+  }
+
+  // Predicate, returns 'true' if the element isn't hidden with 'display: none'.
+  function notHidden(el) {
+    return el.style.display !== 'none';
   }
 
   /*****************************************************************************
@@ -1133,20 +1272,14 @@
   ].join('\n'));
 
   // A CSS style element, dynamically updated by updateCursorStyle.
-  var style = addCss('');
+  var cursorStyle = addCss('');
 
   // This is unusual. Usually you would not dynamically generate CSS that uses
   // different IDs. However, this is a nice hack in this case, because todoist
   // frequently re-creates elements.
   function updateCursorStyle() {
-    var selecter = null;
-    // See comment on 'getTaskById' for explanation
-    if (checkIsAgendaMode() && cursorIndent !== null) {
-      selecter = '#' + cursorId + '.' + cursorIndent;
-    } else {
-      selecter = '#' + cursorId;
-    }
-    style.textContent = [
+    var selecter = getKeySelecter(cursorId, cursorIndent);
+    cursorStyle.textContent = [
       selecter + ' {',
       '  border-left: 2px solid #4d90f0;',
       '  margin-left: -4px;',
@@ -1158,6 +1291,51 @@
       '  margin-left: -16px;',
       '}'
     ].join('\n');
+  }
+
+  // A CSS style element, used to temporarily hide UI elements when they are
+  // being manipulated.
+  var hiddenStyle = addCss('');
+  var hiddenSelecters = {};
+
+  function updateHiddenStyle() {
+    var selecters = [];
+    for (var selecter in hiddenSelecters) {
+      selecters.push(selecter);
+    }
+    if (selecters.length > 0) {
+      hiddenStyle.textContent = selecters.join(', ') + ' { display: none; }';
+    } else {
+      hiddenStyle.textContent = '';
+    }
+  }
+
+  function hide(selecter) {
+    hiddenSelecters[selecter] = true;
+    updateHiddenStyle();
+  }
+
+  function show(selecter) {
+    delete hiddenSelecters[selecter];
+    updateHiddenStyle();
+  }
+
+  function withHidden(selecter, f) {
+    hide(selecter);
+    try {
+      f();
+    } finally {
+      show(selecter);
+    }
+  }
+
+  // See comment on 'getTaskById' for explanation
+  function getKeySelecter(id, indent) {
+    if (checkIsAgendaMode() && indent !== null) {
+      return '#' + id + '.' + indent;
+    } else {
+      return '#' + id;
+    }
   }
 
   /*****************************************************************************
@@ -1203,8 +1381,8 @@
   //
   // TODO: Is there a better way?
   setTimeout(function() {
-    var oldHandler = document.onkeydown;
-    if (oldHandler) {
+    var oldOnkeydown = document.onkeydown;
+    if (oldOnkeydown) {
       document.onkeydown = function(ev) {
         if (ev.keyCode !== 27) {
           /* TODO: This is an attempt at detecting when an item is inserted via
@@ -1217,12 +1395,12 @@
             console.log("oldTasks", oldTasks.length, "newTasks", newTasks.length);
           } else {
           */
-            oldHandler(ev);
+            oldOnkeydown(ev);
           // }
         }
       };
     } else {
-      error('old document keydown handler was not set.');
+      error('document keydown handler was not set.');
     }
-  }, 0);
+  });
 })();
