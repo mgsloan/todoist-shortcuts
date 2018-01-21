@@ -47,7 +47,7 @@
     ['* 3', selectPriority('3')],
     ['* 4', selectPriority('4')],
 
-    // Manipulation of selected items
+    // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
     ['v', moveToProject],
     // TODO: Other possibilities, don't need to follow gmail.
@@ -155,7 +155,7 @@
   // * Should it match append / insert? 'a' would edit at the end of task text,
   //   'i' would edit at beginning of task text.
   //
-  // * o / O should work even when no items exist or when none selected
+  // * o / O should work even when no tasks exist or when none selected
   //
   // * Could get some efficiency by not doing id / class searches from the
   //   document root.
@@ -225,7 +225,7 @@
     }
   }
 
-  // Clicks the 'schedule' link when items are selected.
+  // Clicks the 'schedule' link when tasks are selected.
   function schedule() {
     // Only open calendar if it isn't already open. This allows 't' to also be
     // used for selecting 'tomorrow'.
@@ -286,7 +286,7 @@
     });
   }
 
-  // Clicks the 'Move to project' link when items are selected.
+  // Clicks the 'Move to project' link when tasks are selected.
   function moveToProject() {
     withStableCursor(function() {
       withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
@@ -311,7 +311,7 @@
     });
   }
 
-  // Sets the priority of the selected items to the specified level.
+  // Sets the priority of the selected tasks to the specified level.
   //
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
@@ -329,7 +329,7 @@
   // Adds tasks matching the specified priority level to the current selection,
   // even if they are hidden by collapsing.
   //
-  // TODO: Should it select items hidden by collapsing? Tricky call.
+  // TODO: Should it select tasks hidden by collapsing? Tricky call.
   //
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
@@ -474,7 +474,7 @@
   // * Shift clicking an unselected task toggles the selection state of all the
   //   tasks between the current task and the other tasks.
   //
-  // To work around this, when selecting a previously deselected item,
+  // To work around this, when selecting a previously deselected task,
   // 'setSelections' is used.
   function shiftClickTask(task) {
     // NOTE: Intentionally doesn't simulate full click like the 'click'
@@ -544,7 +544,7 @@
   function registerTopBarVisibilityHack() {
     var observer = new MutationObserver(function() {
       // If there are selections but the top bar isn't visible, then toggle the
-      // last clicked item.
+      // last clicked task.
       if (!getId(ACTIONS_BAR_CLASS)) {
         var isAgenda = checkIsAgendaMode();
         var selections = getSelectedTaskKeys(isAgenda);
@@ -814,7 +814,8 @@
     return results;
   }
 
-  // This returns the ids of all the selected items as a set-like object.
+
+  // This returns the ids of all the selected tasks as a set-like object.
   //
   // When in agenda mode, also includes the indent level in the key. See
   // 'getTaskById' for why.
@@ -989,7 +990,7 @@
     setCursor(tasks[newIndex]);
   }
 
-  // If the cursor disappears, put it on the next item that still exists.
+  // If the cursor disappears, put it on the next task that still exists.
   function withStableCursor(f) {
     // TODO: If we're going to query the list of tasks with every action, may as
     // well pass it into the action.
@@ -1347,7 +1348,7 @@
     if (oldOnkeydown) {
       document.onkeydown = function(ev) {
         if (ev.keyCode !== 27) {
-          /* TODO: This is an attempt at detecting when an item is inserted via
+          /* TODO: This is an attempt at detecting when an task is inserted via
           enter. Use mutation observer instead?
           if (ev.keyCode === 13) {
             var oldTasks = getTasks();
