@@ -155,13 +155,13 @@
   // * Should it match append / insert? 'a' would edit at the end of task text,
   //   'i' would edit at beginning of task text.
   //
-  // * When items are removed or moved, and the cursor is on one, should move
-  //   cursor to the right spot.
-  //
   // * o / O should work even when no items exist or when none selected
   //
   // * Could get some efficiency by not doing id / class searches from the
   //   document root.
+  //
+  // * Remember per project cursor locations.
+
 
   /*****************************************************************************
    * Action combiners
@@ -201,8 +201,10 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, unconditional, function(content) {
-      content.dispatchEvent(new Event('mousedown'));
+    withStableCursor(function() {
+      withUniqueClass(getCursor(), EDIT_CLICK_CLASS, unconditional, function(content) {
+        content.dispatchEvent(new Event('mousedown'));
+      });
     });
   }
 
@@ -231,54 +233,68 @@
       debug('Not opening schedule because it is already open.');
     } else {
       debug('Attempting to open schedule.');
-      withId(ACTIONS_BAR_CLASS, function(parent) {
-        clickLink(parent, SCHEDULE_TEXT);
+      withStableCursor(function() {
+        withId(ACTIONS_BAR_CLASS, function(parent) {
+          clickLink(parent, SCHEDULE_TEXT);
+        });
       });
     }
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
-    withCalendar('scheduleToday', function(calendar) {
-      withUniqueClass(calendar, 'today_icon', notMatchingText('X'), click);
+    withStableCursor(function() {
+      withCalendar('scheduleToday', function(calendar) {
+        withUniqueClass(calendar, 'today_icon', notMatchingText('X'), click);
+      });
     });
   }
 
   // Click 'tomorrow' in schedule. Only does anything if schedule is open.
   function scheduleTomorrow() {
-    withCalendar('scheduleTomorrow', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', unconditional, click);
+    withStableCursor(function() {
+      withCalendar('scheduleTomorrow', function(calendar) {
+        withUniqueClass(calendar, 'cmp_scheduler_tomorrow', unconditional, click);
+      });
     });
   }
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
-    withCalendar('scheduleNextWeek', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_next_week', unconditional, click);
+    withStableCursor(function() {
+      withCalendar('scheduleNextWeek', function(calendar) {
+        withUniqueClass(calendar, 'cmp_scheduler_next_week', unconditional, click);
+      });
     });
   }
 
   // Click 'next month' in schedule. Only does anything if schedule is open.
   function scheduleNextMonth() {
-    withCalendar('scheduleNextMonth', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_month', unconditional, click);
+    withStableCursor(function() {
+      withCalendar('scheduleNextMonth', function(calendar) {
+        withUniqueClass(calendar, 'cmp_scheduler_month', unconditional, click);
+      });
     });
   }
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
   function unschedule() {
-    withCalendar('unschedule', function(calendar) {
-      withUniqueClass(calendar, 'today_icon', matchingText('X'), click);
+    withStableCursor(function() {
+      withCalendar('unschedule', function(calendar) {
+        withUniqueClass(calendar, 'today_icon', matchingText('X'), click);
+      });
     });
   }
 
   // Clicks the 'Move to project' link when items are selected.
   function moveToProject() {
-    withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
-    // The keyboard shortcut used to invoke this also ends up in the completion
-    // box. I thought stopPropagation would fix this, but it doesn't. So, empty
-    // the completion input.
-    setTimeout(function() { fillProjectInput(''); });
+    withStableCursor(function() {
+      withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
+      // The keyboard shortcut used to invoke this also ends up in the completion
+      // box. I thought stopPropagation would fix this, but it doesn't. So, empty
+      // the completion input.
+      setTimeout(function() { fillProjectInput(''); });
+    });
   }
 
   // Fills in the text of the project selection completion.
@@ -352,10 +368,18 @@
 
   // Archive selected tasks. Note that this appears to be the same thing as
   // marking a task complete.
-  function archive() { clickMenu(moreMenu, ARCHIVE_TEXT); }
+  function archive() {
+    withStableCursor(function() {
+      clickMenu(moreMenu, ARCHIVE_TEXT);
+    });
+  }
 
   // Delete selected tasks. Todoist will prompt for deletion.
-  function deleteTasks() { clickMenu(moreMenu, DELETE_TEXT); }
+  function deleteTasks() {
+    withStableCursor(function() {
+      clickMenu(moreMenu, DELETE_TEXT);
+    });
+  }
 
   // Press delete confirm button.
   function confirmDelete() {
@@ -783,7 +807,7 @@
       // Skip elements which don't correspond to tasks, and skip nested tasks
       // that are not visible (if includeCollapsed is not set).
       if (!item.classList.contains('reorder_item') &&
-          (includeCollapsed || notHidden(item.style))) {
+          (includeCollapsed || notHidden(item))) {
         results.push(item);
       }
     });
@@ -904,6 +928,14 @@
     }
   }
 
+  // Sets the cursor to the last task, if any exists.
+  function setCursorToLastTask() {
+    var tasks = getTasks();
+    if (tasks.length > 0) {
+      setCursor(tasks[tasks.length - 1]);
+    }
+  }
+
   // Given the element for a task, set it as the current selection.
   function setCursor(task) {
     withClass(document, CURSOR_CLASS, function(oldCursor) {
@@ -955,6 +987,38 @@
       newIndex = tasks.length - 1;
     }
     setCursor(tasks[newIndex]);
+  }
+
+  // If the cursor disappears, put it on the next item that still exists.
+  function withStableCursor(f) {
+    // TODO: If we're going to query the list of tasks with every action, may as
+    // well pass it into the action.
+    var oldTasks = getTasks();
+    var oldIx = getCursorIndex(oldTasks);
+    try {
+      f();
+    } finally {
+      if (!getCursor()) {
+        debug("cursor element disappeared, finding new location");
+        var found = false;
+        for (var i = oldIx; i < oldTasks.length; i++) {
+          var oldTask = oldTasks[i];
+          if (oldTask) {
+            var task = getId(oldTask.id);
+            if (task) {
+              debug("found still-existing task that was after old cursor, setting cursor to it");
+              found = true;
+              setCursor(task);
+              break;
+            }
+          }
+        }
+        if (!found) {
+          debug("didn't find a particular task to select, so selecting last task");
+          setCursorToLastTask();
+        }
+      }
+    }
   }
 
   // TODO: Should this be cached in a variable? It often gets called multiple
@@ -1285,7 +1349,6 @@
         if (ev.keyCode !== 27) {
           /* TODO: This is an attempt at detecting when an item is inserted via
           enter. Use mutation observer instead?
-
           if (ev.keyCode === 13) {
             var oldTasks = getTasks();
             oldHandler(ev);
