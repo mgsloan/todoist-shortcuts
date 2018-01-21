@@ -359,7 +359,7 @@
 
   // Press delete confirm button.
   function confirmDelete() {
-    withUniqueClass(document, 'ist_button_red', matchingText('Delete'), click);
+    withUniqueClass(document, 'ist_button_red', matchingText(DELETE_CONFIRM_TEXT), click);
   }
 
   // Toggles collapse / expand task under the cursor, if it has children.
@@ -542,6 +542,9 @@
       }
     });
     observer.observe(document.body, { childList: true });
+    onDisable(function() {
+      observer.disconnect();
+    });
   }
 
   // For some reason todoist clears the selections even after applying things
@@ -780,7 +783,7 @@
       // Skip elements which don't correspond to tasks, and skip nested tasks
       // that are not visible (if includeCollapsed is not set).
       if (!item.classList.contains('reorder_item') &&
-          (includeCollapsed || item.style.display !== 'none')) {
+          (includeCollapsed || notHidden(item.style))) {
         results.push(item);
       }
     });
@@ -993,6 +996,9 @@
     var style = document.createElement('style');
     style.textContent = css;
     document.documentElement.appendChild(style);
+    onDisable(function() {
+      style.remove();
+    });
     return style;
   }
 
@@ -1035,6 +1041,8 @@
   }
 
   // Returns first child that matches the specified class and predicate.
+  // TODO:
+  // eslint-disable-next-line no-unused-vars
   function getFirstClass(parent, cls, predicate) {
     return findFirst(predicate, parent.getElementsByClassName(cls));
   }
@@ -1154,6 +1162,24 @@
   }
 
   /*****************************************************************************
+   * Allow loading todoist-shortcuts repeatedly in the terminal
+   */
+
+  (function() {
+    if (window.oldTodoistShortcutsDisableActions) {
+      var arr = window.oldTodoistShortcutsDisableActions;
+      for (var i = 0; i < arr.length; i++) {
+        arr[i]();
+      }
+    }
+    window.oldTodoistShortcutsDisableActions = [];
+  })();
+
+  function onDisable(f) {
+    window.oldTodoistShortcutsDisableActions.push(f);
+  }
+
+  /*****************************************************************************
    * Styling
    */
 
@@ -1215,6 +1241,8 @@
     this._directMap={};return this};c.prototype.stopCallback=function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")||E(b,this.target)?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable};c.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)};c.addKeycodes=function(a){for(var b in a)a.hasOwnProperty(b)&&(p[b]=a[b]);n=null};c.init=function(){var a=c(v),b;for(b in a)"_"!==b.charAt(0)&&(c[b]=function(b){return function(){return a[b].apply(a,
     arguments)}}(b))};c.init();r.Mousetrap=c;"undefined"!==typeof module&&module.exports&&(module.exports=c);"function"===typeof define&&define.amd&&define(function(){return c})}})("undefined"!==typeof window?window:null,"undefined"!==typeof window?document:null);
   /* eslint-enable */
+  // eslint-disable-next-line no-undef
+  var mousetrap = Mousetrap;
 
   /*****************************************************************************
    * Run todoist-shortcuts!
@@ -1226,14 +1254,23 @@
   registerTopBarVisibilityHack();
 
   // Register key bindings
-  for (var i = 0; i < bindings.length; i++) {
-    if (bindings[i].length === 2) {
-      // eslint-disable-next-line no-undef
-      Mousetrap.bind(bindings[i][0], bindings[i][1]);
-    } else {
-      error('Improper binding entry at index', i, 'value is', bindings[i]);
+  (function() {
+    for (var i = 0; i < bindings.length; i++) {
+      if (bindings[i].length === 2) {
+        mousetrap.bind(bindings[i][0], bindings[i][1]);
+      } else {
+        error('Improper binding entry at index', i, 'value is', bindings[i]);
+      }
     }
-  }
+  })();
+
+  // Unregister key bindings when disabled.
+  onDisable(function() {
+    for (var i = 0; i < bindings.length; i++) {
+      // eslint-disable-next-line no-undef
+      mousetrap.unbind(bindings[i][0], bindings[i][1]);
+    }
+  });
 
   // Override some keybindings that interfere.  Specifically:
   //
@@ -1256,7 +1293,7 @@
             console.log("oldTasks", oldTasks.length, "newTasks", newTasks.length);
           } else {
           */
-            oldOnkeydown(ev);
+          oldOnkeydown(ev);
           // }
         }
       };
