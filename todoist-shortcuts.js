@@ -422,23 +422,28 @@
     withUniqueClass(document, 'cancel', unconditional, click);
   }
 
-  // Add a tasks above / below cursor.
-  function addAbove() { clickTaskMenu(getCursor(), ADD_ABOVE_TEXT); }
-  function addBelow() { clickTaskMenu(getCursor(), ADD_BELOW_TEXT); }
+  // Add a task above / below cursor. Unfortunately these options do not exist
+  // in agenda mode, so in that case, instead it is added to the current
+  // section.
+  function addAbove() { addAboveOrBelow(ADD_ABOVE_TEXT); }
+  function addBelow() { addAboveOrBelow(ADD_BELOW_TEXT); }
 
   // Navigate to inbox.
   function goToInbox() {
     withUniqueClass(document, 'cmp_filter_inbox', unconditional, click);
+    setCursorToFirstTask();
   }
 
   // Navigate to today.
   function goToToday() {
     withUniqueClass(document, 'cmp_filter_today', unconditional, click);
+    setCursorToFirstTask();
   }
 
   // Navigate to today.
   function goToNext7() {
     withUniqueClass(document, 'cmp_filter_days', unconditional, click);
+    setCursorToFirstTask();
   }
 
   // Click somewhere on the page that shouldn't do anything in particular except
@@ -773,9 +778,48 @@
     withUniqueClass(task, 'ist_checkbox', unconditional, click);
   }
 
-  function findSection(task) {
-    return findParent(task, or(matchingClass("section_day"), 
-                               matchingClass("project_editor_instance"));
+  // Common code implementing addAbove / addBelow.
+  function addAboveOrBelow(menuText) {
+    var isAgenda = checkIsAgendaMode();
+    var cursor = getCursor();
+    if (isAgenda || cursor === null) {
+      addToSectionContaining(isAgenda, cursor);
+    } else {
+      if (cursor) {
+        clickTaskMenu(cursor, menuText);
+      } else {
+      }
+    }
+  }
+
+  // Clicks the "Add Task" button within the section that contains the specified
+  // task.
+  function addToSectionContaining(isAgenda, task) {
+    var section = null;
+    if (task) {
+      section = findParentSection(isAgenda, task);
+    } else if (isAgenda) {
+      section = getFirstClass(document, "section_day");
+    } else {
+      section = getFirstClass(document, "project_editor_instance");
+    }
+    if (!section) {
+      error("Couldn't find section for task", task);
+      return;
+    }
+    if (isAgenda) {
+      withUniqueClass(section, "agenda_add_task", unconditional, click);
+    } else {
+      withUniqueClass(section, "action_add_item", unconditional, click);
+    }
+  }
+
+  function findParentSection(isAgenda, task) {
+    if (isAgenda) {
+      return findParent(task, matchingClass("section_day"));
+    } else {
+      return findParent(task, matchingClass("project_editor_instance"));
+    }
   }
 
   /* TODO Make it so that after adding a task, the cursor will be on it?
@@ -1131,8 +1175,6 @@
   }
 
   // Returns first child that matches the specified class and predicate.
-  // TODO:
-  // eslint-disable-next-line no-unused-vars
   function getFirstClass(parent, cls, predicate) {
     return findFirst(predicate, parent.getElementsByClassName(cls));
   }
@@ -1250,6 +1292,18 @@
   // Predicate, returns 'true' if the element isn't hidden with 'display: none'.
   function notHidden(el) {
     return el.style.display !== 'none';
+  }
+
+  // Given two predicates, uses && to combine them.
+  // eslint-disable-next-line no-unused-vars
+  function and(p1, p2) {
+    return function(x) { return p1(x) && p2(x); };
+  }
+
+  // Given two predicates, uses || to combine them.
+  // eslint-disable-next-line no-unused-vars
+  function or(p1, p2) {
+    return function(x) { return p1(x) || p2(x); };
   }
 
   /*****************************************************************************
