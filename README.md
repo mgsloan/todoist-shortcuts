@@ -40,8 +40,9 @@ If none are selected, then these will probably apply to the cursor instead.
 | keys | action                            |
 | ---  | ---                               |
 | t    | schedule                          |
+| d    | done: mark task as complete       |
+| e    | archive                           |
 | v    | move to project via search prompt |
-| e    | archive / complete                |
 | #    | delete                            |
 | 1    | set priority to 1                 |
 | 2    | set priority to 2                 |

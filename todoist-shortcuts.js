@@ -50,9 +50,7 @@
     // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
     ['v', moveToProject],
-    // TODO: Other possibilities, don't need to follow gmail.
-    // d (done)
-    // c (completed)
+    ['d', done],
     ['e', archive],
     // TODO: Similarly, should we follow gmail here?
     // d (delete)
@@ -201,10 +199,8 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withStableCursor(function() {
-      withUniqueClass(getCursor(), EDIT_CLICK_CLASS, unconditional, function(content) {
-        content.dispatchEvent(new Event('mousedown'));
-      });
+    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, unconditional, function(content) {
+      content.dispatchEvent(new Event('mousedown'));
     });
   }
 
@@ -233,68 +229,54 @@
       debug('Not opening schedule because it is already open.');
     } else {
       debug('Attempting to open schedule.');
-      withStableCursor(function() {
-        withId(ACTIONS_BAR_CLASS, function(parent) {
-          clickLink(parent, SCHEDULE_TEXT);
-        });
+      withId(ACTIONS_BAR_CLASS, function(parent) {
+        clickLink(parent, SCHEDULE_TEXT);
       });
     }
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
-    withStableCursor(function() {
-      withCalendar('scheduleToday', function(calendar) {
-        withUniqueClass(calendar, 'today_icon', notMatchingText('X'), click);
-      });
+    withCalendar('scheduleToday', function(calendar) {
+      withUniqueClass(calendar, 'today_icon', notMatchingText('X'), click);
     });
   }
 
   // Click 'tomorrow' in schedule. Only does anything if schedule is open.
   function scheduleTomorrow() {
-    withStableCursor(function() {
-      withCalendar('scheduleTomorrow', function(calendar) {
-        withUniqueClass(calendar, 'cmp_scheduler_tomorrow', unconditional, click);
-      });
+    withCalendar('scheduleTomorrow', function(calendar) {
+      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', unconditional, click);
     });
   }
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
-    withStableCursor(function() {
-      withCalendar('scheduleNextWeek', function(calendar) {
-        withUniqueClass(calendar, 'cmp_scheduler_next_week', unconditional, click);
-      });
+    withCalendar('scheduleNextWeek', function(calendar) {
+      withUniqueClass(calendar, 'cmp_scheduler_next_week', unconditional, click);
     });
   }
 
   // Click 'next month' in schedule. Only does anything if schedule is open.
   function scheduleNextMonth() {
-    withStableCursor(function() {
-      withCalendar('scheduleNextMonth', function(calendar) {
-        withUniqueClass(calendar, 'cmp_scheduler_month', unconditional, click);
-      });
+    withCalendar('scheduleNextMonth', function(calendar) {
+      withUniqueClass(calendar, 'cmp_scheduler_month', unconditional, click);
     });
   }
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
   function unschedule() {
-    withStableCursor(function() {
-      withCalendar('unschedule', function(calendar) {
-        withUniqueClass(calendar, 'today_icon', matchingText('X'), click);
-      });
+    withCalendar('unschedule', function(calendar) {
+      withUniqueClass(calendar, 'today_icon', matchingText('X'), click);
     });
   }
 
   // Clicks the 'Move to project' link when tasks are selected.
   function moveToProject() {
-    withStableCursor(function() {
-      withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
-      // The keyboard shortcut used to invoke this also ends up in the completion
-      // box. I thought stopPropagation would fix this, but it doesn't. So, empty
-      // the completion input.
-      setTimeout(function() { fillProjectInput(''); });
-    });
+    withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
+    // The keyboard shortcut used to invoke this also ends up in the completion
+    // box. I thought stopPropagation would fix this, but it doesn't. So, empty
+    // the completion input.
+    setTimeout(function() { fillProjectInput(''); });
   }
 
   // Fills in the text of the project selection completion.
@@ -366,19 +348,27 @@
     };
   }
 
-  // Archive selected tasks. Note that this appears to be the same thing as
-  // marking a task complete.
+  // Archive selected tasks. This seems to be similar to marking a task
+  // complete.  The main variation in behavior between this and 'done' is that
+  // for nested tasks, 'done' keeps them in the list but checks them off. Note
+  // that this appears to be the same thing as marking a task complete.
   function archive() {
-    withStableCursor(function() {
-      clickMenu(moreMenu, ARCHIVE_TEXT);
+    clickMenu(moreMenu, ARCHIVE_TEXT);
+  }
+
+  // Mark all the tasks as completed.
+  function done() {
+    // For some reason, only one task can be marked once at a time. So, the
+    // timeout hack.  Means that the user will see intermediate UI updates,
+    // but hey, it works.
+    withSelectedTasks(function(task) {
+      setTimeout(function() { clickTaskDone(task) });
     });
   }
 
   // Delete selected tasks. Todoist will prompt for deletion.
   function deleteTasks() {
-    withStableCursor(function() {
-      clickMenu(moreMenu, DELETE_TEXT);
-    });
+    clickMenu(moreMenu, DELETE_TEXT);
   }
 
   // Press delete confirm button.
@@ -541,30 +531,68 @@
     debug('setSelections timing:', Date.now() - startTime);
   }
 
-  function registerTopBarVisibilityHack() {
-    var observer = new MutationObserver(function() {
-      // If there are selections but the top bar isn't visible, then toggle the
-      // last clicked task.
-      if (!getId(ACTIONS_BAR_CLASS)) {
-        var isAgenda = checkIsAgendaMode();
-        var selections = getSelectedTaskKeys(isAgenda);
-        if (!isEmptyMap(selections)) {
-          var last = getTaskById(lastShiftClicked, lastShiftClickedIndent);
-          if (last) {
-            debug("Detected that top bar isn't visible when it should be.  Attempting workaround.");
-            shiftClickTask(last);
-            shiftClickTask(last);
-            if (getId(ACTIONS_BAR_CLASS)) {
-              debug('Workaround successful!');
-            } else {
-              warn('Workaround failed...');
-            }
-          } else {
-            warn("Actions bar isn't visible even though there are selections, and last clicked task is gone.");
+  var lastCursorTasks = [];
+  var lastCursorIndex = [];
+
+  // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. IF it
+  // doesn't exist, then use previously stored info to place it after its prior
+  // location.
+  function stableCursorHack() {
+    if (getCursor()) {
+      lastCursorTasks = getTasks();
+      lastCursorIndex = getCursorIndex(lastCursorTasks);
+    } else {
+      debug("cursor element disappeared, finding new location");
+      var found = false;
+      for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
+        var oldTask = lastCursorTasks[i];
+        if (oldTask) {
+          var task = getId(oldTask.id);
+          if (task) {
+            debug("found still-existing task that was after old cursor, setting cursor to it");
+            found = true;
+            setCursor(task);
+            break;
           }
         }
       }
+      if (!found) {
+        debug("didn't find a particular task to select, so selecting last task");
+        setCursorToLastTask();
+      }
+    }
+  }
+
+  // If there are selections but the top bar isn't visible, then toggle the
+  // last clicked task.
+  function topBarVisibilityHack() {
+    if (!getId(ACTIONS_BAR_CLASS)) {
+      var isAgenda = checkIsAgendaMode();
+      var selections = getSelectedTaskKeys(isAgenda);
+      if (!isEmptyMap(selections)) {
+        var last = getTaskById(lastShiftClicked, lastShiftClickedIndent);
+        if (last) {
+          debug("Detected that top bar isn't visible when it should be.  Attempting workaround.");
+          shiftClickTask(last);
+          shiftClickTask(last);
+          if (getId(ACTIONS_BAR_CLASS)) {
+            debug('Workaround successful!');
+          } else {
+            warn('Workaround failed...');
+          }
+        } else {
+          warn("Actions bar isn't visible even though there are selections, and last clicked task is gone.");
+        }
+      }
+    }
+  }
+
+  function registerMutationObserver() {
+    var observer = new MutationObserver(function() {
+      topBarVisibilityHack();
+      stableCursorHack();
     });
+    // TODO: More fine-grained mutation observer.  This is rather inefficient.
     observer.observe(document.body, { childList: true });
     onDisable(function() {
       observer.disconnect();
@@ -741,11 +769,19 @@
     }
   }
 
+  function clickTaskDone(task) {
+    withUniqueClass(task, 'ist_checkbox', unconditional, click);
+  }
+
+  function findSection(task) {
+    return findParent(task, or(matchingClass("section_day"), 
+                               matchingClass("project_editor_instance"));
+  }
+
   /* TODO Make it so that after adding a task, the cursor will be on it?
   function register_editor_keybindings() {
     withId("#editor", function(editor) {
       var observer = new MutationObserver(function() {
-
       });
       // TODO: Figure out how to observe less? This seems fine for now.
       observer.observe(editor, { childList: true, subtree: true });
@@ -814,6 +850,16 @@
     return results;
   }
 
+  // This applies the function to every selected task.
+  function withSelectedTasks(f) {
+    var tasks = getTasks(true);
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i];
+      if (checkTaskIsSelected(task)) {
+        f(task);
+      }
+    }
+  }
 
   // This returns the ids of all the selected tasks as a set-like object.
   //
@@ -990,38 +1036,6 @@
     setCursor(tasks[newIndex]);
   }
 
-  // If the cursor disappears, put it on the next task that still exists.
-  function withStableCursor(f) {
-    // TODO: If we're going to query the list of tasks with every action, may as
-    // well pass it into the action.
-    var oldTasks = getTasks();
-    var oldIx = getCursorIndex(oldTasks);
-    try {
-      f();
-    } finally {
-      if (!getCursor()) {
-        debug("cursor element disappeared, finding new location");
-        var found = false;
-        for (var i = oldIx; i < oldTasks.length; i++) {
-          var oldTask = oldTasks[i];
-          if (oldTask) {
-            var task = getId(oldTask.id);
-            if (task) {
-              debug("found still-existing task that was after old cursor, setting cursor to it");
-              found = true;
-              setCursor(task);
-              break;
-            }
-          }
-        }
-        if (!found) {
-          debug("didn't find a particular task to select, so selecting last task");
-          setCursorToLastTask();
-        }
-      }
-    }
-  }
-
   // TODO: Should this be cached in a variable? It often gets called multiple
   // times in an action.
   function checkIsAgendaMode() {
@@ -1105,6 +1119,17 @@
     }
   }
 
+  // Finds a parentElement which matches the specified predicate.
+  function findParent(element, predicate) {
+    while (element.parentElement !== null) {
+      element = element.parentElement;
+      if (predicate(element)) {
+        return element;
+      }
+    }
+    return null;
+  }
+
   // Returns first child that matches the specified class and predicate.
   // TODO:
   // eslint-disable-next-line no-unused-vars
@@ -1176,13 +1201,14 @@
   // match, or multiple elements match, then nothing gets returned. If predicate
   // is null, then it is treated like 'unconditional'.
   function findUnique(predicate, array) {
-    var result = null;
-    for (var i = 0; i < array.length; i++) {
-      var element = array[i];
+    var result = null; for (var i = 0; i < array.length; i++) {var element = array[i];
       if (!predicate || predicate(element)) {
         if (result === null) {
           result = element;
         } else {
+          debug("findUnique didn't find unique element because there are multiple results. Here are two:",
+                result,
+                element)
           // Not unique, so return null.
           return null;
         }
@@ -1251,8 +1277,7 @@
   // Static css styling.  This does the following:
   //
   // * Makes it so that the actions bar doesn't animate its opacity. This way,
-  //   the bug worked around by registerTopBarVisibilityHack is less
-  //   apparent.
+  //   the bug worked around by topBarVisibilityHack is less apparent.
   addCss([
     '#' + ACTIONS_BAR_CLASS + ' {',
     '  opacity: 1 !important;',
@@ -1314,9 +1339,7 @@
    */
 
   setCursorToFirstTask();
-
-  // Register mutation observers
-  registerTopBarVisibilityHack();
+  registerMutationObserver();
 
   // Register key bindings
   (function() {
