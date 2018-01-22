@@ -302,7 +302,7 @@
       withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
         withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
           var isAgenda = checkIsAgendaMode();
-          withRestoredSelections(isAgenda, function() { click(img) });
+          withRestoredSelections(isAgenda, function() { click(img); });
         });
       });
     };
@@ -362,7 +362,7 @@
     // timeout hack.  Means that the user will see intermediate UI updates,
     // but hey, it works.
     withSelectedTasks(function(task) {
-      setTimeout(function() { clickTaskDone(task) });
+      setTimeout(function() { clickTaskDone(task); });
     });
   }
 
@@ -372,6 +372,8 @@
   }
 
   // Press delete confirm button.
+  // TODO:
+  // eslint-disable-next-line no-unused-vars
   function confirmDelete() {
     withUniqueClass(document, 'ist_button_red', matchingText(DELETE_CONFIRM_TEXT), click);
   }
@@ -544,17 +546,18 @@
   // location.
   function stableCursorHack() {
     if (getCursor()) {
+      debug('wrote down cursor context');
       lastCursorTasks = getTasks();
       lastCursorIndex = getCursorIndex(lastCursorTasks);
     } else {
-      debug("cursor element disappeared, finding new location");
+      debug('cursor element disappeared, finding new location');
       var found = false;
       for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
         var oldTask = lastCursorTasks[i];
         if (oldTask) {
           var task = getId(oldTask.id);
           if (task) {
-            debug("found still-existing task that was after old cursor, setting cursor to it");
+            debug('found still-existing task that was after old cursor, setting cursor to it');
             found = true;
             setCursor(task);
             break;
@@ -562,7 +565,7 @@
         }
       }
       if (!found) {
-        debug("didn't find a particular task to select, so selecting last task");
+        debug('didn\'t find a particular task to select, so selecting last task');
         setCursorToLastTask();
       }
     }
@@ -577,7 +580,7 @@
       if (!isEmptyMap(selections)) {
         var last = getTaskById(lastShiftClicked, lastShiftClickedIndent);
         if (last) {
-          debug("Detected that top bar isn't visible when it should be.  Attempting workaround.");
+          debug('Detected that top bar isn\'t visible when it should be.  Attempting workaround.');
           shiftClickTask(last);
           shiftClickTask(last);
           if (getId(ACTIONS_BAR_CLASS)) {
@@ -586,7 +589,7 @@
             warn('Workaround failed...');
           }
         } else {
-          warn("Actions bar isn't visible even though there are selections, and last clicked task is gone.");
+          warn('Actions bar isn\'t visible even though there are selections, and last clicked task is gone.');
         }
       }
     }
@@ -597,7 +600,6 @@
       topBarVisibilityHack();
       stableCursorHack();
     });
-    // TODO: More fine-grained mutation observer.  This is rather inefficient.
     observer.observe(document.body, { childList: true });
     onDisable(function() {
       observer.disconnect();
@@ -658,7 +660,7 @@
     if (menu) {
       withUniqueTag(menu, 'span', matchingText(text), click);
     } else {
-      error("Can't perform action due to not finding menu element.");
+      error('Can\'t perform action due to not finding menu element.');
     }
   }
 
@@ -760,10 +762,14 @@
   }
 
   function moveDown() {
+    /* FIXME
     withDragHandle(getCursor(), function(el) {
     });
+    */
   }
 
+  // TODO
+  // eslint-disable-next-line no-unused-vars
   function withDragHandle(task, f) {
     var key = getTaskKey(task);
     task.dispatchEvent(new Event('mouseover'));
@@ -785,10 +791,7 @@
     if (isAgenda || cursor === null) {
       addToSectionContaining(isAgenda, cursor);
     } else {
-      if (cursor) {
-        clickTaskMenu(cursor, menuText);
-      } else {
-      }
+      clickTaskMenu(cursor, menuText);
     }
   }
 
@@ -799,26 +802,26 @@
     if (task) {
       section = findParentSection(isAgenda, task);
     } else if (isAgenda) {
-      section = getFirstClass(document, "section_day");
+      section = getFirstClass(document, 'section_day');
     } else {
-      section = getFirstClass(document, "project_editor_instance");
+      section = getFirstClass(document, 'project_editor_instance');
     }
     if (!section) {
-      error("Couldn't find section for task", task);
+      error('Couldn\'t find section for task', task);
       return;
     }
     if (isAgenda) {
-      withUniqueClass(section, "agenda_add_task", unconditional, click);
+      withUniqueClass(section, 'agenda_add_task', unconditional, click);
     } else {
-      withUniqueClass(section, "action_add_item", unconditional, click);
+      withUniqueClass(section, 'action_add_item', unconditional, click);
     }
   }
 
   function findParentSection(isAgenda, task) {
     if (isAgenda) {
-      return findParent(task, matchingClass("section_day"));
+      return findParent(task, matchingClass('section_day'));
     } else {
-      return findParent(task, matchingClass("project_editor_instance"));
+      return findParent(task, matchingClass('project_editor_instance'));
     }
   }
 
@@ -1150,7 +1153,7 @@
     if (el) {
       return f(el);
     } else {
-      warn("Couldn't find ID", id);
+      warn('Couldn\'t find ID', id);
       return null;
     }
   }
@@ -1165,10 +1168,11 @@
 
   // Finds a parentElement which matches the specified predicate.
   function findParent(element, predicate) {
-    while (element.parentElement !== null) {
-      element = element.parentElement;
-      if (predicate(element)) {
-        return element;
+    var el = element;
+    while (el.parentElement !== null) {
+      el = el.parentElement;
+      if (predicate(el)) {
+        return el;
       }
     }
     return null;
@@ -1194,7 +1198,7 @@
     } else {
       // TODO: This warning doesn't make it clear that the predicate could also
       // be the cause.
-      warn("Couldn't find unique child with class", cls, 'instead got', result);
+      warn('Couldn\'t find unique child with class', cls, 'instead got', result);
       return null;
     }
   }
@@ -1212,7 +1216,7 @@
     if (result) {
       return f(result);
     } else {
-      warn("Couldn't find unique child with tag", tag, 'instead got', result);
+      warn('Couldn\'t find unique child with tag', tag, 'instead got', result);
       return null;
     }
   }
@@ -1243,14 +1247,14 @@
   // match, or multiple elements match, then nothing gets returned. If predicate
   // is null, then it is treated like 'unconditional'.
   function findUnique(predicate, array) {
-    var result = null; for (var i = 0; i < array.length; i++) {var element = array[i];
+    var result = null;
+    for (var i = 0; i < array.length; i++) {
+      var element = array[i];
       if (!predicate || predicate(element)) {
         if (result === null) {
           result = element;
         } else {
-          debug("findUnique didn't find unique element because there are multiple results. Here are two:",
-                result,
-                element)
+          debug('findUnique didn\'t find unique element because there are multiple results. Here are two:', result, element);
           // Not unique, so return null.
           return null;
         }
@@ -1295,12 +1299,14 @@
   }
 
   // Given two predicates, uses && to combine them.
+  // TODO:
   // eslint-disable-next-line no-unused-vars
   function and(p1, p2) {
     return function(x) { return p1(x) && p2(x); };
   }
 
   // Given two predicates, uses || to combine them.
+  // TODO:
   // eslint-disable-next-line no-unused-vars
   function or(p1, p2) {
     return function(x) { return p1(x) || p2(x); };
