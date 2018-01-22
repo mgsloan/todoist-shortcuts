@@ -107,7 +107,10 @@ function goToProject() {
     }
   }
 
-
+  // Press delete confirm button.
+  function confirmDelete() {
+    withUniqueClass(document, 'ist_button_red', matchingText(DELETE_CONFIRM_TEXT), click);
+  }
 
   // A CSS style element, used to temporarily hide UI elements when they are
   // being manipulated.

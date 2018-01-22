@@ -81,7 +81,7 @@
   // * "none" - never apply selection oriented commands to the cursor
   //
   // * "most" - apply to all commands that are easy to manually undo (everything
-  //   but archive and delete)
+  //   but done / archive / delete)
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
@@ -129,19 +129,12 @@
   //
   // * Allow using ctrl+arrows while editing text of a task.
   //
-  // * In schedule view with nesting, some ids can occur multiple times,
-  //   screwing up cursor movement.
-  //
   // * In agenda view, cursor should be able to focus empty days, for the
   //   purpose of adding tasks.
-  //
-  // * Also have "s" mean schedule?
   //
   // * What is postpone?
   //
   // * Enter day of month + move between months.
-  //
-  // * Should j and k step into expanded trees? probably keep it that way
   //
   // * l should step out even if not focused on the collapser
   //
@@ -152,11 +145,6 @@
   //
   // * Should it match append / insert? 'a' would edit at the end of task text,
   //   'i' would edit at beginning of task text.
-  //
-  // * o / O should work even when no tasks exist or when none selected
-  //
-  // * Could get some efficiency by not doing id / class searches from the
-  //   document root.
   //
   // * Remember per project cursor locations.
 
@@ -174,9 +162,6 @@
       }
     };
   }
-
-  // TODO: Use something other than mousetrap or augment it to allow enabling
-  // different keymaps under different conditions?
 
   // If the condition is true, runs the first action, otherwise runs the second.
   function ifThenElse(condition, calendarAction, normalAction) {
@@ -311,8 +296,6 @@
   // Adds tasks matching the specified priority level to the current selection,
   // even if they are hidden by collapsing.
   //
-  // TODO: Should it select tasks hidden by collapsing? Tricky call.
-  //
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
   function selectPriority(level) {
@@ -369,13 +352,6 @@
   // Delete selected tasks. Todoist will prompt for deletion.
   function deleteTasks() {
     clickMenu(moreMenu, DELETE_TEXT);
-  }
-
-  // Press delete confirm button.
-  // TODO:
-  // eslint-disable-next-line no-unused-vars
-  function confirmDelete() {
-    withUniqueClass(document, 'ist_button_red', matchingText(DELETE_CONFIRM_TEXT), click);
   }
 
   // Toggles collapse / expand task under the cursor, if it has children.
@@ -569,7 +545,7 @@
         setCursorToLastTask();
       }
     }
-  } 
+  }
 
   var lastObserverDisables = [];
 
@@ -580,7 +556,7 @@
       lastObserverDisables[i]();
     }
     lastObserverDisables = [];
-    withClass(editor, 'items', function(itemsDiv) { 
+    withClass(editor, 'items', function(itemsDiv) {
       debug('registering observer for', itemsDiv);
       lastObserverDisables.push(registerMutationObserver(itemsDiv, ensureCursor));
     });
