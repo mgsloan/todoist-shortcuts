@@ -302,7 +302,7 @@
       withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
         withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
           var isAgenda = checkIsAgendaMode();
-          withRestoredSelections(isAgenda, click(img));
+          withRestoredSelections(isAgenda, function() { click(img) });
         });
       });
     };
