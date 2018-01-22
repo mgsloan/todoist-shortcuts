@@ -541,10 +541,10 @@
   var lastCursorTasks = [];
   var lastCursorIndex = [];
 
-  // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. IF it
+  // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
-  function stableCursorHack() {
+  function ensureCursor() {
     if (getCursor()) {
       debug('wrote down cursor context');
       lastCursorTasks = getTasks();
@@ -569,6 +569,21 @@
         setCursorToLastTask();
       }
     }
+  } 
+
+  var lastObserverDisables = [];
+
+  function handleNavigation(editor) {
+    debug('handleNavigation');
+    setCursorToFirstTask();
+    for (var i = 0; i < lastObserverDisables.length; i++) {
+      lastObserverDisables[i]();
+    }
+    lastObserverDisables = [];
+    withClass(editor, 'items', function(itemsDiv) { 
+      debug('registering observer for', itemsDiv);
+      lastObserverDisables.push(registerMutationObserver(itemsDiv, ensureCursor));
+    });
   }
 
   // If there are selections but the top bar isn't visible, then toggle the
@@ -595,13 +610,23 @@
     }
   }
 
-  function registerMutationObserver() {
-    var observer = new MutationObserver(function() {
-      topBarVisibilityHack();
-      stableCursorHack();
+  // Registers mutation observers on elements that never get removed from the
+  // DOM.  Run on initialization of todoist-shortcuts.
+  function registerTopMutationObservers() {
+    registerMutationObserver(document.body, topBarVisibilityHack);
+    withId("editor", function(content) {
+      console.log("registering top level observer for", editor)
+      registerMutationObserver(content, function() { handleNavigation(editor) });
     });
-    observer.observe(document.body, { childList: true });
-    onDisable(function() {
+  }
+
+  // Registers a mutation observer that just observes modifications to its
+  // child list.
+  function registerMutationObserver(el, f) {
+    var observer = new MutationObserver(f);
+    observer.observe(el, { childList: true });
+    return onDisable(function() {
+      // TODO: Is this doing the right thing?
       observer.disconnect();
     });
   }
@@ -1320,14 +1345,27 @@
     if (window.oldTodoistShortcutsDisableActions) {
       var arr = window.oldTodoistShortcutsDisableActions;
       for (var i = 0; i < arr.length; i++) {
-        arr[i]();
+        if (arr[i] !== null) {
+          arr[i]();
+        }
       }
     }
     window.oldTodoistShortcutsDisableActions = [];
   })();
 
+  // Registers an action to execute when another version of this script is
+  // loaded.  Returns a function to run this action and remove it from the
+  // cleanup actions.
+  //
+  // TODO: slight inefficiency in the usage here.  Would be good to not have
+  // the list always grow.
   function onDisable(f) {
+    var ix = window.oldTodoistShortcutsDisableActions.length;
     window.oldTodoistShortcutsDisableActions.push(f);
+    return function() {
+      window.oldTodoistShortcutsDisableActions[ix] = null;
+      f();
+    }
   }
 
   /*****************************************************************************
@@ -1398,8 +1436,8 @@
    * Run todoist-shortcuts!
    */
 
-  setCursorToFirstTask();
-  registerMutationObserver();
+  withId("editor", handleNavigation);
+  registerTopMutationObservers();
 
   // Register key bindings
   (function() {
