@@ -138,13 +138,14 @@
   //
   // * h should also move cursor down after opening
   //
-  // * In "today" / "next 7 days" view, o and O should add to the same day.
-  //   Should also scroll so the add box is in view.
-  //
   // * Should it match append / insert? 'a' would edit at the end of task text,
   //   'i' would edit at beginning of task text.
   //
   // * Remember per project cursor locations.
+  //
+  // * "bulk reschedule mode" - clears current selection, prompts for
+  //   rescheduling of item then moves cursor to the next.  Similar "bulk
+  //   project move" mode.
 
   /*****************************************************************************
    * Action combiners
