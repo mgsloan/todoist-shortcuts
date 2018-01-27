@@ -601,11 +601,15 @@
   }
 
   // MUTABLE.
-  var lastObserverDisables = [];
+  // var lastObserverDisables = [];
 
-  function handleNavigation(editor) {
+  function handleNavigation() {
     debug('handleNavigation');
     setCursorToFirstTask();
+    // TODO: Following code was an attempt at a more efficient way to watch
+    // for mutations of task lists.  Unfortunately, it does not work in all
+    // cases.  So, instead we just use a { subtree: true } mutation observer.
+    /*
     for (var i = 0; i < lastObserverDisables.length; i++) {
       lastObserverDisables[i]();
     }
@@ -614,6 +618,7 @@
       debug('registering observer for', itemsDiv);
       lastObserverDisables.push(registerMutationObserver(itemsDiv, ensureCursor));
     });
+    */
   }
 
   // If there are selections but the top bar isn't visible, then toggle the
@@ -646,15 +651,17 @@
     registerMutationObserver(document.body, topBarVisibilityHack);
     withId('editor', function(content) {
       debug('registering top level observer for', content);
-      registerMutationObserver(content, function() { handleNavigation(content); });
+      registerMutationObserver(content, handleNavigation);
+      registerMutationObserver(content, ensureCursor, { childList: true, subtree: true });
     });
   }
 
   // Registers a mutation observer that just observes modifications to its
   // child list.
-  function registerMutationObserver(el, f) {
+  function registerMutationObserver(el, f, optionalOpts) {
+    var opts = optionalOpts ? optionalOpts : { childList: true };
     var observer = new MutationObserver(f);
-    observer.observe(el, { childList: true });
+    observer.observe(el, opts);
     return onDisable(function() {
       // TODO: Is this doing the right thing?
       observer.disconnect();
@@ -832,7 +839,8 @@
   // TODO
   // eslint-disable-next-line no-unused-vars
   function withDragHandle(task, f) {
-    var key = getTaskKey(task);
+    var isAgenda = checkIsAgendaMode();
+    var key = getTaskKey(isAgenda, task);
     task.dispatchEvent(new Event('mouseover'));
     try {
       withUniqueClass(task, 'drag_and_drop_handler', unconditional, f);
@@ -1454,7 +1462,7 @@
    * Run todoist-shortcuts!
    */
 
-  withId('editor', handleNavigation);
+  handleNavigation();
   registerTopMutationObservers();
 
   // Register key bindings
