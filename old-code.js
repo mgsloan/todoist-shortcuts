@@ -147,3 +147,48 @@ function goToProject() {
       show(selecter);
     }
   }
+
+
+  /* FIXME: Doesn't work out because the menu doesn't stick around if the
+  selection is removed, which makes sense.
+
+  // If there are no selections, then temporarily selects the cursor, so that
+  // actions that apply to selections will apply to it.
+  //
+  // The first argument is a boolean called "dangerous", indicating whether it is
+  // difficult for the user to undo the action (ignoring the existence of the
+  // undo command). This argument is combined with the WHAT_CURSOR_APPLIES_TO
+  // global setting to determine whether to apply this behavior.
+  //
+  // NOTE: It might be better to avoid this hack, and instead invoke the more
+  // direct actions.  However, I already wrote this and it seems to work.
+  function maybe_with_cursor_selected(dangerous, f) {
+    var should_apply = WHAT_CURSOR_APPLIES_TO == "all" ||
+                         (WHAT_CURSOR_APPLIES_TO == "most" && !dangerous);
+    if (should_apply) {
+      var selections = getSelectedTaskKeys();
+      if (isEmptyMap(selections)) {
+        var prev_cursor_id = cursor_id;
+        var cursor = getCursor();
+        if (cursor) {
+          shiftClickTask(cursor);
+          try {
+            f();
+          } finally {
+            // Deselect the task so that it's like
+            prev_cursor = getId(prev_cursor_id);
+            if (checkTaskIsSelected(prev_cursor)) {
+              shiftClickTask(prev_cursor);
+            }
+          }
+        } else {
+          debug("Skipping action because there is no selections or cursor");
+        }
+      } else {
+        f();
+      }
+    } else {
+      f();
+    }
+  }
+  */

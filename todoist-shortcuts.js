@@ -85,8 +85,7 @@
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
-  // FIXME: Implement
-  // var WHAT_CURSOR_APPLIES_TO = 'all';
+  var WHAT_CURSOR_APPLIES_TO = 'all';
 
   // Set this to true to get more log output.
   var DEBUG = true;
@@ -105,7 +104,6 @@
   var ARCHIVE_TEXT = 'Archive';
   var ARCHIVE_TASK_TEXT = 'Archive task';
   var DELETE_TEXT = 'Delete';
-  var DELETE_CONFIRM_TEXT = 'Delete';
   var DELETE_TASK_TEXT = 'Delete task';
   var ADD_ABOVE_TEXT = 'Add task above';
   var ADD_BELOW_TEXT = 'Add task below';
@@ -206,17 +204,26 @@
     }
   }
 
-  // Clicks the 'schedule' link when tasks are selected.
+  // Clicks the 'schedule' link when tasks are selected.  If
+  // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
+  // cursor if there is no selection.
   function schedule() {
     // Only open calendar if it isn't already open. This allows 't' to also be
     // used for selecting 'tomorrow'.
     if (getUniqueClass(document, CALENDAR_CLASS)) {
       debug('Not opening schedule because it is already open.');
     } else {
-      debug('Attempting to open schedule.');
-      withId(ACTIONS_BAR_CLASS, function(parent) {
-        clickLink(parent, SCHEDULE_TEXT);
-      });
+      var isAgenda = checkIsAgendaMode();
+      var mutateCursor = getCursorToMutate();
+      if (mutateCursor) {
+        withTaskMenu(isAgenda, mutateCursor, function(menu) {
+          withUniqueClass(menu, 'cmp_scheduler_more', unconditional, click);
+        });
+      } else {
+        withId(ACTIONS_BAR_CLASS, function(parent) {
+          clickLink(parent, SCHEDULE_TEXT);
+        });
+      }
     }
   }
 
@@ -255,9 +262,17 @@
     });
   }
 
-  // Clicks the 'Move to project' link when tasks are selected.
+  // Clicks 'Move to project' for the selection. If WHAT_CURSOR_APPLIES_TO is
+  // 'all' or 'most', then instead applies to the cursor if there is no
+  // selection.
   function moveToProject() {
-    withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
+    var isAgenda = checkIsAgendaMode();
+    var mutateCursor = getCursorToMutate();
+    if (mutateCursor) {
+      clickTaskMenu(isAgenda, mutateCursor, MOVE_TEXT);
+    } else {
+      withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
+    }
     // The keyboard shortcut used to invoke this also ends up in the completion
     // box. I thought stopPropagation would fix this, but it doesn't. So, empty
     // the completion input.
@@ -278,18 +293,25 @@
     });
   }
 
-  // Sets the priority of the selected tasks to the specified level.
+  // Sets the priority of the selected tasks to the specified level. If
+  // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
+  // cursor if there is no selection.
   //
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
   function setPriority(level) {
     return function() {
-      withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
-        withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
-          var isAgenda = checkIsAgendaMode();
-          withRestoredSelections(isAgenda, function() { click(img); });
+      var isAgenda = checkIsAgendaMode();
+      var mutateCursor = getCursorToMutate(isAgenda);
+      if (mutateCursor) {
+        withTaskMenu(isAgenda, mutateCursor, function(menu) {
+          clickPriorityMenu(isAgenda, menu, level);
         });
-      });
+      } else {
+        withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
+          clickPriorityMenu(isAgenda, menu, level);
+        });
+      }
     };
   }
 
@@ -321,12 +343,12 @@
       for (var i = 0; i < allTasks.length; i++) {
         var task = allTasks[i];
         if (task.classList.contains(classToMatch)) {
-          selected[getTaskKey(task, isAgenda)] = true;
+          selected[getTaskKey(isAgenda, task)] = true;
           modified = true;
         }
       }
       if (modified) {
-        setSelections(selected, isAgenda);
+        setSelections(isAgenda, selected);
       }
     };
   }
@@ -335,23 +357,47 @@
   // complete.  The main variation in behavior between this and 'done' is that
   // for nested tasks, 'done' keeps them in the list but checks them off. Note
   // that this appears to be the same thing as marking a task complete.
+  //
+  // If WHAT_CURSOR_APPLIES_TO is 'all', then instead applies to the cursor if
+  // there is no selection.
   function archive() {
-    clickMenu(moreMenu, ARCHIVE_TEXT);
+    var isAgenda = checkIsAgendaMode();
+    var mutateCursor = getCursorToMutate(isAgenda, 'dangerous');
+    if (mutateCursor) {
+      clickTaskMenu(isAgenda, mutateCursor, ARCHIVE_TASK_TEXT);
+    } else {
+      clickMenu(moreMenu, ARCHIVE_TEXT);
+    }
   }
 
-  // Mark all the tasks as completed.
+  // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then
+  // instead applies to the cursor if there is no selection.
   function done() {
-    // For some reason, only one task can be marked once at a time. So, the
-    // timeout hack.  Means that the user will see intermediate UI updates,
-    // but hey, it works.
-    withSelectedTasks(function(task) {
-      setTimeout(function() { clickTaskDone(task); });
-    });
+    var mutateCursor = getCursorToMutate(checkIsAgendaMode(), 'dangerous');
+    if (mutateCursor) {
+      clickTaskDone(mutateCursor);
+    } else {
+      // For some reason, only one task can be marked once at a time. So, the
+      // timeout hack.  Means that the user will see intermediate UI updates,
+      // but hey, it works.
+      withSelectedTasks(function(task) {
+        setTimeout(function() { clickTaskDone(task); });
+      });
+    }
   }
 
-  // Delete selected tasks. Todoist will prompt for deletion.
+  // Delete selected tasks. Todoist will prompt for deletion. Since todoist
+  // prompts, this is not treated as a 'dangerous' action.  As such, if
+  // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the cursor if
+  // there is no selection.
   function deleteTasks() {
-    clickMenu(moreMenu, DELETE_TEXT);
+    var isAgenda = checkIsAgendaMode();
+    var mutateCursor = getCursorToMutate(isAgenda);
+    if (mutateCursor) {
+      clickTaskMenu(isAgenda, mutateCursor, DELETE_TASK_TEXT);
+    } else {
+      clickMenu(moreMenu, DELETE_TEXT);
+    }
   }
 
   // Toggles collapse / expand task under the cursor, if it has children.
@@ -467,9 +513,9 @@
     var isAgenda = checkIsAgendaMode();
     var selected = getSelectedTaskKeys(isAgenda);
     withClass(document, id, function(task) {
-      selected[getTaskKey(task, isAgenda)] = true;
+      selected[getTaskKey(isAgenda, task)] = true;
     });
-    setSelections(selected, isAgenda);
+    setSelections(isAgenda, selected);
   }
 
   // Deselects all tasks that have the specified id.
@@ -500,13 +546,13 @@
   // Ensures that the specified task ids are selected (specified by a set-like
   // object). The algorithm for this is quite ugly and inefficient, due to the
   // strange todoist behavior mentioned above.
-  function setSelections(selections, isAgenda) {
+  function setSelections(isAgenda, selections) {
     var startTime = Date.now();
     var allTasks = selectAllInternal();
     // Then deselect all of the things that shouldn't be selected.
     for (var i = 0; i < allTasks.length; i++) {
       var task = allTasks[i];
-      var key = getTaskKey(task, isAgenda);
+      var key = getTaskKey(isAgenda, task);
       if (!selections[key] && checkTaskIsSelected(task)) {
         shiftClickTask(task);
       }
@@ -590,9 +636,9 @@
   // DOM.  Run on initialization of todoist-shortcuts.
   function registerTopMutationObservers() {
     registerMutationObserver(document.body, topBarVisibilityHack);
-    withId("editor", function(content) {
-      console.log("registering top level observer for", editor)
-      registerMutationObserver(content, function() { handleNavigation(editor) });
+    withId('editor', function(content) {
+      debug('registering top level observer for', content);
+      registerMutationObserver(content, function() { handleNavigation(content); });
     });
   }
 
@@ -614,7 +660,7 @@
     try {
       f();
     } finally {
-      setSelections(oldSelections, isAgenda);
+      setSelections(isAgenda, oldSelections);
     }
   }
 
@@ -676,7 +722,13 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  function clickTaskMenu(task, text, isAgenda) {
+  function clickTaskMenu(isAgenda, task, text) {
+    withTaskMenu(isAgenda, task, function(menu) {
+      clickMenu(menu, text);
+    });
+  }
+
+  function withTaskMenu(isAgenda, task, f) {
     withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
       var menu = isAgenda ? agendaTaskMenu : taskMenu;
       if (menu.style.display === 'none') {
@@ -690,7 +742,7 @@
           click(openMenu);
         }
       }
-      clickMenu(menu, text);
+      f(menu);
     });
   }
 
@@ -792,7 +844,7 @@
     if (isAgenda || cursor === null) {
       addToSectionContaining(isAgenda, cursor);
     } else {
-      clickTaskMenu(cursor, menuText);
+      clickTaskMenu(isAgenda, cursor, menuText);
     }
   }
 
@@ -826,59 +878,41 @@
     }
   }
 
-  /* TODO Make it so that after adding a task, the cursor will be on it?
-  function register_editor_keybindings() {
-    withId("#editor", function(editor) {
-      var observer = new MutationObserver(function() {
-      });
-      // TODO: Figure out how to observe less? This seems fine for now.
-      observer.observe(editor, { childList: true, subtree: true });
-    });
-  } */
+  var SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';
+  var SHOULD_UNSAFE_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all';
 
-  /* FIXME: Doesn't work out because the menu doesn't stick around if the
-  selection is removed, which makes sense.
-
-  // If there are no selections, then temporarily selects the cursor, so that
-  // actions that apply to selections will apply to it.
+  // This function is used by commands that can be applied to both selections
+  // and the cursor. It returns the cursor task under the following conditions:
   //
-  // The first argument is a boolean called"dangerous", indicating whether it is
-  // difficult for the user to undo the action (ignoring the existence of the
-  // undo command). This argument is combined with the WHAT_CURSOR_APPLIES_TO
-  // global setting to determine whether to apply this behavior.
+  // * The cursor exists, and there are no selections
   //
-  // NOTE: It might be better to avoid this hack, and instead invoke the more
-  // direct actions.  However, I already wrote this and it seems to work.
-  function maybe_with_cursor_selected(dangerous, f) {
-    var should_apply = WHAT_CURSOR_APPLIES_TO == "all" ||
-                         (WHAT_CURSOR_APPLIES_TO == "most" && !dangerous);
-    if (should_apply) {
-      var selections = getSelectedTaskKeys();
-      if (isEmptyMap(selections)) {
-        var prev_cursor_id = cursor_id;
-        var cursor = getCursor();
-        if (cursor) {
-          shiftClickTask(cursor);
-          try {
-            f();
-          } finally {
-            // Deselect the task so that it's like
-            prev_cursor = getId(prev_cursor_id);
-            if (checkTaskIsSelected(prev_cursor)) {
-              shiftClickTask(prev_cursor);
-            }
-          }
-        } else {
-          debug("Skipping action because there is no selections or cursor");
+  // * The WHAT_CURSOR_APPLIES_TO setting allows for it.
+  function getCursorToMutate(isAgenda, danger) {
+    var cursor = getCursor();
+    // TODO: Something more efficient than finding all selections if we just
+    // want to know if there are any.
+    if (cursor && isEmptyMap(getSelectedTaskKeys(isAgenda))) {
+      // eslint-disable-next-line no-undefined
+      if (danger === undefined) {
+        if (SHOULD_MUTATE_CURSOR) {
+          return cursor;
+        }
+      } else if (danger === 'dangerous') {
+        if (SHOULD_UNSAFE_MUTATE_CURSOR) {
+          return cursor;
         }
       } else {
-        f();
+        error('Unexpected 2nd argument to getCursorToMutate.  Expected undefined or "dangerous", but got:', danger);
       }
-    } else {
-      f();
     }
+    return null;
   }
-  */
+
+  function clickPriorityMenu(isAgenda, menu, level) {
+    withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
+      withRestoredSelections(isAgenda, function() { click(img); });
+    });
+  }
 
   /*****************************************************************************
    * Enumeration of tasks
@@ -919,7 +953,7 @@
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
       if (checkTaskIsSelected(task)) {
-        var key = getTaskKey(task, isAgenda);
+        var key = getTaskKey(isAgenda, task);
         results[key] = true;
       }
     }
@@ -927,7 +961,7 @@
   }
 
   // Get key used for the cursor, in the getSelectedTaskKeys map.
-  function getTaskKey(task, isAgenda) {
+  function getTaskKey(isAgenda, task) {
     if (isAgenda === true) {
       return task.id + ' ' + getTaskIndentClass(task);
     } else if (isAgenda === false) {
@@ -938,7 +972,7 @@
     }
   }
 
-  function makeTaskKey(id, indent, isAgenda) {
+  function makeTaskKey(isAgenda, id, indent) {
     if (isAgenda) {
       return id + ' ' + indent;
     } else {
@@ -1063,7 +1097,7 @@
   }
 
   function getCursorKey(isAgenda) {
-    return makeTaskKey(cursorId, cursorIndent, isAgenda);
+    return makeTaskKey(isAgenda, cursorId, cursorIndent);
   }
 
   // Returns the <li> element which corresponds to the current cursorId.
@@ -1341,7 +1375,7 @@
     return function() {
       window.oldTodoistShortcutsDisableActions[ix] = null;
       f();
-    }
+    };
   }
 
   /*****************************************************************************
@@ -1412,7 +1446,7 @@
    * Run todoist-shortcuts!
    */
 
-  withId("editor", handleNavigation);
+  withId('editor', handleNavigation);
   registerTopMutationObservers();
 
   // Register key bindings

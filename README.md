@@ -35,7 +35,7 @@
 
 ## Manipulation of selected items
 
-If none are selected, then these will probably apply to the cursor instead.
+If none are selected, then these will apply to the cursor instead.
 
 | keys | action                            |
 | ---  | ---                               |
