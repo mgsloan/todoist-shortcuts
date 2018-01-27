@@ -573,7 +573,13 @@
   // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
-  function ensureCursor() {
+  function ensureCursor(content) {
+    // If there's an editor open to modify or add a task, then set the cursor
+    // to the item above.
+    var manager = getUniqueClass(content, 'manager');
+    if (manager && manager.previousElementSibling) {
+      setCursor(manager.previousElementSibling);
+    }
     if (getCursor()) {
       debug('wrote down cursor context');
       lastCursorTasks = getTasks();
@@ -652,7 +658,7 @@
     withId('editor', function(content) {
       debug('registering top level observer for', content);
       registerMutationObserver(content, handleNavigation);
-      registerMutationObserver(content, ensureCursor, { childList: true, subtree: true });
+      registerMutationObserver(content, function() { ensureCursor(content); }, { childList: true, subtree: true });
     });
   }
 
@@ -1495,17 +1501,7 @@
     if (oldOnkeydown) {
       document.onkeydown = function(ev) {
         if (ev.keyCode !== 27) {
-          /* TODO: This is an attempt at detecting when an task is inserted via
-          enter. Use mutation observer instead?
-          if (ev.keyCode === 13) {
-            var oldTasks = getTasks();
-            oldHandler(ev);
-            var newTasks = getTasks();
-            console.log("oldTasks", oldTasks.length, "newTasks", newTasks.length);
-          } else {
-          */
           oldOnkeydown(ev);
-          // }
         }
       };
     } else {
