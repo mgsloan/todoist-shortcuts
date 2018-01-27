@@ -14,7 +14,7 @@
 
   // Here's where the keybindings get specified. Of course, feel free to modify
   // this list, or modify this script in general.
-  var bindings = [
+  var KEY_BINDINGS = [
 
     // Navigation
     ['j', cursorDown],
@@ -145,7 +145,6 @@
   //   'i' would edit at beginning of task text.
   //
   // * Remember per project cursor locations.
-
 
   /*****************************************************************************
    * Action combiners
@@ -482,7 +481,11 @@
 
   // FIXME: lastShiftClicked should probably also be set when user actually
   // shift clicks, instead of just simulated ones.
+
+  // MUTABLE.
   var lastShiftClicked = null;
+
+  // MUTABLE.
   var lastShiftClickedIndent = null;
 
   // Given a task element, shift-clicks it. Unfortunately, todoist currently has
@@ -560,7 +563,10 @@
     debug('setSelections timing:', Date.now() - startTime);
   }
 
+  // MUTABLE.
   var lastCursorTasks = [];
+
+  // MUTABLE.
   var lastCursorIndex = [];
 
   // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
@@ -593,6 +599,7 @@
     }
   }
 
+  // MUTABLE.
   var lastObserverDisables = [];
 
   function handleNavigation(editor) {
@@ -1039,11 +1046,11 @@
    * Task cursor
    */
 
-  // The id of the task that the cursor is on.
+  // The id of the task that the cursor is on. MUTABLE.
   var cursorId = null;
 
   // The indent class of the task that the cursor is on. See 'getTaskById' for
-  // detailed explanation.
+  // detailed explanation. MUTABLE.
   var cursorIndent = null;
 
   // Class used on the single task that the cursor is on.
@@ -1392,7 +1399,7 @@
     '}'
   ].join('\n'));
 
-  // A CSS style element, dynamically updated by updateCursorStyle.
+  // A CSS style element, dynamically updated by updateCursorStyle. MUTABLE.
   var cursorStyle = addCss('');
 
   // This is unusual. Usually you would not dynamically generate CSS that uses
@@ -1451,20 +1458,20 @@
 
   // Register key bindings
   (function() {
-    for (var i = 0; i < bindings.length; i++) {
-      if (bindings[i].length === 2) {
-        mousetrap.bind(bindings[i][0], bindings[i][1]);
+    for (var i = 0; i < KEY_BINDINGS.length; i++) {
+      if (KEY_BINDINGS[i].length === 2) {
+        mousetrap.bind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
       } else {
-        error('Improper binding entry at index', i, 'value is', bindings[i]);
+        error('Improper binding entry at index', i, 'value is', KEY_BINDINGS[i]);
       }
     }
   })();
 
   // Unregister key bindings when disabled.
   onDisable(function() {
-    for (var i = 0; i < bindings.length; i++) {
+    for (var i = 0; i < KEY_BINDINGS.length; i++) {
       // eslint-disable-next-line no-undef
-      mousetrap.unbind(bindings[i][0], bindings[i][1]);
+      mousetrap.unbind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
     }
   });
 
