@@ -21,11 +21,7 @@
     ['k', cursorUp],
     ['h', collapse],
     ['l', expand],
-    // [['g g', 'ctrl+k'], goToProject],
-    ['g i', goToInbox],
-    ['g t', goToToday],
-    // TODO: g n is more intuitive I think. One or both?
-    [['g w', 'g n'], goToNext7],
+    ['g', navigate],
 
     // Manipulation of tasks at cursor
     ['enter', edit],
@@ -33,15 +29,13 @@
     ['o', addBelow],
     ['J', moveDown],
     ['K', moveUp],
-    // TODO ["ctrl+right", indent],
-    // TODO ["ctrl+left", dedent],
+    // ['H ctrl+left', dedent],
+    // ['L ctrl+right', indent],
 
     // Selection
     ['x', toggleSelect],
     ['* a', sequence([selectAll, cancelEmptyAdd])],
     ['* n', deselectAll],
-    // NOTE: these are a bit different than gmail's "select unread" and similar,
-    // as they add to the current selection. I think this is more useful.
     ['* 1', selectPriority('1')],
     ['* 2', selectPriority('2')],
     ['* 3', selectPriority('3')],
@@ -52,10 +46,6 @@
     ['v', moveToProject],
     ['d', done],
     ['e', archive],
-    // TODO: Similarly, should we follow gmail here?
-    // d (delete)
-    // r (remove)
-    // delete
     ['#', deleteTasks],
     ['1', setPriority('1')],
     ['2', setPriority('2')],
@@ -71,6 +61,7 @@
     ['r', unschedule],
 
     // Misc
+    // FIXME: ['u', undo],
     // TODO: ["?", show_keybindings]
     ['escape', closeContextMenus]
   ];
@@ -115,6 +106,8 @@
   var TASKMENU_ITEMS =
     [ARCHIVE_TASK_TEXT, MOVE_TEXT, DELETE_TASK_TEXT];
 
+  var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
+
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
   var todoistRootDiv = document.getElementById(TODOIST_ROOT_ID);
@@ -146,6 +139,15 @@
   // * "bulk reschedule mode" - clears current selection, prompts for
   //   rescheduling of item then moves cursor to the next.  Similar "bulk
   //   project move" mode.
+  //
+  // * e for Archive and d for Done are awfully close to eachother.  Is
+  //   archive vs delete useful?
+  //
+  // * Use querySelectorAll to simplify?
+  //
+  // * Display of keybindings directly on elements suggests a library that
+  //   mixes querySelectorAll / mousetrap / the utilities here.  Design it
+  //   also to be used in normal applications?
 
   /*****************************************************************************
    * Action combiners
@@ -452,28 +454,33 @@
   function addAbove() { addAboveOrBelow(ADD_ABOVE_TEXT); }
   function addBelow() { addAboveOrBelow(ADD_BELOW_TEXT); }
 
-  // Navigate to inbox.
-  function goToInbox() {
-    withUniqueClass(document, 'cmp_filter_inbox', unconditional, click);
-    setCursorToFirstTask();
-  }
-
-  // Navigate to today.
-  function goToToday() {
-    withUniqueClass(document, 'cmp_filter_today', unconditional, click);
-    setCursorToFirstTask();
-  }
-
-  // Navigate to today.
-  function goToNext7() {
-    withUniqueClass(document, 'cmp_filter_days', unconditional, click);
-    setCursorToFirstTask();
-  }
-
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.
   function closeContextMenus() {
     click(document.body);
+  }
+
+  // Switches to a navigation mode, where navigation targets are annotated
+  // with letters to press to click.
+  //
+  // TODO: Consider using mnemonic navigation for project names, which would
+  // use the first character of the project when possible.  Tricky to make
+  // this consistent despite project folding.  Give priority based on lower
+  // indent levels?
+  //
+  // TODO: Handle more than (26 + 10 - 3 == 33) visible projects.
+  function navigate() {
+    withId('projects_list', function(projectsUl) {
+      // Since the projects list can get reconstructed, watch for changes and
+      // reconstruct the shortcut tips.  A function to unregister the mutation
+      // observer is passed in.
+      oldNavigateOptions = [];
+      var finished = function() {};
+      finished = registerMutationObserver(projectsUl, function() {
+        setupNavigate(projectsUl, finished);
+      }, { childList: true, subtree: true });
+      setupNavigate(projectsUl, finished);
+    });
   }
 
   /** ***************************************************************************
@@ -578,7 +585,7 @@
     // to the item above.
     var manager = getUniqueClass(content, 'manager');
     if (manager && manager.previousElementSibling) {
-      setCursor(manager.previousElementSibling);
+      setCursor(manager.previousElementSibling, 'no-scroll');
     }
     if (getCursor()) {
       debug('wrote down cursor context');
@@ -594,14 +601,14 @@
           if (task) {
             debug('found still-existing task that was after old cursor, setting cursor to it');
             found = true;
-            setCursor(task);
+            setCursor(task, 'scroll');
             break;
           }
         }
       }
       if (!found) {
         debug('didn\'t find a particular task to select, so selecting last task');
-        setCursorToLastTask();
+        setCursorToLastTask('scroll');
       }
     }
   }
@@ -609,9 +616,15 @@
   // MUTABLE.
   // var lastObserverDisables = [];
 
+  var lastHash = null;
+
   function handleNavigation() {
     debug('handleNavigation');
-    setCursorToFirstTask();
+    var currentHash = document.location.hash;
+    if (lastHash !== currentHash) {
+      lastHash = currentHash;
+      setCursorToFirstTask('scroll');
+    }
     // TODO: Following code was an attempt at a more efficient way to watch
     // for mutations of task lists.  Unfortunately, it does not work in all
     // cases.  So, instead we just use a { subtree: true } mutation observer.
@@ -658,7 +671,9 @@
     withId('editor', function(content) {
       debug('registering top level observer for', content);
       registerMutationObserver(content, handleNavigation);
-      registerMutationObserver(content, function() { ensureCursor(content); }, { childList: true, subtree: true });
+      registerMutationObserver(content, function() {
+        ensureCursor(content);
+      }, { childList: true, subtree: true });
     });
   }
 
@@ -668,10 +683,7 @@
     var opts = optionalOpts ? optionalOpts : { childList: true };
     var observer = new MutationObserver(f);
     observer.observe(el, opts);
-    return onDisable(function() {
-      // TODO: Is this doing the right thing?
-      observer.disconnect();
-    });
+    return onDisable(function() { observer.disconnect(); });
   }
 
   // For some reason todoist clears the selections even after applying things
@@ -752,14 +764,14 @@
   function withTaskMenu(isAgenda, task, f) {
     withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
       var menu = isAgenda ? agendaTaskMenu : taskMenu;
-      if (menu.style.display === 'none') {
+      if (hidden(menu)) {
         click(openMenu);
       } else {
         // If it's already visible, it might be for the wrong task.
         click(openMenu);
         // If it hides after clicking, then it was already associated with the
         // right task, click it again.
-        if (menu.style.display === 'none') {
+        if (hidden(menu)) {
           click(openMenu);
         }
       }
@@ -1057,6 +1069,122 @@
     }
   }
 
+  // MUTABLE. Used to avoid infinite recursion of 'setupNavigate' due to it
+  // being called on mutation of DOM that it mutates.
+  var oldNavigateOptions = [];
+
+  // Assigns key bindings to sections like inbox / today / various projects.
+  // These keybindings get displayed along the options.  This function should
+  // be re-invoked every time the DOM refreshes, in order to ensure they are
+  // displayed. It overrides the keyboard handler such that it temporarily
+  // expects a key.
+  function setupNavigate(projectsUl, finished) {
+    debug('Creating navigation shortcut tips');
+    try {
+      // Jump keys optimized to be close to homerow.
+      var jumpkeys = Array.from('asdfghjkl' + 'qwertyuiop' + 'zxcvbnm' + '123467890');
+      var options = {
+        'i': maybeParent(getUniqueClass(document, 'cmp_filter_inbox', unconditional, click)),
+        't': maybeParent(getUniqueClass(document, 'cmp_filter_today', unconditional, click)),
+        'n': maybeParent(getUniqueClass(document, 'cmp_filter_days', unconditional, click))
+      };
+      withTag(projectsUl, 'li', function(projectLi) {
+        if (notHidden(projectLi)) {
+          var key = null;
+          // Take a key from the jumpkeys list that isn't already used.
+          while (key === null && jumpkeys.length > 0) {
+            var checkKey = jumpkeys.shift();
+            if (!(checkKey in options)) {
+              key = checkKey;
+            }
+          }
+          options[key] = projectLi;
+        }
+      });
+      var different = false;
+      for (var key in options) {
+        if (oldNavigateOptions[key] !== options[key]) {
+          different = true;
+        }
+      }
+      oldNavigateOptions = options;
+      // Avoid infinite recursion. See comment on oldNavigateOptions.
+      if (different) {
+        debug('Different set of navigation options, so re-setting them.');
+      } else {
+        debug('Same set of navigation options, so avoiding infinite recursion.');
+        return;
+      }
+      removeOldTips();
+      // Add in tips to tell the user what key to press.
+      for (key in options) {
+        var el = options[key];
+        if (!el) {
+          error('Missing element for key', key);
+        } else {
+          var div = document.createElement('div');
+          div.appendChild(document.createTextNode(key));
+          div.classList.add(TODOIST_SHORTCUTS_TIP);
+          el.appendChild(div);
+        }
+      }
+      overrideKeyDown = function(ev) {
+        var keepGoing = false;
+        try {
+          var li = options[ev.key];
+          if (li) {
+            click(li);
+          // Space to scroll down.  Shift+space to scroll up.
+          //
+          // TODO: Document in README
+          } else if (ev.key === 'Shift') {
+            keepGoing = true;
+          } else if (ev.key === ' ') {
+            keepGoing = true;
+            withId('left_menu', function(leftMenu) {
+              if (ev.shiftKey) {
+                leftMenu.scrollBy(0, leftMenu.clientHeight / -2);
+              } else {
+                leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
+              }
+            });
+          } else if (ev.keyCode !== 27) {
+            // If the user pressed something other than "escape", warn about
+            // not finding a jump target.
+            warn('No navigation handler for ', ev);
+          }
+        } finally {
+          if (!keepGoing) {
+            // This is deferred, because the other key handlers may execute
+            // after this one.
+            setTimeout(function() { overrideKeyDown = null; });
+            finished();
+            removeOldTips();
+          }
+        }
+      };
+    } catch (ex) {
+      finished();
+      removeOldTips();
+      throw ex;
+    }
+  }
+
+  // Remove old tips if any still exist.
+  function removeOldTips() {
+    // FIXME: I can't quite explain this, but for some reason, querying the
+    // list that matches the class name doesn't quite work.  So instead find
+    // and remove until they are all gone.
+    var toDelete = [];
+    do {
+      for (var i = 0; i < toDelete.length; i++) {
+        var el = toDelete[i];
+        el.parentElement.removeChild(el);
+      }
+      toDelete = document.getElementsByClassName(TODOIST_SHORTCUTS_TIP);
+    } while (toDelete.length > 0);
+  }
+
   /** ***************************************************************************
    * Task cursor
    */
@@ -1072,23 +1200,23 @@
   var CURSOR_CLASS = 'userscript_cursor';
 
   // Sets the cursor to the first task, if any exists.
-  function setCursorToFirstTask() {
+  function setCursorToFirstTask(shouldScroll) {
     var tasks = getTasks();
     if (tasks.length > 0) {
-      setCursor(tasks[0]);
+      setCursor(tasks[0], shouldScroll);
     }
   }
 
   // Sets the cursor to the last task, if any exists.
-  function setCursorToLastTask() {
+  function setCursorToLastTask(shouldScroll) {
     var tasks = getTasks();
     if (tasks.length > 0) {
-      setCursor(tasks[tasks.length - 1]);
+      setCursor(tasks[tasks.length - 1], shouldScroll);
     }
   }
 
   // Given the element for a task, set it as the current selection.
-  function setCursor(task) {
+  function setCursor(task, shouldScroll) {
     withClass(document, CURSOR_CLASS, function(oldCursor) {
       oldCursor.classList.remove(CURSOR_CLASS);
     });
@@ -1096,7 +1224,11 @@
       cursorId = task.id;
       cursorIndent = getTaskIndentClass(task);
       updateCursorStyle();
-      verticalScrollIntoView(task);
+      if (shouldScroll === 'scroll') {
+        verticalScrollIntoView(task);
+      } else if (shouldScroll !== 'no-scroll') {
+        error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
+      }
     } else {
       cursorId = null;
     }
@@ -1137,7 +1269,7 @@
     if (newIndex >= tasks.length) {
       newIndex = tasks.length - 1;
     }
-    setCursor(tasks[newIndex]);
+    setCursor(tasks[newIndex], 'scroll');
   }
 
   // TODO: Should this be cached in a variable? It often gets called multiple
@@ -1223,6 +1355,14 @@
     }
   }
 
+  // Invokes the function for every child element that matches a tag name.
+  function withTag(parent, tag, f) {
+    var els = parent.getElementsByTagName(tag);
+    for (var i = 0; i < els.length; i++) {
+      f(els[i]);
+    }
+  }
+
   // Finds a parentElement which matches the specified predicate.
   function findParent(element, predicate) {
     var el = element;
@@ -1233,6 +1373,11 @@
       }
     }
     return null;
+  }
+
+  // Gets parentElement attribute.  Returns null if element is null.
+  function maybeParent(element) {
+    return element ? element.parentElement : null;
   }
 
   // Returns first child that matches the specified class and predicate.
@@ -1350,6 +1495,11 @@
     };
   }
 
+  // Predicate, returns 'true' if the element is hidden with 'display: none'.
+  function hidden(el) {
+    return el.style.display === 'none';
+  }
+
   // Predicate, returns 'true' if the element isn't hidden with 'display: none'.
   function notHidden(el) {
     return el.style.display !== 'none';
@@ -1411,6 +1561,22 @@
   addCss([
     '#' + ACTIONS_BAR_CLASS + ' {',
     '  opacity: 1 !important;',
+    '}',
+    '',
+    // Enables positioning of the tips.
+    '#projects_list > li, li.filter {',
+    '  position: relative;',
+    '}',
+    '',
+    // TODO: I'd like to have these be to the left, but I think that would
+    // require absolute positioning or similar.  They get clipped by overflow.
+    '.todoist_shortcuts_tip {',
+    '  position: absolute;',
+    '  top: 0.25em;',
+    '  right: 0;',
+    '  font-weight: normal;',
+    '  font-size: 150%;',
+    '  color: #dd4b39;',
     '}'
   ].join('\n'));
 
@@ -1461,8 +1627,6 @@
     this._directMap={};return this};c.prototype.stopCallback=function(a,b){return-1<(" "+b.className+" ").indexOf(" mousetrap ")||E(b,this.target)?!1:"INPUT"==b.tagName||"SELECT"==b.tagName||"TEXTAREA"==b.tagName||b.isContentEditable};c.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)};c.addKeycodes=function(a){for(var b in a)a.hasOwnProperty(b)&&(p[b]=a[b]);n=null};c.init=function(){var a=c(v),b;for(b in a)"_"!==b.charAt(0)&&(c[b]=function(b){return function(){return a[b].apply(a,
     arguments)}}(b))};c.init();r.Mousetrap=c;"undefined"!==typeof module&&module.exports&&(module.exports=c);"function"===typeof define&&define.amd&&define(function(){return c})}})("undefined"!==typeof window?window:null,"undefined"!==typeof window?document:null);
   /* eslint-enable */
-  // eslint-disable-next-line no-undef
-  var mousetrap = Mousetrap;
 
   /*****************************************************************************
    * Run todoist-shortcuts!
@@ -1471,41 +1635,72 @@
   handleNavigation();
   registerTopMutationObservers();
 
-  // Register key bindings
-  (function() {
-    for (var i = 0; i < KEY_BINDINGS.length; i++) {
-      if (KEY_BINDINGS[i].length === 2) {
-        mousetrap.bind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
-      } else {
-        error('Improper binding entry at index', i, 'value is', KEY_BINDINGS[i]);
-      }
-    }
-  })();
+  var overrideKeyDown = null;
 
-  // Unregister key bindings when disabled.
-  onDisable(function() {
-    for (var i = 0; i < KEY_BINDINGS.length; i++) {
-      // eslint-disable-next-line no-undef
-      mousetrap.unbind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
-    }
-  });
-
-  // Override some keybindings that interfere.  Specifically:
-  //
-  // * Ignore escape, because it deselects stuff, but we want to use it to close
-  //   context menus and such.
-  //
-  // TODO: Is there a better way?
   setTimeout(function() {
-    var oldOnkeydown = document.onkeydown;
-    if (oldOnkeydown) {
-      document.onkeydown = function(ev) {
-        if (ev.keyCode !== 27) {
-          oldOnkeydown(ev);
+    // Remove todoist's global keyboard handler.
+    //
+    // FIXME: Writing these down seems to have fixed some uses of escape.
+    // However, even so, when in the move-to-project dialog, escape does not
+    // cancel it properly.  It would be nice if escape closed it.
+    if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
+    if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
+    if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
+    document.onkeydown = function() {};
+    document.onkeyup = function() {};
+    document.onkeypress = function() {};
+
+    // eslint-disable-next-line no-undef
+    var mousetrap = new Mousetrap(document);
+
+    // Register key bindings
+    (function() {
+      for (var i = 0; i < KEY_BINDINGS.length; i++) {
+        if (KEY_BINDINGS[i].length === 2) {
+          mousetrap.bind(KEY_BINDINGS[i][0], (
+            // eslint-disable-next-line no-loop-func
+            function(f) {
+              return function() {
+                if (!overrideKeyDown) {
+                  f();
+                }
+              };
+            })(KEY_BINDINGS[i][1])
+          );
+        } else {
+          error('Improper binding entry at index', i, 'value is', KEY_BINDINGS[i]);
+        }
+      }
+    })();
+
+    // Unregister key bindings when disabled.
+    onDisable(function() {
+      for (var i = 0; i < KEY_BINDINGS.length; i++) {
+        // eslint-disable-next-line no-undef
+        mousetrap.unbind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
+      }
+    });
+
+    function sometimesCallOriginal(f) {
+      return function(ev) {
+        // Escape key is useful for exiting dialogs and other input boxes, so
+        // should use old todoist handler.
+        if (ev.keyCode === 27) {
+          f(ev);
         }
       };
-    } else {
-      error('document keydown handler was not set.');
     }
+
+    function handleKeyDown(ev) {
+      if (overrideKeyDown) {
+        overrideKeyDown(ev);
+      } else {
+        sometimesCallOriginal(window.originalTodoistKeydown)(ev);
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown, false);
+    document.addEventListener('keyup', sometimesCallOriginal(window.originalTodoistKeyup), false);
+    document.addEventListener('keypress', sometimesCallOriginal(window.originalTodoistKeypress), false);
   });
 })();
