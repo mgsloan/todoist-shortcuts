@@ -77,10 +77,10 @@
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
-  var WHAT_CURSOR_APPLIES_TO = 'all';
+  var WHAT_CURSOR_APPLIES_TO = 'most';
 
   // Set this to true to get more log output.
-  var DEBUG = true;
+  var DEBUG = false;
 
   // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
   var TODOIST_ROOT_ID = 'todoist_app';
