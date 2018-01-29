@@ -54,10 +54,6 @@ now.
     reimplement in terms of mouse clicks.  Doesn't always work for undo,
     though.
 
-
-* Check todoist version number and give a warning if it hasn't been tested
-yet.
-
 * Make left pane visible when in navigate mode.  Here's how to do it:
 
   - Have a special class applied to body when in navigate mode.  Apply the

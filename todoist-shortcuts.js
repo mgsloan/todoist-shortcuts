@@ -108,6 +108,10 @@
     [ARCHIVE_TASK_TEXT, MOVE_TEXT, DELETE_TASK_TEXT];
 
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
+  var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
+
+  var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
+  var TODOIST_TESTED_VERSION = 888;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
@@ -432,7 +436,7 @@
 
   // Open help documentation
   function openShortcutsHelp() {
-    window.open('https://github.com/mgsloan/todoist-shortcuts/blob/master/README.md');
+    window.open(TODOIST_SHORTCUTS_GITHUB + '/blob/master/README.md');
   }
 
   /** ***************************************************************************
@@ -1296,6 +1300,50 @@
     } while (toDelete.length > 0);
   }
 
+  function checkTodoistVersion() {
+    try {
+      var el = getUniqueClass(document, 'version');
+      var todoistVersion = null;
+      if (el) {
+        var stripped = stripPrefix('Version', el.textContent);
+        if (stripped) {
+          todoistVersion = parseInt(stripped.trim(), 10);
+        }
+      }
+      var warningPrefix = null;
+      var warningSuffix = null;
+      if (todoistVersion && todoistVersion < TODOIST_TESTED_VERSION) {
+        warningPrefix =
+          'Note: The version of todoist you are using is older than the version that ';
+        warningSuffix =
+          ' was tested with, version ' +
+          TODOIST_TESTED_VERSION +
+          '. Due to this mismatch, it might not behave as expected.';
+      } else if (!todoistVersion || todoistVersion > TODOIST_TESTED_VERSION) {
+        warningPrefix =
+          'Note: The version of todoist you are using is newer than the version that ';
+        warningSuffix =
+          ' is tested with, version ' +
+          TODOIST_TESTED_VERSION +
+          '. Due to this mismatch, it might not behave as expected. Perhaps check for an updated version?';
+      }
+      if (warningPrefix && warningSuffix) {
+        warn(warningPrefix, 'todoist-shortcuts', warningSuffix);
+        var div = document.createElement('div');
+        div.classList.add(TODOIST_SHORTCUTS_WARNING);
+        div.appendChild(document.createTextNode(warningPrefix));
+        var a = document.createElement('a');
+        a.href = TODOIST_SHORTCUTS_GITHUB;
+        a.appendChild(document.createTextNode('todoist-shortcuts'));
+        div.appendChild(a);
+        div.appendChild(document.createTextNode(warningSuffix));
+        document.getElementById('content').appendChild(div);
+      }
+    } catch (ex) {
+      error('Exception while checking Todoist version', ex);
+    }
+  }
+
   /** ***************************************************************************
    * Task cursor
    */
@@ -1574,6 +1622,17 @@
     return result;
   }
 
+  // Returns string with prefix removed.  Returns null if prefix doesn't
+  // match.
+  function stripPrefix(prefix, string) {
+    var found = string.slice(0, prefix.length);
+    if (found === prefix) {
+      return string.slice(prefix.length);
+    } else {
+      return null;
+    }
+  }
+
   /*****************************************************************************
    * Predicates (for use with get / with functions above)
    */
@@ -1677,13 +1736,21 @@
     '',
     // TODO: I'd like to have these be to the left, but I think that would
     // require absolute positioning or similar.  They get clipped by overflow.
-    '.todoist_shortcuts_tip {',
+    '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
     '  top: 0.25em;',
     '  right: 0;',
     '  font-weight: normal;',
     '  font-size: 150%;',
     '  color: #dd4b39;',
+    '}',
+    '',
+    '.' + TODOIST_SHORTCUTS_WARNING + ' {',
+    '  position: absolute;',
+    '  bottom: 0.5em;',
+    '  right: 0.5em;',
+    '  width: 30em;',
+    '  font-style: italic;',
     '}'
   ].join('\n'));
 
@@ -1742,6 +1809,7 @@
    * Run todoist-shortcuts!
    */
 
+  checkTodoistVersion();
   handleNavigation();
   registerTopMutationObservers();
 
