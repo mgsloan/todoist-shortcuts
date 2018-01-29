@@ -29,8 +29,8 @@
     ['o', addBelow],
     ['J', moveDown],
     ['K', moveUp],
-    // ['H ctrl+left', dedent],
-    // ['L ctrl+right', indent],
+    [['H', 'ctrl+left'], moveOut],
+    [['L', 'ctrl+right'], moveIn],
 
     // Selection
     ['x', toggleSelect],
@@ -803,68 +803,216 @@
     el.click();
   }
 
-  function moveUp() {
+  // Indent task.
+  function moveIn() {
     var isAgenda = checkIsAgendaMode();
-    var task = getCursor();
-    var startCursorKey = getCursorKey(isAgenda);
+    var cursor = getCursor();
+    if (isAgenda) {
+      warn('Indenting task does not work in agenda mode.');
+    } else if (!cursor) {
+      warn('No cursor to indent.');
+    } else {
+      dragTaskOver(cursor, function() {
+        return {
+          destination: cursor,
+          horizontalOffset: 28,
+          verticalOffset: 0
+        };
+      });
+    }
+  }
+
+  // Dedent task.
+  function moveOut() {
+    var isAgenda = checkIsAgendaMode();
+    var cursor = getCursor();
+    if (isAgenda) {
+      warn('Dedenting task does not work in agenda mode.');
+    } else if (!cursor) {
+      warn('No cursor to dedent.');
+    } else {
+      dragTaskOver(cursor, function() {
+        return {
+          destination: cursor,
+          horizontalOffset: -28,
+          verticalOffset: 0
+        };
+      });
+    }
+  }
+
+  // Move task up, maintaining its indent level and not swizzling any nested
+  // structures.
+  function moveUp() {
+    // FIXME: If you edit an item and ctrl+arrow it, cursorIndent can be
+    // temporarily wrong.  Fix moveDown too.
+    debug('cursorIndent is', cursorIndent);
+    var isAgenda = checkIsAgendaMode();
+    var cursor = getCursor();
+    if (isAgenda) {
+      warn('Moving task up does not work in agenda mode (yet).');
+    } else if (!cursor) {
+      warn('No cursor to move up.');
+    } else {
+      dragTaskOver(cursor, function() {
+        var tasks = getTasks();
+        var cursorIndex = getCursorIndex(tasks);
+        for (var i = cursorIndex - 1; i >= 0; i--) {
+          var task = tasks[i];
+          var indent = getTaskIndentClass(task);
+          if (indent === cursorIndent) {
+            return {
+              destination: task,
+              horizontalOffset: 0,
+              verticalOffset: cursor.clientHeight / -3
+            };
+          } else if (indent < cursorIndent) {
+            warn('Refusing to dedent task to move it up.');
+            return null;
+          }
+        }
+        warn('Couldn\'t find task above cursor to move it above.');
+        return null;
+      });
+    }
+  }
+
+  // Move task down, maintaining its indent level and not swizzling any nested
+  // structures.
+  function moveDown() {
+    var isAgenda = checkIsAgendaMode();
+    var cursor = getCursor();
+    if (isAgenda) {
+      warn('Moving task down does not work in agenda mode (yet).');
+    } else if (!cursor) {
+      warn('No cursor to move down.');
+    } else {
+      dragTaskOver(cursor, function() {
+        var tasks = getTasks();
+        var cursorIndex = getCursorIndex(tasks);
+        var lastQualifyingTask = null;
+        for (var i = cursorIndex + 1; i < tasks.length; i++) {
+          var task = tasks[i];
+          var indent = getTaskIndentClass(task);
+          // Logic here is a bit tricky.  The first time we encounter a task
+          // at the same indent level, this is the subtree we want to move
+          // past.  So, set lastQualifyingTask to non-null and keep track of
+          // the last one.  After that, when we encounter something at a
+          // lesser or equal indent to cursorIndent, we want to place it after
+          // the last one.
+          if (!lastQualifyingTask) {
+            if (indent === cursorIndent) {
+              lastQualifyingTask = task;
+            } else if (indent < cursorIndent) {
+              warn('Refusing to dedent task to move it down.');
+              return null;
+            }
+          } else if (indent <= cursorIndent) {
+            break;
+          } else {
+            lastQualifyingTask = task;
+          }
+        }
+        if (lastQualifyingTask) {
+          return {
+            destination: lastQualifyingTask,
+            horizontalOffset: 0,
+            verticalOffset: cursor.clientHeight / 3
+          };
+        } else {
+          warn('Couldn\'t find task below cursor to move it below.');
+          return null;
+        }
+      });
+    }
+  }
+
+  var dragInProgress = false;
+
+  function dragTaskOver(sourceTask, findDestination) {
+    var sourceY = sourceTask.offsetTop;
+    if (dragInProgress) {
+      warn('Not executing drag because one is already in progress.');
+    } else {
+      dragInProgress = true;
+      try {
+        withDragHandle(sourceTask, function(el, x, y) {
+          var result = findDestination();
+          if (result) {
+            var deltaX = result.horizontalOffset;
+            var deltaY = result.destination.offsetTop - sourceY + result.verticalOffset;
+            animateDrag(el, x, y, x + deltaX, y + deltaY, function() { dragInProgress = false; });
+          } else {
+            dragInProgress = false;
+          }
+        }, function() { dragInProgress = false; });
+      } catch (ex) {
+        dragInProgress = false;
+        throw ex;
+      }
+    }
+  }
+
+  function withDragHandle(task, f, finished) {
+    var isAgenda = checkIsAgendaMode();
+    var key = getTaskKey(isAgenda, task);
     task.dispatchEvent(new Event('mouseover'));
     try {
-      withCursorDragHandle(function(el, x, y) {
-        el.dispatchEvent(new MouseEvent('mousedown', {
-          screenX: x,
-          screenY: y,
-          clientX: x,
-          clientY: y
-        }));
-        // FIXME: In order to jump between sections, should use previous task position
-        //
-        // NOTE: Would be nice to not need this 0ms timeout as it makes it a
-        // little laggier. Seems to be needed though.
-        setTimeout(function() {
-          var params = {
-            bubbles: true,
-            screenX: x,
-            screenY: y - task.clientHeight + 20,
-            clientX: x,
-            clientY: y - task.clientHeight + 20
-          };
-          el.dispatchEvent(new MouseEvent('mousemove', params));
-          el.dispatchEvent(new MouseEvent('mouseup', params));
-        });
-      });
+      var handler = getUniqueClass(task, 'drag_and_drop_handler');
+      if (handler) {
+        var x = handler.offsetLeft - window.scrollX;
+        var y = handler.offsetTop - window.scrollY;
+        f(handler, x, y);
+      } else {
+        // FIXME: Sometimes this triggers, particularly when move up / move
+        // down key is held down with repeat.  Tried some hacks to resolve,
+        // but nothing seems to work well.
+        warn('Couldn\'t find drag_and_drop_handler.');
+        finished();
+      }
     } finally {
-      withTaskByKey(startCursorKey, function(el) {
+      withTaskByKey(key, function(el) {
         el.dispatchEvent(new Event('mouseout'));
       });
     }
   }
 
-  function withCursorDragHandle(f) {
-    withUniqueClass(getCursor(), 'drag_and_drop_handler', unconditional, function(el) {
-      var x = el.offsetLeft - window.scrollX;
-      var y = el.offsetTop - window.scrollY;
-      f(el, x, y);
-    });
+  function animateDrag(el, sx, sy, tx, ty, finished) {
+    var startParams = mkMouseParams(sx, sy);
+    el.dispatchEvent(new MouseEvent('mousedown', startParams));
+    var startTime = Date.now();
+    var duration = 100;
+    var maxFrames = 10;
+    // NOTE: Animating this may seem overkill, but doing a direct move didn't
+    // work reliably.  This also makes it clearer what's happening.
+    var dragLoop = function() {
+      var alpha = (Date.now() - startTime) / duration;
+      if (alpha >= 1) {
+        var params = mkMouseParams(tx, ty);
+        el.dispatchEvent(new MouseEvent('mousemove', params));
+        el.dispatchEvent(new MouseEvent('mouseup', params));
+        finished();
+      } else {
+        params = mkMouseParams(lerp(sx, tx, alpha), lerp(sy, ty, alpha));
+        el.dispatchEvent(new MouseEvent('mousemove', params));
+        setTimeout(dragLoop, duration / maxFrames);
+      }
+    };
+    dragLoop();
   }
 
-  function moveDown() {
-    /* FIXME
-    withDragHandle(getCursor(), function(el) {
-    });
-    */
+  function lerp(s, t, a) {
+    return s * (1 - a) + t * a;
   }
 
-  // TODO
-  // eslint-disable-next-line no-unused-vars
-  function withDragHandle(task, f) {
-    var isAgenda = checkIsAgendaMode();
-    var key = getTaskKey(isAgenda, task);
-    task.dispatchEvent(new Event('mouseover'));
-    try {
-      withUniqueClass(task, 'drag_and_drop_handler', unconditional, f);
-    } finally {
-      withTaskByKey(key, function(el) { el.dispatchEvent(new Event('mouseout')); });
-    }
+  function mkMouseParams(x, y) {
+    return {
+      bubbles: true,
+      screenX: x,
+      screenY: y,
+      clientX: x,
+      clientY: y
+    };
   }
 
   function clickTaskDone(task) {
@@ -1235,21 +1383,29 @@
   }
 
   // Given a list of task elements (yielded by getTasks), returns the index
-  // that corresponds to cursorId.
+  // that corresponds to cursorId / cursorIndent.
   function getCursorIndex(tasks) {
     if (cursorId) {
-      var isAgenda = checkIsAgendaMode();
-      for (var i = 0; i < tasks.length; i++) {
-        var task = tasks[i];
-        if (task.id === cursorId &&
-            (!isAgenda || task.classList.contains(cursorIndent))) {
-          return i;
-        }
+      return getTaskIndex(checkIsAgendaMode(), tasks, cursorId, cursorIndent);
+    } else {
+      return null;
+    }
+  }
+
+  // Returns index of task in list, identified by id and indent.
+  function getTaskIndex(isAgenda, tasks, id, indent) {
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i];
+      if (task.id === id &&
+          (!isAgenda || task.classList.contains(indent))) {
+        return i;
       }
     }
     return null;
   }
 
+  // TODO
+  // eslint-disable-next-line no-unused-vars
   function getCursorKey(isAgenda) {
     return makeTaskKey(isAgenda, cursorId, cursorIndent);
   }
@@ -1596,6 +1752,9 @@
       selecter + ' .sel_checkbox_td {',
       '  padding-left: 2px;',
       '}',
+      // FIXME: This is intended to make the drag and drop handler not move
+      // when the cursor is on it.  Seems to have broken.  There is also a
+      // tricky case when something is a nested task parent.
       selecter + ' .arrow, ' + selecter + ' .drag_and_drop_handler {',
       '  margin-left: -16px;',
       '}'
