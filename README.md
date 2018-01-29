@@ -1,5 +1,8 @@
 # todoist-shortcuts user documentation
 
+`todoist-shortcuts` is a browser extension or greasemonkey script which adds a
+bunch of keyboard shortcuts to [Todoist](https://todoist.com).
+
 ## Add tasks
 
 | keys |                              |
