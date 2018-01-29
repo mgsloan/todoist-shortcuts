@@ -1,4 +1,5 @@
-This is a file containing general notes about the development of todoist-shortcuts.
+This is a file containing general notes about the development of
+todoist-shortcuts.
 
 # Contributing
 
@@ -37,11 +38,7 @@ First, install eslint:
 npm install eslint eslint-config-es5
 ```
 
-Then, run this incantation to use it:
-
-```
-./node_modules/eslint/bin/eslint.js todoist-shortcuts.js
-```
+Then, run `eslint.sh` to use it to do checking.
 
 # TODO "soon"
 

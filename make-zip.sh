@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Ensure that eslint passes.
+./eslint.sh
+
 rm -f todoist-shortcuts.zip
 zip todoist-shortcuts.zip src/inject.js src/manifest.json src/todoist-shortcuts.js
 
