@@ -711,6 +711,42 @@
     el.click();
   }
 
+  /* FIXME: Figure out why these various approaches don't work.
+
+  // Trigger todoist's undo.
+  function undo() {
+    // todoistShortcut({ key: 'u', keyCode: 85 });
+    var ev = Object.assign({}, window.event);
+    ev.type = "keydown";
+    todoistRootDiv.dispatchEvent(ev);
+    // originalTodoistKeydown(ev);
+    var ev = Object.assign({}, window.event);
+    ev.type = "keyup";
+    todoistRootDiv.dispatchEvent(ev);
+    // originalTodoistKeyup(ev);
+    var ev = Object.assign({}, window.event);
+    ev.type = "keypress";
+    todoistRootDiv.dispatchEvent(ev);
+    // originalTodoistKeypress(ev);
+  }
+
+  // Simulate a key press with todoist's global handlers.
+  //
+  // TODO: Would be nice to have something to convenient provide all correct
+  // options.  Instead we rely on todoist only checking some event attributes.
+  function todoistShortcut(options) {
+    var ev = new Event('keydown');
+    for (var o in options) { ev[o] = options[o]; }
+    originalTodoistKeydown(ev);
+    ev = new Event('keyup');
+    for (o in options) { ev[o] = options[o]; }
+    originalTodoistKeyup(ev);
+    ev = new Event('keypress');
+    for (o in options) { ev[o] = options[o]; }
+    originalTodoistKeypress(ev);
+  }
+  */
+
   // Indent task.
   function moveIn() {
     var isAgenda = checkIsAgendaMode();
@@ -1734,10 +1770,35 @@
 
     function sometimesCallOriginal(f) {
       return function(ev) {
-        // Escape key is useful for exiting dialogs and other input boxes, so
-        // should use old todoist handler.
-        if (ev.keyCode === 27) {
-          f(ev);
+        if (!overrideKeyDown) {
+          // Escape key is useful for exiting dialogs and other input boxes, so
+          // should also use old todoist handler.
+          //
+          // FIXME: Infuriatingly, this also doesn't work.
+          //
+          // Use default todoist keys for
+          //
+          // * u for undo last action
+          // * q for quick add task
+          // * / or f for search
+          // * s, p, r for sorting options
+          //
+          // It would be good to also do the following, but it aliases keys used
+          // in combos:
+          //
+          // * a for add task at the bottom of the list
+          // * A for add task at the top of the list
+          var keysToProxy = ['u', 'q', '/', 'f', 's', 'p', 'r'];
+          var matches = false;
+          for (var i = 0; i < keysToProxy.length; i++) {
+            if (keysToProxy[i] === ev.key) {
+              matches = true;
+              break;
+            }
+          }
+          if (matches || ev.keyCode === 27) {
+            f(ev);
+          }
         }
       };
     }

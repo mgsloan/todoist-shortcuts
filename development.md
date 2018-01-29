@@ -45,7 +45,10 @@ Then, run this incantation to use it:
 
 # TODO "soon"
 
-* Allow usage of various standard todoist shortcuts.  Particularly `u`.
+* Allow usage of various standard todoist shortcuts.  Particularly `u`.  There
+are currently two attempts at this in the code, one as actions and one as
+exceptions for the key handler.  Infuriatingly, neither is working right
+now.
 
 * Have `?` open up todoist-shortcuts README.md.
 
@@ -78,6 +81,9 @@ move" mode.
 * If user edits task and uses ctrl+arrow to indent / dedent, `cursorIndent`
 doesn't update.  This can cause moveUp / moveDown to fail, among other
 inconsistencies.
+
+* Most functions have at least some documentation comments, but not all.
+Should add these!
 
 # TODO "one day"
 
