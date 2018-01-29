@@ -54,7 +54,6 @@ now.
     reimplement in terms of mouse clicks.  Doesn't always work for undo,
     though.
 
-* Have `?` open up todoist-shortcuts README.md.
 
 * Check todoist version number and give a warning if it hasn't been tested
 yet.
@@ -88,6 +87,9 @@ inconsistencies.
 
 * Most functions have at least some documentation comments, but not all.
 Should add these!
+
+* Have `?` open up todoist-shortcuts README.md that is specific to the user's
+  version.  Check if there is a new version?
 
 # TODO "one day"
 

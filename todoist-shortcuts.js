@@ -63,6 +63,7 @@
     // Misc
     ['q', quickAddTask],
     [['/', 'f'], focusSearch],
+    ['?', openShortcutsHelp],
     ['escape', closeContextMenus]
   ];
 
@@ -427,6 +428,11 @@
         input.dispatchEvent(new Event('focus'));
       });
     });
+  }
+
+  // Open help documentation
+  function openShortcutsHelp() {
+    window.open('https://github.com/mgsloan/todoist-shortcuts/blob/master/README.md');
   }
 
   /** ***************************************************************************
