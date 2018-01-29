@@ -45,6 +45,8 @@ Then, run this incantation to use it:
 
 # TODO "soon"
 
+* `f` / `/` for focusing the search bar doesn't work.
+
 * Allow usage of various standard todoist shortcuts.  Particularly `u`.  There
 are currently two attempts at this in the code, one as actions and one as
 exceptions for the key handler.  Infuriatingly, neither is working right
@@ -125,6 +127,12 @@ recently accumulated set of key disables was `hjklxvtqaAuspr1234noO`
 clicked.  However, it does not pay attention to user shift-clicks.  This means
 if the last selection was done with the mouse, then some other stuff could get
 randomly selected, which isn't very good.
+
+* Youtube video?
+
+* Blog post about the overall technique?
+
+* Chrome webstore promotional tile images?
 
 # Changes to todoist that would be very helpful
 

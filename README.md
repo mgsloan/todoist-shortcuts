@@ -5,8 +5,8 @@ bunch of keyboard shortcuts to [Todoist](https://todoist.com).
 
 ## Add tasks
 
-| keys |                              |
-| ---  |                              |
+| keys | action                       |
+| ---  | ---                          |
 | `q`  | open quick task addition box |
 
 See the "Task Quick Add shortcuts" section of [todoist's keyboard shortcuts
