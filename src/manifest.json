@@ -1,0 +1,16 @@
+{
+  "name": "todoist-shortcuts",
+  "author": "Michael Sloan",
+  "description": "Adds a bunch of keyboard shortcuts to Todoist. More info: https://github.com/mgsloan/todoist-shortcuts",
+  "version": "0.1",
+  "content_scripts": [
+  	{
+      "matches": ["http://todoist.com/app*", "https://todoist.com/app*"],
+      "js": ["inject.js"]
+  	}
+  ],
+  "web_accessible_resources": [
+  	"todoist-shortcuts.js"
+  ],
+  "manifest_version": 2
+}

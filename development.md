@@ -87,6 +87,10 @@ Should add these!
 * Have `?` open up todoist-shortcuts README.md that is specific to the user's
   version.  Check if there is a new version?
 
+* Add `update_url` field to `manifest.json`.
+
+* Add a chrome extension icon.
+
 # TODO "one day"
 
 * In agenda view, cursor should be able to focus empty days, for the purpose
