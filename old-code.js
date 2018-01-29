@@ -148,6 +148,25 @@ function goToProject() {
     }
   }
 
+  // Clicks "cancel" on inline add of a task, if there's no task in the entry
+  // box. This is a hacky workaround for usage of "a" in the default keybinding
+  // for select_all.
+  function cancelEmptyAdd() {
+    setTimeout(function() {
+      withUniqueClass(document, 'richtext_editor', unconditional, function(editor) {
+        if (editor.textContent === '') {
+          cancelAdd();
+        } else {
+          warn('Not cancelling add because it has text.');
+        }
+      });
+    });
+  }
+
+  // Clicks "cancel" on inline add of a task.
+  function cancelAdd() {
+    withUniqueClass(document, 'cancel', unconditional, click);
+  }
 
   /* FIXME: Doesn't work out because the menu doesn't stick around if the
   selection is removed, which makes sense.

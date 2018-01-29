@@ -17,24 +17,24 @@
   var KEY_BINDINGS = [
 
     // Navigation
-    ['j', cursorDown],
-    ['k', cursorUp],
-    ['h', collapse],
-    ['l', expand],
+    [['j', 'down'], cursorDown],
+    [['k', 'up'], cursorUp],
+    [['h', 'left'], collapse],
+    [['l', 'right'], expand],
     ['g', navigate],
 
     // Manipulation of tasks at cursor
     ['enter', edit],
     ['O', addAbove],
     ['o', addBelow],
-    ['J', moveDown],
-    ['K', moveUp],
-    [['H', 'ctrl+left'], moveOut],
-    [['L', 'ctrl+right'], moveIn],
+    [['J', 'shift+down'], moveDown],
+    [['K', 'shift+up'], moveUp],
+    [['H', 'shift+left'], moveOut],
+    [['L', 'shift+right'], moveIn],
 
     // Selection
     ['x', toggleSelect],
-    ['* a', sequence([selectAll, cancelEmptyAdd])],
+    ['* a', selectAll],
     ['* n', deselectAll],
     ['* 1', selectPriority('1')],
     ['* 2', selectPriority('2')],
@@ -61,8 +61,6 @@
     ['r', unschedule],
 
     // Misc
-    // FIXME: ['u', undo],
-    // TODO: ["?", show_keybindings]
     ['escape', closeContextMenus]
   ];
 
@@ -113,48 +111,13 @@
   var todoistRootDiv = document.getElementById(TODOIST_ROOT_ID);
   if (!todoistRootDiv) return;
 
-  // Misc TODO:
-  //
-  // * Check todoist version number and give a warning if it hasn't been tested
-  //   yet.
-  //
-  // * Allow using ctrl+arrows while editing text of a task.
-  //
-  // * In agenda view, cursor should be able to focus empty days, for the
-  //   purpose of adding tasks.
-  //
-  // * What is postpone?
-  //
-  // * Enter day of month + move between months.
-  //
-  // * l should step out even if not focused on the collapser
-  //
-  // * h should also move cursor down after opening
-  //
-  // * Should it match append / insert? 'a' would edit at the end of task text,
-  //   'i' would edit at beginning of task text.
-  //
-  // * Remember per project cursor locations.
-  //
-  // * "bulk reschedule mode" - clears current selection, prompts for
-  //   rescheduling of item then moves cursor to the next.  Similar "bulk
-  //   project move" mode.
-  //
-  // * e for Archive and d for Done are awfully close to eachother.  Is
-  //   archive vs delete useful?
-  //
-  // * Use querySelectorAll to simplify?
-  //
-  // * Display of keybindings directly on elements suggests a library that
-  //   mixes querySelectorAll / mousetrap / the utilities here.  Design it
-  //   also to be used in normal applications?
-
   /*****************************************************************************
    * Action combiners
    */
 
   // Take multiple actions (functions that take no arguments), and run them in
   // sequence.
+  // eslint-disable-next-line no-unused-vars
   function sequence(actions) {
     return function() {
       for (var i = 0; i < actions.length; i++) {
@@ -286,11 +249,6 @@
     withUniqueClass(document, PROJECT_COMPLETE_CLASS, unconditional, function(complete) {
       withUniqueTag(complete, 'input', unconditional, function(input) {
         input.value = text;
-        // FIXME: Initially doesn't show projects list because setting 'value'
-        // doesn't trigger any events. However, neither a bare keydown or change
-        // work. Requires further investigation.
-        //
-        // input.dispatchEvent(new Event("keydown"));
       });
     });
   }
@@ -426,28 +384,6 @@
     selectAllInternal();
   }
 
-  // Clicks "cancel" on inline add of a task, if there's no task in the entry
-  // box. This is a hacky workaround for usage of "a" in the default keybinding
-  // for select_all.
-  //
-  // FIXME: Instead figure out a way to suppress the event.
-  function cancelEmptyAdd() {
-    setTimeout(function() {
-      withUniqueClass(document, 'richtext_editor', unconditional, function(editor) {
-        if (editor.textContent === '') {
-          cancelAdd();
-        } else {
-          warn('Not cancelling add because it has text.');
-        }
-      });
-    });
-  }
-
-  // Clicks "cancel" on inline add of a task.
-  function cancelAdd() {
-    withUniqueClass(document, 'cancel', unconditional, click);
-  }
-
   // Add a task above / below cursor. Unfortunately these options do not exist
   // in agenda mode, so in that case, instead it is added to the current
   // section.
@@ -462,13 +398,6 @@
 
   // Switches to a navigation mode, where navigation targets are annotated
   // with letters to press to click.
-  //
-  // TODO: Consider using mnemonic navigation for project names, which would
-  // use the first character of the project when possible.  Tricky to make
-  // this consistent despite project folding.  Give priority based on lower
-  // indent levels?
-  //
-  // TODO: Handle more than (26 + 10 - 3 == 33) visible projects.
   function navigate() {
     withId('projects_list', function(projectsUl) {
       // Since the projects list can get reconstructed, watch for changes and
@@ -486,9 +415,6 @@
   /** ***************************************************************************
    * Utilities for manipulating the UI
    */
-
-  // FIXME: lastShiftClicked should probably also be set when user actually
-  // shift clicks, instead of just simulated ones.
 
   // MUTABLE.
   var lastShiftClicked = null;
@@ -513,8 +439,6 @@
     var mde = new Event('mousedown');
     mde.shiftKey = true;
     task.dispatchEvent(mde);
-    // TODO: Should handle this via a mousedown handler, so that it keeps track
-    // of mouseclicks too.  Otherwise could get wonky behavior in
     lastShiftClicked = task.id;
     lastShiftClickedIndent = getTaskIndentClass(task);
   }
@@ -613,9 +537,6 @@
     }
   }
 
-  // MUTABLE.
-  // var lastObserverDisables = [];
-
   var lastHash = null;
 
   function handleNavigation() {
@@ -625,19 +546,6 @@
       lastHash = currentHash;
       setCursorToFirstTask('scroll');
     }
-    // TODO: Following code was an attempt at a more efficient way to watch
-    // for mutations of task lists.  Unfortunately, it does not work in all
-    // cases.  So, instead we just use a { subtree: true } mutation observer.
-    /*
-    for (var i = 0; i < lastObserverDisables.length; i++) {
-      lastObserverDisables[i]();
-    }
-    lastObserverDisables = [];
-    withClass(editor, 'items', function(itemsDiv) {
-      debug('registering observer for', itemsDiv);
-      lastObserverDisables.push(registerMutationObserver(itemsDiv, ensureCursor));
-    });
-    */
   }
 
   // If there are selections but the top bar isn't visible, then toggle the
@@ -844,9 +752,6 @@
   // Move task up, maintaining its indent level and not swizzling any nested
   // structures.
   function moveUp() {
-    // FIXME: If you edit an item and ctrl+arrow it, cursorIndent can be
-    // temporarily wrong.  Fix moveDown too.
-    debug('cursorIndent is', cursorIndent);
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
     if (isAgenda) {
@@ -1154,6 +1059,7 @@
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   function makeTaskKey(isAgenda, id, indent) {
     if (isAgenda) {
       return id + ' ' + indent;
@@ -1283,8 +1189,6 @@
           if (li) {
             click(li);
           // Space to scroll down.  Shift+space to scroll up.
-          //
-          // TODO: Document in README
           } else if (ev.key === 'Shift') {
             keepGoing = true;
           } else if (ev.key === ' ') {
@@ -1404,12 +1308,6 @@
     return null;
   }
 
-  // TODO
-  // eslint-disable-next-line no-unused-vars
-  function getCursorKey(isAgenda) {
-    return makeTaskKey(isAgenda, cursorId, cursorIndent);
-  }
-
   // Returns the <li> element which corresponds to the current cursorId.
   function getCursor() {
     return getTaskById(cursorId, cursorIndent);
@@ -1428,8 +1326,6 @@
     setCursor(tasks[newIndex], 'scroll');
   }
 
-  // TODO: Should this be cached in a variable? It often gets called multiple
-  // times in an action.
   function checkIsAgendaMode() {
     return getId(AGENDA_VIEW_ID) !== null;
   }
@@ -1454,10 +1350,10 @@
     console.warn.apply(null, args);
   }
 
-  // TODO: add issue tracker link?  What about warning?
   function error() {
     var args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
+    args.push('Please report this as an issue to http://github.com/mgsloan/todoist-shortcuts');
     // eslint-disable-next-line no-console
     console.error.apply(null, arguments);
   }
@@ -1481,8 +1377,8 @@
     var rect = el.getBoundingClientRect();
     if (rect.top < 0 || rect.bottom > window.innerHeight) {
       var top = rect.top + window.scrollY;
-      // FIXME: for large tasks, this could end up with the whole task not being
-      // in view.
+      // TODO: for very large tasks, this could end up with the whole task not
+      // being in view.
       window.scrollTo(0, top - window.innerHeight / 2);
     }
   }
@@ -1554,9 +1450,7 @@
     if (result) {
       return f(result);
     } else {
-      // TODO: This warning doesn't make it clear that the predicate could also
-      // be the cause.
-      warn('Couldn\'t find unique child with class', cls, 'instead got', result);
+      warn('Couldn\'t find unique child with class', cls, 'and matching predicate, instead got', result);
       return null;
     }
   }
@@ -1662,14 +1556,12 @@
   }
 
   // Given two predicates, uses && to combine them.
-  // TODO:
   // eslint-disable-next-line no-unused-vars
   function and(p1, p2) {
     return function(x) { return p1(x) && p2(x); };
   }
 
   // Given two predicates, uses || to combine them.
-  // TODO:
   // eslint-disable-next-line no-unused-vars
   function or(p1, p2) {
     return function(x) { return p1(x) || p2(x); };
