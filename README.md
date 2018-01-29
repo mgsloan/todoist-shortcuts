@@ -1,5 +1,15 @@
 # todoist-shortcuts user documentation
 
+## Add tasks
+
+| keys |                              |
+| ---  |                              |
+| `q`  | open quick task addition box |
+
+See the "Task Quick Add shortcuts" section of [todoist's keyboard shortcuts
+documentation](https://support.todoist.com/hc/en-us/articles/205063212) for
+information about shorthands to use when adding tasks.
+
 ## Navigation
 
 | keys           | action                           |
@@ -8,6 +18,7 @@
 | `k` or `up`    | move cursor up                   |
 | `h` or `left`  | collapse nested at cursor        |
 | `l` or `right` | expand nested at cursor          |
+| `/` or `f`     | focus search input               |
 | `g`            | enter section navigation mode    |
 
 In "section navigation mode", the different selections in the left pane are
@@ -21,15 +32,15 @@ you can scroll the left pane down and up with `space` and `shift+space`.
 
 ## Manipulation of tasks at cursor
 
-| keys                       | action                 |
-| ---                        | ---                    |
-| `enter`                    | edit task at cursor    |
-| `o`                        | add task after cursor  |
-| `shift+o`                  | add task before cursor |
-| `shift+j` or `shift+down`  | move task at cursor downwards
-| `shift+k` or `shift+up`    | move task at cursor upwards
-| `shift+l` or `shift+left`  | dedent task at cursor  |
-| `shift+h` or `shift+right` | indent task at cursor  |
+| keys                       | action                        |
+| ---                        | ---                           |
+| `enter`                    | edit task at cursor           |
+| `o`                        | add task after cursor         |
+| `shift+o`                  | add task before cursor        |
+| `shift+j` or `shift+down`  | move task at cursor downwards |
+| `shift+k` or `shift+up`    | move task at cursor upwards   |
+| `shift+l` or `shift+left`  | dedent task at cursor         |
+| `shift+h` or `shift+right` | indent task at cursor         |
 
 ## Selection
 
@@ -70,6 +81,11 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `w`    | next week    |
 | `m`    | month        |
 | `r`    | remove       |
+
+# Missing shortcuts (coming soon)
+
+NOTE that `u` should do undo, but it currently doesn't, due to some
+frustrating technical difficulties with getting it to work.
 
 # todoist-shortcuts development
 

@@ -50,6 +50,10 @@ are currently two attempts at this in the code, one as actions and one as
 exceptions for the key handler.  Infuriatingly, neither is working right
 now.
 
+  - An alternative approach already used for `q` / `/` / `f` is just to
+    reimplement in terms of mouse clicks.  Doesn't always work for undo,
+    though.
+
 * Have `?` open up todoist-shortcuts README.md.
 
 * Check todoist version number and give a warning if it hasn't been tested

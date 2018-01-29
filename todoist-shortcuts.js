@@ -61,6 +61,8 @@
     ['r', unschedule],
 
     // Misc
+    ['q', quickAddTask],
+    [['/', 'f'], focusSearch],
     ['escape', closeContextMenus]
   ];
 
@@ -409,6 +411,21 @@
         setupNavigate(projectsUl, finished);
       }, { childList: true, subtree: true });
       setupNavigate(projectsUl, finished);
+    });
+  }
+
+  // Clicks quick add task button.  Would be better to use todoist's builtin
+  // shortcut, but that logic is currently WIP and broken.
+  function quickAddTask() {
+    withId('quick_add_task_holder', click);
+  }
+
+  // Focus the search bar.
+  function focusSearch() {
+    withId('quick_find', function(div) {
+      withUniqueTag(div, 'input', unconditional, function(input) {
+        input.dispatchEvent(new Event('focus'));
+      });
     });
   }
 
@@ -1779,8 +1796,6 @@
           // Use default todoist keys for
           //
           // * u for undo last action
-          // * q for quick add task
-          // * / or f for search
           // * s, p, r for sorting options
           //
           // It would be good to also do the following, but it aliases keys used
@@ -1788,7 +1803,7 @@
           //
           // * a for add task at the bottom of the list
           // * A for add task at the top of the list
-          var keysToProxy = ['u', 'q', '/', 'f', 's', 'p', 'r'];
+          var keysToProxy = ['u', 's', 'p', 'r'];
           var matches = false;
           for (var i = 0; i < keysToProxy.length; i++) {
             if (keysToProxy[i] === ev.key) {
