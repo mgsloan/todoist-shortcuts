@@ -4,7 +4,10 @@
 ./eslint.sh
 
 rm -f todoist-shortcuts.zip
-zip todoist-shortcuts.zip src/inject.js src/manifest.json src/todoist-shortcuts.js
+cd src
+zip todoist-shortcuts.zip inject.js manifest.json todoist-shortcuts.js
+cd ../
+mv src/todoist-shortcuts.zip .
 
 # Turns out chrome webstore just wants a zip
 #
