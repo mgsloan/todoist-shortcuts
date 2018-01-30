@@ -8,7 +8,6 @@
 // @grant       none
 // ==/UserScript==
 
-// Set timeout is a hack so that the mousetrap library will be in scope.
 (function() {
   'use strict';
 
