@@ -153,7 +153,7 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, unconditional, function(content) {
+    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, all, function(content) {
       content.dispatchEvent(new Event('mousedown'));
     });
   }
@@ -188,7 +188,7 @@
       var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         withTaskMenu(isAgenda, mutateCursor, function(menu) {
-          withUniqueClass(menu, 'cmp_scheduler_more', unconditional, click);
+          withUniqueClass(menu, 'cmp_scheduler_more', all, click);
         });
       } else {
         withId(ACTIONS_BAR_CLASS, function(parent) {
@@ -208,21 +208,21 @@
   // Click 'tomorrow' in schedule. Only does anything if schedule is open.
   function scheduleTomorrow() {
     withCalendar('scheduleTomorrow', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', unconditional, click);
+      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', all, click);
     });
   }
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
     withCalendar('scheduleNextWeek', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_next_week', unconditional, click);
+      withUniqueClass(calendar, 'cmp_scheduler_next_week', all, click);
     });
   }
 
   // Click 'next month' in schedule. Only does anything if schedule is open.
   function scheduleNextMonth() {
     withCalendar('scheduleNextMonth', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_month', unconditional, click);
+      withUniqueClass(calendar, 'cmp_scheduler_month', all, click);
     });
   }
 
@@ -252,8 +252,8 @@
 
   // Fills in the text of the project selection completion.
   function fillProjectInput(text) {
-    withUniqueClass(document, PROJECT_COMPLETE_CLASS, unconditional, function(complete) {
-      withUniqueTag(complete, 'input', unconditional, function(input) {
+    withUniqueClass(document, PROJECT_COMPLETE_CLASS, all, function(complete) {
+      withUniqueTag(complete, 'input', all, function(input) {
         input.value = text;
       });
     });
@@ -274,7 +274,7 @@
           clickPriorityMenu(isAgenda, menu, level);
         });
       } else {
-        withUniqueClass(document, 'priority_menu', unconditional, function(menu) {
+        withUniqueClass(document, 'priority_menu', all, function(menu) {
           clickPriorityMenu(isAgenda, menu, level);
         });
       }
@@ -368,7 +368,7 @@
 
   // Toggles collapse / expand task under the cursor, if it has children.
   function toggleCollapse() {
-    withUniqueClass(getCursor(), ARROW_CLASS, unconditional, click);
+    withUniqueClass(getCursor(), ARROW_CLASS, all, click);
   }
 
   // Expands or collapses task under the cursor, that have children. Does
@@ -427,7 +427,7 @@
   // Focus the search bar.
   function focusSearch() {
     withId('quick_find', function(div) {
-      withUniqueTag(div, 'input', unconditional, function(input) {
+      withUniqueTag(div, 'input', all, function(input) {
         input.dispatchEvent(new Event('focus'));
       });
     });
@@ -639,7 +639,7 @@
   // Finds a menu element. These do not have any unique class or ID, so instead
   // need to do it by looking at text content of the options.
   function findMenu(name, expectedItems, predicate0, expectedCount0) {
-    var predicate = predicate0 ? predicate0 : unconditional;
+    var predicate = predicate0 ? predicate0 : all;
     var expectedCount = expectedCount0 ? expectedCount0 : 1;
     var results = [];
     withClass(document, 'ist_menu', function(menu) {
@@ -667,7 +667,7 @@
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
   var moreMenu = findMenu('More...', MORE_MENU_ITEMS);
-  var taskMenu = findMenu('task', TASKMENU_ITEMS, unconditional, 2);
+  var taskMenu = findMenu('task', TASKMENU_ITEMS, all, 2);
   var agendaTaskMenu = findMenu('agenda task', TASKMENU_ITEMS, function(el) { return el !== taskMenu; });
 
   function clickMenu(menu, text) {
@@ -730,12 +730,6 @@
     }
   }
 
-  // Simulate a mouse click.
-  function click(el) {
-    el.dispatchEvent(new Event('mousedown'));
-    el.dispatchEvent(new Event('mouseup'));
-    el.click();
-  }
 
   /* FIXME: Figure out why these various approaches don't work.
 
@@ -983,7 +977,7 @@
   }
 
   function clickTaskDone(task) {
-    withUniqueClass(task, 'ist_checkbox', unconditional, click);
+    withUniqueClass(task, 'ist_checkbox', all, click);
   }
 
   // Common code implementing addAbove / addBelow.
@@ -1013,9 +1007,9 @@
       return;
     }
     if (isAgenda) {
-      withUniqueClass(section, 'agenda_add_task', unconditional, click);
+      withUniqueClass(section, 'agenda_add_task', all, click);
     } else {
-      withUniqueClass(section, 'action_add_item', unconditional, click);
+      withUniqueClass(section, 'action_add_item', all, click);
     }
   }
 
@@ -1058,7 +1052,7 @@
   }
 
   function clickPriorityMenu(isAgenda, menu, level) {
-    withUniqueClass(menu, 'cmp_priority' + level, unconditional, function(img) {
+    withUniqueClass(menu, 'cmp_priority' + level, all, function(img) {
       withRestoredSelections(isAgenda, function() { click(img); });
     });
   }
@@ -1200,9 +1194,9 @@
       // Jump keys optimized to be close to homerow.
       var jumpkeys = Array.from('asdfghjkl' + 'qwertyuiop' + 'zxcvbnm' + '123467890');
       var options = {
-        'i': maybeParent(getUniqueClass(document, 'cmp_filter_inbox', unconditional, click)),
-        't': maybeParent(getUniqueClass(document, 'cmp_filter_today', unconditional, click)),
-        'n': maybeParent(getUniqueClass(document, 'cmp_filter_days', unconditional, click))
+        'i': maybeParent(getUniqueClass(document, 'cmp_filter_inbox', all, click)),
+        't': maybeParent(getUniqueClass(document, 'cmp_filter_today', all, click)),
+        'n': maybeParent(getUniqueClass(document, 'cmp_filter_days', all, click))
       };
       withTag(projectsUl, 'li', function(projectLi) {
         if (notHidden(projectLi)) {
@@ -1590,7 +1584,7 @@
   }
 
   // Given a predicate, returns the first element that matches. If predicate is
-  // null, then it is treated like 'unconditional'.
+  // null, then it is treated like 'all'.
   function findFirst(predicate, array) {
     for (var i = 0; i < array.length; i++) {
       var element = array[i];
@@ -1603,7 +1597,7 @@
 
   // Given a predicate, returns the only element that matches. If no elements
   // match, or multiple elements match, then nothing gets returned. If predicate
-  // is null, then it is treated like 'unconditional'.
+  // is null, then it is treated like 'all'.
   function findUnique(predicate, array) {
     var result = null;
     for (var i = 0; i < array.length; i++) {
@@ -1632,12 +1626,19 @@
     }
   }
 
+  // Simulate a mouse click.
+  function click(el) {
+    el.dispatchEvent(new Event('mousedown'));
+    el.dispatchEvent(new Event('mouseup'));
+    el.click();
+  }
+
   /*****************************************************************************
    * Predicates (for use with get / with functions above)
    */
 
   // Predicate which always returns 'true'.
-  function unconditional() {
+  function all() {
     return true;
   }
 
