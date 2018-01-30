@@ -1,7 +1,12 @@
 # todoist-shortcuts user documentation
 
 `todoist-shortcuts` is a browser extension or greasemonkey script which adds a
-bunch of keyboard shortcuts to [Todoist](https://todoist.com).
+bunch of keyboard shortcuts to [Todoist](https://todoist.com). Along with this
+repository, it is also available from the following places:
+
+* [Extension for chrome](https://chrome.google.com/webstore/detail/todoist-shortcuts/dehmghpdcahlffompjagejmgbcfahndp)
+
+* [Extension for firefox](https://addons.mozilla.org/en-US/firefox/addon/todoist-shortcuts/)
 
 ## Add tasks
 
