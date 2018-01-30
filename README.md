@@ -1,4 +1,4 @@
-`todoist-shortcuts` is a browser extension or greasemonkey script which adds a
+**todoist-shortcuts** is a browser extension or greasemonkey script which adds a
 bunch of keyboard shortcuts to [Todoist](https://todoist.com). Along with this
 repository, it is also available from the following places:
 
@@ -90,12 +90,14 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `m`    | month        |
 | `r`    | remove       |
 
-# Missing shortcuts (coming soon)
+# Other stuff
+
+## Missing shortcuts (coming soon)
 
 NOTE that `u` should do undo, but it currently doesn't, due to some
 frustrating technical difficulties with getting it to work.
 
-# todoist-shortcuts development
+## Development
 
 Contributions are appreciated. See [development.md](./development.md) for more
 information about development.
