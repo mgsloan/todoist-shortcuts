@@ -435,7 +435,7 @@
 
   // Open help documentation
   function openShortcutsHelp() {
-    window.open(TODOIST_SHORTCUTS_GITHUB + '/blob/master/README.md');
+    window.open(TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
   }
 
   /** ***************************************************************************
