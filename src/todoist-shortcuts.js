@@ -1330,7 +1330,7 @@
         a.appendChild(document.createTextNode('todoist-shortcuts'));
         div.appendChild(a);
         div.appendChild(document.createTextNode(warningSuffix));
-        document.getElementById('content').appendChild(div);
+        document.getElementById('page_background').appendChild(div);
       }
     } catch (ex) {
       error('Exception while checking Todoist version', ex);
@@ -1743,6 +1743,10 @@
     '  font-weight: normal;',
     '  font-size: 150%;',
     '  color: #dd4b39;',
+    '}',
+    '',
+    '#page_background {',
+    '  position: relative;',
     '}',
     '',
     '.' + TODOIST_SHORTCUTS_WARNING + ' {',
