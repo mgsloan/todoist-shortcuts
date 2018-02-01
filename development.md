@@ -65,9 +65,11 @@ now.
   }
   ```
 
+* Have it fetch and cache which todoist versions are compatible.
+
 * "bulk reschedule mode" - clears current selection, prompts for
-rescheduling of item then moves cursor to the next.  Similar "bulk   project
-move" mode.
+rescheduling of item then moves cursor to the next.  Similar "bulk project
+move" mode would also be nice.
 
 * l should step out even if not focused on the collapser
 
