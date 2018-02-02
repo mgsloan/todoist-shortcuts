@@ -47,7 +47,7 @@
 
     // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
-    ['m', moveToProject],
+    ['m', ifThenElse(checkCalendarOpen, scheduleNextMonth, moveToProject)],
     ['d', done],
     ['e', archive],
     ['#', deleteTasks],
@@ -61,7 +61,6 @@
     // The following binding is handled earlier ['t', scheduleTomorrow]
     ['n', scheduleToday],
     ['w', scheduleNextWeek],
-    ['m', scheduleNextMonth],
     ['r', unschedule],
 
     // Other

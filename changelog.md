@@ -1,5 +1,10 @@
 # todoist-shortcuts changelog
 
+## Version 4
+
+* Last version was hastily released, this fixes "move to project" (release
+  made minutes after the last one)
+
 ## Version 3
 
 * Now "move to project" is "m" instead of "v".
