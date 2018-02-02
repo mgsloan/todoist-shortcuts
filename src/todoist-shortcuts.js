@@ -15,6 +15,11 @@
   // this list, or modify this script in general.
   var KEY_BINDINGS = [
 
+    // Add tasks
+    ['q', quickAddTask],
+    ['a', addTaskBottom],
+    ['A', addTaskTop],
+
     // Navigation
     [['j', 'down'], cursorDown],
     [['k', 'up'], cursorUp],
@@ -59,9 +64,9 @@
     ['m', scheduleNextMonth],
     ['r', unschedule],
 
-    // Misc
-    ['q', quickAddTask],
-    [['/', 'f'], focusSearch],
+    // Other
+    ['u', undo],
+    [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
     ['escape', closeContextMenus]
   ];
@@ -424,19 +429,31 @@
     withId('quick_add_task_holder', click);
   }
 
-  // Focus the search bar.
-  function focusSearch() {
-    withId('quick_find', function(div) {
-      withUniqueTag(div, 'input', all, function(input) {
-        input.dispatchEvent(new Event('focus'));
-      });
-    });
+  // Add new task to the bottom of the list.
+  function addTaskBottom() {
+    todoistShortcut('a');
   }
 
-  // Open help documentation
+  // Add new task to the top of the list.
+  function addTaskTop() {
+    todoistShortcut('A');
+  }
+
+  // Focus the search bar.
+  function focusSearch() {
+    todoistShortcut('/');
+  }
+
+  // Trigger undo by simulating a keypress.
+  function undo() {
+    todoistShortcut('u');
+  }
+
+  // Open help documentation.
   function openShortcutsHelp() {
     window.open(TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
   }
+
 
   /** ***************************************************************************
    * Utilities for manipulating the UI
@@ -730,42 +747,19 @@
     }
   }
 
-
-  /* FIXME: Figure out why these various approaches don't work.
-
-  // Trigger todoist's undo.
-  function undo() {
-    // todoistShortcut({ key: 'u', keyCode: 85 });
-    var ev = Object.assign({}, window.event);
-    ev.type = "keydown";
-    todoistRootDiv.dispatchEvent(ev);
-    // originalTodoistKeydown(ev);
-    var ev = Object.assign({}, window.event);
-    ev.type = "keyup";
-    todoistRootDiv.dispatchEvent(ev);
-    // originalTodoistKeyup(ev);
-    var ev = Object.assign({}, window.event);
-    ev.type = "keypress";
-    todoistRootDiv.dispatchEvent(ev);
-    // originalTodoistKeypress(ev);
-  }
-
   // Simulate a key press with todoist's global handlers.
-  //
-  // TODO: Would be nice to have something to convenient provide all correct
-  // options.  Instead we rely on todoist only checking some event attributes.
-  function todoistShortcut(options) {
+  function todoistShortcut(options0) {
+    var options = typeof options0 === 'string' ? { key: options0 } : options0;
     var ev = new Event('keydown');
     for (var o in options) { ev[o] = options[o]; }
-    originalTodoistKeydown(ev);
+    window.originalTodoistKeydown.apply(document, ev);
     ev = new Event('keyup');
     for (o in options) { ev[o] = options[o]; }
-    originalTodoistKeyup(ev);
+    window.originalTodoistKeyup.apply(document, ev);
     ev = new Event('keypress');
     for (o in options) { ev[o] = options[o]; }
-    originalTodoistKeypress(ev);
+    window.originalTodoistKeypress.apply(document, ev);
   }
-  */
 
   // Indent task.
   function moveIn() {
@@ -1863,34 +1857,19 @@
       }
     });
 
+    // TODO I think something like the following should work instead, registered
+    // to the escape key handler. But it doesn't work, so instead there is this
+    // workaround.
+    //
+    // todoistShortcut({ key: 'Escape', keyAscii: 27, keyCode: 27, which: 27, code: 'Escape' });
+
     function sometimesCallOriginal(f) {
       return function(ev) {
         if (!overrideKeyDown) {
           // Escape key is useful for exiting dialogs and other input boxes, so
           // should also use old todoist handler.
-          //
-          // FIXME: Infuriatingly, this also doesn't work.
-          //
-          // Use default todoist keys for
-          //
-          // * u for undo last action
-          // * s, p, r for sorting options
-          //
-          // It would be good to also do the following, but it aliases keys used
-          // in combos:
-          //
-          // * a for add task at the bottom of the list
-          // * A for add task at the top of the list
-          var keysToProxy = ['u', 's', 'p', 'r'];
-          var matches = false;
-          for (var i = 0; i < keysToProxy.length; i++) {
-            if (keysToProxy[i] === ev.key) {
-              matches = true;
-              break;
-            }
-          }
-          if (matches || ev.keyCode === 27) {
-            f(ev);
+          if (ev.keyCode === 27) {
+            f.apply(document, ev);
           }
         }
       };

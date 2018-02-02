@@ -44,15 +44,6 @@ Then, run `eslint.sh` to use it to do checking.
 
 * Old version message overlaps badly with todo list that's larger than a screenful.
 
-* Allow usage of various standard todoist shortcuts.  Particularly `u`.  There
-are currently two attempts at this in the code, one as actions and one as
-exceptions for the key handler.  Infuriatingly, neither is working right
-now.
-
-  - An alternative approach already used for `q` is just to reimplement in terms
-    of mouse clicks. Doesn't always work for undo, though. Implementation of `f`
-    / `/` is sort of there, but focusing the search bar doesn't work.
-
 * Make left pane visible when in navigate mode.  Here's how to do it:
 
   - Have a special class applied to body when in navigate mode.  Apply the

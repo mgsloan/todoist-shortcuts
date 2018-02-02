@@ -10,13 +10,17 @@ repository, it is also available from the following places:
 
 ## Add tasks
 
-| keys | action                       |
-| ---  | ---                          |
-| `q`  | open quick task addition box |
+| keys | action                                 |
+| ---  | ---                                    |
+| `q`  | Add task                               |
+| `a`  | Add new task at the bottom of the list |
+| `A`  | Add new task at the top of the list    |
 
 See the "Task Quick Add shortcuts" section of [todoist's keyboard shortcuts
 documentation](https://support.todoist.com/hc/en-us/articles/205063212) for
-information about shorthands to use when adding tasks.
+information about shorthands to use when adding tasks.  "Adding or editing
+tasks" is also a good section to read, which includes keyboard shortcuts not
+described in this document.
 
 ## Navigation
 
@@ -90,12 +94,23 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `m`    | month        |
 | `r`    | remove       |
 
-# Other stuff
+## Sorting
 
-## Missing shortcuts (coming soon)
+When viewing the inbox or a project, the following keybindings can be used to
+sort the tasks:
 
-NOTE that `u` should do undo, but it currently doesn't, due to some
-frustrating technical difficulties with getting it to work.
+| keys | sorted by        |
+| ---  | ---              |
+| `s`  | Sort by date     |
+| `p`  | Sort by priority |
+| `r`  | Sort by asignee  |
+
+## Other
+
+| keys       |             |
+| ---        | ---         |
+| `u`        | undo        |
+| `f` or `/` | open search |
 
 ## Development
 
