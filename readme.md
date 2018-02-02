@@ -112,12 +112,70 @@ sort the tasks:
 | `u`        | undo        |
 | `f` or `/` | open search |
 
-## Development
+# How to customize keyboard shortcuts
+
+Ideally, there would be a UI for customizing keyboard shortcuts. However, it
+seems like this would take a substantial amount of development effort
+(PR contributions appreciated!). For now, you can do the following to customize
+the keyboard shortcuts in Chrome:
+
+1. Clone this repository (run `git clone https://github.com/mgsloan/todoist-shortcuts`)
+
+2. Go to `chrome://extensions` in the url bar, and switch from the official
+   version of todoist-shortcuts to a local version.
+
+   - Disable the official version of todoist-shortcuts by unchecking "Enabled".
+
+   - Click the "Developer mode" box in the top right if it is not yet checked.
+
+   - Click the "Load unpacked extension..." button.  In the directory selecter
+     navigate to the folder you cloned todoist-shortcuts to, and point it at the
+     `src` sub-directory.
+
+2. Edit `src/todoist-shortcuts.js` in a text editor.
+
+   - You will probably just want to edit the definition of KEY_BINDINGS near the
+     top.
+
+   - To disable a keybinding, put `//` in front of it.
+
+   - The functions in the section marked `Actions` are intended to be bound
+     directly to keys.  You can also combine multiple actions via use of the
+     `sequence` and `ifThenElse` actions.
+
+   - Multiple key sequences can be bound to the same action by using a list of
+     key sequences (like `['j', 'down']`) instead of a single string for it.
+     The docs for [mousetrap](https://craig.is/killing/mice) may be helpful in
+     figuring out how to express key sequences.
+
+3. Use `ctrl+r` on `chrome://extensions`.  This causes the extension to be
+   reloaded from your local files.
+
+4. If you reload Todoist, you will now be using your modified version of the
+   extension.
+
+I'm sure there is a similar mechanism for Firefox, but I do not use it for
+developing the extension, so not sure of the details.
+
+One thing to note is that you will no longer receive automated updates.  To
+update your locally modified extension, do the following:
+
+1. `git stash` to store your changes.
+
+2. `git pull` to fetch the most recent changes in this repository.
+
+3. `git stash apply` to bring back your changes. This may cause merge conflicts.
+
+See the git documentation.  A miscellaneous aside is that I highly recommend
+[git from the bottom up](https://jwiegley.github.io/git-from-the-bottom-up/) as
+a guide to understanding git's data model.
+
+# Development
 
 Contributions are appreciated. See [development.md](./development.md) for more
 information about development.
 
-## Supported by bounty from Doist company
+# Supported by bounty from Doist company
 
 See [this github thread](https://github.com/rohitpaulk/todoist-tribute/issues/5)
 for context. The initial work on this was kindly supported by Amir Salihefendic
