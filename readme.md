@@ -116,3 +116,9 @@ sort the tasks:
 
 Contributions are appreciated. See [development.md](./development.md) for more
 information about development.
+
+## Supported by bounty from Doist company
+
+See [this github thread](https://github.com/rohitpaulk/todoist-tribute/issues/5)
+for context. The initial work on this was kindly supported by Amir Salihefendic
+of Doist company.
