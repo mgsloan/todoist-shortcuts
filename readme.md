@@ -141,7 +141,7 @@ the keyboard shortcuts in Chrome:
 
    - The functions in the section marked `Actions` are intended to be bound
      directly to keys.  You can also combine multiple actions via use of the
-     `sequence` and `ifThenElse` actions.
+     `sequence` and `ifThenElse` action combiners.
 
    - Multiple key sequences can be bound to the same action by using a list of
      key sequences (like `['j', 'down']`) instead of a single string for it.
