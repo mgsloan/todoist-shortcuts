@@ -1,4 +1,10 @@
-# Version 2
+# todoist-shortcuts changelog
+
+## Version 3
+
+* Now "move to project" is "m" instead of "v".
+
+## Version 2
 
 * Most default todoist keybindings like 'u' for undo now work too.
 

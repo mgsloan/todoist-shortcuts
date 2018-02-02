@@ -47,7 +47,7 @@
 
     // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
-    ['v', moveToProject],
+    ['m', moveToProject],
     ['d', done],
     ['e', archive],
     ['#', deleteTasks],
