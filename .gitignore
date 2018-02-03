@@ -1,5 +1,7 @@
 *~
+.#*
 node_modules
 .dir-locals.el
 .git/
 todoist-shortcuts.zip
+etc/secrets.json

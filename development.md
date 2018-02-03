@@ -163,3 +163,19 @@ and the new click location, selection statuses get toggled!?  See
     shift-clicked task.
 
   - Disable opacity animation to make this less visible.
+
+# Automated upload of extensions
+
+This is probably only useful to me for uploading the extension, but I figured
+I'd document it anyway incase someone wondered what's up with the
+`Gruntfile.js`.  It is used to automate extension upload.
+
+Install grunt and https://github.com/c301/grunt-webstore-upload via
+
+```
+npm install grunt grunt-webstore-upload
+```
+
+Then, populate `etc/secrets.json` with a json object with `chrome_client_id` and
+`chrome_client_secret` fields. Finally, you can run `./make-and-upload.sh` to
+make the zip and upload it!
