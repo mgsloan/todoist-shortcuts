@@ -4,7 +4,7 @@
 // @description Todoist keyboard shortcuts
 // @include     https://todoist.com/app*
 // @include     http://todoist.com/app*
-// @version     4
+// @version     5
 // @grant       none
 // ==/UserScript==
 
@@ -114,7 +114,7 @@
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
-  var TODOIST_TESTED_VERSION = 889;
+  var TODOIST_TESTED_VERSION = 890;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
@@ -1300,14 +1300,24 @@
       var warningSuffix = null;
       if (todoistVersion && todoistVersion < TODOIST_TESTED_VERSION) {
         warningPrefix =
-          'Note: The version of todoist you are using is older than the version that ';
+          'Note: The version of todoist you are using, version ' +
+          todoistVersion +
+          ', is older than the version that ';
         warningSuffix =
           ' was tested with, version ' +
           TODOIST_TESTED_VERSION +
           '. Due to this mismatch, it might not behave as expected.';
       } else if (!todoistVersion || todoistVersion > TODOIST_TESTED_VERSION) {
-        warningPrefix =
-          'Note: The version of todoist you are using is newer than the version that ';
+        if (todoistVersion) {
+          warningPrefix =
+            'Note: The version of todoist you are using, version ' +
+            todoistVersion +
+            ', is newer than the version that ';
+        } else {
+          warningPrefix =
+            'Note: The version of todoist you are using could not be detected, ' +
+            'which probably means that it is new newer than the version that ';
+        }
         warningSuffix =
           ' is tested with, version ' +
           TODOIST_TESTED_VERSION +

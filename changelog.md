@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 5
+
+* Bump to todoist version 890.
+
+* Have mismatch warning tell you which
+  version was expected.
+
 ## Version 4
 
 * Last version was hastily released, this fixes "move to project" (release
