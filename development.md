@@ -85,6 +85,8 @@ Should add these!
 
 # TODO "one day"
 
+* Is it useful to be able to navigate to first / last task within a section?
+
 * In agenda view, cursor should be able to focus empty days, for the purpose
 of adding tasks.
 

@@ -8,6 +8,8 @@
 
 * Implements sorting keybindings. Issue #1
 
+* Adds "^" and "$" keybindings for moving cursor to first and last task.
+
 ## Version 5
 
 * Bump to todoist version 890.

@@ -25,6 +25,8 @@
     [['k', 'up'], cursorUp],
     [['h', 'left'], collapse],
     [['l', 'right'], expand],
+    ['^', cursorFirst],
+    ['$', cursorLast],
     ['g', navigate],
 
     // Manipulation of tasks at cursor
@@ -159,6 +161,10 @@
   // Move the cursor up and down.
   function cursorDown() { modifyCursorIndex(function(ix) { return ix + 1; }); }
   function cursorUp() { modifyCursorIndex(function(ix) { return ix - 1; }); }
+
+  // Move the cursor to first / last task.
+  function cursorFirst() { setCursorToFirstTask('scroll'); }
+  function cursorLast() { setCursorToLastTask('scroll'); }
 
   // Edit the task under the cursor.
   function edit() {

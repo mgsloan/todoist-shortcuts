@@ -30,6 +30,8 @@ described in this document.
 | `k` or `up`    | move cursor up                   |
 | `h` or `left`  | collapse nested at cursor        |
 | `l` or `right` | expand nested at cursor          |
+| `^`            | move cursor to first task        |
+| `$`            | move cursor to last task         |
 | `/` or `f`     | focus search input               |
 | `g`            | enter section navigation mode    |
 
