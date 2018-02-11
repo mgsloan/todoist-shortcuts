@@ -11,8 +11,8 @@ module.exports = function(grunt) {
       accounts: {
         default: {
           publish: true,
-          client_id: secrets ? secrets.client_id : null,
-          client_secret: secrets ? secrets.client_secret : null
+          client_id: secrets ? secrets.chrome_client_id : null,
+          client_secret: secrets ? secrets.chrome_client_secret : null
         }
       },
       extensions: {
