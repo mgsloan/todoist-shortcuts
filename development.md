@@ -44,18 +44,6 @@ Then, run `eslint.sh` to use it to do checking.
 
 * Is WHAT_CURSOR_APPLIES_TO = 'all' a good default?
 
-* Make left pane visible when in navigate mode.  Here's how to do it:
-
-  - Have a special class applied to body when in navigate mode.  Apply the
-    following style:
-
-  ```css
-  .mini_version.todoist_shortcuts_navigate_mode #left_menu {
-    left: 0;
-    bottom: 0;
-  }
-  ```
-
 * Have it fetch and cache which todoist versions are compatible.
 
 * "bulk reschedule mode" - clears current selection, prompts for

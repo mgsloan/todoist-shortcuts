@@ -119,6 +119,7 @@
 
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
+  var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
   var TODOIST_TESTED_VERSION = 891;
@@ -1246,6 +1247,7 @@
   // displayed. It overrides the keyboard handler such that it temporarily
   // expects a key.
   function setupNavigate(projectsUl, finished) {
+    document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
       // Jump keys optimized to be close to homerow.
@@ -1325,12 +1327,14 @@
             setTimeout(function() { overrideKeyDown = null; });
             finished();
             removeOldTips();
+            document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
           }
         }
       };
     } catch (ex) {
       finished();
       removeOldTips();
+      document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
       throw ex;
     }
   }
@@ -1822,6 +1826,11 @@
     '  right: 0.5em;',
     '  width: 30em;',
     '  font-style: italic;',
+    '}',
+    '',
+    'body.mini_version.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
+    '  left: 0;',
+    '  bottom: 0;',
     '}'
   ].join('\n'));
 

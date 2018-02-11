@@ -12,6 +12,9 @@
 
 * Cursor is now stable even when task gets re-scheduled or moved.
 
+* When navigate mode is activated ("g"), the left pane will now become
+  visible even when the browser window is narrow and so in 'mini mode'.
+
 ## Version 5
 
 * Bump to todoist version 890.
