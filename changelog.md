@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 6
+
+* Defaults to allow applying done / archive directly to cursor. Issue #1
+
+* Implements sorting keybindings. Issue #1
+
 ## Version 5
 
 * Bump to todoist version 890.
