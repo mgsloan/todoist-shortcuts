@@ -10,6 +10,8 @@
 
 * Adds "^" and "$" keybindings for moving cursor to first and last task.
 
+* Cursor is now stable even when task gets re-scheduled or moved.
+
 ## Version 5
 
 * Bump to todoist version 890.

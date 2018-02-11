@@ -159,12 +159,20 @@
    */
 
   // Move the cursor up and down.
-  function cursorDown() { modifyCursorIndex(function(ix) { return ix + 1; }); }
-  function cursorUp() { modifyCursorIndex(function(ix) { return ix - 1; }); }
+  function cursorDown() {
+    modifyCursorIndex(checkIsAgendaMode(), function(ix) { return ix + 1; });
+  }
+  function cursorUp() {
+    modifyCursorIndex(checkIsAgendaMode(), function(ix) { return ix - 1; });
+  }
 
   // Move the cursor to first / last task.
-  function cursorFirst() { setCursorToFirstTask('scroll'); }
-  function cursorLast() { setCursorToLastTask('scroll'); }
+  function cursorFirst() {
+    setCursorToFirstTask(checkIsAgendaMode(), 'scroll');
+  }
+  function cursorLast() {
+    setCursorToLastTask(checkIsAgendaMode(), 'scroll');
+  }
 
   // Edit the task under the cursor.
   function edit() {
@@ -549,46 +557,89 @@
     debug('setSelections timing:', Date.now() - startTime);
   }
 
-  // MUTABLE.
+  // All MUTABLE. Only mutated by 'storeCursorContext'.
   var lastCursorTasks = [];
-
-  // MUTABLE.
   var lastCursorIndex = [];
+  var lastCursorId = null;
+  var lastCursorIndent = null;
+  var lastCursorSection = null;
+
+  function storeCursorContext(isAgenda, currentCursor) {
+    lastCursorTasks = getTasks();
+    lastCursorIndex = getCursorIndex(lastCursorTasks);
+    lastCursorId = cursorId;
+    lastCursorIndent = cursorIndent;
+    lastCursorSection = getSectionName(isAgenda, currentCursor);
+    debug('wrote down cursor context');
+  }
 
   // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
   function ensureCursor(content) {
+    var isAgenda = checkIsAgendaMode();
     // If there's an editor open to modify or add a task, then set the cursor
     // to the item above.
     var manager = getUniqueClass(content, 'manager');
     if (manager && manager.previousElementSibling) {
-      setCursor(manager.previousElementSibling, 'no-scroll');
+      setCursor(isAgenda, manager.previousElementSibling, 'no-scroll');
     }
-    if (getCursor()) {
-      debug('wrote down cursor context');
-      lastCursorTasks = getTasks();
-      lastCursorIndex = getCursorIndex(lastCursorTasks);
+    var currentCursor = getCursor();
+    // Detect if the cursor has changed section. This can happen when the user
+    // re-schedules it or moves it to a different project. I find it nicer if
+    // the cursor doesn't follow the task for these moves, hence this logic.
+    var changedSection = false;
+    var currentSection = null;
+    if (currentCursor && lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
+      currentSection = getSectionName(isAgenda, currentCursor);
+      changedSection = currentSection !== lastCursorSection;
+    }
+    debug(currentSection, lastCursorSection);
+    if (currentCursor && !changedSection) {
+      storeCursorContext(isAgenda, currentCursor);
     } else {
-      debug('cursor element disappeared, finding new location');
+      if (changedSection) {
+        debug('cursor element changed section, finding new location');
+      } else {
+        debug('cursor element disappeared, finding new location');
+      }
       var found = false;
-      for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
+      for (var i = lastCursorIndex + 1; i < lastCursorTasks.length; i++) {
         var oldTask = lastCursorTasks[i];
         if (oldTask) {
           var task = getId(oldTask.id);
           if (task) {
             debug('found still-existing task that was after old cursor, setting cursor to it');
             found = true;
-            setCursor(task, 'scroll');
+            setCursor(isAgenda, task, 'scroll');
             break;
           }
         }
       }
       if (!found) {
         debug('didn\'t find a particular task to select, so selecting last task');
-        setCursorToLastTask('scroll');
+        setCursorToLastTask(isAgenda, 'scroll');
       }
     }
+  }
+
+  // Gets the name of the section that a task is in.
+  function getSectionName(isAgenda, task) {
+    var predicate =
+        isAgenda
+          ? or(matchingClass('section_overdue'), matchingClass('section_day'))
+          : matchingClass('list_editor');
+    var section = findParent(task, predicate);
+    var result = null;
+    if (section) {
+      withUniqueClass(section, isAgenda ? 'subsection_header' : 'section_header', all, function(header) {
+        result = header.textContent;
+      });
+    }
+    if (!result) {
+      error('Failed to find section name for', task);
+    }
+    return result;
   }
 
   var lastHash = null;
@@ -597,8 +648,9 @@
     debug('handleNavigation');
     var currentHash = document.location.hash;
     if (lastHash !== currentHash) {
+      var isAgenda = checkIsAgendaMode();
       lastHash = currentHash;
-      setCursorToFirstTask('scroll');
+      setCursorToFirstTask(isAgenda, 'scroll');
     }
   }
 
@@ -1367,29 +1419,30 @@
   var CURSOR_CLASS = 'userscript_cursor';
 
   // Sets the cursor to the first task, if any exists.
-  function setCursorToFirstTask(shouldScroll) {
+  function setCursorToFirstTask(isAgenda, shouldScroll) {
     var tasks = getTasks();
     if (tasks.length > 0) {
-      setCursor(tasks[0], shouldScroll);
+      setCursor(isAgenda, tasks[0], shouldScroll);
     }
   }
 
   // Sets the cursor to the last task, if any exists.
-  function setCursorToLastTask(shouldScroll) {
+  function setCursorToLastTask(isAgenda, shouldScroll) {
     var tasks = getTasks();
     if (tasks.length > 0) {
-      setCursor(tasks[tasks.length - 1], shouldScroll);
+      setCursor(isAgenda, tasks[tasks.length - 1], shouldScroll);
     }
   }
 
   // Given the element for a task, set it as the current selection.
-  function setCursor(task, shouldScroll) {
+  function setCursor(isAgenda, task, shouldScroll) {
     withClass(document, CURSOR_CLASS, function(oldCursor) {
       oldCursor.classList.remove(CURSOR_CLASS);
     });
     if (task) {
       cursorId = task.id;
       cursorIndent = getTaskIndentClass(task);
+      storeCursorContext(isAgenda, task);
       updateCursorStyle();
       if (shouldScroll === 'scroll') {
         verticalScrollIntoView(task);
@@ -1429,7 +1482,7 @@
   }
 
   // A functional-ish idiom to reduce boilerplate.
-  function modifyCursorIndex(f) {
+  function modifyCursorIndex(isAgenda, f) {
     var tasks = getTasks();
     var newIndex = f(getCursorIndex(tasks), tasks);
     if (newIndex < 0) {
@@ -1438,7 +1491,7 @@
     if (newIndex >= tasks.length) {
       newIndex = tasks.length - 1;
     }
-    setCursor(tasks[newIndex], 'scroll');
+    setCursor(isAgenda, tasks[newIndex], 'scroll');
   }
 
   function checkIsAgendaMode() {
@@ -1695,7 +1748,6 @@
   }
 
   // Given two predicates, uses || to combine them.
-  // eslint-disable-next-line no-unused-vars
   function or(p1, p2) {
     return function(x) { return p1(x) || p2(x); };
   }
