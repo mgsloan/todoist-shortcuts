@@ -119,7 +119,7 @@
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
-  var TODOIST_TESTED_VERSION = 890;
+  var TODOIST_TESTED_VERSION = 891;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.

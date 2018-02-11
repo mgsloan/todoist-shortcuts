@@ -2,6 +2,8 @@
 
 ## Version 6
 
+* Bump to todoist version 891.
+
 * Defaults to allow applying done / archive directly to cursor. Issue #1
 
 * Implements sorting keybindings. Issue #1
