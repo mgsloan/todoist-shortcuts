@@ -63,6 +63,11 @@
     ['w', scheduleNextWeek],
     ['r', unschedule],
 
+    // Sorting
+    ['s', sortByDate],
+    ['p', sortByPriority],
+    ['r', sortByAssignee],
+
     // Other
     ['u', undo],
     [['f', '/'], focusSearch],
@@ -80,7 +85,7 @@
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
-  var WHAT_CURSOR_APPLIES_TO = 'most';
+  var WHAT_CURSOR_APPLIES_TO = 'all';
 
   // Set this to true to get more log output.
   var DEBUG = false;
@@ -429,24 +434,25 @@
   }
 
   // Add new task to the bottom of the list.
-  function addTaskBottom() {
-    todoistShortcut('a');
-  }
+  function addTaskBottom() { todoistShortcut('a'); }
 
   // Add new task to the top of the list.
-  function addTaskTop() {
-    todoistShortcut('A');
-  }
+  function addTaskTop() { todoistShortcut('A'); }
 
   // Focus the search bar.
-  function focusSearch() {
-    todoistShortcut('/');
-  }
+  function focusSearch() { todoistShortcut('/'); }
 
   // Trigger undo by simulating a keypress.
-  function undo() {
-    todoistShortcut('u');
-  }
+  function undo() { todoistShortcut('u'); }
+
+  // Trigger sort-by-date by simulating a keypress.
+  function sortByDate() { todoistShortcut('s'); }
+
+  // Trigger sort-by-priority by simulating a keypress.
+  function sortByPriority() { todoistShortcut('p'); }
+
+  // Trigger sort-by-assignee by simulating a keypress.
+  function sortByAssignee() { todoistShortcut('r'); }
 
   // Open help documentation.
   function openShortcutsHelp() {

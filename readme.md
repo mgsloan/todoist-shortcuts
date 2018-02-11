@@ -103,7 +103,7 @@ sort the tasks:
 | ---  | ---              |
 | `s`  | Sort by date     |
 | `p`  | Sort by priority |
-| `r`  | Sort by asignee  |
+| `r`  | Sort by assignee |
 
 ## Other
 

@@ -42,7 +42,7 @@ Then, run `eslint.sh` to use it to do checking.
 
 # TODO "soon"
 
-* Old version message overlaps badly with todo list that's larger than a screenful.
+* Is WHAT_CURSOR_APPLIES_TO = 'all' a good default?
 
 * Make left pane visible when in navigate mode.  Here's how to do it:
 
