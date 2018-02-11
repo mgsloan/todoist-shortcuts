@@ -4,7 +4,7 @@
 // @description Todoist keyboard shortcuts
 // @include     https://todoist.com/app*
 // @include     http://todoist.com/app*
-// @version     5
+// @version     6
 // @grant       none
 // ==/UserScript==
 
