@@ -61,12 +61,12 @@
     // The following binding is handled earlier ['t', scheduleTomorrow]
     ['n', scheduleToday],
     ['w', scheduleNextWeek],
-    ['r', unschedule],
+    ['r', ifThenElse(checkCalendarOpen, unschedule, sortByAssignee)],
 
     // Sorting
+    // 'r' is handled earlier
     ['s', sortByDate],
     ['p', sortByPriority],
-    ['r', sortByAssignee],
 
     // Other
     ['u', undo],
