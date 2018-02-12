@@ -50,7 +50,7 @@
     // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
     ['v', moveToProject],
-    ['d', done],
+    ['d', ifThenElse(checkCalendarOpen, scheduleToday, done)],
     ['e', archive],
     ['#', deleteTasks],
     ['1', setPriority('1')],

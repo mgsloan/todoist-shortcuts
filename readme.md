@@ -90,10 +90,10 @@ When scheduling is opened via `t`, the following keybindings will apply:
 
 | keys   | date         |
 | ---    | ---          |
+| `d`    | today        |
 | `t`    | tomorrow     |
-| `n`    | today        |
 | `w`    | next week    |
-| `m`    | month        |
+| `m`    | in 1 month   |
 | `r`    | remove       |
 
 ## Sorting
