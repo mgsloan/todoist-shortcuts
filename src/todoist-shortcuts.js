@@ -49,8 +49,8 @@
 
     // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
-    ['m', ifThenElse(checkCalendarOpen, scheduleNextMonth, moveToProject)],
-    ['d', done],
+    ['v', moveToProject],
+    ['d', ifThenElse(checkCalendarOpen, scheduleToday, done)],
     ['e', archive],
     ['#', deleteTasks],
     ['1', setPriority('1')],
@@ -63,6 +63,7 @@
     // The following binding is handled earlier ['t', scheduleTomorrow]
     ['n', scheduleToday],
     ['w', scheduleNextWeek],
+    ['m', scheduleNextMonth],
     ['r', ifThenElse(checkCalendarOpen, unschedule, sortByAssignee)],
 
     // Sorting

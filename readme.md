@@ -77,7 +77,7 @@ If none are selected, then these will apply to the cursor instead.
 | `t`    | schedule                          |
 | `d`    | done: mark task as complete       |
 | `e`    | archive                           |
-| `m`    | move to project via search prompt |
+| `v`    | move to project via search prompt |
 | `#`    | delete                            |
 | `1`    | set priority to 1                 |
 | `2`    | set priority to 2                 |
@@ -90,10 +90,10 @@ When scheduling is opened via `t`, the following keybindings will apply:
 
 | keys   | date         |
 | ---    | ---          |
+| `d`    | today        |
 | `t`    | tomorrow     |
-| `n`    | today        |
 | `w`    | next week    |
-| `m`    | month        |
+| `m`    | in 1 month   |
 | `r`    | remove       |
 
 ## Sorting
