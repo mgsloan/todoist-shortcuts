@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 7
+
+* Bump to todoist version 892.
+
+* No longer has a noisy warning by default for version mismatch.
+
+* "r" for sort by assignee now works.
+
+* Scheduling keybinding for "today" is now "d" instead of "n".
+
+* Now "move to project" is back to being "v" instead of "m".
+
 ## Version 6
 
 * Bump to todoist version 891.
