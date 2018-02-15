@@ -4,7 +4,7 @@
 // @description Todoist keyboard shortcuts
 // @include     https://todoist.com/app*
 // @include     http://todoist.com/app*
-// @version     6
+// @version     7
 // @grant       none
 // ==/UserScript==
 
@@ -130,7 +130,7 @@
   var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
-  var TODOIST_TESTED_VERSION = 891;
+  var TODOIST_TESTED_VERSION = 892;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
