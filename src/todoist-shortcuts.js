@@ -93,6 +93,13 @@
   // Set this to true to get more log output.
   var DEBUG = false;
 
+  // Set this to true to get a UI message directly in the page when the version
+  // number isn't what was expected. When false, instead the mismatch warning
+  // just appears in a submenu. Mostly intended for developers of
+  // todoist-shortcuts, as the version bumps too often for it to be reasonable
+  // to do releases of the extension.
+  var NOISY_VERSION_CHECK = false;
+
   // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
   var TODOIST_ROOT_ID = 'todoist_app';
   var AGENDA_VIEW_ID = 'agenda_view';
@@ -1390,7 +1397,7 @@
         warningSuffix =
           ' is tested with, version ' +
           TODOIST_TESTED_VERSION +
-          '. Due to this mismatch, it might not behave as expected. Perhaps check for an updated version?';
+          '. Due to this mismatch, it might not behave as expected, though usually it will still work fine. Perhaps check for an updated version?';
       }
       if (warningPrefix && warningSuffix) {
         warn(warningPrefix, 'todoist-shortcuts', warningSuffix);
@@ -1399,10 +1406,14 @@
         div.appendChild(document.createTextNode(warningPrefix));
         var a = document.createElement('a');
         a.href = TODOIST_SHORTCUTS_GITHUB;
-        a.appendChild(document.createTextNode('todoist-shortcuts'));
+        a.appendChild(document.createTextNode('the todoist-shortcuts extension'));
         div.appendChild(a);
         div.appendChild(document.createTextNode(warningSuffix));
-        document.getElementById('page_background').appendChild(div);
+        if (NOISY_VERSION_CHECK) {
+          document.getElementById('page_background').appendChild(div);
+        } else {
+          document.getElementById('last_synced').parentElement.appendChild(div);
+        }
       }
     } catch (ex) {
       error('Exception while checking Todoist version', ex);
@@ -1825,8 +1836,14 @@
     '  position: absolute;',
     '  bottom: 0.5em;',
     '  right: 0.5em;',
-    '  width: 30em;',
+    '  width: 20em;',
     '  font-style: italic;',
+    '  margin-top: 1em;',
+    '}',
+    '',
+    // When it is hidden in the settings menu (default).
+    '.version .' + TODOIST_SHORTCUTS_WARNING + ' {',
+    '  position: static;',
     '}',
     '',
     'body.mini_version.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
