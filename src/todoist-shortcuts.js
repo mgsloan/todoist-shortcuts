@@ -196,6 +196,7 @@
   }
 
   // Toggles selection of the task focused by the cursor.
+  // eslint-disable-next-line no-unused-vars
   function toggleSelect() {
     var cursor = getCursor();
     if (cursor) {
@@ -598,7 +599,7 @@
   var lastCursorIndent = null;
   var lastCursorSection = null;
   var mouseGotMoved = false;
-  var selectionMode = "none";
+  var selectionMode = 'none';
 
   function storeCursorContext(isAgenda, cursor) {
     lastCursorTasks = getTasks();
@@ -635,16 +636,16 @@
 
   function handleCursorMove(cursor) {
     switch (selectionMode) {
-      case 'none':
-        break;
-      case 'select':
-        selectTaskId(cursor.id);
-        break;
-      case 'deselect':
-        deselectTaskId(cursor.id);
-        break;
-      default:
-        error('Invariant violated, unexpected selectionMode:', selectionMode);
+    case 'none':
+      break;
+    case 'select':
+      selectTaskId(cursor.id);
+      break;
+    case 'deselect':
+      deselectTaskId(cursor.id);
+      break;
+    default:
+      error('Invariant violated, unexpected selectionMode:', selectionMode);
     }
   }
 
