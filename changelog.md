@@ -2,6 +2,10 @@
 
 ## Version 8 (not yet released)
 
+* Now uses the standard drag-and-drop handle to indicate the cursor.
+
+* 'x' can be held down to select / deselect every task the cursor is moved to.
+
 * Vertical auto-scrolling now takes into account top bar occlusion.
 
 ## Version 7
