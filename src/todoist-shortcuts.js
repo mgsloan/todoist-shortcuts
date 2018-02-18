@@ -572,40 +572,59 @@
   var lastCursorId = null;
   var lastCursorIndent = null;
   var lastCursorSection = null;
+  var mouseGotMoved = false;
 
-  function storeCursorContext(isAgenda, currentCursor) {
+  function storeCursorContext(isAgenda, cursor) {
     lastCursorTasks = getTasks();
-    lastCursorIndex = getCursorIndex(lastCursorTasks);
-    lastCursorId = cursorId;
-    lastCursorIndent = cursorIndent;
-    lastCursorSection = getSectionName(isAgenda, currentCursor);
+    lastCursorIndex = lastCursorTasks.indexOf(cursor);
+    lastCursorId = cursor.id;
+    lastCursorIndent = getTaskIndentClass(cursor);
+    lastCursorSection = getSectionName(isAgenda, cursor);
+    mouseGotMoved = false;
     debug('wrote down cursor context');
+  }
+
+  function handleMouseMove() {
+    mouseGotMoved = true;
   }
 
   // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
   function ensureCursor(content) {
+    debug('ensuring cursor');
     var isAgenda = checkIsAgendaMode();
     // If there's an editor open to modify or add a task, then set the cursor
     // to the item above.
     var manager = getUniqueClass(content, 'manager');
     if (manager && manager.previousElementSibling) {
       setCursor(isAgenda, manager.previousElementSibling, 'no-scroll');
+      return;
     }
-    var currentCursor = getCursor();
+    var cursor = getCursor();
     // Detect if the cursor has changed section. This can happen when the user
     // re-schedules it or moves it to a different project. I find it nicer if
     // the cursor doesn't follow the task for these moves, hence this logic.
     var changedSection = false;
     var currentSection = null;
-    if (currentCursor && lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
-      currentSection = getSectionName(isAgenda, currentCursor);
-      changedSection = currentSection !== lastCursorSection;
+    if (cursor) {
+      var cursorIndent = getTaskIndentClass(cursor);
+      if (lastCursorId === cursor.id && lastCursorIndent === cursorIndent) {
+        currentSection = getSectionName(isAgenda, cursor);
+        changedSection = currentSection !== lastCursorSection;
+      } else if (!mouseGotMoved) {
+        debug('Cursor changed without mouse moving. This can happen on scroll, so attempting to move it back to where it was.');
+        var lastCursor = getTaskById(lastCursorId, lastCursorIndent);
+        if (lastCursor) {
+          setCursor(isAgenda, lastCursor, 'no-scroll');
+          return;
+        } else {
+          warn('Expected to find last cursor position, but could\'nt find it.');
+        }
+      }
     }
-    debug(currentSection, lastCursorSection);
-    if (currentCursor && !changedSection) {
-      storeCursorContext(isAgenda, currentCursor);
+    if (cursor && !changedSection) {
+      storeCursorContext(isAgenda, cursor);
     } else {
       if (changedSection) {
         debug('cursor element changed section, finding new location');
@@ -883,7 +902,8 @@
     } else {
       dragTaskOver(cursor, function() {
         var tasks = getTasks();
-        var cursorIndex = getCursorIndex(tasks);
+        var cursorIndex = tasks.indexOf(cursor);
+        var cursorIndent = getTaskIndentClass(cursor);
         for (var i = cursorIndex - 1; i >= 0; i--) {
           var task = tasks[i];
           var indent = getTaskIndentClass(task);
@@ -916,7 +936,8 @@
     } else {
       dragTaskOver(cursor, function() {
         var tasks = getTasks();
-        var cursorIndex = getCursorIndex(tasks);
+        var cursorIndex = tasks.indexOf(cursor);
+        var cursorIndent = getTaskIndentClass(cursor);
         var lastQualifyingTask = null;
         for (var i = cursorIndex + 1; i < tasks.length; i++) {
           var task = tasks[i];
@@ -1424,16 +1445,6 @@
    * Task cursor
    */
 
-  // The id of the task that the cursor is on. MUTABLE.
-  var cursorId = null;
-
-  // The indent class of the task that the cursor is on. See 'getTaskById' for
-  // detailed explanation. MUTABLE.
-  var cursorIndent = null;
-
-  // Class used on the single task that the cursor is on.
-  var CURSOR_CLASS = 'userscript_cursor';
-
   // Sets the cursor to the first task, if any exists.
   function setCursorToFirstTask(isAgenda, shouldScroll) {
     var tasks = getTasks();
@@ -1452,14 +1463,7 @@
 
   // Given the element for a task, set it as the current selection.
   function setCursor(isAgenda, task, shouldScroll) {
-    withClass(document, CURSOR_CLASS, function(oldCursor) {
-      oldCursor.classList.remove(CURSOR_CLASS);
-    });
     if (task) {
-      cursorId = task.id;
-      cursorIndent = getTaskIndentClass(task);
-      storeCursorContext(isAgenda, task);
-      updateCursorStyle();
       if (shouldScroll === 'scroll') {
         withId('top_bar', function(topBar) {
           verticalScrollIntoView(task, topBar.clientHeight, 0);
@@ -1467,42 +1471,27 @@
       } else if (shouldScroll !== 'no-scroll') {
         error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
       }
-    } else {
-      cursorId = null;
+      storeCursorContext(isAgenda, task);
+      task.dispatchEvent(new MouseEvent('mouseover'));
+      // HACK: Sometimes scrolling causes mouseover events that move the cursor.
+      // This seems to resolve those cases. It is particularly worrisome that
+      // this doesn't seem to work reliably with a 0 timeout.
+      setTimeout(function() {
+        task.dispatchEvent(new MouseEvent('mouseover'));
+      }, 20);
     }
   }
 
-  // Given a list of task elements (yielded by getTasks), returns the index
-  // that corresponds to cursorId / cursorIndent.
-  function getCursorIndex(tasks) {
-    if (cursorId) {
-      return getTaskIndex(checkIsAgendaMode(), tasks, cursorId, cursorIndent);
-    } else {
-      return null;
-    }
-  }
-
-  // Returns index of task in list, identified by id and indent.
-  function getTaskIndex(isAgenda, tasks, id, indent) {
-    for (var i = 0; i < tasks.length; i++) {
-      var task = tasks[i];
-      if (task.id === id &&
-          (!isAgenda || task.classList.contains(indent))) {
-        return i;
-      }
-    }
-    return null;
-  }
-
-  // Returns the <li> element which corresponds to the current cursorId.
+  // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    return getTaskById(cursorId, cursorIndent);
+    return maybeParent(getUniqueClass(document, 'drag_and_drop_handler'));
   }
 
   // A functional-ish idiom to reduce boilerplate.
   function modifyCursorIndex(isAgenda, f) {
     var tasks = getTasks();
-    var newIndex = f(getCursorIndex(tasks), tasks);
+    var cursorIndex = tasks.indexOf(getCursor());
+    var newIndex = f(cursorIndex, tasks);
     if (newIndex < 0) {
       newIndex = 0;
     }
@@ -1854,40 +1843,6 @@
     '}'
   ].join('\n'));
 
-  // A CSS style element, dynamically updated by updateCursorStyle. MUTABLE.
-  var cursorStyle = addCss('');
-
-  // This is unusual. Usually you would not dynamically generate CSS that uses
-  // different IDs. However, this is a nice hack in this case, because todoist
-  // frequently re-creates elements.
-  function updateCursorStyle() {
-    var selecter = getKeySelecter(cursorId, cursorIndent);
-    cursorStyle.textContent = [
-      selecter + ' {',
-      '  border-left: 2px solid #4d90f0;',
-      '  margin-left: -4px;',
-      '}',
-      selecter + ' .sel_checkbox_td {',
-      '  padding-left: 2px;',
-      '}',
-      // FIXME: This is intended to make the drag and drop handler not move
-      // when the cursor is on it.  Seems to have broken.  There is also a
-      // tricky case when something is a nested task parent.
-      selecter + ' .arrow, ' + selecter + ' .drag_and_drop_handler {',
-      '  margin-left: -16px;',
-      '}'
-    ].join('\n');
-  }
-
-  // See comment on 'getTaskById' for explanation
-  function getKeySelecter(id, indent) {
-    if (checkIsAgendaMode() && indent !== null) {
-      return '#' + id + '.' + indent;
-    } else {
-      return '#' + id;
-    }
-  }
-
   /*****************************************************************************
    * mousetrap v1.6.1 craig.is/killing/mice
    */
@@ -1957,6 +1912,11 @@
         // eslint-disable-next-line no-undef
         mousetrap.unbind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
       }
+    });
+
+    document.addEventListener('mousemove', handleMouseMove);
+    onDisable(function() {
+      document.removeEventListener('mousemove', handleMouseMove);
     });
 
     // TODO I think something like the following should work instead, registered
