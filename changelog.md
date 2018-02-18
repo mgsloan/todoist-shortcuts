@@ -1,6 +1,8 @@
 # todoist-shortcuts changelog
 
-## Version 8 (not yet released)
+## Version 9 (not yet released)
+
+## Version 8
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.
 
