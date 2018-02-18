@@ -1461,7 +1461,9 @@
       storeCursorContext(isAgenda, task);
       updateCursorStyle();
       if (shouldScroll === 'scroll') {
-        verticalScrollIntoView(task);
+        withId('top_bar', function(topBar) {
+          verticalScrollIntoView(task, topBar.clientHeight, 0);
+        });
       } else if (shouldScroll !== 'no-scroll') {
         error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
       }
@@ -1557,9 +1559,9 @@
   // element in the middle of the window, but only if necessary to bring it into
   // view. Does not work well for elements that are larger than half a screen
   // full.
-  function verticalScrollIntoView(el) {
+  function verticalScrollIntoView(el, marginTop, marginBottom) {
     var rect = el.getBoundingClientRect();
-    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+    if (rect.top < marginTop || rect.bottom > window.innerHeight - marginBottom) {
       var top = rect.top + window.scrollY;
       // TODO: for very large tasks, this could end up with the whole task not
       // being in view.
