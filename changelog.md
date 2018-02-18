@@ -1,5 +1,9 @@
 # todoist-shortcuts changelog
 
+## Version 8 (not yet released)
+
+* Vertical auto-scrolling now takes into account top bar occlusion.
+
 ## Version 7
 
 * Bump to todoist version 892.
