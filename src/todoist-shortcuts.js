@@ -39,7 +39,10 @@
     [['L', 'shift+right'], moveIn],
 
     // Selection
-    ['x', toggleSelect],
+    //
+    // NOTE: Selection can be held down during multiple cursor motions. So, it
+    // is not simply a keypress handler. See SELECT_KEY for configuration
+    // ['x', toggleSelect],
     ['* a', selectAll],
     ['* n', deselectAll],
     ['* 1', selectPriority('1')],
@@ -77,6 +80,8 @@
     ['?', openShortcutsHelp],
     ['escape', closeContextMenus]
   ];
+
+  var SELECT_KEY = 'x';
 
   // Which selection-oriented commands to apply to the cursor if there is no
   // selection. A few possible values:
@@ -194,18 +199,38 @@
   function toggleSelect() {
     var cursor = getCursor();
     if (cursor) {
-      // NOTE: todoist's shift-click actually only does one element at a time,
-      // even if they have the same id. This intentionally deviates from that
-      // behavior.
       if (checkTaskIsSelected(cursor)) {
         deselectTaskId(cursor.id);
       } else {
         selectTaskId(cursor.id);
       }
     } else {
-      warn("No cursor, so can't select");
+      warn("No cursor, so can't toggle selection.");
     }
   }
+
+  // Selects the task focused by the cursor.
+  // eslint-disable-next-line no-unused-vars
+  function select() {
+    var cursor = getCursor();
+    if (cursor) {
+      selectTaskId(cursor.id);
+    } else {
+      warn("No cursor, so can't select.");
+    }
+  }
+
+  // Deselects the task focused by the cursor.
+  // eslint-disable-next-line no-unused-vars
+  function deselect() {
+    var cursor = getCursor();
+    if (cursor) {
+      deselectTaskId(cursor.id);
+    } else {
+      warn("No cursor, so can't deselect.");
+    }
+  }
+
 
   // Clicks the 'schedule' link when tasks are selected.  If
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
@@ -573,6 +598,7 @@
   var lastCursorIndent = null;
   var lastCursorSection = null;
   var mouseGotMoved = false;
+  var selectionMode = "none";
 
   function storeCursorContext(isAgenda, cursor) {
     lastCursorTasks = getTasks();
@@ -581,11 +607,45 @@
     lastCursorIndent = getTaskIndentClass(cursor);
     lastCursorSection = getSectionName(isAgenda, cursor);
     mouseGotMoved = false;
+    handleCursorMove(cursor);
     debug('wrote down cursor context');
   }
 
   function handleMouseMove() {
     mouseGotMoved = true;
+  }
+
+  function selectPressed() {
+    var cursor = getCursor();
+    if (cursor) {
+      if (checkTaskIsSelected(cursor)) {
+        selectionMode = 'deselect';
+      } else {
+        selectionMode = 'select';
+      }
+    } else {
+      selectionMode = 'select';
+    }
+    handleCursorMove(cursor);
+  }
+
+  function selectReleased() {
+    selectionMode = 'none';
+  }
+
+  function handleCursorMove(cursor) {
+    switch (selectionMode) {
+      case 'none':
+        break;
+      case 'select':
+        selectTaskId(cursor.id);
+        break;
+      case 'deselect':
+        deselectTaskId(cursor.id);
+        break;
+      default:
+        error('Invariant violated, unexpected selectionMode:', selectionMode);
+    }
   }
 
   // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
@@ -621,6 +681,10 @@
         } else {
           warn('Expected to find last cursor position, but could\'nt find it.');
         }
+      } else {
+        debug('Cursor moved by the mouse');
+        handleCursorMove(cursor);
+        return;
       }
     }
     if (cursor && !changedSection) {
@@ -1940,13 +2004,25 @@
     function handleKeyDown(ev) {
       if (overrideKeyDown) {
         overrideKeyDown(ev);
+      } else if (ev.key === SELECT_KEY && !ev.repeat) {
+        selectPressed();
       } else {
         sometimesCallOriginal(window.originalTodoistKeydown)(ev);
       }
     }
 
+    function handleKeyUp(ev) {
+      if (overrideKeyDown) {
+        return;
+      } else if (ev.key === SELECT_KEY) {
+        selectReleased();
+      } else {
+        sometimesCallOriginal(window.originalTodoistKeyup)(ev);
+      }
+    }
+
     document.addEventListener('keydown', handleKeyDown, false);
-    document.addEventListener('keyup', sometimesCallOriginal(window.originalTodoistKeyup), false);
+    document.addEventListener('keyup', handleKeyUp, false);
     document.addEventListener('keypress', sometimesCallOriginal(window.originalTodoistKeypress), false);
   });
 })();
