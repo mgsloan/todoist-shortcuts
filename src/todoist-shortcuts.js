@@ -662,8 +662,14 @@
     // If there's an editor open to modify or add a task, then set the cursor
     // to the item above.
     var manager = getUniqueClass(content, 'manager');
-    if (manager && manager.previousElementSibling) {
-      setCursor(isAgenda, manager.previousElementSibling, 'no-scroll');
+    if (manager) {
+      var tasks = getTasks('no-collapsed', 'include-editors');
+      var managerIndex = tasks.findIndex(function(task) {
+        return task.classList.contains('manager');
+      });
+      if (managerIndex > 0) {
+        setCursor(isAgenda, tasks[managerIndex - 1], 'no-scroll');
+      }
       return;
     }
     var cursor = getCursor();
@@ -1218,7 +1224,7 @@
    */
 
   // Get the <li> elements for all the tasks visible in the current view.
-  function getTasks(includeCollapsed) {
+  function getTasks(includeCollapsed, includeEditors) {
     var shouldIncludeCollapsed = false;
     if (includeCollapsed === 'include-collapsed') {
       shouldIncludeCollapsed = true;
@@ -1226,12 +1232,24 @@
       error('Unexpected value for includeCollapsed:', includeCollapsed);
       return [];
     }
+    var shouldIncludeEditors = false;
+    if (includeEditors === 'include-editors') {
+      shouldIncludeEditors = true;
+    } else if (includeEditors && includeEditors !== 'no-editors') {
+      error('Unexpected value for includeEditors:', includeEditors);
+      return [];
+    }
     var results = [];
-    withClass(document, 'task_item', function(item) {
-      // Skip elements which don't correspond to tasks, and skip nested tasks
-      // that are not visible (if includeCollapsed is not set).
-      if (!item.classList.contains('reorder_item') &&
-          (shouldIncludeCollapsed || notHidden(item))) {
+    withTag(document, 'li', function(item) {
+      // Skip elements which don't correspond to tasks
+      var classMatches =
+        !item.classList.contains('reorder_item') &&
+        (  item.classList.contains('task_item')
+        || (item.classList.contains('manager') && includeEditors)
+        );
+      // Skip nested tasks that are not visible (if includeCollapsed is not set).
+      var visible = shouldIncludeCollapsed || notHidden(item);
+      if (classMatches && visible) {
         results.push(item);
       }
     });
