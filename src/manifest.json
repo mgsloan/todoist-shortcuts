@@ -5,7 +5,12 @@
   "version": "9",
   "content_scripts": [
   	{
-      "matches": ["http://todoist.com/app*", "https://todoist.com/app*"],
+      "matches":
+        [ "http://todoist.com/app*"
+        , "https://todoist.com/app*"
+        , "http://beta.todoist.com/app*"
+        , "https://beta.todoist.com/app*"
+        ],
       "js": ["inject.js"]
   	}
   ],

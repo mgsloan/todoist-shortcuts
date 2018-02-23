@@ -4,6 +4,8 @@
 
 * Only has noisy version mismatch if your todoist version is too old.
 
+* Now also works on https://beta.todoist.com/app
+
 ## Version 8
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.
