@@ -2,7 +2,7 @@
   "name": "todoist-shortcuts",
   "author": "Michael Sloan",
   "description": "Adds a bunch of keyboard shortcuts to Todoist. More info: https://github.com/mgsloan/todoist-shortcuts",
-  "version": "8",
+  "version": "9",
   "content_scripts": [
   	{
       "matches": ["http://todoist.com/app*", "https://todoist.com/app*"],
