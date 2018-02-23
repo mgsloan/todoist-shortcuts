@@ -710,7 +710,7 @@
       for (var i = lastCursorIndex + 1; i < lastCursorTasks.length; i++) {
         var oldTask = lastCursorTasks[i];
         if (oldTask) {
-          var task = getId(oldTask.id);
+          var task = getById(oldTask.id);
           if (task) {
             debug('found still-existing task that was after old cursor, setting cursor to it');
             found = true;
@@ -760,7 +760,7 @@
   // If there are selections but the top bar isn't visible, then toggle the
   // last clicked task.
   function topBarVisibilityHack() {
-    if (!getId(ACTIONS_BAR_CLASS)) {
+    if (!getById(ACTIONS_BAR_CLASS)) {
       var isAgenda = checkIsAgendaMode();
       var selections = getSelectedTaskKeys(isAgenda);
       if (!isEmptyMap(selections)) {
@@ -769,7 +769,7 @@
           debug('Detected that top bar isn\'t visible when it should be.  Attempting workaround.');
           shiftClickTask(last);
           shiftClickTask(last);
-          if (getId(ACTIONS_BAR_CLASS)) {
+          if (getById(ACTIONS_BAR_CLASS)) {
             debug('Workaround successful!');
           } else {
             warn('Workaround failed...');
@@ -1601,7 +1601,7 @@
   }
 
   function checkIsAgendaMode() {
-    return getId(AGENDA_VIEW_ID) !== null;
+    return getById(AGENDA_VIEW_ID) !== null;
   }
 
   /*****************************************************************************
@@ -1658,13 +1658,13 @@
   }
 
   // Alias for document.getElementById
-  function getId(id) {
+  function getById(id) {
     return document.getElementById(id);
   }
 
   // Invokes the function for the matching id, or logs a warning.
   function withId(id, f) {
-    var el = getId(id);
+    var el = getById(id);
     if (el) {
       return f(el);
     } else {
