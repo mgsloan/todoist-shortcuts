@@ -98,9 +98,9 @@
   // Set this to true to get more log output.
   var DEBUG = false;
 
-  // Set this to true to get a UI message directly in the page when the version
-  // number isn't what was expected. When false, instead the mismatch warning
-  // just appears in a submenu. Mostly intended for developers of
+  // Set this to true to get a UI message directly in the page when the Todoist
+  // version number is newer than expected. When false, instead the mismatch
+  // warning just appears in a submenu. Mostly intended for developers of
   // todoist-shortcuts, as the version bumps too often for it to be reasonable
   // to do releases of the extension.
   var NOISY_VERSION_CHECK = false;
@@ -616,6 +616,8 @@
     mouseGotMoved = true;
   }
 
+  // FIXME: If the select key was very recently released on this task, then this
+  // should not toggle the state.
   function selectPressed() {
     var cursor = getCursor();
     if (cursor) {
@@ -1460,7 +1462,9 @@
       }
       var warningPrefix = null;
       var warningSuffix = null;
+      var isTooOld = false;
       if (todoistVersion && todoistVersion < TODOIST_TESTED_VERSION) {
+        isTooOld = true;
         warningPrefix =
           'Note: The version of todoist you are using, version ' +
           todoistVersion +
@@ -1495,7 +1499,7 @@
         a.appendChild(document.createTextNode('the todoist-shortcuts extension'));
         div.appendChild(a);
         div.appendChild(document.createTextNode(warningSuffix));
-        if (NOISY_VERSION_CHECK) {
+        if (isTooOld || NOISY_VERSION_CHECK) {
           document.getElementById('page_background').appendChild(div);
         } else {
           document.getElementById('last_synced').parentElement.appendChild(div);

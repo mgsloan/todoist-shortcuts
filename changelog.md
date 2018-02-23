@@ -2,6 +2,8 @@
 
 ## Version 9 (not yet released)
 
+* Only has noisy version mismatch if your todoist version is too old.
+
 ## Version 8
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.
