@@ -2,7 +2,7 @@
 
 ## Version 9 (not yet released)
 
-* Bump to todoist version 893.
+* Bump to todoist version 893.  Fixes for things that changed.
 
 * Only has noisy version mismatch if your todoist version is too old.
 

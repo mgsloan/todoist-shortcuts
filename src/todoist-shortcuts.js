@@ -261,7 +261,7 @@
   // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
     withCalendar('scheduleToday', function(calendar) {
-      withUniqueClass(calendar, 'today_icon', notMatchingText('X'), click);
+      withUniqueClass(calendar, 'icon_today', notMatchingText('X'), click);
     });
   }
 
@@ -289,7 +289,7 @@
   // Click 'no due date' in schedule. Only does anything if schedule is open.
   function unschedule() {
     withCalendar('unschedule', function(calendar) {
-      withUniqueClass(calendar, 'today_icon', matchingText('X'), click);
+      withUniqueClass(calendar, 'icon_today', matchingText('X'), click);
     });
   }
 
