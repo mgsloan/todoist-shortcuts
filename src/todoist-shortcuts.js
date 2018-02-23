@@ -1248,7 +1248,7 @@
       var classMatches =
         !item.classList.contains('reorder_item') &&
         (  item.classList.contains('task_item')
-        || (item.classList.contains('manager') && includeEditors)
+        || (item.classList.contains('manager') && shouldIncludeEditors)
         );
       // Skip nested tasks that are not visible (if includeCollapsed is not set).
       var visible = shouldIncludeCollapsed || notHidden(item);
