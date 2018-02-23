@@ -169,3 +169,7 @@ npm install grunt grunt-webstore-upload
 Then, populate `etc/secrets.json` with a json object with `chrome_client_id` and
 `chrome_client_secret` fields. Finally, you can run `./make-and-upload.sh` to
 make the zip and upload it!
+
+
+Firefox is not yet automated, for now I just visit
+https://addons.mozilla.org/en-US/developers/addon/todoist-shortcuts/edit
