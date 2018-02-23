@@ -2,6 +2,8 @@
 
 ## Version 9 (not yet released)
 
+* Bump to todoist version 893.
+
 * Only has noisy version mismatch if your todoist version is too old.
 
 * Now also works on https://beta.todoist.com/app
