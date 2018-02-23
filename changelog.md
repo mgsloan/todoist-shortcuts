@@ -14,6 +14,8 @@
 * Fixes to issues with cursor position after task add. See
   https://github.com/mgsloan/todoist-shortcuts/issues/8
 
+* Old scheduling binding for "n" removed, use "d" instead.
+
 ## Version 8
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.

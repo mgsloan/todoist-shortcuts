@@ -66,7 +66,6 @@
     // Scheduling keybindings (requires schedule to be open)
     //
     // The following binding is handled earlier ['t', scheduleTomorrow]
-    ['n', scheduleToday],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
     ['r', ifThenElse(checkCalendarOpen, unschedule, sortByAssignee)],
