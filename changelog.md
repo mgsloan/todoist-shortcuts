@@ -9,6 +9,9 @@
 * Adding tasks via `o` and `O` now works when cursor is on an overdue task
   in agenda view
 
+* Fixes to issues with cursor position after task add. See
+  https://github.com/mgsloan/todoist-shortcuts/issues/8
+
 ## Version 8
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.
