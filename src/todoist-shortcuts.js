@@ -1572,12 +1572,6 @@
       }
       storeCursorContext(isAgenda, task);
       task.dispatchEvent(new MouseEvent('mouseover'));
-      // HACK: Sometimes scrolling causes mouseover events that move the cursor.
-      // This seems to resolve those cases. It is particularly worrisome that
-      // this doesn't seem to work reliably with a 0 timeout.
-      setTimeout(function() {
-        task.dispatchEvent(new MouseEvent('mouseover'));
-      }, 20);
     }
   }
 
