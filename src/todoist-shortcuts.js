@@ -1169,6 +1169,9 @@
       return;
     }
     if (isAgenda) {
+      if (section.classList.contains('section_overdue')) {
+        section = getFirstClass(document, 'section_day');
+      }
       withUniqueClass(section, 'agenda_add_task', all, click);
     } else {
       withUniqueClass(section, 'action_add_item', all, click);
@@ -1177,7 +1180,7 @@
 
   function findParentSection(isAgenda, task) {
     if (isAgenda) {
-      return findParent(task, matchingClass('section_day'));
+      return findParent(task, or(matchingClass('section_day'), matchingClass('section_overdue')));
     } else {
       return findParent(task, matchingClass('project_editor_instance'));
     }

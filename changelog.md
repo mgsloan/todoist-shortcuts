@@ -6,6 +6,9 @@
 
 * Now also works on https://beta.todoist.com/app
 
+* Adding tasks via `o` and `O` now works when cursor is on an overdue task
+  in agenda view
+
 ## Version 8
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.
