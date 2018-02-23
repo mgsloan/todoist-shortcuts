@@ -362,7 +362,7 @@
         error('Unrecognized level in selectPriority', level);
       }
       var isAgenda = checkIsAgendaMode();
-      var allTasks = getTasks(true);
+      var allTasks = getTasks('include-collapsed');
       var classToMatch = 'priority_' + actualLevel;
       var selected = getSelectedTaskKeys(isAgenda);
       var modified = false;
@@ -567,7 +567,7 @@
   // Like select_all, but returns the list of task elements.
   function selectAllInternal() {
     deselectAll();
-    var allTasks = getTasks(true);
+    var allTasks = getTasks('include-collapsed');
     if (allTasks.length > 0) {
       shiftClickTask(allTasks[0]);
       if (allTasks.length > 1) {
@@ -1219,12 +1219,19 @@
 
   // Get the <li> elements for all the tasks visible in the current view.
   function getTasks(includeCollapsed) {
+    var shouldIncludeCollapsed = false;
+    if (includeCollapsed === 'include-collapsed') {
+      shouldIncludeCollapsed = true;
+    } else if (includeCollapsed && includeCollapsed !== 'no-collapsed') {
+      error('Unexpected value for includeCollapsed:', includeCollapsed);
+      return [];
+    }
     var results = [];
     withClass(document, 'task_item', function(item) {
       // Skip elements which don't correspond to tasks, and skip nested tasks
       // that are not visible (if includeCollapsed is not set).
       if (!item.classList.contains('reorder_item') &&
-          (includeCollapsed || notHidden(item))) {
+          (shouldIncludeCollapsed || notHidden(item))) {
         results.push(item);
       }
     });
@@ -1233,7 +1240,7 @@
 
   // This applies the function to every selected task.
   function withSelectedTasks(f) {
-    var tasks = getTasks(true);
+    var tasks = getTasks('include-collapsed');
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
       if (checkTaskIsSelected(task)) {
@@ -1248,7 +1255,7 @@
   // 'getTaskById' for why.
   function getSelectedTaskKeys(isAgenda) {
     var results = {};
-    var tasks = getTasks(true);
+    var tasks = getTasks('include-collapsed');
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
       if (checkTaskIsSelected(task)) {
