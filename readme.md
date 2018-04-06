@@ -184,6 +184,5 @@ information about development.
 
 # Supported by bounty from Doist company
 
-See [this github thread](https://github.com/rohitpaulk/todoist-tribute/issues/5)
-for context. The initial work on this was kindly supported by Amir Salihefendic
-of Doist company.
+Much of the work on this has been kindly supported by Amir Salihefendic of Doist
+company. They're awesome!
