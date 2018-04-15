@@ -1349,9 +1349,9 @@
       // Jump keys optimized to be close to homerow.
       var jumpkeys = Array.from('asdfghjkl' + 'qwertyuiop' + 'zxcvbnm' + '123467890');
       var options = {
-        'i': maybeParent(getUniqueClass(document, 'cmp_filter_inbox', all, click)),
-        't': maybeParent(getUniqueClass(document, 'cmp_filter_today', all, click)),
-        'n': maybeParent(getUniqueClass(document, 'cmp_filter_days', all, click))
+        'i': findParent(getUniqueClass(document, 'cmp_filter_inbox', all, click), matchingTag('LI')),
+        't': findParent(getUniqueClass(document, 'cmp_filter_today', all, click), matchingTag('LI')),
+        'n': findParent(getUniqueClass(document, 'cmp_filter_days', all, click), matchingTag('LI'))
       };
       withTag(projectsUl, 'li', function(projectLi) {
         if (notHidden(projectLi)) {
@@ -1390,7 +1390,7 @@
           var div = document.createElement('div');
           div.appendChild(document.createTextNode(key));
           div.classList.add(TODOIST_SHORTCUTS_TIP);
-          el.appendChild(div);
+          el.prepend(div);
         }
       }
       overrideKeyDown = function(ev) {
@@ -1547,7 +1547,7 @@
 
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    return maybeParent(getUniqueClass(document, 'drag_and_drop_handler'));
+    return findParent(getUniqueClass(document, 'drag_and_drop_handler'), matchingTag('LI'));
   }
 
   // A functional-ish idiom to reduce boilerplate.
@@ -1653,21 +1653,19 @@
     }
   }
 
-  // Finds a parentElement which matches the specified predicate.
+  // Finds a parentElement which matches the specified predicate. Returns null
+  // if element is null.
   function findParent(element, predicate) {
-    var el = element;
-    while (el.parentElement !== null) {
-      el = el.parentElement;
+    if (!element) return null;
+    var el = element.parentElement;
+    if (!el) return null;
+    do {
       if (predicate(el)) {
         return el;
       }
-    }
+      el = el.parentElement;
+    } while (el);
     return null;
-  }
-
-  // Gets parentElement attribute.  Returns null if element is null.
-  function maybeParent(element) {
-    return element ? element.parentElement : null;
   }
 
   // Returns first child that matches the specified class and predicate.
@@ -1803,6 +1801,13 @@
     };
   }
 
+  // Returns predicate which returns 'true' if the element has the specified tag.
+  function matchingTag(tag) {
+    return function(el) {
+      return el.tagName === tag;
+    };
+  }
+
   // Predicate, returns 'true' if the element is hidden with 'display: none'.
   function hidden(el) {
     return el.style.display === 'none';
@@ -1887,10 +1892,13 @@
     '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
     '  top: 0.25em;',
-    '  right: 0;',
+    '  left: -1.8em;',
     '  font-weight: normal;',
-    '  font-size: 150%;',
+    '  font-size: 18px;',
     '  color: #dd4b39;',
+    '}',
+    '.filter .' + TODOIST_SHORTCUTS_TIP + ' {',
+    '  left: -1em;',
     '}',
     '',
     '#page_background {',
