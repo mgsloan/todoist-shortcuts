@@ -19,6 +19,8 @@
   up selected. This is now fixed. See
   https://github.com/mgsloan/todoist-shortcuts/issues/9
 
+* Bump to todoist version 898.  Fixes for things that changed.
+
 ## Version 9
 
 * Bump to todoist version 893.  Fixes for things that changed.
