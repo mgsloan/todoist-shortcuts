@@ -2061,23 +2061,37 @@
     }
 
     function handleKeyDown(ev) {
-      if (overrideKeyDown) {
-        overrideKeyDown(ev);
-      } else if (ev.key === SELECT_KEY && !ev.repeat) {
-        selectPressed();
-      } else {
-        sometimesCallOriginal(window.originalTodoistKeydown)(ev);
+      if (!stopCallback(ev)) {
+        if (overrideKeyDown) {
+          overrideKeyDown(ev);
+          return;
+        } else if (ev.key === SELECT_KEY && !ev.repeat) {
+          selectPressed();
+          return;
+        }
       }
+      sometimesCallOriginal(window.originalTodoistKeydown)(ev);
     }
 
     function handleKeyUp(ev) {
-      if (overrideKeyDown) {
-        return;
-      } else if (ev.key === SELECT_KEY) {
-        selectReleased();
-      } else {
-        sometimesCallOriginal(window.originalTodoistKeyup)(ev);
+      if (!stopCallback(ev)) {
+        if (overrideKeyDown) {
+          return;
+        } else if (ev.key === SELECT_KEY) {
+          selectReleased();
+          return;
+        }
       }
+      sometimesCallOriginal(window.originalTodoistKeyup)(ev);
+    }
+
+    // Based loosely on mousetrap's stopCallback function.
+    function stopCallback(ev) {
+      var el = ev.target || ev.srcElement;
+      return el.tagName === 'INPUT' ||
+             el.tagName === 'SELECT' ||
+             el.tagName === 'TEXTAREA' ||
+             el.isContentEditable;
     }
 
     document.addEventListener('keydown', handleKeyDown, false);

@@ -8,6 +8,9 @@
 * `?` shortcut for keyboard shortcuts help now links to the readme for
   that particular release, rather than master.
 
+* Typing "x" in an input field no longer toggles selection. See
+  https://github.com/mgsloan/todoist-shortcuts/issues/15
+
 ## Version 9
 
 * Bump to todoist version 893.  Fixes for things that changed.
