@@ -305,7 +305,7 @@
   // selection.
   function moveToProject() {
     var isAgenda = checkIsAgendaMode();
-    var mutateCursor = getCursorToMutate();
+    var mutateCursor = getCursorToMutate(isAgenda);
     if (mutateCursor) {
       clickTaskMenu(isAgenda, mutateCursor, MOVE_TEXT);
     } else {
