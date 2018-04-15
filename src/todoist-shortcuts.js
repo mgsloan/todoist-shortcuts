@@ -10,6 +10,11 @@
 // @grant       none
 // ==/UserScript==
 
+// See issue #11 for why ItemSelecter is used (it is added to the global scope
+// by Todoist).
+
+/* global ItemSelecter */
+
 (function() {
   'use strict';
 
@@ -101,7 +106,7 @@
   var WHAT_CURSOR_APPLIES_TO = 'all';
 
   // Set this to true to get more log output.
-  var DEBUG = false;
+  var DEBUG = true;
 
   // Set this to true to get a UI message directly in the page when the Todoist
   // version number is newer than expected. When false, instead the mismatch
@@ -209,11 +214,7 @@
   function toggleSelect() {
     var cursor = getCursor();
     if (cursor) {
-      if (checkTaskIsSelected(cursor)) {
-        deselectTaskId(cursor.id);
-      } else {
-        selectTaskId(cursor.id);
-      }
+      toggleSelectTask(cursor);
     } else {
       warn("No cursor, so can't toggle selection.");
     }
@@ -224,7 +225,7 @@
   function select() {
     var cursor = getCursor();
     if (cursor) {
-      selectTaskId(cursor.id);
+      selectTask(cursor);
     } else {
       warn("No cursor, so can't select.");
     }
@@ -235,7 +236,7 @@
   function deselect() {
     var cursor = getCursor();
     if (cursor) {
-      deselectTaskId(cursor.id);
+      deselectTask(cursor);
     } else {
       warn("No cursor, so can't deselect.");
     }
@@ -450,17 +451,14 @@
   function expandAll() { repeatedlyClickArrows(COLLAPSED_ARROW_CLASS); }
 
   // Clears all selections.
-  function deselectAll() {
-    var isAgenda = checkIsAgendaMode();
-    var selected = getSelectedTaskKeys(isAgenda);
-    for (var key in selected) {
-      withTaskByKey(key, shiftClickTask);
-    }
-  }
+  function deselectAll() { ItemSelecter.deselectAll(); }
 
   // Selects all tasks, even those hidden by collapsing.
   function selectAll() {
-    selectAllInternal();
+    var allTasks = getTasks('include-collapsed');
+    for (var i = 0; i < allTasks.length; i++) {
+      selectTask(allTasks[i]);
+    }
   }
 
   // Add a task above / below cursor. Unfortunately these options do not exist
@@ -529,83 +527,36 @@
    * Utilities for manipulating the UI
    */
 
-  // MUTABLE.
-  var lastShiftClicked = null;
 
-  // MUTABLE.
-  var lastShiftClickedIndent = null;
-
-  // Given a task element, shift-clicks it. Unfortunately, todoist currently has
-  // quite strange behavior:
-  //
-  // * Shift clicking a selected task deselects a single task.
-  //
-  // * Shift clicking an unselected task toggles the selection state of all the
-  //   tasks between the current task and the other tasks.
-  //
-  // To work around this, when selecting a previously deselected task,
-  // 'setSelections' is used.
-  function shiftClickTask(task) {
-    // NOTE: Intentionally doesn't simulate full click like the 'click'
-    // function. This function gets called a lot, so best to just trigger one
-    // event.
-    var mde = new Event('mousedown');
-    mde.shiftKey = true;
-    task.dispatchEvent(mde);
-    lastShiftClicked = task.id;
-    lastShiftClickedIndent = getTaskIndentClass(task);
+  function toggleSelectTask(task) {
+    ItemSelecter.toggle(task);
   }
 
-  // Selects all tasks that have the specified id.
-  function selectTaskId(id) {
-    var isAgenda = checkIsAgendaMode();
-    var selected = getSelectedTaskKeys(isAgenda);
-    withClass(document, id, function(task) {
-      selected[getTaskKey(isAgenda, task)] = true;
-    });
-    setSelections(isAgenda, selected);
-  }
-
-  // Deselects all tasks that have the specified id.
-  //
-  // See the docs for shiftClickTask for why deselection is so much easier than
-  // selecting a task id.
-  function deselectTaskId(id) {
-    withClass(document, id, function(task) {
-      if (checkTaskIsSelected(task)) {
-        shiftClickTask(task);
-      }
-    });
-  }
-
-  // Like select_all, but returns the list of task elements.
-  function selectAllInternal() {
-    deselectAll();
-    var allTasks = getTasks('include-collapsed');
-    if (allTasks.length > 0) {
-      shiftClickTask(allTasks[0]);
-      if (allTasks.length > 1) {
-        shiftClickTask(allTasks[allTasks.length - 1]);
-      }
+  function selectTask(task) {
+    if (!checkTaskIsSelected(task)) {
+      ItemSelecter.toggle(task);
     }
-    return allTasks;
+  }
+
+  function deselectTask(task) {
+    if (checkTaskIsSelected(task)) {
+      ItemSelecter.toggle(task);
+    }
   }
 
   // Ensures that the specified task ids are selected (specified by a set-like
-  // object). The algorithm for this is quite ugly and inefficient, due to the
-  // strange todoist behavior mentioned above.
+  // object).
   function setSelections(isAgenda, selections) {
-    var startTime = Date.now();
-    var allTasks = selectAllInternal();
-    // Then deselect all of the things that shouldn't be selected.
+    var allTasks = getTasks('include-collapsed');
     for (var i = 0; i < allTasks.length; i++) {
       var task = allTasks[i];
       var key = getTaskKey(isAgenda, task);
-      if (!selections[key] && checkTaskIsSelected(task)) {
-        shiftClickTask(task);
+      if (selections[key]) {
+        selectTask(task);
+      } else {
+        deselectTask(task);
       }
     }
-    debug('setSelections timing:', Date.now() - startTime);
   }
 
   // All MUTABLE. Only mutated by 'storeCursorContext'.
@@ -659,10 +610,10 @@
     case 'none':
       break;
     case 'select':
-      selectTaskId(cursor.id);
+      selectTask(cursor);
       break;
     case 'deselect':
-      deselectTaskId(cursor.id);
+      deselectTask(cursor);
       break;
     default:
       error('Invariant violated, unexpected selectionMode:', selectionMode);
@@ -788,34 +739,9 @@
     }
   }
 
-  // If there are selections but the top bar isn't visible, then toggle the
-  // last clicked task.
-  function topBarVisibilityHack() {
-    if (!getById(ACTIONS_BAR_CLASS)) {
-      var isAgenda = checkIsAgendaMode();
-      var selections = getSelectedTaskKeys(isAgenda);
-      if (!isEmptyMap(selections)) {
-        var last = getTaskById(lastShiftClicked, lastShiftClickedIndent);
-        if (last) {
-          debug('Detected that top bar isn\'t visible when it should be.  Attempting workaround.');
-          shiftClickTask(last);
-          shiftClickTask(last);
-          if (getById(ACTIONS_BAR_CLASS)) {
-            debug('Workaround successful!');
-          } else {
-            warn('Workaround failed...');
-          }
-        } else {
-          warn('Actions bar isn\'t visible even though there are selections, and last clicked task is gone.');
-        }
-      }
-    }
-  }
-
   // Registers mutation observers on elements that never get removed from the
   // DOM.  Run on initialization of todoist-shortcuts.
   function registerTopMutationObservers() {
-    registerMutationObserver(document.body, topBarVisibilityHack);
     withId('editor', function(content) {
       debug('registering top level observer for', content);
       registerMutationObserver(content, handleNavigation);
@@ -1950,15 +1876,7 @@
    * Styling
    */
 
-  // Static css styling.  This does the following:
-  //
-  // * Makes it so that the actions bar doesn't animate its opacity. This way,
-  //   the bug worked around by topBarVisibilityHack is less apparent.
   addCss([
-    '#' + ACTIONS_BAR_CLASS + ' {',
-    '  opacity: 1 !important;',
-    '}',
-    '',
     // Enables positioning of the tips.
     '#projects_list > li, li.filter {',
     '  position: relative;',
