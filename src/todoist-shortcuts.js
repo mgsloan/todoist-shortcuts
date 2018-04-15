@@ -121,23 +121,26 @@
   var EXPANDED_ARROW_CLASS = 'cmp_open_arrow_down';
   var COLLAPSED_ARROW_CLASS = 'cmp_open_arrow_right';
 
-  var SCHEDULE_TEXT = 'Schedule';
-  var MOVE_TEXT = 'Move to project';
-  var ARCHIVE_TEXT = 'Archive';
-  var ARCHIVE_TASK_TEXT = 'Archive task';
-  var DELETE_TEXT = 'Delete';
-  var DELETE_TASK_TEXT = 'Delete task';
-  var ADD_ABOVE_TEXT = 'Add task above';
-  var ADD_BELOW_TEXT = 'Add task below';
   var SAVE_BTN_TEXT = 'Save';
   var ADD_TASK_BTN_TEXT = 'Add Task';
+
+  var MI_SCHEDULE = 'menu_item_schedule';
+  var MI_MOVE = 'menu_item_move';
+  var MI_ARCHIVE = 'menu_item_archive';
+  var MI_DUPLICATE = 'menu_item_duplicate';
+  var MI_DELETE = 'menu_item_delete';
+  var MI_ADD_LABEL = 'menu_item_add_label';
+  var MI_REMOVE_LABEL = 'menu_item_remove_label';
+  var MI_ADD_ABOVE = 'menu_item_add_above';
+  var MI_ADD_BELOW = 'menu_item_add_below';
+  var MI_EDIT = 'menu_item_edit';
 
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
   var MORE_MENU_ITEMS =
-    [ARCHIVE_TEXT, 'Duplicate', DELETE_TEXT, 'Add label', 'Remove label'];
+    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE, MI_ADD_LABEL, MI_REMOVE_LABEL];
   var TASKMENU_ITEMS =
-    [ARCHIVE_TASK_TEXT, MOVE_TEXT, DELETE_TASK_TEXT];
+    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE, MI_EDIT];
 
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
@@ -259,7 +262,7 @@
         });
       } else {
         withId(ACTIONS_BAR_CLASS, function(parent) {
-          clickLink(parent, SCHEDULE_TEXT);
+          withUniqueClass(parent, MI_SCHEDULE, all, click);
         });
       }
     }
@@ -307,9 +310,11 @@
     var isAgenda = checkIsAgendaMode();
     var mutateCursor = getCursorToMutate(isAgenda);
     if (mutateCursor) {
-      clickTaskMenu(isAgenda, mutateCursor, MOVE_TEXT);
+      clickTaskMenu(isAgenda, mutateCursor, MI_MOVE);
     } else {
-      withId(ACTIONS_BAR_CLASS, function(parent) { clickLink(parent, MOVE_TEXT); });
+      withId(ACTIONS_BAR_CLASS, function(parent) {
+        withUniqueClass(parent, MI_MOVE, all, click);
+      });
     }
     // The keyboard shortcut used to invoke this also ends up in the completion
     // box. I thought stopPropagation would fix this, but it doesn't. So, empty
@@ -397,9 +402,9 @@
     var isAgenda = checkIsAgendaMode();
     var mutateCursor = getCursorToMutate(isAgenda, 'dangerous');
     if (mutateCursor) {
-      clickTaskMenu(isAgenda, mutateCursor, ARCHIVE_TASK_TEXT);
+      clickTaskMenu(isAgenda, mutateCursor, MI_ARCHIVE);
     } else {
-      clickMenu(moreMenu, ARCHIVE_TEXT);
+      clickMenu(moreMenu, MI_ARCHIVE);
     }
   }
 
@@ -427,9 +432,9 @@
     var isAgenda = checkIsAgendaMode();
     var mutateCursor = getCursorToMutate(isAgenda);
     if (mutateCursor) {
-      clickTaskMenu(isAgenda, mutateCursor, DELETE_TASK_TEXT);
+      clickTaskMenu(isAgenda, mutateCursor, MI_DELETE);
     } else {
-      clickMenu(moreMenu, DELETE_TEXT);
+      clickMenu(moreMenu, MI_DELETE);
     }
   }
 
@@ -464,8 +469,8 @@
   // Add a task above / below cursor. Unfortunately these options do not exist
   // in agenda mode, so in that case, instead it is added to the current
   // section.
-  function addAbove() { addAboveOrBelow(ADD_ABOVE_TEXT); }
-  function addBelow() { addAboveOrBelow(ADD_BELOW_TEXT); }
+  function addAbove() { addAboveOrBelow(MI_ADD_ABOVE); }
+  function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.
@@ -851,11 +856,6 @@
     }
   }
 
-  // Finds a <a> element with the specified text and clicks it.
-  function clickLink(parent, text) {
-    withUniqueTag(parent, 'a', matchingText(text), click);
-  }
-
   // Finds a menu element. These do not have any unique class or ID, so instead
   // need to do it by looking at text content of the options.
   function findMenu(name, expectedItems, predicate0, expectedCount0) {
@@ -866,7 +866,7 @@
       if (predicate(menu)) {
         var matches = true;
         for (var i = 0; i < expectedItems.length; i++) {
-          if (!getUniqueTag(menu, 'span', matchingText(expectedItems[i]))) {
+          if (!getUniqueClass(menu, expectedItems[i])) {
             matches = false;
             break;
           }
@@ -879,7 +879,7 @@
     if (results.length === expectedCount) {
       return results[0];
     } else {
-      warn('Couldn\'t find unique \'' + name + '\' menu element, found:', results);
+      error('Couldn\'t find unique \'' + name + '\' menu element, found:', results);
       return null;
     }
   }
@@ -890,12 +890,10 @@
   var taskMenu = findMenu('task', TASKMENU_ITEMS, all, 2);
   var agendaTaskMenu = findMenu('agenda task', TASKMENU_ITEMS, function(el) { return el !== taskMenu; });
 
-  function clickMenu(menu, text) {
-    if (menu) {
-      withUniqueTag(menu, 'span', matchingText(text), click);
-    } else {
-      error('Can\'t perform action due to not finding menu element.');
-    }
+  function clickMenu(menu, cls) {
+    withUniqueClass(menu, cls, all, function(container) {
+      withUniqueTag(container, 'span', all, click);
+    });
   }
 
   // Returns true if the node under the cursor has children and is collapsed.
@@ -929,9 +927,9 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  function clickTaskMenu(isAgenda, task, text) {
+  function clickTaskMenu(isAgenda, task, cls) {
     withTaskMenu(isAgenda, task, function(menu) {
-      clickMenu(menu, text);
+      clickMenu(menu, cls);
     });
   }
 
@@ -1200,13 +1198,13 @@
   }
 
   // Common code implementing addAbove / addBelow.
-  function addAboveOrBelow(menuText) {
+  function addAboveOrBelow(menuCls) {
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
     if (isAgenda || cursor === null) {
       addToSectionContaining(isAgenda, cursor);
     } else {
-      clickTaskMenu(isAgenda, cursor, menuText);
+      clickTaskMenu(isAgenda, cursor, menuCls);
     }
   }
 
