@@ -51,6 +51,8 @@
     ['* 2', selectPriority('2')],
     ['* 3', selectPriority('3')],
     ['* 4', selectPriority('4')],
+    ['* h', collapseAll],
+    ['* l', expandAll],
 
     // Manipulation of selected tasks
     ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
@@ -114,6 +116,8 @@
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
   var ARROW_CLASS = 'arrow';
   var CALENDAR_CLASS = 'minical_container';
+  var EXPANDED_ARROW_CLASS = 'cmp_open_arrow_down';
+  var COLLAPSED_ARROW_CLASS = 'cmp_open_arrow_right';
 
   var SCHEDULE_TEXT = 'Schedule';
   var MOVE_TEXT = 'Move to project';
@@ -430,10 +434,14 @@
     withUniqueClass(getCursor(), ARROW_CLASS, all, click);
   }
 
-  // Expands or collapses task under the cursor, that have children. Does
+  // Collapses or expands task under the cursor, that have children. Does
   // nothing if it's already in the desired state.
   function collapse() { if (checkCursorExpanded()) { toggleCollapse(); } }
   function expand() { if (checkCursorCollapsed()) { toggleCollapse(); } }
+
+  // Collapses or expands all tasks.
+  function collapseAll() { repeatedlyClickArrows(EXPANDED_ARROW_CLASS); }
+  function expandAll() { repeatedlyClickArrows(COLLAPSED_ARROW_CLASS); }
 
   // Clears all selections.
   function deselectAll() {
@@ -862,12 +870,31 @@
 
   // Returns true if the node under the cursor has children and is collapsed.
   function checkCursorCollapsed() {
-    return getUniqueClass(getCursor(), 'cmp_open_arrow_right');
+    return getUniqueClass(getCursor(), COLLAPSED_ARROW_CLASS);
   }
 
   // Returns true if the node under the cursor has children and is expanded.
   function checkCursorExpanded() {
-    return getUniqueClass(getCursor(), 'cmp_open_arrow_down');
+    return getUniqueClass(getCursor(), EXPANDED_ARROW_CLASS);
+  }
+
+  // Click elements within the content which match the specified class.
+  // Persistently clicks until the class can no longer be found. Used to
+  // collapse / expand all items.
+  function repeatedlyClickArrows(cls) {
+    withId("content", function(content) {
+      for (var i = 0; i < 100; i++) {
+        var clickedSomething = false;
+        withClass(content, cls, function(el) {
+          click(el);
+          clickedSomething = true;
+        });
+        if (!clickedSomething) break;
+        if (i == 99) {
+          warn('iteratively clicked arrows 100 times but they didn\'t all toggle');
+        }
+      }
+    });
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.

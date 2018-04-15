@@ -58,15 +58,18 @@ you can scroll the left pane down and up with `space` and `shift+space`.
 
 ## Selection
 
-| keys   | action                                |
-| ---    | ---                                   |
-| `x`    | add task at cursor to selection       |
-| `* a`  | select all tasks                      |
-| `* n`  | clear selection                       |
-| `* 1`  | add all priority 1 tasks to selection |
-| `* 2`  | add all priority 2 tasks to selection |
-| `* 3`  | add all priority 3 tasks to selection |
-| `* 4`  | add all priority 4 tasks to selection |
+| keys  | action                                |
+| ---   | ---                                   |
+| `x`   | add task at cursor to selection       |
+| `* a` | select all tasks                      |
+| `* n` | clear selection                       |
+| `* 1` | add all priority 1 tasks to selection |
+| `* 2` | add all priority 2 tasks to selection |
+| `* 3` | add all priority 3 tasks to selection |
+| `* 4` | add all priority 4 tasks to selection |
+| `* h` | collapses all tasks                   |
+| `* l` | expands all tasks                     |
+
 
 `x` works a bit different than all the other shortcuts. It can be held down, and
 cursor navigation will cause selection or deselection of other tasks. It can be

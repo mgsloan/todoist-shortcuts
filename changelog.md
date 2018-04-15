@@ -1,6 +1,11 @@
 # todoist-shortcuts changelog
 
-## Version 9 (not yet released)
+## Version 10
+
+* Adds `* l` and `* h` to expand or collapse all task nesting. See
+  https://github.com/mgsloan/todoist-shortcuts/issues/18
+
+## Version 9
 
 * Bump to todoist version 893.  Fixes for things that changed.
 
