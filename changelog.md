@@ -5,6 +5,9 @@
 * Adds `* l` and `* h` to expand or collapse all task nesting. See
   https://github.com/mgsloan/todoist-shortcuts/issues/18
 
+* `?` shortcut for keyboard shortcuts help now links to the readme for
+  that particular release, rather than master.
+
 ## Version 9
 
 * Bump to todoist version 893.  Fixes for things that changed.

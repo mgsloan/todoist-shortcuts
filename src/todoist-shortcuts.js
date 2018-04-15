@@ -13,6 +13,8 @@
 (function() {
   'use strict';
 
+  var TODOIST_SHORTCUTS_VERSION = 9;
+
   // Here's where the keybindings get specified. Of course, feel free to modify
   // this list, or modify this script in general.
   var KEY_BINDINGS = [
@@ -514,9 +516,10 @@
 
   // Open help documentation.
   function openShortcutsHelp() {
-    window.open(TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
+    window.open(
+      TODOIST_SHORTCUTS_GITHUB + '/blob/v' +
+      TODOIST_SHORTCUTS_VERSION + '/readme.md');
   }
-
 
   /** ***************************************************************************
    * Utilities for manipulating the UI
