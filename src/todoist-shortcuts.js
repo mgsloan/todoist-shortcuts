@@ -252,7 +252,7 @@
       debug('Not opening schedule because it is already open.');
     } else {
       var isAgenda = checkIsAgendaMode();
-      var mutateCursor = getCursorToMutate();
+      var mutateCursor = getCursorToMutate(isAgenda);
       if (mutateCursor) {
         withTaskMenu(isAgenda, mutateCursor, function(menu) {
           withUniqueClass(menu, 'cmp_scheduler_more', all, click);
