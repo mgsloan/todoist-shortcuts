@@ -11,6 +11,10 @@
 * Typing "x" in an input field no longer toggles selection. See
   https://github.com/mgsloan/todoist-shortcuts/issues/15
 
+* There was a bug where after editing a task, the task before it would end
+  up selected. This is now fixed. See
+  https://github.com/mgsloan/todoist-shortcuts/issues/9
+
 ## Version 9
 
 * Bump to todoist version 893.  Fixes for things that changed.

@@ -129,6 +129,8 @@
   var DELETE_TASK_TEXT = 'Delete task';
   var ADD_ABOVE_TEXT = 'Add task above';
   var ADD_BELOW_TEXT = 'Add task below';
+  var SAVE_BTN_TEXT = 'Save';
+  var ADD_TASK_BTN_TEXT = 'Add Task';
 
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
@@ -612,14 +614,16 @@
   var lastCursorSection = null;
   var mouseGotMoved = false;
   var selectionMode = 'none';
+  var wasEditing = false;
 
-  function storeCursorContext(isAgenda, cursor) {
+  function storeCursorContext(isAgenda, cursor, editing) {
     lastCursorTasks = getTasks();
     lastCursorIndex = lastCursorTasks.indexOf(cursor);
     lastCursorId = cursor.id;
     lastCursorIndent = getTaskIndentClass(cursor);
     lastCursorSection = getSectionName(isAgenda, cursor);
     mouseGotMoved = false;
+    wasEditing = editing;
     handleCursorMove(cursor);
     debug('wrote down cursor context');
   }
@@ -669,8 +673,8 @@
   function ensureCursor(content) {
     debug('ensuring cursor');
     var isAgenda = checkIsAgendaMode();
-    // If there's an editor open to modify or add a task, then set the cursor
-    // to the item above.
+    // If there's an editor open to add a task, then set the cursor to the item
+    // above.
     var manager = getUniqueClass(content, 'manager');
     if (manager) {
       var tasks = getTasks('no-collapsed', 'include-editors');
@@ -678,7 +682,15 @@
         return task.classList.contains('manager');
       });
       if (managerIndex > 0) {
-        setCursor(isAgenda, tasks[managerIndex - 1], 'no-scroll');
+        withUniqueClass(manager, 'submit_btn', all, function(submitBtn) {
+          if (matchingText(SAVE_BTN_TEXT)(submitBtn)) {
+            storeCursorContext(isAgenda, tasks[managerIndex - 1], true);
+          } else if (matchingText(ADD_TASK_BTN_TEXT)(submitBtn)) {
+            setCursor(isAgenda, tasks[managerIndex - 1], 'no-scroll');
+          } else {
+            warn('Didn\'t find expected text in task editor submit button');
+          }
+        });
       }
       return;
     }
@@ -688,7 +700,7 @@
     // the cursor doesn't follow the task for these moves, hence this logic.
     var changedSection = false;
     var currentSection = null;
-    if (cursor) {
+    if (cursor && !wasEditing) {
       var cursorIndent = getTaskIndentClass(cursor);
       if (lastCursorId === cursor.id && lastCursorIndent === cursorIndent) {
         currentSection = getSectionName(isAgenda, cursor);
@@ -709,7 +721,7 @@
       }
     }
     if (cursor && !changedSection) {
-      storeCursorContext(isAgenda, cursor);
+      storeCursorContext(isAgenda, cursor, false);
     } else {
       if (changedSection) {
         debug('cursor element changed section, finding new location');
@@ -717,15 +729,30 @@
         debug('cursor element disappeared, finding new location');
       }
       var found = false;
-      for (var i = lastCursorIndex + 1; i < lastCursorTasks.length; i++) {
-        var oldTask = lastCursorTasks[i];
-        if (oldTask) {
-          var task = getById(oldTask.id);
-          if (task) {
-            debug('found still-existing task that was after old cursor, setting cursor to it');
+      if (wasEditing) {
+        var task = getById(lastCursorTasks[lastCursorIndex].id);
+        if (task) {
+          tasks = getTasks();
+          var priorIndex = tasks.indexOf(task);
+          if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
+            debug('found task that is probably the one that was previously being edited');
             found = true;
-            setCursor(isAgenda, task, 'scroll');
-            break;
+            setCursor(isAgenda, tasks[priorIndex + 1], 'scroll');
+          }
+        } else {
+          warn('expected to still find task that was above the one being edited.');
+        }
+      } else {
+        for (var i = lastCursorIndex + 1; i < lastCursorTasks.length; i++) {
+          var oldTask = lastCursorTasks[i];
+          if (oldTask) {
+            task = getById(oldTask.id);
+            if (task) {
+              debug('found still-existing task that was after old cursor, setting cursor to it');
+              found = true;
+              setCursor(isAgenda, task, 'scroll');
+              break;
+            }
           }
         }
       }
@@ -1600,7 +1627,7 @@
       } else if (shouldScroll !== 'no-scroll') {
         error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
       }
-      storeCursorContext(isAgenda, task);
+      storeCursorContext(isAgenda, task, false);
       task.dispatchEvent(new MouseEvent('mouseover'));
     }
   }
