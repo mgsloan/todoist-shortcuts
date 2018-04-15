@@ -121,9 +121,6 @@
   var EXPANDED_ARROW_CLASS = 'cmp_open_arrow_down';
   var COLLAPSED_ARROW_CLASS = 'cmp_open_arrow_right';
 
-  var SAVE_BTN_TEXT = 'Save';
-  var ADD_TASK_BTN_TEXT = 'Add Task';
-
   var MI_SCHEDULE = 'menu_item_schedule';
   var MI_MOVE = 'menu_item_move';
   var MI_ARCHIVE = 'menu_item_archive';
@@ -687,15 +684,7 @@
         return task.classList.contains('manager');
       });
       if (managerIndex > 0) {
-        withUniqueClass(manager, 'submit_btn', all, function(submitBtn) {
-          if (matchingText(SAVE_BTN_TEXT)(submitBtn)) {
-            storeCursorContext(isAgenda, tasks[managerIndex - 1], true);
-          } else if (matchingText(ADD_TASK_BTN_TEXT)(submitBtn)) {
-            setCursor(isAgenda, tasks[managerIndex - 1], 'no-scroll');
-          } else {
-            warn('Didn\'t find expected text in task editor submit button');
-          }
-        });
+        storeCursorContext(isAgenda, tasks[managerIndex - 1], true);
       }
       return;
     }
