@@ -44,8 +44,6 @@ Then, run `eslint.sh` to use it to do checking.
 
 * Is WHAT_CURSOR_APPLIES_TO = 'all' a good default?
 
-* Have it fetch and cache which todoist versions are compatible.
-
 * "bulk reschedule mode" - clears current selection, prompts for
 rescheduling of item then moves cursor to the next.  Similar "bulk project
 move" mode would also be nice.
@@ -60,14 +58,6 @@ move" mode would also be nice.
 * If user edits task and uses ctrl+arrow to indent / dedent, `cursorIndent`
 doesn't update.  This can cause moveUp / moveDown to fail, among other
 inconsistencies.
-
-* Most functions have at least some documentation comments, but not all.
-Should add these!
-
-* Have `?` open up todoist-shortcuts README.md that is specific to the user's
-  version.  Check if there is a new version?
-
-* Add `update_url` field to `manifest.json`.
 
 * Add a chrome extension icon.
 
