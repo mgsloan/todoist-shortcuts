@@ -885,15 +885,16 @@
   // Persistently clicks until the class can no longer be found. Used to
   // collapse / expand all items.
   function repeatedlyClickArrows(cls) {
-    withId("content", function(content) {
+    withId('content', function(content) {
+      var clickedSomething = false;
+      var doClick = function(el) {
+        click(el);
+        clickedSomething = true;
+      };
       for (var i = 0; i < 100; i++) {
-        var clickedSomething = false;
-        withClass(content, cls, function(el) {
-          click(el);
-          clickedSomething = true;
-        });
+        withClass(content, cls, doClick);
         if (!clickedSomething) break;
-        if (i == 99) {
+        if (i === 99) {
           warn('iteratively clicked arrows 100 times but they didn\'t all toggle');
         }
       }
