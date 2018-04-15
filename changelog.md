@@ -19,6 +19,10 @@
   up selected. This is now fixed. See
   https://github.com/mgsloan/todoist-shortcuts/issues/9
 
+* Some Todoist internals are now directly invoked, to handle
+  selection more efficiently. See
+  https://github.com/mgsloan/todoist-shortcuts/issues/11
+
 * Bump to todoist version 898.  Fixes for things that changed.
 
 ## Version 9
