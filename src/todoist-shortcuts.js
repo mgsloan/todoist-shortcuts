@@ -476,16 +476,16 @@
   // Switches to a navigation mode, where navigation targets are annotated
   // with letters to press to click.
   function navigate() {
-    withId('projects_list', function(projectsUl) {
+    withId('list_holder', function(listHolder) {
       // Since the projects list can get reconstructed, watch for changes and
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
       oldNavigateOptions = [];
       var finished = function() {};
-      finished = registerMutationObserver(projectsUl, function() {
-        setupNavigate(projectsUl, finished);
+      finished = registerMutationObserver(listHolder, function() {
+        setupNavigate(listHolder, finished);
       }, { childList: true, subtree: true });
-      setupNavigate(projectsUl, finished);
+      setupNavigate(listHolder, finished);
     });
   }
 
@@ -1342,28 +1342,32 @@
   // be re-invoked every time the DOM refreshes, in order to ensure they are
   // displayed. It overrides the keyboard handler such that it temporarily
   // expects a key.
-  function setupNavigate(projectsUl, finished) {
+  function setupNavigate(listHolder, finished) {
     document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
       // Jump keys optimized to be close to homerow.
       var jumpkeys = Array.from('asdfghjkl' + 'qwertyuiop' + 'zxcvbnm' + '123467890');
-      var options = {
-        'i': findParent(getUniqueClass(document, 'cmp_filter_inbox', all, click), matchingTag('LI')),
-        't': findParent(getUniqueClass(document, 'cmp_filter_today', all, click), matchingTag('LI')),
-        'n': findParent(getUniqueClass(document, 'cmp_filter_days', all, click), matchingTag('LI'))
-      };
-      withTag(projectsUl, 'li', function(projectLi) {
-        if (notHidden(projectLi)) {
+      var options = {};
+      withTag(listHolder, 'li', function(li) {
+        if (notHidden(li)) {
           var key = null;
-          // Take a key from the jumpkeys list that isn't already used.
-          while (key === null && jumpkeys.length > 0) {
-            var checkKey = jumpkeys.shift();
-            if (!(checkKey in options)) {
-              key = checkKey;
+          if (getUniqueClass(li, 'cmp_filter_inbox')) {
+            key = 'i';
+          } else if (getUniqueClass(li, 'cmp_filter_today')) {
+            key = 't';
+          } else if (getUniqueClass(li, 'cmp_filter_days')) {
+            key = 'n';
+          } else {
+            // Take a key from the jumpkeys list that isn't already used.
+            while (key === null && jumpkeys.length > 0) {
+              var checkKey = jumpkeys.shift();
+              if (!(checkKey in options)) {
+                key = checkKey;
+              }
             }
           }
-          options[key] = projectLi;
+          options[key] = li;
         }
       });
       var different = false;
