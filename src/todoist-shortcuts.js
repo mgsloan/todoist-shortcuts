@@ -1811,9 +1811,10 @@
   // Given a predicate, returns the first element that matches. If predicate is
   // null, then it is treated like 'all'.
   function findFirst(predicate, array) {
+    var pred = checkedPredicate('findFirst', predicate ? predicate : all);
     for (var i = 0; i < array.length; i++) {
       var element = array[i];
-      if (!predicate || predicate(element)) {
+      if (pred(element)) {
         return element;
       }
     }
@@ -1824,10 +1825,11 @@
   // match, or multiple elements match, then nothing gets returned. If predicate
   // is null, then it is treated like 'all'.
   function findUnique(predicate, array) {
+    var pred = checkedPredicate('findUnique', predicate ? predicate : all);
     var result = null;
     for (var i = 0; i < array.length; i++) {
       var element = array[i];
-      if (!predicate || predicate(element)) {
+      if (pred(element)) {
         if (result === null) {
           result = element;
         } else {
@@ -1901,12 +1903,29 @@
   // Given two predicates, uses && to combine them.
   // eslint-disable-next-line no-unused-vars
   function and(p1, p2) {
-    return function(x) { return p1(x) && p2(x); };
+    return function(x) {
+      return checkedPredicate('left side of and', p1)(x) &&
+             checkedPredicate('right side of and', p2)(x);
+    };
   }
 
   // Given two predicates, uses || to combine them.
   function or(p1, p2) {
-    return function(x) { return p1(x) || p2(x); };
+    return function(x) {
+      return checkedPredicate('left side of or', p1)(x) ||
+             checkedPredicate('right side of or', p2)(x);
+    };
+  }
+
+  function checkedPredicate(context, predicate) {
+    return function(x) {
+      var bool = predicate(x);
+      if (typeof bool !== 'boolean') {
+        // TODO: perhaps an exception would be better.
+        error('In ' + context + ', expected boolean result from predicate. Instead got', bool);
+      }
+      return bool;
+    };
   }
 
   /*****************************************************************************
