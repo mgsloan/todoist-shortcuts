@@ -664,7 +664,11 @@
       }
       return;
     }
-    var cursor = getCursor();
+    var cursor = getCursorOrOnLeft();
+    if (cursor === 'OnLeft') {
+      debug('Cursor is in the sidebar, not updating task cursor.');
+      return;
+    }
     // Detect if the cursor has changed section. This can happen when the user
     // re-schedules it or moves it to a different project. I find it nicer if
     // the cursor doesn't follow the task for these moves, hence this logic.
@@ -697,52 +701,56 @@
     if (cursor && !changedSection) {
       storeCursorContext(isAgenda, cursor, false);
     } else {
-      var found = false;
-      if (lastCursorIndex > 0) {
-        if (changedSection) {
-          debug('cursor element changed section, finding new location');
-        } else {
-          debug('cursor element disappeared, finding new location');
-        }
-        if (wasEditing) {
-          var task = getById(lastCursorTasks[lastCursorIndex].id);
-          if (task) {
-            tasks = getTasks();
-            var priorIndex = tasks.indexOf(task);
-            if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
-              debug('found task that is probably the one that was previously being edited');
-              found = true;
-              setCursor(isAgenda, tasks[priorIndex + 1], 'no-scroll');
-            }
-          } else {
-            warn('expected to still find task that was above the one being edited.');
+      if (changedSection) {
+        debug('cursor element changed section, finding new location');
+      } else {
+        debug('cursor element disappeared, finding new location');
+      }
+      restoreLastCursor(isAgenda);
+    }
+  }
+
+  function restoreLastCursor(isAgenda) {
+    var found = false;
+    if (lastCursorIndex > 0) {
+      if (wasEditing) {
+        var task = getById(lastCursorTasks[lastCursorIndex].id);
+        if (task) {
+          var tasks = getTasks();
+          var priorIndex = tasks.indexOf(task);
+          if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
+            debug('found task that is probably the one that was previously being edited');
+            found = true;
+            setCursor(isAgenda, tasks[priorIndex + 1], 'no-scroll');
           }
         } else {
-          for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
-            var oldTask = lastCursorTasks[i];
-            if (oldTask) {
-              task = getById(oldTask.id);
-              if (task) {
-                debug(
-                  'found still-existing task that is',
-                  i - lastCursorIndex,
-                  'tasks after old cursor position, at',
-                  lastCursorIndex,
-                  ', setting cursor to it');
-                found = true;
-                setCursor(isAgenda, task, 'no-scroll');
-                break;
-              }
-            }
-          }
+          warn('expected to still find task that was above the one being edited.');
         }
       } else {
-        warn('lastCursorIndex wasn\'t set yet');
+        for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
+          var oldTask = lastCursorTasks[i];
+          if (oldTask) {
+            task = getById(oldTask.id);
+            if (task) {
+              debug(
+                'found still-existing task that is',
+                i - lastCursorIndex,
+                'tasks after old cursor position, at',
+                lastCursorIndex,
+                ', setting cursor to it');
+              found = true;
+              setCursor(isAgenda, task, 'no-scroll');
+              break;
+            }
+          }
+        }
       }
-      if (!found) {
-        debug('didn\'t find a particular task to select, so selecting last task');
-        setCursorToLastTask(isAgenda, 'no-scroll');
-      }
+    } else {
+      warn('lastCursorIndex wasn\'t set yet');
+    }
+    if (!found) {
+      debug('didn\'t find a particular task to select, so selecting last task');
+      setCursorToLastTask(isAgenda, 'no-scroll');
     }
   }
 
@@ -1616,21 +1624,52 @@
 
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    return findParent(getUniqueClass(document, 'drag_and_drop_handler'), matchingTag('LI'));
+    var cursor = getCursorOrOnLeft();
+    // Ignore when items on the left menu are hovered.
+    return cursor === 'OnLeft' ? null : cursor;
+  }
+
+  // Returns the <li> element which corresponds to the current cursor. If the
+  // cursor is currently hovering something on the left menu (project, label,
+  // filter), then returns string 'OnLeft'.
+  function getCursorOrOnLeft() {
+    var cursor = findParent(getUniqueClass(document, 'drag_and_drop_handler'), matchingTag('LI'));
+    // Ignore when items on the left menu are hovered.
+    if (findParent(cursor, matchingId('left_menu'))) {
+      return 'OnLeft';
+    } else {
+      return cursor;
+    }
   }
 
   // A functional-ish idiom to reduce boilerplate.
   function modifyCursorIndex(isAgenda, f) {
     var tasks = getTasks();
-    var cursorIndex = tasks.indexOf(getCursor());
-    var newIndex = f(cursorIndex, tasks);
-    if (newIndex < 0) {
-      newIndex = 0;
+    var cursor = getCursor();
+    if (!cursor) {
+      debug('modifyCursorIndex couldn\'t find cursor, so running restoreLastCursor');
+      restoreLastCursor();
     }
-    if (newIndex >= tasks.length) {
-      newIndex = tasks.length - 1;
+    cursor = getCursor();
+    if (!cursor) {
+      warn('ensureCursor failed, so aborting modifyCursorIndex');
+    } else {
+      var cursorIndex = tasks.indexOf(getCursor());
+      if (cursorIndex < 0) {
+        error(
+          'Invariant violation: couldn\'t find', cursor, 'in', tasks,
+          ', so aborting modifyCursorIndex');
+        return;
+      }
+      var newIndex = f(cursorIndex, tasks);
+      if (newIndex < 0) {
+        newIndex = 0;
+      }
+      if (newIndex >= tasks.length) {
+        newIndex = tasks.length - 1;
+      }
+      setCursor(isAgenda, tasks[newIndex], 'scroll');
     }
-    setCursor(isAgenda, tasks[newIndex], 'scroll');
   }
 
   function checkIsAgendaMode() {
@@ -1874,6 +1913,13 @@
   function matchingTag(tag) {
     return function(el) {
       return el.tagName === tag;
+    };
+  }
+
+  // Returns predicate which returns 'true' if the element has the specified id.
+  function matchingId(id) {
+    return function(el) {
+      return el.id === id;
     };
   }
 
