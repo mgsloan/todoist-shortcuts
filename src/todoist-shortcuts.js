@@ -775,8 +775,8 @@
 
   var lastHash = null;
 
-  function handleNavigation() {
-    debug('handleNavigation');
+  function handlePageChange() {
+    debug('handlePageChange');
     var currentHash = document.location.hash;
     if (lastHash !== currentHash) {
       var isAgenda = checkIsAgendaMode();
@@ -791,7 +791,7 @@
   function registerTopMutationObservers() {
     withId('editor', function(content) {
       debug('registering top level observer for', content);
-      registerMutationObserver(content, handleNavigation);
+      registerMutationObserver(content, handlePageChange);
       registerMutationObserver(content, function() {
         ensureCursor(content);
       }, { childList: true, subtree: true });
@@ -2085,7 +2085,7 @@
    */
 
   checkTodoistVersion();
-  handleNavigation();
+  handlePageChange();
   registerTopMutationObservers();
 
   setTimeout(function() {
