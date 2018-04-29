@@ -118,7 +118,7 @@
   var WHAT_CURSOR_APPLIES_TO = 'all';
 
   // Set this to true to get more log output.
-  var DEBUG = true;
+  var DEBUG = false;
 
   // Set this to true to get a UI message directly in the page when the Todoist
   // version number is newer than expected. When false, instead the mismatch
