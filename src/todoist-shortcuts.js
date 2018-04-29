@@ -688,12 +688,12 @@
           warn('expected to still find task that was above the one being edited.');
         }
       } else {
-        for (var i = lastCursorIndex + 1; i < lastCursorTasks.length; i++) {
+        for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
           var oldTask = lastCursorTasks[i];
           if (oldTask) {
             task = getById(oldTask.id);
             if (task) {
-              debug('found still-existing task that was after old cursor, setting cursor to it');
+              debug('found still-existing task that was on or after old cursor, setting cursor to it');
               found = true;
               setCursor(isAgenda, task, 'scroll');
               break;

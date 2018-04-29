@@ -31,6 +31,9 @@
 * Now supports navigating to labels and filters. See
   [#3](https://github.com/mgsloan/todoist-shortcuts/issues/3)
 
+* Fixes an issue where typing `g` followed by some key that does nothing
+  would cause the cursor to move down one.
+
 * Bump to todoist version 901.
 
 ## Version 9
