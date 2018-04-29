@@ -62,9 +62,9 @@
     ['* l', expandAll],
 
     // Manipulation of selected tasks
-    ['t', ifThenElse(checkCalendarOpen, scheduleTomorrow, schedule)],
+    ['t', schedule],
     ['v', moveToProject],
-    ['d', ifThenElse(checkCalendarOpen, scheduleToday, done)],
+    ['d', done],
     ['e', archive],
     ['#', deleteTasks],
     ['1', setPriority('1')],
@@ -72,15 +72,8 @@
     ['3', setPriority('3')],
     ['4', setPriority('4')],
 
-    // Scheduling keybindings (requires schedule to be open)
-    //
-    // The following binding is handled earlier ['t', scheduleTomorrow]
-    ['w', scheduleNextWeek],
-    ['m', scheduleNextMonth],
-    ['r', ifThenElse(checkCalendarOpen, unschedule, sortByAssignee)],
-
     // Sorting
-    // 'r' is handled earlier
+    ['r', sortByAssignee],
     ['s', sortByDate],
     ['p', sortByPriority],
 
@@ -89,6 +82,15 @@
     [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
     ['escape', closeContextMenus]
+  ];
+
+  // Scheduling keybindings (used when scheduler is open)
+  var SCHEDULE_BINDINGS = [
+    ['d', scheduleToday],
+    ['t', scheduleTomorrow],
+    ['w', scheduleNextWeek],
+    ['m', scheduleNextMonth],
+    ['r', unschedule]
   ];
 
   var SELECT_KEY = 'x';
@@ -156,6 +158,9 @@
   var todoistRootDiv = document.getElementById(TODOIST_ROOT_ID);
   if (!todoistRootDiv) return;
 
+  // Set on initialization to mousetrap instance.
+  var mousetrap = null;
+
   /*****************************************************************************
    * Action combiners
    */
@@ -172,6 +177,7 @@
   }
 
   // If the condition is true, runs the first action, otherwise runs the second.
+  // eslint-disable-next-line no-unused-vars
   function ifThenElse(condition, calendarAction, normalAction) {
     return function() {
       if (condition()) {
@@ -748,6 +754,17 @@
       registerMutationObserver(content, function() {
         ensureCursor(content);
       }, { childList: true, subtree: true });
+    });
+    registerMutationObserver(document.body, function() {
+      if (mousetrap) {
+        if (checkCalendarOpen()) {
+          debug('Setting keymap to schedule');
+          mousetrap.switchKeymap('schedule');
+        } else {
+          debug('Setting keymap to default');
+          mousetrap.switchKeymap('default');
+        }
+      }
     });
   }
 
@@ -1933,10 +1950,37 @@
    * mousetrap v1.6.1 craig.is/killing/mice
    *
    * Forked version at https://github.com/mgsloan/mousetrap (see submodule)
+   *
+   * Minified via "uglifyjs --compress --mangle -- mousetrap.js | xclip"
    */
   /* eslint-disable */
-!function(e,r,t){if(e){for(var a,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},s={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},o=1;o<20;++o)i[111+o]="f"+o;for(o=0;o<=9;++o)i[o+96]=o.toString();w.prototype.bind=function(e,t,n,r){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,r),this},w.prototype.unbind=function(e,t){return this.bind.call(this,e,function(){},t)},w.prototype.trigger=function(e,t,n){var r=n||"default";return this._directMap[r][e+":"+t]&&this._directMap[r][e+":"+t]({},e),this},w.prototype.reset=function(e){var t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},w.prototype.switchKeymap=function(e){e&&(this._resetSequences(),this._currentKeymap=e)},w.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==r&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},w.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},w.addKeycodes=function(e){for(var t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);a=null},w.init=function(){var t=w(r);for(var e in t)"_"!==e.charAt(0)&&(w[e]=function(e){return function(){return t[e].apply(t,arguments)}}(e))},w.init(),e.Mousetrap=w,"undefined"!=typeof module&&module.exports&&(module.exports=w),"function"==typeof define&&define.amd&&define(function(){return w})}function v(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,n)}function b(e){if("keypress"==e.type){var t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase()}function g(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function l(e,t,n){return n||(n=function(){if(!a)for(var e in a={},i)95<e&&e<112||i.hasOwnProperty(e)&&(a[i[e]]=e);return a}()[e]?"keydown":"keypress"),"keypress"==n&&t.length&&(n="keydown"),n}function _(e,t){var n,r,a,i,o=[];for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),a=0;a<n.length;++a)r=n[a],s[r]&&(r=s[r]),t&&"keypress"!=t&&c[r]&&(r=c[r],o.push("shift")),g(r)&&o.push(r);return{key:r,modifiers:o,action:t=l(r,o,t)}}function w(e){var y=this;if(e=e||r,!(y instanceof w))return new w(e);y.target=e,y._callbacks={},y._directMap={},y._currentKeymap="default";var m={},l=!1,u=!1,p=!1;function f(e){e=e||{};var t,n=!1;for(t in m)e[t]?n=!0:m[t]=0;n||(p=!1)}function h(e,t,n,r,a,i){var o,c,s,l,u=[],p=n.type,f=y._callbacks[y._currentKeymap];if(!f)return[];if(!f[e])return[];for("keyup"==p&&g(e)&&(t=[e]),o=0;o<f[e].length;++o)if(c=f[e][o],(r||!c.seq||m[c.seq]==c.level)&&p==c.action&&("keypress"==p&&!n.metaKey&&!n.ctrlKey||(s=t,l=c.modifiers,s.sort().join(",")===l.sort().join(",")))){var h=!r&&c.combo==a,d=r&&c.seq==r&&c.level==i;(h||d)&&f[e].splice(o,1),u.push(c)}return u}function d(e,t,n,r){var a,i;y.stopCallback(t,t.target||t.srcElement,n,r)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(a=t).stopPropagation?a.stopPropagation():a.cancelBubble=!0)}function t(e){"number"!=typeof e.which&&(e.which=e.keyCode);var t,n,r=b(e);r&&("keyup"!=e.type||l!==r?y.handleKey(r,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):l=!1)}function k(e,t,n,r,a,i){var o=r||"default";y._directMap[o]=y._directMap[o]||{},y._directMap[o][e+":"+n]=t;var c,s=(e=e.replace(/\s+/g," ")).split(" ");1<s.length?function(t,e,n,r,a){function i(e){return function(){p=e,++m[t]}}function o(e){d(n,e,t),"keyup"!==r&&(l=b(e)),setTimeout(f,10)}for(var c=m[t]=0;c<e.length;++c){var s=c+1===e.length?o:i(r||_(e[c+1]).action);k(e[c],s,r,a,t,c)}}(e,s,t,n,r):(c=_(e,n),y._callbacks[o]=y._callbacks[o]||{},y._callbacks[o][c.key]=y._callbacks[o][c.key]||[],h(c.key,c.modifiers,{type:c.action},a,e,i),y._callbacks[o][c.key][a?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:a,level:i,combo:e}))}y._handleKey=function(e,t,n){var r,a=h(e,t,n),i={},o=0,c=!1;for(r=0;r<a.length;++r)a[r].seq&&(o=Math.max(o,a[r].level));for(r=0;r<a.length;++r)if(a[r].seq){if(a[r].level!=o)continue;c=!0,i[a[r].seq]=1,d(a[r].callback,n,a[r].combo,a[r].seq)}else c||d(a[r].callback,n,a[r].combo);var s="keypress"==n.type&&u;n.type!=p||g(e)||s||f(i),u=c&&"keydown"==n.type},y._bindMultiple=function(e,t,n,r){for(var a=0;a<e.length;++a)k(e[a],t,n,r)},v(e,"keypress",t),v(e,"keydown",t),v(e,"keyup",t)}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
+!function(e,r,t){if(e){for(var a,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},s={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},o=1;o<20;++o)i[111+o]="f"+o;for(o=0;o<=9;++o)i[o+96]=o.toString();g.prototype.bind=function(e,t,n,r){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,r),this},g.prototype.unbind=function(e,t,n){return this.bind.call(this,e,function(){},t,n)},g.prototype.trigger=function(e,t,n){var r=n||"default";return this._directMap[r][e+":"+t]&&this._directMap[r][e+":"+t]({},e),this},g.prototype.reset=function(e){var t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},g.prototype.switchKeymap=function(e){e&&e!==this._currentKeymap&&(this._resetSequences(),this._currentKeymap=e)},g.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==r&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},g.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},g.addKeycodes=function(e){for(var t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);a=null},g.init=function(){var t=g(r);for(var e in t)"_"!==e.charAt(0)&&(g[e]=function(e){return function(){return t[e].apply(t,arguments)}}(e))},g.init(),e.Mousetrap=g,"undefined"!=typeof module&&module.exports&&(module.exports=g),"function"==typeof define&&define.amd&&define(function(){return g})}function y(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,n)}function v(e){if("keypress"==e.type){var t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase()}function _(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function u(e,t,n){return n||(n=function(){if(!a)for(var e in a={},i)95<e&&e<112||i.hasOwnProperty(e)&&(a[i[e]]=e);return a}()[e]?"keydown":"keypress"),"keypress"==n&&t.length&&(n="keydown"),n}function b(e,t){var n,r,a,i,o=[];for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),a=0;a<n.length;++a)r=n[a],s[r]&&(r=s[r]),t&&"keypress"!=t&&c[r]&&(r=c[r],o.push("shift")),_(r)&&o.push(r);return{key:r,modifiers:o,action:t=u(r,o,t)}}function g(e){var m=this;if(e=e||r,!(m instanceof g))return new g(e);m.target=e,m._callbacks={},m._directMap={},m._currentKeymap="default";var k={},u=!1,l=!1,p=!1;function f(e,t,n,r,a,i,o){var c,s,u,l,p=[],f=n.type,h=m._callbacks[r];if(!h)return[];if(!h[e])return[];for("keyup"==f&&_(e)&&(t=[e]),c=0;c<h[e].length;++c)if(s=h[e][c],(a||!s.seq||k[s.seq]==s.level)&&f==s.action&&("keypress"==f&&!n.metaKey&&!n.ctrlKey||(u=t,l=s.modifiers,u.sort().join(",")===l.sort().join(",")))){var d=!a&&s.combo==i,y=a&&s.seq==a&&s.level==o;(d||y)&&h[e].splice(c,1),p.push(s)}return p}function h(e,t,n,r){var a,i;m.stopCallback(t,t.target||t.srcElement,n,r)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(a=t).stopPropagation?a.stopPropagation():a.cancelBubble=!0)}function t(e){"number"!=typeof e.which&&(e.which=e.keyCode);var t,n,r=v(e);r&&("keyup"!=e.type||u!==r?m.handleKey(r,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):u=!1)}function d(e,t,n,r,a,i){var o=r||"default";m._directMap[o]=m._directMap[o]||{},m._directMap[o][e+":"+n]=t;var c,s=(e=e.replace(/\s+/g," ")).split(" ");1<s.length?function(t,e,n,r,a){function i(e){return function(){p=e,++k[t]}}function o(e){h(n,e,t),"keyup"!==r&&(u=v(e)),setTimeout(m._resetSequences,10)}for(var c=k[t]=0;c<e.length;++c){var s=c+1===e.length?o:i(r||b(e[c+1]).action);d(e[c],s,r,a,t,c)}}(e,s,t,n,r):(c=b(e,n),m._callbacks[o]=m._callbacks[o]||{},m._callbacks[o][c.key]=m._callbacks[o][c.key]||[],f(c.key,c.modifiers,{type:c.action},o,a,e,i),m._callbacks[o][c.key][a?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:a,level:i,combo:e}))}m._resetSequences=function(e){e=e||{};var t,n=!1;for(t in k)e[t]?n=!0:k[t]=0;n||(p=!1)},m._handleKey=function(e,t,n){var r,a=f(e,t,n,m._currentKeymap),i={},o=0,c=!1;for(r=0;r<a.length;++r)a[r].seq&&(o=Math.max(o,a[r].level));for(r=0;r<a.length;++r)if(a[r].seq){if(a[r].level!=o)continue;c=!0,i[a[r].seq]=1,h(a[r].callback,n,a[r].combo,a[r].seq)}else c||h(a[r].callback,n,a[r].combo);var s="keypress"==n.type&&l;n.type!=p||_(e)||s||m._resetSequences(i),l=c&&"keydown"==n.type},m._bindMultiple=function(e,t,n,r){for(var a=0;a<e.length;++a)d(e[a],t,n,r)},y(e,"keypress",t),y(e,"keydown",t),y(e,"keyup",t)}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
   /* eslint-enable */
+
+  // Tell eslint that "Mousetrap" is now a global.
+  /* global Mousetrap */
+
+  /*****************************************************************************
+   * Mousetrap utilities
+   */
+
+  function callIfNoOverride(f) {
+    return function() {
+      if (!overrideKeyDown) {
+        f();
+      }
+    };
+  }
+
+  function registerKeybindings(keymap, binds) {
+    for (var i = 0; i < binds.length; i++) {
+      if (binds[i].length === 2) {
+        mousetrap.bind(binds[i][0], callIfNoOverride(binds[i][1]), undefined, keymap);
+      } else {
+        error('Improper binding entry at index', i, 'value is', binds[i]);
+      }
+    }
+  }
 
   /*****************************************************************************
    * Run todoist-shortcuts!
@@ -1961,36 +2005,14 @@
     document.onkeyup = function() {};
     document.onkeypress = function() {};
 
-    // eslint-disable-next-line no-undef
-    var mousetrap = new Mousetrap(document);
+    mousetrap = new Mousetrap(document);
 
     // Register key bindings
-    (function() {
-      for (var i = 0; i < KEY_BINDINGS.length; i++) {
-        if (KEY_BINDINGS[i].length === 2) {
-          mousetrap.bind(KEY_BINDINGS[i][0], (
-            // eslint-disable-next-line no-loop-func
-            function(f) {
-              return function() {
-                if (!overrideKeyDown) {
-                  f();
-                }
-              };
-            })(KEY_BINDINGS[i][1])
-          );
-        } else {
-          error('Improper binding entry at index', i, 'value is', KEY_BINDINGS[i]);
-        }
-      }
-    })();
+    registerKeybindings('default', KEY_BINDINGS);
+    registerKeybindings('schedule', SCHEDULE_BINDINGS);
 
-    // Unregister key bindings when disabled.
-    onDisable(function() {
-      for (var i = 0; i < KEY_BINDINGS.length; i++) {
-        // eslint-disable-next-line no-undef
-        mousetrap.unbind(KEY_BINDINGS[i][0], KEY_BINDINGS[i][1]);
-      }
-    });
+    // Reset mousetrap on disable
+    onDisable(function() { mousetrap.reset(); });
 
     document.addEventListener('mousemove', handleMouseMove);
     onDisable(function() {
