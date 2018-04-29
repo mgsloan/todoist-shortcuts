@@ -23,6 +23,11 @@
   selection more efficiently. See
   https://github.com/mgsloan/todoist-shortcuts/issues/11
 
+* Previously key sequences like `* a` required that you not delay more
+  than 1 second between keystrokes, due to behavior in the
+  [mousetrap](https://github.com/ccampbell/mousetrap) library. This
+  is no longer the case.
+
 * Bump to todoist version 898.  Fixes for things that changed.
 
 ## Version 9
