@@ -28,7 +28,10 @@
   [mousetrap](https://github.com/ccampbell/mousetrap) library. This
   is no longer the case.
 
-* Bump to todoist version 898.  Fixes for things that changed.
+* Now supports navigating to labels and filters. See
+  https://github.com/mgsloan/todoist-shortcuts/issues/3
+
+* Bump to todoist version 898.
 
 ## Version 9
 
