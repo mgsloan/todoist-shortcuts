@@ -48,10 +48,7 @@
     [['L', 'shift+right'], moveIn],
 
     // Selection
-    //
-    // NOTE: Selection can be held down during multiple cursor motions. So, it
-    // is not simply a keypress handler. See SELECT_KEY for configuration
-    // ['x', toggleSelect],
+    // NOTE: 'x' selection is handled by fallbackHandler below.
     ['* a', selectAll],
     ['* n', deselectAll],
     ['* 1', selectPriority('1')],
@@ -81,7 +78,8 @@
     ['u', undo],
     [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
-    ['escape', closeContextMenus]
+    ['escape', closeContextMenus],
+    ['fallback', fallbackHandler]
   ];
 
   // Scheduling keybindings (used when scheduler is open)
@@ -90,10 +88,22 @@
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
-    ['r', unschedule]
+    ['r', unschedule],
+    ['escape', closeContextMenus]
   ];
 
-  var SELECT_KEY = 'x';
+  function fallbackHandler(e) {
+    if (e.key === 'x') {
+      if (e.type === 'keydown') {
+        selectPressed();
+        return false;
+      } else if (e.type === 'keyup') {
+        selectReleased();
+        return false;
+      }
+    }
+    return true;
+  }
 
   // Which selection-oriented commands to apply to the cursor if there is no
   // selection. A few possible values:
@@ -487,11 +497,10 @@
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
       oldNavigateOptions = [];
-      var finished = function() {};
-      finished = registerMutationObserver(listHolder, function() {
-        setupNavigate(listHolder, finished);
+      finishNavigate = registerMutationObserver(listHolder, function() {
+        setupNavigate(listHolder);
       }, { childList: true, subtree: true });
-      setupNavigate(listHolder, finished);
+      setupNavigate(listHolder);
     });
   }
 
@@ -755,17 +764,19 @@
         ensureCursor(content);
       }, { childList: true, subtree: true });
     });
-    registerMutationObserver(document.body, function() {
-      if (mousetrap) {
-        if (checkCalendarOpen()) {
-          debug('Setting keymap to schedule');
-          mousetrap.switchKeymap('schedule');
-        } else {
-          debug('Setting keymap to default');
-          mousetrap.switchKeymap('default');
-        }
+    registerMutationObserver(document.body, updateKeymap);
+  }
+
+  function updateKeymap() {
+    if (mousetrap) {
+      if (checkCalendarOpen()) {
+        debug('Setting keymap to schedule');
+        mousetrap.switchKeymap('schedule');
+      } else {
+        debug('Setting keymap to default');
+        mousetrap.switchKeymap('default');
       }
-    });
+    }
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -1350,22 +1361,29 @@
     }
   }
 
+  // MUTABLE. When set, this function should be called when navigate mode
+  // finished.
+  var finishNavigate = null;
+
+  // MUTABLE. Current set of navigate options.
+  var navigateOptions = {};
+
   // MUTABLE. Used to avoid infinite recursion of 'setupNavigate' due to it
   // being called on mutation of DOM that it mutates.
-  var oldNavigateOptions = [];
+  var oldNavigateOptions = {};
 
   // Assigns key bindings to sections like inbox / today / various projects.
   // These keybindings get displayed along the options.  This function should
   // be re-invoked every time the DOM refreshes, in order to ensure they are
   // displayed. It overrides the keyboard handler such that it temporarily
   // expects a key.
-  function setupNavigate(listHolder, finished) {
+  function setupNavigate(listHolder) {
     document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
       // Jump keys optimized to be close to homerow.
       var jumpkeys = Array.from('asdfghjkl' + 'qwertyuiop' + 'zxcvbnm' + '123467890');
-      var options = {};
+      navigateOptions = {};
       withTag(listHolder, 'li', function(li) {
         if (notHidden(li)) {
           var key = null;
@@ -1379,21 +1397,21 @@
             // Take a key from the jumpkeys list that isn't already used.
             while (key === null && jumpkeys.length > 0) {
               var checkKey = jumpkeys.shift();
-              if (!(checkKey in options)) {
+              if (!(checkKey in navigateOptions)) {
                 key = checkKey;
               }
             }
           }
-          options[key] = li;
+          navigateOptions[key] = li;
         }
       });
       var different = false;
-      for (var key in options) {
-        if (oldNavigateOptions[key] !== options[key]) {
+      for (var key in navigateOptions) {
+        if (oldNavigateOptions[key] !== navigateOptions[key]) {
           different = true;
         }
       }
-      oldNavigateOptions = options;
+      oldNavigateOptions = navigateOptions;
       // Avoid infinite recursion. See comment on oldNavigateOptions.
       if (different) {
         debug('Different set of navigation options, so re-setting them.');
@@ -1403,8 +1421,8 @@
       }
       removeOldTips();
       // Add in tips to tell the user what key to press.
-      for (key in options) {
-        var el = options[key];
+      for (key in navigateOptions) {
+        var el = navigateOptions[key];
         if (!el) {
           error('Missing element for key', key);
         } else {
@@ -1414,45 +1432,51 @@
           el.prepend(div);
         }
       }
-      overrideKeyDown = function(ev) {
-        var keepGoing = false;
-        try {
-          var li = options[ev.key];
-          if (li) {
-            click(li);
-          // Space to scroll down.  Shift+space to scroll up.
-          } else if (ev.key === 'Shift') {
-            keepGoing = true;
-          } else if (ev.key === ' ') {
-            keepGoing = true;
-            withId('left_menu', function(leftMenu) {
-              if (ev.shiftKey) {
-                leftMenu.scrollBy(0, leftMenu.clientHeight / -2);
-              } else {
-                leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
-              }
-            });
-          } else if (ev.keyCode !== 27) {
-            // If the user pressed something other than "escape", warn about
-            // not finding a jump target.
-            warn('No navigation handler for ', ev);
-          }
-        } finally {
-          if (!keepGoing) {
-            // This is deferred, because the other key handlers may execute
-            // after this one.
-            setTimeout(function() { overrideKeyDown = null; });
-            finished();
-            removeOldTips();
-            document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
-          }
-        }
-      };
+      mousetrap.switchKeymap('navigate');
     } catch (ex) {
-      finished();
+      if (finishNavigate) { finishNavigate(); }
       removeOldTips();
       document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
       throw ex;
+    }
+  }
+
+  function handleNavigateKey(ev) {
+    var keepGoing = false;
+    if (ev.type === 'keydown') {
+      try {
+        var li = navigateOptions[ev.key];
+        if (li) {
+          click(li);
+        // Space to scroll down.  Shift+space to scroll up.
+        } else if (ev.key === 'Shift') {
+          keepGoing = true;
+        } else if (ev.key === ' ') {
+          keepGoing = true;
+          withId('left_menu', function(leftMenu) {
+            if (ev.shiftKey) {
+              leftMenu.scrollBy(0, leftMenu.clientHeight / -2);
+            } else {
+              leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
+            }
+          });
+        } else if (ev.keyCode !== 27) {
+          // If the user pressed something other than "escape", warn about
+          // not finding a jump target.
+          warn('No navigation handler for ', ev);
+        }
+      } finally {
+        if (!keepGoing) {
+          // This is deferred, because the other key handlers may execute
+          // after this one.
+          setTimeout(function() {
+            mousetrap.switchKeymap('default');
+          });
+          if (finishNavigate) { finishNavigate(); }
+          removeOldTips();
+          document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
+        }
+      }
     }
   }
 
@@ -1954,7 +1978,7 @@
    * Minified via "uglifyjs --compress --mangle -- mousetrap.js | xclip"
    */
   /* eslint-disable */
-!function(e,r,t){if(e){for(var a,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},s={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},o=1;o<20;++o)i[111+o]="f"+o;for(o=0;o<=9;++o)i[o+96]=o.toString();g.prototype.bind=function(e,t,n,r){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,r),this},g.prototype.unbind=function(e,t,n){return this.bind.call(this,e,function(){},t,n)},g.prototype.trigger=function(e,t,n){var r=n||"default";return this._directMap[r][e+":"+t]&&this._directMap[r][e+":"+t]({},e),this},g.prototype.reset=function(e){var t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},g.prototype.switchKeymap=function(e){e&&e!==this._currentKeymap&&(this._resetSequences(),this._currentKeymap=e)},g.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==r&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},g.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},g.addKeycodes=function(e){for(var t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);a=null},g.init=function(){var t=g(r);for(var e in t)"_"!==e.charAt(0)&&(g[e]=function(e){return function(){return t[e].apply(t,arguments)}}(e))},g.init(),e.Mousetrap=g,"undefined"!=typeof module&&module.exports&&(module.exports=g),"function"==typeof define&&define.amd&&define(function(){return g})}function y(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,n)}function v(e){if("keypress"==e.type){var t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase()}function _(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function u(e,t,n){return n||(n=function(){if(!a)for(var e in a={},i)95<e&&e<112||i.hasOwnProperty(e)&&(a[i[e]]=e);return a}()[e]?"keydown":"keypress"),"keypress"==n&&t.length&&(n="keydown"),n}function b(e,t){var n,r,a,i,o=[];for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),a=0;a<n.length;++a)r=n[a],s[r]&&(r=s[r]),t&&"keypress"!=t&&c[r]&&(r=c[r],o.push("shift")),_(r)&&o.push(r);return{key:r,modifiers:o,action:t=u(r,o,t)}}function g(e){var m=this;if(e=e||r,!(m instanceof g))return new g(e);m.target=e,m._callbacks={},m._directMap={},m._currentKeymap="default";var k={},u=!1,l=!1,p=!1;function f(e,t,n,r,a,i,o){var c,s,u,l,p=[],f=n.type,h=m._callbacks[r];if(!h)return[];if(!h[e])return[];for("keyup"==f&&_(e)&&(t=[e]),c=0;c<h[e].length;++c)if(s=h[e][c],(a||!s.seq||k[s.seq]==s.level)&&f==s.action&&("keypress"==f&&!n.metaKey&&!n.ctrlKey||(u=t,l=s.modifiers,u.sort().join(",")===l.sort().join(",")))){var d=!a&&s.combo==i,y=a&&s.seq==a&&s.level==o;(d||y)&&h[e].splice(c,1),p.push(s)}return p}function h(e,t,n,r){var a,i;m.stopCallback(t,t.target||t.srcElement,n,r)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(a=t).stopPropagation?a.stopPropagation():a.cancelBubble=!0)}function t(e){"number"!=typeof e.which&&(e.which=e.keyCode);var t,n,r=v(e);r&&("keyup"!=e.type||u!==r?m.handleKey(r,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):u=!1)}function d(e,t,n,r,a,i){var o=r||"default";m._directMap[o]=m._directMap[o]||{},m._directMap[o][e+":"+n]=t;var c,s=(e=e.replace(/\s+/g," ")).split(" ");1<s.length?function(t,e,n,r,a){function i(e){return function(){p=e,++k[t]}}function o(e){h(n,e,t),"keyup"!==r&&(u=v(e)),setTimeout(m._resetSequences,10)}for(var c=k[t]=0;c<e.length;++c){var s=c+1===e.length?o:i(r||b(e[c+1]).action);d(e[c],s,r,a,t,c)}}(e,s,t,n,r):(c=b(e,n),m._callbacks[o]=m._callbacks[o]||{},m._callbacks[o][c.key]=m._callbacks[o][c.key]||[],f(c.key,c.modifiers,{type:c.action},o,a,e,i),m._callbacks[o][c.key][a?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:a,level:i,combo:e}))}m._resetSequences=function(e){e=e||{};var t,n=!1;for(t in k)e[t]?n=!0:k[t]=0;n||(p=!1)},m._handleKey=function(e,t,n){var r,a=f(e,t,n,m._currentKeymap),i={},o=0,c=!1;for(r=0;r<a.length;++r)a[r].seq&&(o=Math.max(o,a[r].level));for(r=0;r<a.length;++r)if(a[r].seq){if(a[r].level!=o)continue;c=!0,i[a[r].seq]=1,h(a[r].callback,n,a[r].combo,a[r].seq)}else c||h(a[r].callback,n,a[r].combo);var s="keypress"==n.type&&l;n.type!=p||_(e)||s||m._resetSequences(i),l=c&&"keydown"==n.type},m._bindMultiple=function(e,t,n,r){for(var a=0;a<e.length;++a)d(e[a],t,n,r)},y(e,"keypress",t),y(e,"keydown",t),y(e,"keyup",t)}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
+!function(e,r,t){if(e){for(var a,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},s={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},o=1;o<20;++o)i[111+o]="f"+o;for(o=0;o<=9;++o)i[o+96]=o.toString();g.prototype.bind=function(e,t,n,r){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,r),this},g.prototype.unbind=function(e,t,n){return this.bind.call(this,e,function(){},t,n)},g.prototype.trigger=function(e,t,n){var r=n||"default";return this._directMap[r][e+":"+t]&&this._directMap[r][e+":"+t]({},e),this},g.prototype.reset=function(e){var t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},g.prototype.switchKeymap=function(e){e&&e!==this._currentKeymap&&(this._resetSequences(),this._currentKeymap=e)},g.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==r&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},g.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},g.addKeycodes=function(e){for(var t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);a=null},e.Mousetrap=g,"undefined"!=typeof module&&module.exports&&(module.exports=g),"function"==typeof define&&define.amd&&define(function(){return g})}function y(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,n)}function b(e){if("keypress"==e.type){var t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase()}function v(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function l(e,t,n){return n||(n=function(){if(!a)for(var e in a={},i)95<e&&e<112||i.hasOwnProperty(e)&&(a[i[e]]=e);return a}()[e]?"keydown":"keypress"),"keypress"==n&&t.length&&(n="keydown"),n}function _(e,t){var n,r,a,i,o=[];for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),a=0;a<n.length;++a)r=n[a],s[r]&&(r=s[r]),t&&"keypress"!=t&&c[r]&&(r=c[r],o.push("shift")),v(r)&&o.push(r);return{key:r,modifiers:o,action:t=l(r,o,t)}}function g(e){var m=this;if(e=e||r,!(m instanceof g))return new g(e);m.target=e,m._callbacks={},m._directMap={},m._currentKeymap="default";var k={},l=!1,p=!1,f=!1;function h(e,t,n,r,a,i,o){var c,s,l,u,p=[],f=n.type,h=m._callbacks[r];if(!h)return[];if(!h[e])return[];for("keyup"==f&&v(e)&&(t=[e]),c=0;c<h[e].length;++c)if(s=h[e][c],(a||!s.seq||k[s.seq]==s.level)&&f==s.action&&("keypress"==f&&!n.metaKey&&!n.ctrlKey||(l=t,u=s.modifiers,l.sort().join(",")===u.sort().join(",")))){var d=!a&&s.combo==i,y=a&&s.seq==a&&s.level==o;(d||y)&&h[e].splice(c,1),p.push(s)}return p}function d(e,t,n,r){var a,i;m.stopCallback(t,t.target||t.srcElement,n,r)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(a=t).stopPropagation?a.stopPropagation():a.cancelBubble=!0)}function t(e){"number"!=typeof e.which&&(e.which=e.keyCode);var t,n,r=b(e);r&&("keyup"!=e.type||l!==r?m.handleKey(r,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):l=!1)}function u(e,t,n,r,a,i){var o=r||"default";if(m._callbacks[o]=m._callbacks[o]||{},m._directMap[o]=m._directMap[o]||{},m._directMap[o][e+":"+n]=t,"fallback"!==e){var c,s=(e=e.replace(/\s+/g," ")).split(" ");1<s.length?function(t,e,n,r,a){function i(e){return function(){f=e,++k[t]}}function o(e){d(n,e,t),"keyup"!==r&&(l=b(e)),setTimeout(m._resetSequences,10)}for(var c=k[t]=0;c<e.length;++c){var s=c+1===e.length?o:i(r||_(e[c+1]).action);u(e[c],s,r,a,t,c)}}(e,s,t,n,r):(c=_(e,n),m._callbacks[o][c.key]=m._callbacks[o][c.key]||[],h(c.key,c.modifiers,{type:c.action},o,a,e,i),m._callbacks[o][c.key][a?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:a,level:i,combo:e}))}else m._callbacks[o].fallback=[{callback:t,modifiers:[],action:n,seq:a,level:i,combo:e}]}m._resetSequences=function(e){e=e||{};var t,n=!1;for(t in k)e[t]?n=!0:k[t]=0;n||(f=!1)},m._handleKey=function(e,t,n){var r,a=h(e,t,n,m._currentKeymap),i={},o=0,c=!1,s=m._callbacks[m._currentKeymap];if(0===a.length&&s){var l=s.fallback;l&&a.push(l[0])}for(r=0;r<a.length;++r)a[r].seq&&(o=Math.max(o,a[r].level));for(r=0;r<a.length;++r)if(a[r].seq){if(a[r].level!=o)continue;c=!0,i[a[r].seq]=1,d(a[r].callback,n,a[r].combo,a[r].seq)}else c||d(a[r].callback,n,a[r].combo);var u="keypress"==n.type&&p;n.type!=f||v(e)||u||m._resetSequences(i),p=c&&"keydown"==n.type},m._bindMultiple=function(e,t,n,r){for(var a=0;a<e.length;++a)u(e[a],t,n,r)},y(e,"keypress",t),y(e,"keydown",t),y(e,"keyup",t)}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
   /* eslint-enable */
 
   // Tell eslint that "Mousetrap" is now a global.
@@ -1964,19 +1988,21 @@
    * Mousetrap utilities
    */
 
-  function callIfNoOverride(f) {
+  function callBinding(f) {
     return function() {
-      if (!overrideKeyDown) {
-        f();
-      }
+      var result = f.apply(null, arguments);
+      // Default to stopping propagation.
+      return result === true;
     };
   }
 
   function registerKeybindings(keymap, binds) {
     for (var i = 0; i < binds.length; i++) {
       if (binds[i].length === 2) {
-        mousetrap.bind(binds[i][0], callIfNoOverride(binds[i][1]), undefined, keymap);
+        // eslint-disable-next-line no-undefined
+        mousetrap.bind(binds[i][0], callBinding(binds[i][1]), undefined, keymap);
       } else {
+        // eslint-disable-next-line no-undefined
         error('Improper binding entry at index', i, 'value is', binds[i]);
       }
     }
@@ -1990,89 +2016,39 @@
   handleNavigation();
   registerTopMutationObservers();
 
-  var overrideKeyDown = null;
-
   setTimeout(function() {
     // Remove todoist's global keyboard handler.
-    //
-    // FIXME: Writing these down seems to have fixed some uses of escape.
-    // However, even so, when in the move-to-project dialog, escape does not
-    // cancel it properly.  It would be nice if escape closed it.
     if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
     if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
     if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
-    document.onkeydown = function() {};
-    document.onkeyup = function() {};
-    document.onkeypress = function() {};
+    // Call global keyboard handler only for escape.
+    function sometimesCallOriginal(f) {
+      return function(ev) {
+        // Escape key is useful for exiting dialogs and other input boxes, so
+        // should also use old todoist handler.
+        if (ev.keyCode === 27) {
+          f.apply(document, ev);
+        }
+      };
+    }
+    document.onkeydown = sometimesCallOriginal(window.originalTodoistKeydown);
+    document.onkeyup = sometimesCallOriginal(window.originalTodoistKeyup);
+    document.onkeypress = sometimesCallOriginal(window.originalTodoistKeypress);
 
     mousetrap = new Mousetrap(document);
 
     // Register key bindings
     registerKeybindings('default', KEY_BINDINGS);
     registerKeybindings('schedule', SCHEDULE_BINDINGS);
+    registerKeybindings('navigate', [['fallback', handleNavigateKey]]);
 
     // Reset mousetrap on disable
     onDisable(function() { mousetrap.reset(); });
 
+    // Register mousemove handler
     document.addEventListener('mousemove', handleMouseMove);
     onDisable(function() {
       document.removeEventListener('mousemove', handleMouseMove);
     });
-
-    // TODO I think something like the following should work instead, registered
-    // to the escape key handler. But it doesn't work, so instead there is this
-    // workaround.
-    //
-    // todoistShortcut({ key: 'Escape', keyAscii: 27, keyCode: 27, which: 27, code: 'Escape' });
-
-    function sometimesCallOriginal(f) {
-      return function(ev) {
-        if (!overrideKeyDown) {
-          // Escape key is useful for exiting dialogs and other input boxes, so
-          // should also use old todoist handler.
-          if (ev.keyCode === 27) {
-            f.apply(document, ev);
-          }
-        }
-      };
-    }
-
-    function handleKeyDown(ev) {
-      if (!stopCallback(ev)) {
-        if (overrideKeyDown) {
-          overrideKeyDown(ev);
-          return;
-        } else if (ev.key === SELECT_KEY && !ev.repeat) {
-          selectPressed();
-          return;
-        }
-      }
-      sometimesCallOriginal(window.originalTodoistKeydown)(ev);
-    }
-
-    function handleKeyUp(ev) {
-      if (!stopCallback(ev)) {
-        if (overrideKeyDown) {
-          return;
-        } else if (ev.key === SELECT_KEY) {
-          selectReleased();
-          return;
-        }
-      }
-      sometimesCallOriginal(window.originalTodoistKeyup)(ev);
-    }
-
-    // Based loosely on mousetrap's stopCallback function.
-    function stopCallback(ev) {
-      var el = ev.target || ev.srcElement;
-      return el.tagName === 'INPUT' ||
-             el.tagName === 'SELECT' ||
-             el.tagName === 'TEXTAREA' ||
-             el.isContentEditable;
-    }
-
-    document.addEventListener('keydown', handleKeyDown, false);
-    document.addEventListener('keyup', handleKeyUp, false);
-    document.addEventListener('keypress', sometimesCallOriginal(window.originalTodoistKeypress), false);
   });
 })();
