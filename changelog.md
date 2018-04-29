@@ -34,6 +34,8 @@
 * Fixes an issue where typing `g` followed by some key that does nothing
   would cause the cursor to move down one.
 
+* Scrolling behavior and cursor mouse behavior is now less glitchy.
+
 * Bump to todoist version 901.
 
 ## Version 9

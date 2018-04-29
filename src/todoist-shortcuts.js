@@ -576,7 +576,7 @@
 
   // All MUTABLE. Only mutated by 'storeCursorContext'.
   var lastCursorTasks = [];
-  var lastCursorIndex = [];
+  var lastCursorIndex = -1;
   var lastCursorId = null;
   var lastCursorIndent = null;
   var lastCursorSection = null;
@@ -587,13 +587,21 @@
   function storeCursorContext(isAgenda, cursor, editing) {
     lastCursorTasks = getTasks();
     lastCursorIndex = lastCursorTasks.indexOf(cursor);
+    if (lastCursorIndex < 0) {
+      error('Invariant violation - couldn\'t find ', cursor, 'in', lastCursorTasks);
+    }
     lastCursorId = cursor.id;
     lastCursorIndent = getTaskIndentClass(cursor);
     lastCursorSection = getSectionName(isAgenda, cursor);
     mouseGotMoved = false;
     wasEditing = editing;
     handleCursorMove(cursor);
-    debug('wrote down cursor context');
+    debug(
+      'wrote down cursor context:',
+      'id =', lastCursorId,
+      'indent =', lastCursorIndent,
+      'section =', lastCursorSection,
+      'idx =', lastCursorIndex);
   }
 
   function handleMouseMove() {
@@ -651,6 +659,8 @@
       });
       if (managerIndex > 0) {
         storeCursorContext(isAgenda, tasks[managerIndex - 1], true);
+      } else {
+        error('There seems to be a task editor, but then couldn\'t find it.');
       }
       return;
     }
@@ -663,6 +673,10 @@
     if (cursor && !wasEditing) {
       var cursorIndent = getTaskIndentClass(cursor);
       if (lastCursorId === cursor.id && lastCursorIndent === cursorIndent) {
+        debug(
+          'Cursor hasn\'t changed task:',
+          'id =', cursor.id,
+          'indent =', cursorIndent);
         currentSection = getSectionName(isAgenda, cursor);
         changedSection = currentSection !== lastCursorSection;
       } else if (!mouseGotMoved) {
@@ -676,49 +690,58 @@
         }
       } else {
         debug('Cursor moved by the mouse');
-        handleCursorMove(cursor);
+        storeCursorContext(isAgenda, cursor, false);
         return;
       }
     }
     if (cursor && !changedSection) {
       storeCursorContext(isAgenda, cursor, false);
     } else {
-      if (changedSection) {
-        debug('cursor element changed section, finding new location');
-      } else {
-        debug('cursor element disappeared, finding new location');
-      }
       var found = false;
-      if (wasEditing) {
-        var task = getById(lastCursorTasks[lastCursorIndex].id);
-        if (task) {
-          tasks = getTasks();
-          var priorIndex = tasks.indexOf(task);
-          if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
-            debug('found task that is probably the one that was previously being edited');
-            found = true;
-            setCursor(isAgenda, tasks[priorIndex + 1], 'scroll');
+      if (lastCursorIndex > 0) {
+        if (changedSection) {
+          debug('cursor element changed section, finding new location');
+        } else {
+          debug('cursor element disappeared, finding new location');
+        }
+        if (wasEditing) {
+          var task = getById(lastCursorTasks[lastCursorIndex].id);
+          if (task) {
+            tasks = getTasks();
+            var priorIndex = tasks.indexOf(task);
+            if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
+              debug('found task that is probably the one that was previously being edited');
+              found = true;
+              setCursor(isAgenda, tasks[priorIndex + 1], 'no-scroll');
+            }
+          } else {
+            warn('expected to still find task that was above the one being edited.');
           }
         } else {
-          warn('expected to still find task that was above the one being edited.');
-        }
-      } else {
-        for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
-          var oldTask = lastCursorTasks[i];
-          if (oldTask) {
-            task = getById(oldTask.id);
-            if (task) {
-              debug('found still-existing task that was on or after old cursor, setting cursor to it');
-              found = true;
-              setCursor(isAgenda, task, 'scroll');
-              break;
+          for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
+            var oldTask = lastCursorTasks[i];
+            if (oldTask) {
+              task = getById(oldTask.id);
+              if (task) {
+                debug(
+                  'found still-existing task that is',
+                  i - lastCursorIndex,
+                  'tasks after old cursor position, at',
+                  lastCursorIndex,
+                  ', setting cursor to it');
+                found = true;
+                setCursor(isAgenda, task, 'no-scroll');
+                break;
+              }
             }
           }
         }
+      } else {
+        warn('lastCursorIndex wasn\'t set yet');
       }
       if (!found) {
         debug('didn\'t find a particular task to select, so selecting last task');
-        setCursorToLastTask(isAgenda, 'scroll');
+        setCursorToLastTask(isAgenda, 'no-scroll');
       }
     }
   }
@@ -750,6 +773,7 @@
     if (lastHash !== currentHash) {
       var isAgenda = checkIsAgendaMode();
       lastHash = currentHash;
+      debug('Setting cursor to first task after navigation');
       setCursorToFirstTask(isAgenda, 'scroll');
     }
   }
