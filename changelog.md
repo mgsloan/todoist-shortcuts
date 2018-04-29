@@ -31,7 +31,7 @@
 * Now supports navigating to labels and filters. See
   [#3](https://github.com/mgsloan/todoist-shortcuts/issues/3)
 
-* Bump to todoist version 898.
+* Bump to todoist version 901.
 
 ## Version 9
 
