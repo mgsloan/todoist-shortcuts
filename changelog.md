@@ -4,24 +4,24 @@
 
 * Due to Todoist making some small changes to their code, it is now
   possible to use todoist-shortcuts with languages other than english.
-  See https://github.com/mgsloan/todoist-shortcuts/issues/2
+  See [#2](https://github.com/mgsloan/todoist-shortcuts/issues/2)
 
 * Adds `* l` and `* h` to expand or collapse all task nesting. See
-  https://github.com/mgsloan/todoist-shortcuts/issues/18
+  [#18](https://github.com/mgsloan/todoist-shortcuts/issues/18)
 
 * `?` shortcut for keyboard shortcuts help now links to the readme for
   that particular release, rather than master.
 
 * Typing "x" in an input field no longer toggles selection. See
-  https://github.com/mgsloan/todoist-shortcuts/issues/15
+  [#15](https://github.com/mgsloan/todoist-shortcuts/issues/15)
 
 * There was a bug where after editing a task, the task before it would end
   up selected. This is now fixed. See
-  https://github.com/mgsloan/todoist-shortcuts/issues/9
+  [#9](https://github.com/mgsloan/todoist-shortcuts/issues/9)
 
 * Some Todoist internals are now directly invoked, to handle
   selection more efficiently. See
-  https://github.com/mgsloan/todoist-shortcuts/issues/11
+  [#11](https://github.com/mgsloan/todoist-shortcuts/issues/11)
 
 * Previously key sequences like `* a` required that you not delay more
   than 1 second between keystrokes, due to behavior in the
@@ -29,7 +29,7 @@
   is no longer the case.
 
 * Now supports navigating to labels and filters. See
-  https://github.com/mgsloan/todoist-shortcuts/issues/3
+  [#3](https://github.com/mgsloan/todoist-shortcuts/issues/3)
 
 * Bump to todoist version 898.
 
