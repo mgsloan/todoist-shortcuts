@@ -2,8 +2,8 @@
 
 ## Version 10
 
-* Due to Todoist making some small changes to their code, it is now
-  possible to use todoist-shortcuts with languages other than english.
+* Due to Todoist making some changes to their code, it is now possible
+  to use todoist-shortcuts with languages other than english.
   See [#2](https://github.com/mgsloan/todoist-shortcuts/issues/2)
 
 * Adds `* l` and `* h` to expand or collapse all task nesting. See
