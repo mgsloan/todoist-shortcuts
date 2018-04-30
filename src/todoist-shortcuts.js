@@ -74,6 +74,10 @@
     ['s', sortByDate],
     ['p', sortByPriority],
 
+    // Bulk reschedule / move mode
+    ['* t', bulkSchedule],
+    // ['* v', bulkMove],
+
     // Other
     [['u', 'ctrl+z'], undo],
     [['f', '/'], focusSearch],
@@ -81,6 +85,7 @@
     ['escape', closeContextMenus],
     ['fallback', fallbackHandler]
   ];
+  var DEFAULT_KEYMAP = 'default';
 
   // Scheduling keybindings (used when scheduler is open)
   var SCHEDULE_BINDINGS = [
@@ -91,6 +96,26 @@
     ['r', unschedule],
     ['escape', closeContextMenus]
   ];
+  var SCHEDULE_KEYMAP = 'schedule';
+
+  // Bulk schedule mode keybindings
+  var BULK_SCHEDULE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
+    ['s', skipBulkSchedule],
+    ['escape', exitBulkSchedule]
+  ]);
+  var BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
+
+  /*
+  // Bulk move keybindings
+  var BULK_MOVE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
+    ['escape', exitBulkSchedule]
+  ]);
+  var BULK_MOVE_KEYMAP = 'bulk_move';
+  */
+
+  // Navigation mode uses its own key handler.
+  var NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
+  var NAVIGATE_KEYMAP = 'navigate';
 
   function fallbackHandler(e) {
     if (e.key === 'x') {
@@ -544,10 +569,69 @@
       TODOIST_SHORTCUTS_VERSION + '/readme.md');
   }
 
-  /** ***************************************************************************
+ /*****************************************************************************
+  * Bulk schedule
+  */
+
+  // MUTABLE. Is 'true' if we're in bulk schedule mode.
+  var inBulkScheduleMode = false;
+  var nextBulkScheduleKey = null;
+
+  function bulkSchedule() {
+    deselectAll();
+    var cursor = getCursor();
+    if (cursor) {
+      inBulkScheduleMode = true;
+      updateKeymap();
+      oneBulkSchedule(cursor);
+    } else {
+      warn('Can\'t bulk schedule if there\'s no cursor task.');
+    }
+  }
+
+  function skipBulkSchedule() {
+    if (nextBulkScheduleKey) {
+      // Closing the calendar will make it open the next.
+      closeContextMenus();
+    } else {
+      exitBulkSchedule();
+      closeContextMenus();
+      // Additional click needed to close context menu.
+      setTimeout(closeContextMenus);
+    }
+  }
+
+  function exitBulkSchedule() {
+    inBulkScheduleMode = false;
+    updateKeymap();
+  }
+
+  // NOTE: Cursor must exist.
+  function oneBulkSchedule(cursor) {
+    var isAgenda = checkIsAgendaMode();
+    var tasks = getTasks();
+    var found = false;
+    nextBulkScheduleKey = null;
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i] === cursor) {
+        found = true;
+        if (i + 1 < tasks.length) {
+          nextBulkScheduleKey = getTaskKey(isAgenda, tasks[i + 1]);
+        }
+        break;
+      }
+    }
+    if (!found) {
+      error('Invariant violation in oneBulkSchedule - expected to find cursor.');
+      exitBulkSchedule();
+    } else {
+      schedule();
+    }
+  }
+
+  /*****************************************************************************
    * Utilities for manipulating the UI
    */
-
 
   function toggleSelectTask(task) {
     ItemSelecter.toggle(task);
@@ -802,19 +886,50 @@
         ensureCursor(content);
       }, { childList: true, subtree: true });
     });
-    registerMutationObserver(document.body, updateKeymap);
+    registerMutationObserver(document.body, calendarVisibilityMayHaveChanged);
+  }
+
+  function calendarVisibilityMayHaveChanged() {
+    updateKeymap();
+    if (inBulkScheduleMode) {
+      if (!checkCalendarOpen()) {
+        if (nextBulkScheduleKey) {
+          var nextTask = getTaskByKey(nextBulkScheduleKey);
+          if (nextTask) {
+            debug('Calendar is closed in bulk schedule mode, so scheduling next task.');
+            var isAgenda = checkIsAgendaMode();
+            setCursor(isAgenda, nextTask, 'no-scroll');
+            oneBulkSchedule(nextTask);
+          } else {
+            error('Could not find next task for bulk schedule.');
+            exitBulkSchedule();
+          }
+        } else {
+          debug('Bulk schedule done because there\'s no next task.');
+          inBulkScheduleMode = false;
+          updateKeymap();
+        }
+      }
+    }
   }
 
   function updateKeymap() {
     if (mousetrap) {
-      if (checkCalendarOpen()) {
-        debug('Setting keymap to schedule');
-        mousetrap.switchKeymap('schedule');
+      if (inBulkScheduleMode) {
+        switchKeymap(BULK_SCHEDULE_KEYMAP);
+      } else if (finishNavigate) {
+        switchKeymap(NAVIGATE_KEYMAP);
+      } else if (checkCalendarOpen()) {
+        switchKeymap(SCHEDULE_KEYMAP);
       } else {
-        debug('Setting keymap to default');
-        mousetrap.switchKeymap('default');
+        switchKeymap(DEFAULT_KEYMAP);
       }
     }
+  }
+
+  function switchKeymap(keymap) {
+    debug('Setting keymap to', keymap);
+    mousetrap.switchKeymap(keymap);
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -1508,9 +1623,10 @@
         return;
       }
       navigateKeysPressed = "";
-      if (rerenderTips()) {
-        mousetrap.switchKeymap('navigate');
+      if (!rerenderTips() && finishNavigate) {
+        finishNavigate();
       }
+      updateKeymap();
     } catch (ex) {
       if (finishNavigate) { finishNavigate(); }
       removeOldTips();
@@ -1775,12 +1891,12 @@
         }
       } finally {
         if (!keepGoing) {
+          if (finishNavigate) { finishNavigate(); }
           // This is deferred, because the other key handlers may execute
           // after this one.
           setTimeout(function() {
-            mousetrap.switchKeymap('default');
+            updateKeymap();
           });
-          if (finishNavigate) { finishNavigate(); }
           removeOldTips();
           document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
         }
@@ -2405,9 +2521,10 @@
     mousetrap = new Mousetrap(document);
 
     // Register key bindings
-    registerKeybindings('default', KEY_BINDINGS);
-    registerKeybindings('schedule', SCHEDULE_BINDINGS);
-    registerKeybindings('navigate', [['fallback', handleNavigateKey]]);
+    registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
+    registerKeybindings(SCHEDULE_KEYMAP, SCHEDULE_BINDINGS);
+    registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
+    registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
 
     // Reset mousetrap on disable
     onDisable(function() { mousetrap.reset(); });

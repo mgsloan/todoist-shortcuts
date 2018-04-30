@@ -42,9 +42,7 @@ Then, run `eslint.sh` to use it to do checking.
 
 # TODO "soon"
 
-* "bulk reschedule mode" - clears current selection, prompts for
-rescheduling of item then moves cursor to the next.  Similar "bulk project
-move" mode would also be nice.
+* bulk project move
 
 * l should step out even if not focused on the collapser
 

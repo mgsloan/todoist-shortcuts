@@ -48,6 +48,8 @@
 
 * `ctrl+z` is now a synonym for undo.
 
+* Adds `* t` keybinding to enter bulk reschedule mode.
+
 * Bump to todoist version 901.
 
 ## Version 9
