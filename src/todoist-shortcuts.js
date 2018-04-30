@@ -1990,6 +1990,9 @@
 
   // Invokes the function for the matching id, or logs a warning.
   function withId(id, f) {
+    if (arguments.length > 2) {
+      error('Too many arguments passed to withId', arguments);
+    }
     var el = getById(id);
     if (el) {
       return f(el);
@@ -2001,6 +2004,9 @@
 
   // Invokes the function for every child element that matches the class name.
   function withClass(parent, cls, f) {
+    if (arguments.length > 3) {
+      error('Too many arguments passed to withClass', arguments);
+    }
     var els = parent.getElementsByClassName(cls);
     for (var i = 0; i < els.length; i++) {
       f(els[i]);
@@ -2009,6 +2015,9 @@
 
   // Invokes the function for every child element that matches a tag name.
   function withTag(parent, tag, f) {
+    if (arguments.length > 3) {
+      error('Too many arguments passed to withTag', arguments);
+    }
     var els = parent.getElementsByTagName(tag);
     for (var i = 0; i < els.length; i++) {
       f(els[i]);
