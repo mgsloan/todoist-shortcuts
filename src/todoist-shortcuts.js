@@ -76,7 +76,7 @@
 
     // Bulk reschedule / move mode
     ['* t', bulkSchedule],
-    // ['* v', bulkMove],
+    ['* v', bulkMove],
 
     // Other
     [['u', 'ctrl+z'], undo],
@@ -105,13 +105,12 @@
   ]);
   var BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
-  /*
   // Bulk move keybindings
-  var BULK_MOVE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
-    ['escape', exitBulkSchedule]
-  ]);
+  //
+  // These can't be handled by mousetrap, because they need to be triggered
+  // while an input is focused. See 'sometimesCallOriginal'.
+  var BULK_MOVE_BINDINGS = [];
   var BULK_MOVE_KEYMAP = 'bulk_move';
-  */
 
   // Navigation mode uses its own key handler.
   var NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
@@ -160,6 +159,7 @@
   // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
   var TODOIST_ROOT_ID = 'todoist_app';
   var AGENDA_VIEW_ID = 'agenda_view';
+  var MOVE_TO_PROJECT_ID = 'GB_window';
   var EDIT_CLICK_CLASS = 'content';
   var ACTIONS_BAR_CLASS = 'item_selecter';
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
@@ -528,9 +528,13 @@
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
       oldNavigateOptions = [];
-      finishNavigate = registerMutationObserver(listHolder, function() {
+      var unregisterListener = registerMutationObserver(listHolder, function() {
         setupNavigate(listHolder);
       }, { childList: true, subtree: true });
+      finishNavigate = function() {
+        unregisterListener();
+        finishNavigate = null;
+      };
       setupNavigate(listHolder);
     });
   }
@@ -569,7 +573,7 @@
       TODOIST_SHORTCUTS_VERSION + '/readme.md');
   }
 
- /*****************************************************************************
+  /*****************************************************************************
   * Bulk schedule
   */
 
@@ -595,15 +599,13 @@
       closeContextMenus();
     } else {
       exitBulkSchedule();
-      closeContextMenus();
-      // Additional click needed to close context menu.
-      setTimeout(closeContextMenus);
     }
   }
 
   function exitBulkSchedule() {
     inBulkScheduleMode = false;
     updateKeymap();
+    closeContextMenus();
   }
 
   // NOTE: Cursor must exist.
@@ -626,6 +628,64 @@
       exitBulkSchedule();
     } else {
       schedule();
+    }
+  }
+
+  /*****************************************************************************
+  * Bulk move
+  */
+
+  // MUTABLE. Is 'true' if we're in bulk move mode.
+  var inBulkMoveMode = false;
+  var nextBulkMoveKey = null;
+
+  function bulkMove() {
+    deselectAll();
+    var cursor = getCursor();
+    if (cursor) {
+      inBulkMoveMode = true;
+      updateKeymap();
+      oneBulkMove(cursor);
+    } else {
+      warn('Can\'t bulk move if there\'s no cursor task.');
+    }
+  }
+
+  function skipBulkMove() {
+    if (nextBulkMoveKey) {
+      // Closing the calendar will make it open the next.
+      closeContextMenus();
+    } else {
+      exitBulkMove();
+    }
+  }
+
+  function exitBulkMove() {
+    inBulkMoveMode = false;
+    updateKeymap();
+    closeContextMenus();
+  }
+
+  // NOTE: Cursor must exist.
+  function oneBulkMove(cursor) {
+    var isAgenda = checkIsAgendaMode();
+    var tasks = getTasks();
+    var found = false;
+    nextBulkMoveKey = null;
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i] === cursor) {
+        found = true;
+        if (i + 1 < tasks.length) {
+          nextBulkMoveKey = getTaskKey(isAgenda, tasks[i + 1]);
+        }
+        break;
+      }
+    }
+    if (!found) {
+      error('Invariant violation in oneBulkMove - expected to find cursor.');
+      exitBulkMove();
+    } else {
+      moveToProject();
     }
   }
 
@@ -890,6 +950,7 @@
   }
 
   function calendarVisibilityMayHaveChanged() {
+    var isAgenda;
     updateKeymap();
     if (inBulkScheduleMode) {
       if (!checkCalendarOpen()) {
@@ -897,7 +958,7 @@
           var nextTask = getTaskByKey(nextBulkScheduleKey);
           if (nextTask) {
             debug('Calendar is closed in bulk schedule mode, so scheduling next task.');
-            var isAgenda = checkIsAgendaMode();
+            isAgenda = checkIsAgendaMode();
             setCursor(isAgenda, nextTask, 'no-scroll');
             oneBulkSchedule(nextTask);
           } else {
@@ -906,8 +967,26 @@
           }
         } else {
           debug('Bulk schedule done because there\'s no next task.');
-          inBulkScheduleMode = false;
-          updateKeymap();
+          exitBulkSchedule();
+        }
+      }
+    }
+    if (inBulkMoveMode) {
+      if (!checkMoveToProjectOpen()) {
+        if (nextBulkMoveKey) {
+          var nextTask = getTaskByKey(nextBulkMoveKey);
+          if (nextTask) {
+            debug('Move-to-project is closed in bulk move mode, so scheduling next task.');
+            isAgenda = checkIsAgendaMode();
+            setCursor(isAgenda, nextTask, 'no-scroll');
+            oneBulkMove(nextTask);
+          } else {
+            error('Could not find next task for bulk move.');
+            exitBulkMove();
+          }
+        } else {
+          debug('Bulk move done because there\'s no next task.');
+          exitBulkMove();
         }
       }
     }
@@ -917,6 +996,8 @@
     if (mousetrap) {
       if (inBulkScheduleMode) {
         switchKeymap(BULK_SCHEDULE_KEYMAP);
+      } else if (inBulkMoveMode) {
+        switchKeymap(BULK_MOVE_KEYMAP);
       } else if (finishNavigate) {
         switchKeymap(NAVIGATE_KEYMAP);
       } else if (checkCalendarOpen()) {
@@ -1045,6 +1126,10 @@
       }
       f(menu);
     });
+  }
+
+  function checkMoveToProjectOpen() {
+    return getById(MOVE_TO_PROJECT_ID) !== null;
   }
 
   function checkCalendarOpen() {
@@ -2275,9 +2360,10 @@
 
   // Simulate a mouse click.
   function click(el) {
-    el.dispatchEvent(new Event('mousedown'));
-    el.dispatchEvent(new Event('mouseup'));
-    el.click();
+    var options = { bubbles: true, cancelable: true, view: window };
+    el.dispatchEvent(new MouseEvent('mousedown', options));
+    el.dispatchEvent(new MouseEvent('mouseup', options));
+    el.dispatchEvent(new MouseEvent('click', options));
   }
 
   /*****************************************************************************
@@ -2511,7 +2597,15 @@
         // should also use old todoist handler.
         if (ev.keyCode === 27) {
           f.apply(document, ev);
-        }
+          // Bulk move keypresses need to happen even though the focus is on the
+          // input box.
+          if (inBulkMoveMode && ev.type === 'keydown') {
+            exitBulkMove();
+          }
+        } /* FIXME: see https://github.com/mgsloan/todoist-shortcuts/issues/21
+            else if (inBulkMoveMode && ev.key === 's') {
+          skipBulkMove();
+        } */
       };
     }
     document.onkeydown = sometimesCallOriginal(window.originalTodoistKeydown);

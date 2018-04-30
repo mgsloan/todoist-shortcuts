@@ -42,8 +42,6 @@ Then, run `eslint.sh` to use it to do checking.
 
 # TODO "soon"
 
-* bulk project move
-
 * l should step out even if not focused on the collapser
 
 * h should also move cursor down after opening

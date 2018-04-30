@@ -50,6 +50,8 @@
 
 * Adds `* t` keybinding to enter bulk reschedule mode.
 
+* Adds `* v` keybinding to enter bulk move mode.
+
 * Bump to todoist version 901.
 
 ## Version 9
