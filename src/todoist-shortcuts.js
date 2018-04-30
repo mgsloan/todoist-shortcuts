@@ -117,6 +117,11 @@
   //
   var WHAT_CURSOR_APPLIES_TO = 'all';
 
+  // 'navigate' (g) attempts to assign keys to items based on their names. In
+  // some case there might not be a concise labeling. This sets the limit on key
+  // sequence length for things based on prefixes.
+  var MAX_NAVIGATE_PREFIX = 2;
+
   // Set this to true to get more log output.
   var DEBUG = false;
 
@@ -157,6 +162,7 @@
     [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE, MI_EDIT];
 
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
+  var TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
   var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
 
@@ -1404,6 +1410,9 @@
   // being called on mutation of DOM that it mutates.
   var oldNavigateOptions = {};
 
+  // MUTABLE. Keys the user has pressed so far.
+  var navigateKeysPressed = "";
+
   // Assigns key bindings to sections like inbox / today / various projects.
   // These keybindings get displayed along the options.  This function should
   // be re-invoked every time the DOM refreshes, in order to ensure they are
@@ -1413,30 +1422,49 @@
     document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
-      // Jump keys optimized to be close to homerow.
-      var jumpkeys = Array.from('asdfghjkl' + 'qwertyuiop' + 'zxcvbnm' + '123467890');
-      navigateOptions = {};
+      var navigateItems = [];
       withTag(listHolder, 'li', function(li) {
-        if (notHidden(li)) {
-          var key = null;
-          if (getUniqueClass(li, 'cmp_filter_inbox')) {
-            key = 'i';
-          } else if (getUniqueClass(li, 'cmp_filter_today')) {
-            key = 't';
-          } else if (getUniqueClass(li, 'cmp_filter_days')) {
-            key = 'n';
-          } else {
-            // Take a key from the jumpkeys list that isn't already used.
-            while (key === null && jumpkeys.length > 0) {
-              var checkKey = jumpkeys.shift();
-              if (!(checkKey in navigateOptions)) {
-                key = checkKey;
-              }
-            }
-          }
-          navigateOptions[key] = li;
+        var key = null;
+        var mustBeKeys = null;
+        var text = null;
+        if (getUniqueClass(li, 'cmp_filter_inbox')) {
+          mustBeKeys = 'i';
+        } else if (getUniqueClass(li, 'cmp_filter_today')) {
+          mustBeKeys = 't';
+        } else if (getUniqueClass(li, 'cmp_filter_days')) {
+          mustBeKeys = 'n';
+        } else {
+          withUniqueClass(li, 'name', all, function(nameElement) {
+            withUniqueTag(nameElement, 'span', all, function(nameSpan) {
+              text = preprocessItemText(nameSpan.textContent);
+            });
+          });
+        }
+        // Add some stable sequences for common text
+        if (text === 'priority1') { mustBeKeys = 'p1'; }
+        if (text === 'priority2') { mustBeKeys = 'p2'; }
+        if (text === 'priority3') { mustBeKeys = 'p3'; }
+        if (text === 'priority4') { mustBeKeys = 'p4'; }
+        if (text === 'assignedtome') { mustBeKeys = 'am'; }
+        if (text === 'assignedtoothers') { mustBeKeys = 'ao'; }
+        if (text === 'viewall') { mustBeKeys = 'va'; }
+        if (text === 'noduedate') { mustBeKeys = 'dn'; }
+        if (mustBeKeys) {
+          navigateItems.push({
+            element: li,
+            mustBeKeys: mustBeKeys,
+            text: text
+          });
+        } else if (text) {
+          navigateItems.push({
+            element: li,
+            text: text
+          });
+        } else {
+          warn('Couldn\'t figure out text for', li);
         }
       });
+      navigateOptions = assignKeysToItems(navigateItems);
       var different = false;
       for (var key in navigateOptions) {
         if (oldNavigateOptions[key] !== navigateOptions[key]) {
@@ -1451,20 +1479,10 @@
         debug('Same set of navigation options, so avoiding infinite recursion.');
         return;
       }
-      removeOldTips();
-      // Add in tips to tell the user what key to press.
-      for (key in navigateOptions) {
-        var el = navigateOptions[key];
-        if (!el) {
-          error('Missing element for key', key);
-        } else {
-          var div = document.createElement('div');
-          div.appendChild(document.createTextNode(key));
-          div.classList.add(TODOIST_SHORTCUTS_TIP);
-          el.prepend(div);
-        }
+      navigateKeysPressed = "";
+      if (rerenderTips()) {
+        mousetrap.switchKeymap('navigate');
       }
-      mousetrap.switchKeymap('navigate');
     } catch (ex) {
       if (finishNavigate) { finishNavigate(); }
       removeOldTips();
@@ -1473,15 +1491,211 @@
     }
   }
 
+  // Add in tips to tell the user what key to press.
+  function rerenderTips() {
+    removeOldTips();
+    var renderedAny = false;
+    for (var key in navigateOptions) {
+      var prefix = key.slice(0, navigateKeysPressed.length);
+      var rest = key.slice(navigateKeysPressed.length);
+      if (prefix === navigateKeysPressed) {
+        var el = navigateOptions[key];
+        if (!el) {
+          error('Missing element for tip', key);
+        } else {
+          var div = document.createElement('div');
+          if (prefix.length > 0) {
+            var typed = document.createElement('div');
+            typed.appendChild(document.createTextNode(prefix));
+            typed.classList.add(TODOIST_SHORTCUTS_TIP_TYPED);
+            div.appendChild(typed);
+          }
+          div.appendChild(document.createTextNode(rest));
+          div.classList.add(TODOIST_SHORTCUTS_TIP);
+          el.prepend(div);
+          renderedAny = true;
+        }
+      }
+    }
+    return renderedAny;
+  }
+
+  // Lowercase and take only alphanumeric.
+  function preprocessItemText(text) {
+    var result = "";
+    for (var i = 0; i < text.length; i++) {
+      var char = text[i].toLowerCase();
+      if (lowercaseCharIsAlphanum(char)) {
+        result += char;
+      }
+    }
+    return result;
+  }
+
+  function lowercaseCharIsAlphanum(char) {
+    var code = char.charCodeAt(0);
+    return (
+      (code > 47 && code < 58) || // (0-9)
+      (code > 96 && code < 123));  // (a-z)
+  }
+
+  var JUMP_KEYS = 'asdfghjklqwertyuiopzxcvbnm1234567890';
+
+  // Assign keys to items based on their text.
+  function assignKeysToItems(items) {
+    var result = {};
+    var item;
+    var keys;
+    var prefix;
+    var prefixesUsed = {};
+    // Ensure none of the results are prefixes or equal to this keysequence.
+    var prefixNotAliased = function(ks) {
+      for (var i = 1; i <= ks.length; i++) {
+        if (result[ks.slice(0, i)]) {
+          return false;
+        }
+      }
+      return true;
+    };
+    var noAliasing = function(ks) {
+      if (!prefixNotAliased(ks)) {
+        return false;
+      }
+      // Ensure this is keysequence is not a prefix of any other keysequence.
+      if (prefixesUsed[ks]) {
+        return false;
+      }
+      return true;
+    };
+    var addResult = function(ks, x) {
+      var noAlias = noAliasing(ks);
+      if (noAlias) {
+        result[ks] = x.element;
+        for (var i = 1; i <= ks.length; i++) {
+          prefixesUsed[ks.slice(0, i)] = true;
+        }
+      }
+      return noAlias;
+    };
+    // Handle items with 'mustBeKeys' set.
+    for (var i = 0; i < items.length; i++) {
+      item = items[i];
+      if (item.mustBeKeys) {
+        keys = item.mustBeKeys.toLowerCase();
+        if (addResult(keys, item)) {
+          // Remove this from the list of items to process.
+          items.splice(i, 1);
+          i--;
+        } else {
+          warn('Overlap in mustBeKeys', keys);
+        }
+      }
+    }
+    // For each possible prefix length, assign when unambiguous.
+    for (var l = 1; l <= MAX_NAVIGATE_PREFIX; l++) {
+      var groups = {};
+      for (var j = 0; j < items.length; j++) {
+        item = items[j];
+        prefix = item.text.slice(0, l);
+        var group = groups[prefix];
+        if (!group) {
+          group = [];
+          groups[prefix] = group;
+        }
+        group.push(j);
+      }
+      var unambiguous = [];
+      for (keys in groups) {
+        var groupItems = groups[keys];
+        // Unambiguous prefix of non-aliasing sequence
+        if (groupItems.length === 1 && noAliasing(keys)) {
+          unambiguous.push(groupItems[0]);
+        }
+      }
+      // sort backwards so that deletion works.
+      unambiguous.sort(function(a, b) { return b - a; });
+      for (var k = 0; k < unambiguous.length; k++) {
+        var ix = unambiguous[k];
+        item = items[ix];
+        prefix = item.text.slice(0, l);
+        if (addResult(prefix, item)) {
+          items.splice(ix, 1);
+        }
+      }
+    }
+    // For the ones that didn't have unambiguous prefixes, try other character
+    // suffixes.
+    for (var p = MAX_NAVIGATE_PREFIX - 1; p >= 0; p--) {
+      for (var m = 0; m < items.length; m++) {
+        item = items[m];
+        prefix = item.text.slice(0, MAX_NAVIGATE_PREFIX - 1);
+        if (prefixNotAliased(prefix)) {
+          for (var n = -1; n < JUMP_KEYS.length; n++) {
+            if (n === -1) {
+              if (prefix.length > 0) {
+                // First, try doubling the last key, easiest to type.
+                keys = prefix + prefix[prefix.length - 1];
+              } else {
+                continue;
+              }
+            } else {
+              keys = prefix + JUMP_KEYS[n];
+            }
+            if (addResult(keys, item)) {
+              items.splice(m, 1);
+              m--;
+              break;
+            }
+          }
+        }
+      }
+    }
+    // Finally, fallback on choosing arbitrary combinations of characters.
+    for (var q = 0; q < items.length; q++) {
+      item = items[q];
+      var success = false;
+      // TODO: Don't hardcode choosing one or two, instead follow MAX_NAVIGATE_PREFIX
+      for (var r = 0; r < JUMP_KEYS.length; r++) {
+        if (addResult(JUMP_KEYS[r], item)) {
+          items.splice(q, 1);
+          q--;
+          success = true;
+          break;
+        }
+      }
+      if (success) {
+        continue;
+      }
+      for (var s = 0; s < JUMP_KEYS.length; s++) {
+        for (var t = -1; t < JUMP_KEYS.length; t++) {
+          // Prefer doubling keys.
+          var secondKey = t === -1 ? JUMP_KEYS[s] : JUMP_KEYS[t];
+          if (addResult(JUMP_KEYS[s] + secondKey, item)) {
+            items.splice(q, 1);
+            q--;
+            success = true;
+            break;
+          }
+        }
+        if (success) {
+          break;
+        }
+      }
+    }
+    // That should have assigned keys to everything, but if there are many
+    // similar number of options this case can happen.
+    if (items.length !== 0) {
+      warn('There must be many similar sidebar options, couldn\'t find keysequences for', items);
+    }
+    return result;
+  }
+
   function handleNavigateKey(ev) {
     var keepGoing = false;
     if (ev.type === 'keydown') {
       try {
-        var li = navigateOptions[ev.key];
-        if (li) {
-          click(li);
         // Space to scroll down.  Shift+space to scroll up.
-        } else if (ev.key === 'Shift') {
+        if (ev.key === 'Shift') {
           keepGoing = true;
         } else if (ev.key === ' ') {
           keepGoing = true;
@@ -1492,10 +1706,17 @@
               leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
             }
           });
-        } else if (ev.keyCode !== 27) {
-          // If the user pressed something other than "escape", warn about
-          // not finding a jump target.
-          warn('No navigation handler for ', ev);
+        } else {
+          var char = ev.key.toLowerCase();
+          if (char.length === 1 && lowercaseCharIsAlphanum(char)) {
+            navigateKeysPressed += char;
+            var li = navigateOptions[navigateKeysPressed];
+            if (li) {
+              click(li);
+            } else {
+              keepGoing = rerenderTips();
+            }
+          }
         }
       } finally {
         if (!keepGoing) {
@@ -2007,10 +2228,16 @@
     '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
     '  margin-top: 4px;',
-    '  margin-left: -28px;',
+    '  margin-left: -40px;',
+    '  font-family: monospace;',
     '  font-weight: normal;',
     '  font-size: 18px;',
     '  color: #dd4b39;',
+    '}',
+    '',
+    '.' + TODOIST_SHORTCUTS_TIP_TYPED + ' {',
+    '  display: inline;',
+    '  color: #aaa;',
     '}',
     '',
     '#top_filters .' + TODOIST_SHORTCUTS_TIP + ' {',
