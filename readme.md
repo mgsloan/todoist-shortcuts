@@ -36,13 +36,9 @@ described in this document.
 | `g`            | enter section navigation mode    |
 
 In "section navigation mode", the different selections in the left pane are
-annotated with the key to press to navigate to that section.  "Inbox" always
-uses the key `i`, "Today" always uses the key `t`, "Next 7 days" always uses
-the key `n`.
-
-Currently, up to 33 projects can be jumped to with this mechanism.  Sometimes
-this is more than can fit in a screenful.  While in "section navigation mode",
-you can scroll the left pane down and up with `space` and `shift+space`.
+annotated with the keys to press to navigate to that section. Sometimes the
+sidebar can have more than a screenful of content. While in this mode, you can
+scroll the left pane down and up with `space` and `shift+space`.
 
 ## Manipulation of tasks at cursor
 

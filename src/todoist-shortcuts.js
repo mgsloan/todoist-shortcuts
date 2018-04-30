@@ -1430,7 +1430,7 @@
         if (getUniqueClass(li, 'cmp_filter_inbox')) {
           mustBeKeys = 'i';
         } else if (getUniqueClass(li, 'cmp_filter_today')) {
-          mustBeKeys = 't';
+          mustBeKeys = 'g';
         } else if (getUniqueClass(li, 'cmp_filter_days')) {
           mustBeKeys = 'n';
         } else {
@@ -1464,11 +1464,39 @@
           warn('Couldn\'t figure out text for', li);
         }
       });
+      withClass(listHolder, 'panel_summary', function(summary) {
+        var mustBeKeys = null;
+        var dataTrackAttr = summary.attributes['data-track'];
+        if (dataTrackAttr) {
+          var dataTrack = dataTrackAttr.value;
+          if (dataTrack === 'navigation|projects_panel') {
+            mustBeKeys = 'tp';
+          } else if (dataTrack === 'navigation|labels_panel') {
+            mustBeKeys = 'tl';
+          } else if (dataTrack === 'navigation|filters_panel') {
+            mustBeKeys = 'tf';
+          } else {
+            warn('Unexpected dataTrack value:', dataTrack);
+          }
+        }
+        if (mustBeKeys) {
+          navigateItems.push({
+            element: summary,
+            mustBeKeys: mustBeKeys,
+            keepGoing: true
+          });
+        }
+      });
       navigateOptions = assignKeysToItems(navigateItems);
       var different = false;
       for (var key in navigateOptions) {
-        if (oldNavigateOptions[key] !== navigateOptions[key]) {
+        var oldOption = oldNavigateOptions[key];
+        if (!oldOption) {
           different = true;
+          break;
+        } else if (oldOption.element !== navigateOptions[key].element) {
+          different = true;
+          break;
         }
       }
       oldNavigateOptions = navigateOptions;
@@ -1499,7 +1527,8 @@
       var prefix = key.slice(0, navigateKeysPressed.length);
       var rest = key.slice(navigateKeysPressed.length);
       if (prefix === navigateKeysPressed) {
-        var el = navigateOptions[key];
+        var option = navigateOptions[key];
+        var el = option.element;
         if (!el) {
           error('Missing element for tip', key);
         } else {
@@ -1570,7 +1599,7 @@
     var addResult = function(ks, x) {
       var noAlias = noAliasing(ks);
       if (noAlias) {
-        result[ks] = x.element;
+        result[ks] = x;
         for (var i = 1; i <= ks.length; i++) {
           prefixesUsed[ks.slice(0, i)] = true;
         }
@@ -1710,9 +1739,13 @@
           var char = ev.key.toLowerCase();
           if (char.length === 1 && lowercaseCharIsAlphanum(char)) {
             navigateKeysPressed += char;
-            var li = navigateOptions[navigateKeysPressed];
-            if (li) {
-              click(li);
+            var option = navigateOptions[navigateKeysPressed];
+            if (option) {
+              click(option.element);
+              if (option.keepGoing) {
+                navigateKeysPressed = "";
+                keepGoing = rerenderTips();
+              }
             } else {
               keepGoing = rerenderTips();
             }
@@ -2243,6 +2276,10 @@
     '#top_filters .' + TODOIST_SHORTCUTS_TIP + ' {',
     '  margin-top: -4px;',
     '  margin-left: -20px;',
+    '}',
+    '',
+    '.panel_summary .' + TODOIST_SHORTCUTS_TIP + ' {',
+    '  margin-left: -28px;',
     '}',
     '',
     '#page_background {',

@@ -6,6 +6,16 @@
   to use todoist-shortcuts with languages other than english.
   See [#2](https://github.com/mgsloan/todoist-shortcuts/issues/2)
 
+* In navigate mode, `t` is no longer used to navigate to "Today",
+  instead `g` is used. The main reason for this is that in navigate
+  mode, it is now possible to use `tp` / `tl` / `tf` to toggle the
+  different sections. These would not have b These would not have been
+  typeable if `t` was taken. This also makes it a little faster to
+  navigate to the commonly used "Today" section.
+
+* Now supports navigating to labels and filters. See
+  [#3](https://github.com/mgsloan/todoist-shortcuts/issues/3)
+
 * Adds `* l` and `* h` to expand or collapse all task nesting. See
   [#18](https://github.com/mgsloan/todoist-shortcuts/issues/18)
 
@@ -27,9 +37,6 @@
   than 1 second between keystrokes, due to behavior in the
   [mousetrap](https://github.com/ccampbell/mousetrap) library. This
   is no longer the case.
-
-* Now supports navigating to labels and filters. See
-  [#3](https://github.com/mgsloan/todoist-shortcuts/issues/3)
 
 * Fixes an issue where typing `g` followed by some key that does nothing
   would cause the cursor to move down one.
