@@ -40,6 +40,10 @@ annotated with the keys to press to navigate to that section. Sometimes the
 sidebar can have more than a screenful of content. While in this mode, you can
 scroll the left pane down and up with `space` and `shift+space`.
 
+When projects have sub-projects, they are automatically expanded when the
+project is selected from the list. To collapse the sub-projects, just use
+navigation mode to select the same project again.
+
 ## Manipulation of tasks at cursor
 
 | keys                       | action                        |
@@ -65,7 +69,6 @@ scroll the left pane down and up with `space` and `shift+space`.
 | `* 4` | add all priority 4 tasks to selection |
 | `* h` | collapses all tasks                   |
 | `* l` | expands all tasks                     |
-
 
 `x` works a bit different than all the other shortcuts. It can be held down, and
 cursor navigation will cause selection or deselection of other tasks. It can be

@@ -1741,8 +1741,30 @@
             navigateKeysPressed += char;
             var option = navigateOptions[navigateKeysPressed];
             if (option) {
-              click(option.element);
-              if (option.keepGoing) {
+              var el = option.element;
+              var elToClick = el;
+              var foldingSection = false;
+              // If the user re-selects the same section they are already on,
+              // toggle folding.
+              var arrow = getUniqueClass(el, 'arrow');
+              if (el.classList.contains('current')) {
+                var prev = el.previousSibling;
+                if (!prev || !prev.classList.contains('current')) {
+                  if (arrow) {
+                    elToClick = arrow;
+                    foldingSection = true;
+                  }
+                }
+              }
+              if (!foldingSection && arrow) {
+                if (getUniqueClass(arrow, 'cmp_open_arrow_right')) {
+                  click(arrow);
+                }
+              }
+              click(elToClick);
+              // If we're just changing folding, then the user probably wants to
+              // stay in navigation mode, so reset and rerender.
+              if (option.keepGoing || foldingSection) {
                 navigateKeysPressed = "";
                 keepGoing = rerenderTips();
               }

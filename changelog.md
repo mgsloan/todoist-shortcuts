@@ -16,6 +16,9 @@
 * Now supports navigating to labels and filters. See
   [#3](https://github.com/mgsloan/todoist-shortcuts/issues/3)
 
+* In navigation mode, selecting a project with collapsed sub-projects will
+  cause them to expand. To collapse, just re-select the same project.
+
 * Adds `* l` and `* h` to expand or collapse all task nesting. See
   [#18](https://github.com/mgsloan/todoist-shortcuts/issues/18)
 
