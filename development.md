@@ -42,8 +42,6 @@ Then, run `eslint.sh` to use it to do checking.
 
 # TODO "soon"
 
-* Is WHAT_CURSOR_APPLIES_TO = 'all' a good default?
-
 * "bulk reschedule mode" - clears current selection, prompts for
 rescheduling of item then moves cursor to the next.  Similar "bulk project
 move" mode would also be nice.
@@ -54,10 +52,6 @@ move" mode would also be nice.
 
 * Allow using ctrl+arrows while editing text of a task. Instead use
   shift+arrows to shift it around while editing.
-
-* If user edits task and uses ctrl+arrow to indent / dedent, `cursorIndent`
-doesn't update.  This can cause moveUp / moveDown to fail, among other
-inconsistencies.
 
 * Add a chrome extension icon.
 
@@ -106,11 +100,6 @@ randomly selected, which isn't very good.
 
 # Changes to todoist that would be very helpful
 
-* Every button in menus should have a distinct, semantic class.  Right now for
-some menus I am matching by english text, and this won't work for other
-languages.  I could match it by index of the button, but this seems quite
-unreliable if the order gets changed in the future.
-
 * Other than things like today / tomorrow / next week / next month, there is
 no good way to reschedule a task to a particular day.  I think it would
 generally be a good improvement if the rescheduling calendar always had a
@@ -120,29 +109,7 @@ dates.
 
 # Todoist issues
 
-It would also be nice to get these fixed, but not really necessary.  Other
-than the undo issue, I have solid workarounds.
-
-* Undo will not work for multiple completions or deletions
-
-* The behavior for shift-click is strange.  Between the last click location
-and the new click location, selection statuses get toggled!?  See
-`setSelections` and `shiftClickTask` functions in the code.
-
-* In agenda mode, ids get duplicated
-
-* In agenda mode, if you shift click a task that is in two spots, shift click
-  should probably select both.
-
-  - If you move the tasks so they are in the same day, they do not recombine!
-
-* Sometimes when shift-clicking tasks, the top bar disappears.  I am currently
-  doing the following workaround:
-
-  - When it's detected that it has disappeared, double shift-click the last
-    shift-clicked task.
-
-  - Disable opacity animation to make this less visible.
+* Undo does not work for multiple completions or deletions
 
 # Automated upload of extensions
 
