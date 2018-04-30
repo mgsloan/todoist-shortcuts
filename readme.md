@@ -1,3 +1,5 @@
+![todoist-shortcuts logo](src/icon128.png)
+
 **todoist-shortcuts** is a browser extension or greasemonkey script which adds a
 bunch of keyboard shortcuts to [Todoist](https://todoist.com). Along with this
 repository, it is also available from the following places:
