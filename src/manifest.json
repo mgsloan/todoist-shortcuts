@@ -17,5 +17,12 @@
   "web_accessible_resources": [
   	"todoist-shortcuts.js"
   ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "browser_action": {
+    "default_icon": "icon48.png"
+  },
   "manifest_version": 2
 }
