@@ -75,7 +75,7 @@
     ['p', sortByPriority],
 
     // Other
-    ['u', undo],
+    [['u', 'ctrl+z'], undo],
     [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
     ['escape', closeContextMenus],

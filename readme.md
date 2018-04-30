@@ -116,10 +116,10 @@ sort the tasks:
 
 ## Other
 
-| keys       |             |
-| ---        | ---         |
-| `u`        | undo        |
-| `f` or `/` | open search |
+| keys            | action      |
+| ---             | ---         |
+| `u` or `ctrl+z` | undo        |
+| `f` or `/`      | open search |
 
 # How to customize keyboard shortcuts
 

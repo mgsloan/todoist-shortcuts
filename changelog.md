@@ -46,6 +46,8 @@
 
 * Scrolling behavior and cursor mouse behavior is now less glitchy.
 
+* `ctrl+z` is now a synonym for undo.
+
 * Bump to todoist version 901.
 
 ## Version 9
