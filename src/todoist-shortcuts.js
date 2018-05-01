@@ -651,6 +651,7 @@
     }
   }
 
+  // eslint-disable-next-line no-unused-vars
   function skipBulkMove() {
     if (nextBulkMoveKey) {
       // Closing the calendar will make it open the next.
@@ -951,11 +952,12 @@
 
   function calendarVisibilityMayHaveChanged() {
     var isAgenda;
+    var nextTask;
     updateKeymap();
     if (inBulkScheduleMode) {
       if (!checkCalendarOpen()) {
         if (nextBulkScheduleKey) {
-          var nextTask = getTaskByKey(nextBulkScheduleKey);
+          nextTask = getTaskByKey(nextBulkScheduleKey);
           if (nextTask) {
             debug('Calendar is closed in bulk schedule mode, so scheduling next task.');
             isAgenda = checkIsAgendaMode();
@@ -974,7 +976,7 @@
     if (inBulkMoveMode) {
       if (!checkMoveToProjectOpen()) {
         if (nextBulkMoveKey) {
-          var nextTask = getTaskByKey(nextBulkMoveKey);
+          nextTask = getTaskByKey(nextBulkMoveKey);
           if (nextTask) {
             debug('Move-to-project is closed in bulk move mode, so scheduling next task.');
             isAgenda = checkIsAgendaMode();
@@ -1611,7 +1613,7 @@
   var oldNavigateOptions = {};
 
   // MUTABLE. Keys the user has pressed so far.
-  var navigateKeysPressed = "";
+  var navigateKeysPressed = '';
 
   // Assigns key bindings to sections like inbox / today / various projects.
   // These keybindings get displayed along the options.  This function should
@@ -1624,7 +1626,6 @@
     try {
       var navigateItems = [];
       withTag(listHolder, 'li', function(li) {
-        var key = null;
         var mustBeKeys = null;
         var text = null;
         if (getUniqueClass(li, 'cmp_filter_inbox')) {
@@ -1707,7 +1708,7 @@
         debug('Same set of navigation options, so avoiding infinite recursion.');
         return;
       }
-      navigateKeysPressed = "";
+      navigateKeysPressed = '';
       if (!rerenderTips() && finishNavigate) {
         finishNavigate();
       }
@@ -1752,7 +1753,7 @@
 
   // Lowercase and take only alphanumeric.
   function preprocessItemText(text) {
-    var result = "";
+    var result = '';
     for (var i = 0; i < text.length; i++) {
       var char = text[i].toLowerCase();
       if (lowercaseCharIsAlphanum(char)) {
@@ -1966,7 +1967,7 @@
               // If we're just changing folding, then the user probably wants to
               // stay in navigation mode, so reset and rerender.
               if (option.keepGoing || foldingSection) {
-                navigateKeysPressed = "";
+                navigateKeysPressed = '';
                 keepGoing = rerenderTips();
               }
             } else {
@@ -2162,8 +2163,9 @@
         // Figure out the direction of cursor motion, to determine the direction
         // that should be searched.
         var increasing = newIndex > cursorIndex;
-        for (; newIndex >= 0 && newIndex < tasks.length
-             ; increasing ? newIndex++ : newIndex--) {
+        for (
+          ; newIndex >= 0 && newIndex < tasks.length
+          ; increasing ? newIndex++ : newIndex--) {
           var task = tasks[newIndex];
           if (!isIndented(task)) {
             newCursor = task;
@@ -2652,6 +2654,7 @@
     registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
     registerKeybindings(SCHEDULE_KEYMAP, SCHEDULE_BINDINGS);
     registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
+    registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
 
     // Reset mousetrap on disable
