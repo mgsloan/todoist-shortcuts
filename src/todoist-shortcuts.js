@@ -2087,15 +2087,23 @@
   // Given the element for a task, set it as the current selection.
   function setCursor(isAgenda, task, shouldScroll) {
     if (task) {
-      if (shouldScroll === 'scroll') {
-        withId('top_bar', function(topBar) {
-          verticalScrollIntoView(task, topBar.clientHeight, 0);
-        });
-      } else if (shouldScroll !== 'no-scroll') {
-        error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
+      // Don't attempt to focus nested sub-projects in agenda view, because it
+      // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
+      if (isAgenda && isIndented(task)) {
+        warn('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #14');
+      } else {
+        if (shouldScroll === 'scroll') {
+          withId('top_bar', function(topBar) {
+            verticalScrollIntoView(task, topBar.clientHeight, 0);
+          });
+        } else if (shouldScroll !== 'no-scroll') {
+          error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
+        }
+        storeCursorContext(isAgenda, task, false);
+        task.dispatchEvent(new MouseEvent('mouseover'));
       }
-      storeCursorContext(isAgenda, task, false);
-      task.dispatchEvent(new MouseEvent('mouseover'));
+    } else {
+      warn('Null task passed to setCursor');
     }
   }
 
@@ -2145,8 +2153,34 @@
       if (newIndex >= tasks.length) {
         newIndex = tasks.length - 1;
       }
-      setCursor(isAgenda, tasks[newIndex], 'scroll');
+      var newCursor = tasks[newIndex];
+      // Don't attempt to focus nested sub-projects in agenda view, because it
+      // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
+      if (isAgenda && isIndented(newCursor)) {
+        warn('Skipping cursor over nested sub-projects due to issue #14');
+        newCursor = null;
+        // Figure out the direction of cursor motion, to determine the direction
+        // that should be searched.
+        var increasing = newIndex > cursorIndex;
+        for (; newIndex >= 0 && newIndex < tasks.length
+             ; increasing ? newIndex++ : newIndex--) {
+          var task = tasks[newIndex];
+          if (!isIndented(task)) {
+            newCursor = task;
+            break;
+          }
+        }
+      }
+      if (newCursor) {
+        setCursor(isAgenda, newCursor, 'scroll');
+      }
     }
+  }
+
+  function isIndented(task) {
+    return task.classList.contains('indent_2') ||
+           task.classList.contains('indent_3') ||
+           task.classList.contains('indent_4');
   }
 
   function checkIsAgendaMode() {
