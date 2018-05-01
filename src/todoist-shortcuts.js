@@ -147,7 +147,7 @@
   var MAX_NAVIGATE_PREFIX = 2;
 
   // Set this to true to get more log output.
-  var DEBUG = false;
+  var DEBUG = true;
 
   // Set this to true to get a UI message directly in the page when the Todoist
   // version number is newer than expected. When false, instead the mismatch
@@ -828,11 +828,13 @@
     if (cursor && !wasEditing) {
       var cursorIndent = getTaskIndentClass(cursor);
       if (lastCursorId === cursor.id && lastCursorIndent === cursorIndent) {
+        currentSection = getSectionName(isAgenda, cursor);
         debug(
           'Cursor hasn\'t changed task:',
+          'currentSection = ', currentSection,
+          'lastCursorSection = ', lastCursorSection,
           'id =', cursor.id,
           'indent =', cursorIndent);
-        currentSection = getSectionName(isAgenda, cursor);
         changedSection = currentSection !== lastCursorSection;
       } else if (!mouseGotMoved) {
         debug('Cursor changed without mouse moving. This can happen on scroll, so attempting to move it back to where it was.');
@@ -884,15 +886,21 @@
           if (oldTask) {
             task = getById(oldTask.id);
             if (task) {
-              debug(
-                'found still-existing task that is',
-                i - lastCursorIndex,
-                'tasks after old cursor position, at',
-                lastCursorIndex,
-                ', setting cursor to it');
-              found = true;
-              setCursor(isAgenda, task, 'no-scroll');
-              break;
+              var taskSection = getSectionName(isAgenda, task);
+              // Don't jump back to the same task if it moved changed section.
+              if (i != lastCursorIndex || taskSection === lastCursorSection) {
+                debug(
+                  'found still-existing task that is',
+                  i - lastCursorIndex,
+                  'tasks after old cursor position, at',
+                  lastCursorIndex,
+                  ', setting cursor to it');
+                found = true;
+                setCursor(isAgenda, task, 'no-scroll');
+                break;
+              } else {
+                debug('disappeared due to changing section, finding new location');
+              }
             }
           }
         }
@@ -924,14 +932,22 @@
   function getSectionName(isAgenda, task) {
     var predicate =
         isAgenda
-          ? or(matchingClass('section_overdue'), matchingClass('section_day'))
+          ? or( or( matchingClass('section_overdue')
+                  , matchingClass('section_day')
+                  )
+              , matchingId('agenda_view')
+              )
           : matchingClass('list_editor');
     var section = findParent(task, predicate);
     var result = null;
     if (section) {
-      withUniqueClass(section, isAgenda ? 'subsection_header' : 'section_header', all, function(header) {
+      var header = getUniqueClass(section, 'section_header');
+      if (!header) {
+        header = getUniqueClass(section, 'subsection_header');
+      }
+      if (header) {
         result = header.textContent;
-      });
+      }
     }
     if (!result) {
       error('Failed to find section name for', task);
