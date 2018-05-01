@@ -863,11 +863,12 @@
 
   function restoreLastCursor(isAgenda) {
     var found = false;
-    if (lastCursorIndex > 0) {
+    var tasks = null;
+    if (lastCursorIndex >= 0) {
       if (wasEditing) {
         var task = getById(lastCursorTasks[lastCursorIndex].id);
         if (task) {
-          var tasks = getTasks();
+          tasks = getTasks();
           var priorIndex = tasks.indexOf(task);
           if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
             debug('found task that is probably the one that was previously being edited');
@@ -900,8 +901,22 @@
       warn('lastCursorIndex wasn\'t set yet');
     }
     if (!found) {
-      debug('didn\'t find a particular task to select, so selecting last task');
-      setCursorToLastTask(isAgenda, 'no-scroll');
+      warn('didn\'t find a particular task to select.');
+      if (!tasks) {
+        tasks = getTasks();
+      }
+      if (lastCursorIndex < tasks.length - lastCursorIndex) {
+        debug('selecting first task, because it\'s nearer to lastCursorIndex.');
+        setCursorToFirstTask(isAgenda, 'no-scroll');
+      } else {
+        debug('selecting last task, because it\'s nearer to lastCursorIndex.');
+        setCursorToLastTask(isAgenda, 'no-scroll');
+        if (!getCursor()) {
+          // This can happen if the last task is a nested sub-project.
+          warn('failed to set the cursor to last task, so setting to first');
+          setCursorToFirstTask(isAgenda, 'no-scroll');
+        }
+      }
     }
   }
 
