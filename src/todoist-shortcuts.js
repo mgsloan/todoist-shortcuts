@@ -677,7 +677,6 @@
   function oneBulkMove() {
     var isAgenda = checkIsAgendaMode();
     var tasks = getTasks();
-    var found = false;
     if (!nextBulkMoveKey) {
       debug('Exiting bulk move mode because there is nothing left to move.');
       exitBulkMove();
@@ -898,7 +897,7 @@
             if (task) {
               var taskSection = getSectionName(isAgenda, task);
               // Don't jump back to the same task if it moved changed section.
-              if (i != lastCursorIndex || taskSection === lastCursorSection) {
+              if (i !== lastCursorIndex || taskSection === lastCursorSection) {
                 debug(
                   'found still-existing task that is',
                   i - lastCursorIndex,
@@ -940,14 +939,9 @@
 
   // Gets the name of the section that a task is in.
   function getSectionName(isAgenda, task) {
-    var predicate =
-        isAgenda
-          ? or( or( matchingClass('section_overdue')
-                  , matchingClass('section_day')
-                  )
-              , matchingId('agenda_view')
-              )
-          : matchingClass('list_editor');
+    var predicate = isAgenda
+      ? or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'))
+      : matchingClass('list_editor');
     var section = findParent(task, predicate);
     var result = null;
     if (section) {
@@ -1842,7 +1836,7 @@
       var char = text[i];
       var lowerChar = char.toLowerCase();
       if (lowercaseCharIsAlphanum(lowerChar) &&
-        (i === 0 || text[i - 1] === ' ' || lowerChar != char)) {
+        (i === 0 || text[i - 1] === ' ' || lowerChar !== char)) {
         result += lowerChar;
       }
     }
@@ -1942,8 +1936,8 @@
     }
     // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
     // assigning those.
-    addUnambiguousGroupings(function(item) {
-      var initials = item.initials;
+    addUnambiguousGroupings(function(it) {
+      var initials = it.initials;
       if (initials.length >= MAX_NAVIGATE_PREFIX) {
         return initials.slice(0, MAX_NAVIGATE_PREFIX);
       } else {
@@ -1952,7 +1946,7 @@
     });
     // For each possible prefix length, assign when unambiguous.
     for (var l = 1; l <= MAX_NAVIGATE_PREFIX; l++) {
-      addUnambiguousGroupings(function(item) { return item.text.slice(0, l); });
+      addUnambiguousGroupings(function(it) { return it.text.slice(0, l); });
     }
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
