@@ -1888,7 +1888,7 @@
       }
       return noAlias;
     };
-    var addUnambiguousGroupings = function(f) {
+    var addViaKeyFunc = function(mode, f) {
       var groups = {};
       for (var j = 0; j < items.length; j++) {
         keys = f(items[j]);
@@ -1901,42 +1901,69 @@
           group.push(j);
         }
       }
-      var unambiguous = [];
+      var qualifying = [];
       for (keys in groups) {
-        var groupItems = groups[keys];
-        // Unambiguous prefix of non-aliasing sequence
-        if (groupItems.length === 1 && noAliasing(keys)) {
-          unambiguous.push(groupItems[0]);
+        if (noAliasing(keys)) {
+          var groupItems = groups[keys];
+          var isUnique = groupItems.length === 1;
+          var qualifies = false;
+          if (mode === 'must-be-unique') {
+            if (!isUnique) {
+              error('keys', keys, 'must be unique.');
+            } else {
+              qualifies = true;
+            }
+          } else if (mode === 'allow-ambiguous') {
+            qualifies = true;
+          } else if (mode === 'try-shortening') {
+            // Prefer shortened key sequences if they are unambiguous.
+            for (var sl = MAX_NAVIGATE_PREFIX - 1; sl > 0; sl--) {
+              var shortened = keys.slice(0, sl);
+              if (noAliasing(shortened)) {
+                var found = true;
+                for (var otherKeys in groups) {
+                  if (otherKeys !== keys && otherKeys.slice(0, sl) != shortened) {
+                    found = false;
+                    break;
+                  }
+                }
+                if (found) {
+                  keys = shortened;
+                  break;
+                }
+              } else {
+                break;
+              }
+            }
+            // Still allow ambiguous assignments, even if there is no
+            // shortening.
+            qualifies = true;
+          } else {
+            error('Invariant violation: unexpected mode in addViaKeyFunc');
+          }
+          // Non-aliasing sequence which is unambiguous if ambiguousAddFirst is
+          // false.
+          if (qualifies) {
+            qualifying.push([keys, groupItems[0]]);
+          }
         }
       }
       // sort backwards so that deletion works.
-      unambiguous.sort(function(a, b) { return b - a; });
-      for (var k = 0; k < unambiguous.length; k++) {
-        var ix = unambiguous[k];
+      qualifying.sort(function(a, b) { return b[1] - a[1]; });
+      for (var k = 0; k < qualifying.length; k++) {
+        var keys = qualifying[k][0];
+        var ix = qualifying[k][1];
         item = items[ix];
-        keys = f(item);
         if (addResult(keys, item)) {
           items.splice(ix, 1);
         }
       }
     };
     // Handle items with 'mustBeKeys' set.
-    for (var i = 0; i < items.length; i++) {
-      item = items[i];
-      if (item.mustBeKeys) {
-        keys = item.mustBeKeys.toLowerCase();
-        if (addResult(keys, item)) {
-          // Remove this from the list of items to process.
-          items.splice(i, 1);
-          i--;
-        } else {
-          warn('Overlap in mustBeKeys', keys);
-        }
-      }
-    }
+    addViaKeyFunc('must-be-unique', function(item) { return item.mustBeKeys; });
     // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
     // assigning those.
-    addUnambiguousGroupings(function(it) {
+    addViaKeyFunc('allow-ambiguous', function(it) {
       var initials = it.initials;
       if (initials.length >= MAX_NAVIGATE_PREFIX) {
         return initials.slice(0, MAX_NAVIGATE_PREFIX);
@@ -1944,10 +1971,10 @@
         return null;
       }
     });
-    // For each possible prefix length, assign when unambiguous.
-    for (var l = 1; l <= MAX_NAVIGATE_PREFIX; l++) {
-      addUnambiguousGroupings(function(it) { return it.text.slice(0, l); });
-    }
+    // Attempt to use prefix as the key sequence.
+    addViaKeyFunc('try-shortening', function(it) {
+      return it.text.slice(0, MAX_NAVIGATE_PREFIX);
+    });
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
     for (var p = MAX_NAVIGATE_PREFIX - 1; p >= 0; p--) {
