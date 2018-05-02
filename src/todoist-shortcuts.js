@@ -1694,6 +1694,7 @@
       withTag(listHolder, 'li', function(li) {
         var mustBeKeys = null;
         var text = null;
+        var initials = null;
         if (getUniqueClass(li, 'cmp_filter_inbox')) {
           mustBeKeys = 'i';
         } else if (getUniqueClass(li, 'cmp_filter_today')) {
@@ -1704,6 +1705,8 @@
           withUniqueClass(li, 'name', all, function(nameElement) {
             withUniqueTag(nameElement, 'span', all, function(nameSpan) {
               text = preprocessItemText(nameSpan.textContent);
+              initials = getItemInitials(nameSpan.textContent);
+              debug('Initials = ', initials);
             });
           });
         }
@@ -1720,12 +1723,14 @@
           navigateItems.push({
             element: li,
             mustBeKeys: mustBeKeys,
-            text: text
+            text: text,
+            initials: initials
           });
         } else if (text) {
           navigateItems.push({
             element: li,
-            text: text
+            text: text,
+            initials: initials
           });
         } else {
           warn('Couldn\'t figure out text for', li);
@@ -1821,9 +1826,24 @@
   function preprocessItemText(text) {
     var result = '';
     for (var i = 0; i < text.length; i++) {
-      var char = text[i].toLowerCase();
-      if (lowercaseCharIsAlphanum(char)) {
-        result += char;
+      var char = text[i];
+      var lowerChar = char.toLowerCase();
+      if (lowercaseCharIsAlphanum(lowerChar)) {
+        result += lowerChar;
+      }
+    }
+    return result;
+  }
+
+  // Lowercase and get initials.
+  function getItemInitials(text) {
+    var result = '';
+    for (var i = 0; i < text.length; i++) {
+      var char = text[i];
+      var lowerChar = char.toLowerCase();
+      if (lowercaseCharIsAlphanum(lowerChar) &&
+        (i === 0 || text[i - 1] === ' ' || lowerChar != char)) {
+        result += lowerChar;
       }
     }
     return result;
@@ -1874,32 +1894,18 @@
       }
       return noAlias;
     };
-    // Handle items with 'mustBeKeys' set.
-    for (var i = 0; i < items.length; i++) {
-      item = items[i];
-      if (item.mustBeKeys) {
-        keys = item.mustBeKeys.toLowerCase();
-        if (addResult(keys, item)) {
-          // Remove this from the list of items to process.
-          items.splice(i, 1);
-          i--;
-        } else {
-          warn('Overlap in mustBeKeys', keys);
-        }
-      }
-    }
-    // For each possible prefix length, assign when unambiguous.
-    for (var l = 1; l <= MAX_NAVIGATE_PREFIX; l++) {
+    var addUnambiguousGroupings = function(f) {
       var groups = {};
       for (var j = 0; j < items.length; j++) {
-        item = items[j];
-        prefix = item.text.slice(0, l);
-        var group = groups[prefix];
-        if (!group) {
-          group = [];
-          groups[prefix] = group;
+        keys = f(items[j]);
+        if (keys) {
+          var group = groups[keys];
+          if (!group) {
+            group = [];
+            groups[keys] = group;
+          }
+          group.push(j);
         }
-        group.push(j);
       }
       var unambiguous = [];
       for (keys in groups) {
@@ -1914,11 +1920,39 @@
       for (var k = 0; k < unambiguous.length; k++) {
         var ix = unambiguous[k];
         item = items[ix];
-        prefix = item.text.slice(0, l);
-        if (addResult(prefix, item)) {
+        keys = f(item);
+        if (addResult(keys, item)) {
           items.splice(ix, 1);
         }
       }
+    };
+    // Handle items with 'mustBeKeys' set.
+    for (var i = 0; i < items.length; i++) {
+      item = items[i];
+      if (item.mustBeKeys) {
+        keys = item.mustBeKeys.toLowerCase();
+        if (addResult(keys, item)) {
+          // Remove this from the list of items to process.
+          items.splice(i, 1);
+          i--;
+        } else {
+          warn('Overlap in mustBeKeys', keys);
+        }
+      }
+    }
+    // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
+    // assigning those.
+    addUnambiguousGroupings(function(item) {
+      var initials = item.initials;
+      if (initials.length >= MAX_NAVIGATE_PREFIX) {
+        return initials.slice(0, MAX_NAVIGATE_PREFIX);
+      } else {
+        return null;
+      }
+    });
+    // For each possible prefix length, assign when unambiguous.
+    for (var l = 1; l <= MAX_NAVIGATE_PREFIX; l++) {
+      addUnambiguousGroupings(function(item) { return item.text.slice(0, l); });
     }
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
