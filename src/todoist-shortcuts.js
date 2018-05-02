@@ -302,9 +302,7 @@
       var isAgenda = checkIsAgendaMode();
       var mutateCursor = getCursorToMutate(isAgenda);
       if (mutateCursor) {
-        withTaskMenu(isAgenda, mutateCursor, function(menu) {
-          withUniqueClass(menu, 'cmp_scheduler_more', all, click);
-        });
+        clickTaskSchedule(isAgenda, mutateCursor);
       } else {
         withId(ACTIONS_BAR_CLASS, function(parent) {
           withUniqueClass(parent, MI_SCHEDULE, all, click);
@@ -585,7 +583,9 @@
     deselectAll();
     var cursor = getCursor();
     if (cursor) {
+      var isAgenda = checkIsAgendaMode();
       inBulkScheduleMode = true;
+      nextBulkScheduleKey = getTaskKey(isAgenda, cursor);
       updateKeymap();
       oneBulkSchedule(cursor);
     } else {
@@ -604,30 +604,34 @@
 
   function exitBulkSchedule() {
     inBulkScheduleMode = false;
+    nextBulkScheduleKey = null;
     updateKeymap();
     closeContextMenus();
   }
 
-  // NOTE: Cursor must exist.
-  function oneBulkSchedule(cursor) {
+  // NOTE: This is called internally, not intended for use as keybinding action.
+  function oneBulkSchedule() {
     var isAgenda = checkIsAgendaMode();
     var tasks = getTasks();
-    var found = false;
-    nextBulkScheduleKey = null;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i] === cursor) {
-        found = true;
-        if (i + 1 < tasks.length) {
-          nextBulkScheduleKey = getTaskKey(isAgenda, tasks[i + 1]);
-        }
-        break;
-      }
-    }
-    if (!found) {
-      error('Invariant violation in oneBulkSchedule - expected to find cursor.');
+    if (!nextBulkScheduleKey) {
+      debug('Exiting bulk schedule mode because there is nothing left to schedule.');
       exitBulkSchedule();
+      return;
+    }
+    var curBulkScheduleTask = getTaskByKey(nextBulkScheduleKey);
+    if (!curBulkScheduleTask) {
+      warn('Exiting bulk schedule mode because it couldn\'t find', nextBulkScheduleKey);
+      exitBulkSchedule();
+      return;
+    }
+    var nextBulkScheduleTask =
+        getNextCursorableTask(isAgenda, tasks, nextBulkScheduleKey);
+    setCursor(isAgenda, curBulkScheduleTask, 'scroll');
+    clickTaskSchedule(isAgenda, curBulkScheduleTask);
+    if (nextBulkScheduleTask) {
+      nextBulkScheduleKey = getTaskKey(isAgenda, nextBulkScheduleTask);
     } else {
-      schedule();
+      nextBulkScheduleKey = null;
     }
   }
 
@@ -643,9 +647,11 @@
     deselectAll();
     var cursor = getCursor();
     if (cursor) {
+      var isAgenda = checkIsAgendaMode();
       inBulkMoveMode = true;
+      nextBulkMoveKey = getTaskKey(isAgenda, cursor);
       updateKeymap();
-      oneBulkMove(cursor);
+      oneBulkMove();
     } else {
       warn('Can\'t bulk move if there\'s no cursor task.');
     }
@@ -667,26 +673,30 @@
     closeContextMenus();
   }
 
-  // NOTE: Cursor must exist.
-  function oneBulkMove(cursor) {
+  // NOTE: This is called internally, not intended for use as keybinding action.
+  function oneBulkMove() {
     var isAgenda = checkIsAgendaMode();
     var tasks = getTasks();
     var found = false;
-    nextBulkMoveKey = null;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i] === cursor) {
-        found = true;
-        if (i + 1 < tasks.length) {
-          nextBulkMoveKey = getTaskKey(isAgenda, tasks[i + 1]);
-        }
-        break;
-      }
-    }
-    if (!found) {
-      error('Invariant violation in oneBulkMove - expected to find cursor.');
+    if (!nextBulkMoveKey) {
+      debug('Exiting bulk move mode because there is nothing left to move.');
       exitBulkMove();
+      return;
+    }
+    var curBulkMoveTask = getTaskByKey(nextBulkMoveKey);
+    if (!curBulkMoveTask) {
+      warn('Exiting bulk move mode because it couldn\'t find', nextBulkMoveKey);
+      exitBulkMove();
+      return;
+    }
+    var nextBulkMoveTask =
+        getNextCursorableTask(isAgenda, tasks, nextBulkMoveKey);
+    setCursor(isAgenda, curBulkMoveTask, 'scroll');
+    clickTaskMenu(isAgenda, curBulkMoveTask, MI_MOVE);
+    if (nextBulkMoveTask) {
+      nextBulkMoveKey = getTaskKey(isAgenda, nextBulkMoveTask);
     } else {
-      moveToProject();
+      nextBulkMoveKey = null;
     }
   }
 
@@ -992,8 +1002,7 @@
           if (nextTask) {
             debug('Calendar is closed in bulk schedule mode, so scheduling next task.');
             isAgenda = checkIsAgendaMode();
-            setCursor(isAgenda, nextTask, 'no-scroll');
-            oneBulkSchedule(nextTask);
+            oneBulkSchedule();
           } else {
             error('Could not find next task for bulk schedule.');
             exitBulkSchedule();
@@ -1012,7 +1021,7 @@
             debug('Move-to-project is closed in bulk move mode, so scheduling next task.');
             isAgenda = checkIsAgendaMode();
             setCursor(isAgenda, nextTask, 'no-scroll');
-            oneBulkMove(nextTask);
+            oneBulkMove();
           } else {
             error('Could not find next task for bulk move.');
             exitBulkMove();
@@ -1407,6 +1416,12 @@
     };
   }
 
+  function clickTaskSchedule(isAgenda, task) {
+    withTaskMenu(isAgenda, task, function(menu) {
+      withUniqueClass(menu, 'cmp_scheduler_more', all, click);
+    });
+  }
+
   function clickTaskDone(task) {
     withUniqueClass(task, 'ist_checkbox', all, click);
   }
@@ -1581,6 +1596,11 @@
     return task.classList.contains('selected');
   }
 
+  function isTaskIndented(task) {
+    var indentClass = getTaskIndentClass(task);
+    return !indentClass || indentClass !== 'indent_1';
+  }
+
   function getTaskIndentClass(task) {
     return findUnique(isIndentClass, task.classList);
   }
@@ -1630,6 +1650,21 @@
     } else {
       return document.getElementById(id);
     }
+  }
+
+  // Gets the next task the cursor can be moved to, after the specified task.
+  function getNextCursorableTask(isAgenda, tasks, currentKey) {
+    for (var i = 0; i < tasks.length; i++) {
+      if (getTaskKey(isAgenda, tasks[i]) === currentKey) {
+        for (var j = i + 1; j < tasks.length; j++) {
+          var task = tasks[j];
+          if (!isAgenda || !isTaskIndented(task)) {
+            return task;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   // MUTABLE. When set, this function should be called when navigate mode
@@ -2121,7 +2156,7 @@
     if (task) {
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
-      if (isAgenda && isIndented(task)) {
+      if (isAgenda && isTaskIndented(task)) {
         warn('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #14');
       } else {
         if (shouldScroll === 'scroll') {
@@ -2188,7 +2223,7 @@
       var newCursor = tasks[newIndex];
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
-      if (isAgenda && isIndented(newCursor)) {
+      if (isAgenda && isTaskIndented(newCursor)) {
         warn('Skipping cursor over nested sub-projects due to issue #14');
         newCursor = null;
         // Figure out the direction of cursor motion, to determine the direction
@@ -2198,7 +2233,7 @@
           ; newIndex >= 0 && newIndex < tasks.length
           ; increasing ? newIndex++ : newIndex--) {
           var task = tasks[newIndex];
-          if (!isIndented(task)) {
+          if (!isTaskIndented(task)) {
             newCursor = task;
             break;
           }
@@ -2208,12 +2243,6 @@
         setCursor(isAgenda, newCursor, 'scroll');
       }
     }
-  }
-
-  function isIndented(task) {
-    return task.classList.contains('indent_2') ||
-           task.classList.contains('indent_3') ||
-           task.classList.contains('indent_4');
   }
 
   function checkIsAgendaMode() {
