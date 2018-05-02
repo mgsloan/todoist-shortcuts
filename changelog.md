@@ -1,6 +1,7 @@
 # todoist-shortcuts changelog
 
-## Version 10
+
+## Version 10 ##
 
 * Due to Todoist making some changes to their code, it is now possible
   to use todoist-shortcuts with languages other than english.
@@ -52,9 +53,16 @@
 
 * Adds `* v` keybinding to enter bulk move mode.
 
+* Using `h` to collapse will now collapse the parent if the cursor
+  is already collapsed
+
+* Using `l` to expand will now move the cursor to the first
+  sub-project.
+
 * Bump to todoist version 901.
 
-## Version 9
+
+## Version 9 ##
 
 * Bump to todoist version 893.  Fixes for things that changed.
 
@@ -70,7 +78,8 @@
 
 * Old scheduling binding for "n" removed, use "d" instead.
 
-## Version 8
+
+## Version 8 ##
 
 * Now uses the standard drag-and-drop handle to indicate the cursor.
 
@@ -78,7 +87,8 @@
 
 * Vertical auto-scrolling now takes into account top bar occlusion.
 
-## Version 7
+
+## Version 7 ##
 
 * Bump to todoist version 892.
 
@@ -90,7 +100,8 @@
 
 * Now "move to project" is back to being "v" instead of "m".
 
-## Version 6
+
+## Version 6 ##
 
 * Bump to todoist version 891.
 
@@ -105,22 +116,26 @@
 * When navigate mode is activated ("g"), the left pane will now become
   visible even when the browser window is narrow and so in 'mini mode'.
 
-## Version 5
+
+## Version 5 ##
 
 * Bump to todoist version 890.
 
 * Have mismatch warning tell you which version was expected.
 
-## Version 4
+
+## Version 4 ##
 
 * Last version was hastily released, this fixes "move to project" (release
   made minutes after the last one)
 
-## Version 3
+
+## Version 3 ##
 
 * Now "move to project" is "m" instead of "v".
 
-## Version 2
+
+## Version 2 ##
 
 * Most default todoist keybindings like 'u' for undo now work too.
 
