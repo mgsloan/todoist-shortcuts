@@ -32,8 +32,8 @@
     // Navigation
     [['j', 'down'], cursorDown],
     [['k', 'up'], cursorUp],
-    [['h', 'left'], collapse],
-    [['l', 'right'], expand],
+    [['h', 'left'], cursorLeft],
+    [['l', 'right'], cursorRight],
     ['^', cursorFirst],
     ['$', cursorLast],
     ['g', navigate],
@@ -486,10 +486,55 @@
     withUniqueClass(getCursor(), ARROW_CLASS, all, click);
   }
 
+  // Collapse cursor. If it is already collapsed, select and collapse parent.
+  function cursorLeft() {
+    if (checkCursorExpanded()) {
+      toggleCollapse();
+    } else {
+      selectAndCollapseParent();
+    }
+  }
+
+  // Expand cursor and move down.
+  function cursorRight() {
+    if (checkCursorCollapsed()) {
+      toggleCollapse();
+      if (!checkIsAgendaMode()) {
+        // Issue #14
+        cursorDown();
+      }
+    }
+  }
+
   // Collapses or expands task under the cursor, that have children. Does
   // nothing if it's already in the desired state.
   function collapse() { if (checkCursorExpanded()) { toggleCollapse(); } }
   function expand() { if (checkCursorCollapsed()) { toggleCollapse(); } }
+
+  // Move selection to parent project.
+  function selectAndCollapseParent() {
+    var cursor = getCursor();
+    var tasks = getTasks();
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i];
+      if (task === cursor) {
+        for (var j = i; j >= 0; j--) {
+          task = tasks[j];
+          if (getUniqueClass(task, EXPANDED_ARROW_CLASS)) {
+            var isAgenda = checkIsAgendaMode();
+            setCursor(isAgenda, task, 'scroll');
+            toggleCollapse();
+            break;
+          }
+          // If we hit the top level, then stop looking for a parent.
+          if (getTaskIndentClass(task) === 'indent_1') {
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
 
   // Collapses or expands all tasks.
   function collapseAll() { repeatedlyClickArrows(EXPANDED_ARROW_CLASS); }

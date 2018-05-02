@@ -42,10 +42,6 @@ Then, run `eslint.sh` to use it to do checking.
 
 # TODO "soon"
 
-* l should step out even if not focused on the collapser
-
-* h should also move cursor down after opening
-
 * Allow using ctrl+arrows while editing text of a task. Instead use
   shift+arrows to shift it around while editing.
 
