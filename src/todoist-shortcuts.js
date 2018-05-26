@@ -1745,7 +1745,6 @@
             withUniqueTag(nameElement, 'span', all, function(nameSpan) {
               text = preprocessItemText(nameSpan.textContent);
               initials = getItemInitials(nameSpan.textContent);
-              debug('Initials = ', initials);
             });
           });
         }
