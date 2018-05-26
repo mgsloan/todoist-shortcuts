@@ -2111,6 +2111,18 @@
               var el = option.element;
               var elToClick = el;
               var foldingSection = false;
+              // If the user is selecting a section like projects / labels /
+              // filters, then close the other sections.
+              if (el.classList.contains('panel_summary')) {
+                withId('list_holder', function(listHolder) {
+                  withClass(listHolder, 'panel_summary', function(ps) {
+                    var isExpanded = ps.classList.contains('panel_summary--expanded');
+                    if (ps != el && isExpanded) {
+                      ps.click();
+                    }
+                  });
+                });
+              }
               // If the user re-selects the same section they are already on,
               // toggle folding.
               var arrow = getUniqueClass(el, 'arrow');
