@@ -524,7 +524,10 @@
 
   // Collapses or expands task under the cursor, that have children. Does
   // nothing if it's already in the desired state.
+
+  // eslint-disable-next-line no-unused-vars
   function collapse() { if (checkCursorExpanded()) { toggleCollapse(); } }
+  // eslint-disable-next-line no-unused-vars
   function expand() { if (checkCursorCollapsed()) { toggleCollapse(); } }
 
   // Move selection to parent project.
@@ -1984,7 +1987,7 @@
               if (noAliasing(shortened)) {
                 var found = true;
                 for (var otherKeys in groups) {
-                  if (otherKeys !== keys && otherKeys.slice(0, sl) != shortened) {
+                  if (otherKeys !== keys && otherKeys.slice(0, sl) !== shortened) {
                     found = false;
                     break;
                   }
@@ -2013,7 +2016,7 @@
       // sort backwards so that deletion works.
       qualifying.sort(function(a, b) { return b[1] - a[1]; });
       for (var k = 0; k < qualifying.length; k++) {
-        var keys = qualifying[k][0];
+        keys = qualifying[k][0];
         var ix = qualifying[k][1];
         item = items[ix];
         if (addResult(keys, item)) {
@@ -2022,7 +2025,7 @@
       }
     };
     // Handle items with 'mustBeKeys' set.
-    addViaKeyFunc('must-be-unique', function(item) { return item.mustBeKeys; });
+    addViaKeyFunc('must-be-unique', function(it) { return it.mustBeKeys; });
     // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
     // assigning those.
     addViaKeyFunc('allow-ambiguous', function(it) {
@@ -2135,7 +2138,7 @@
                 withId('list_holder', function(listHolder) {
                   withClass(listHolder, 'panel_summary', function(ps) {
                     var isExpanded = ps.classList.contains('panel_summary--expanded');
-                    if (ps != el && isExpanded) {
+                    if (!sameElement(el)(ps) && isExpanded) {
                       ps.click();
                     }
                   });
@@ -2643,6 +2646,13 @@
   // Predicate, returns 'true' if the element isn't hidden with 'display: none'.
   function notHidden(el) {
     return el.style.display !== 'none';
+  }
+
+  function sameElement(el1) {
+    return function(el2) {
+      // eslint-disable-next-line eqeqeq
+      return el1 == el2;
+    };
   }
 
   // Given two predicates, uses && to combine them.
