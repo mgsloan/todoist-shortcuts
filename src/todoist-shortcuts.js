@@ -330,7 +330,7 @@
   // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
     withCalendar('scheduleToday', function(calendar) {
-      withUniqueClass(calendar, 'icon_today', notMatchingText('X'), click);
+      withUniqueClass(calendar, 'icon_today', not(matchingText('X')), click);
     });
   }
 
@@ -1595,7 +1595,7 @@
         || (item.classList.contains('manager') && shouldIncludeEditors)
         );
       // Skip nested tasks that are not visible (if includeCollapsed is not set).
-      var visible = shouldIncludeCollapsed || notHidden(item);
+      var visible = shouldIncludeCollapsed || not(hidden(item));
       if (classMatches && visible) {
         results.push(item);
       }
@@ -2610,13 +2610,6 @@
     };
   }
 
-  // Returns predicate which returns 'true' if text content doesn't match text.
-  function notMatchingText(text) {
-    return function(el) {
-      return el.textContent !== text;
-    };
-  }
-
   // Returns predicate which returns 'true' if the element has the specified class.
   function matchingClass(cls) {
     return function(el) {
@@ -2643,9 +2636,11 @@
     return el.style.display === 'none';
   }
 
-  // Predicate, returns 'true' if the element isn't hidden with 'display: none'.
-  function notHidden(el) {
-    return el.style.display !== 'none';
+  // Inverts the result of a predicate.
+  function not(p) {
+    return function(x) {
+      return !p(x);
+    };
   }
 
   function sameElement(el1) {
