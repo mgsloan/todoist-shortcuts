@@ -63,7 +63,9 @@
     [['L', 'shift+right'], moveIn],
 
     // Selection
-    // NOTE: 'x' selection is handled by fallbackHandler below.
+    //
+    // NOTE: 'x' selection is either handled by fallbackHandler below, or by
+    // adding the binding if MULTISELECT is enabled
     ['* a', selectAll],
     ['* n', deselectAll],
     ['* 1', selectPriority('1')],
