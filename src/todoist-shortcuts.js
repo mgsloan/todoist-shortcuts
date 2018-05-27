@@ -957,7 +957,7 @@
       });
       if (managerIndex > 0) {
         storeCursorContext(isAgenda, tasks[managerIndex - 1], true);
-      } else {
+      } else if (managerIndex < 0) {
         error('There seems to be a task editor, but then couldn\'t find it.');
       }
       return;
@@ -1053,10 +1053,10 @@
         }
       }
     } else {
-      warn('lastCursorIndex wasn\'t set yet');
+      debug('lastCursorIndex wasn\'t set yet');
     }
     if (!found) {
-      warn('didn\'t find a particular task to select.');
+      debug('didn\'t find a particular task to select.');
       if (!tasks) {
         tasks = getTasks();
       }
@@ -1068,7 +1068,7 @@
         setCursorToLastTask(isAgenda, 'no-scroll');
         if (!getCursor()) {
           // This can happen if the last task is a nested sub-project.
-          warn('failed to set the cursor to last task, so setting to first');
+          debug('failed to set the cursor to last task, so setting to first');
           setCursorToFirstTask(isAgenda, 'no-scroll');
         }
       }
@@ -2447,7 +2447,7 @@
         task.dispatchEvent(new MouseEvent('mouseover'));
       }
     } else {
-      warn('Null task passed to setCursor');
+      error('Null task passed to setCursor');
     }
   }
 
@@ -2481,7 +2481,7 @@
     }
     cursor = getCursor();
     if (!cursor) {
-      warn('ensureCursor failed, so aborting modifyCursorIndex');
+      debug('ensureCursor failed, so aborting modifyCursorIndex');
     } else {
       var cursorIndex = tasks.indexOf(getCursor());
       if (cursorIndex < 0) {

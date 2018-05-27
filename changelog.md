@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 12 ##
+
+* Removed some warnings which can occur during normal operation
+  (particularly when no tasks are visible).
+
+
 ## Version 11 ##
 
 * Fixed icons
