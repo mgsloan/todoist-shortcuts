@@ -72,11 +72,6 @@ navigation mode to select the same project again.
 | `* h` | collapses all tasks                   |
 | `* l` | expands all tasks                     |
 
-`x` works a bit different than all the other shortcuts. It can be held down, and
-cursor navigation will cause selection or deselection of other tasks. It can be
-convenient to hold down `x` and move the mouse over all the tasks you want to
-select / deselect.
-
 ## Manipulation of selected items
 
 If none are selected, then these will apply to the cursor instead.

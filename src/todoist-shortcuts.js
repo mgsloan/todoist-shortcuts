@@ -20,6 +20,19 @@
 
   var TODOIST_SHORTCUTS_VERSION = 9;
 
+  // When true, enables selecting multiple items by holding 'x' and moving the
+  // cursor.
+  //
+  // While this behavior can be useful, it is not a very good default. Due to
+  // overlapping keypresses this doesn't work very well if the user has a habit
+  // of rapidly using "jxjxjxjx" to select items (such a habit can come from
+  // using the gmail keyboard shortcuts).
+  //
+  // It should be possible to support multi selection without this deficiency,
+  // but it seems like any such solution will necessarily involve some fiddly
+  // heuristics.
+  var MULTISELECT = false;
+
   // Here's where the keybindings get specified. Of course, feel free to modify
   // this list, or modify this script in general.
   var KEY_BINDINGS = [
@@ -87,6 +100,10 @@
   ];
   var DEFAULT_KEYMAP = 'default';
 
+  if (!MULTISELECT) {
+    KEY_BINDINGS.push(['x', toggleSelect]);
+  }
+
   // Scheduling keybindings (used when scheduler is open)
   var SCHEDULE_BINDINGS = [
     ['d', scheduleToday],
@@ -117,8 +134,8 @@
   var NAVIGATE_KEYMAP = 'navigate';
 
   function fallbackHandler(e) {
-    if (e.key === 'x') {
-      if (e.type === 'keydown') {
+    if (MULTISELECT && e.key === 'x') {
+      if (e.type === 'keydown' && !e.repeat) {
         selectPressed();
         return false;
       } else if (e.type === 'keyup') {
@@ -257,7 +274,6 @@
   }
 
   // Toggles selection of the task focused by the cursor.
-  // eslint-disable-next-line no-unused-vars
   function toggleSelect() {
     var cursor = getCursor();
     if (cursor) {
@@ -834,17 +850,19 @@
   }
 
   function handleCursorMove(cursor) {
-    switch (selectionMode) {
-    case 'none':
-      break;
-    case 'select':
-      selectTask(cursor);
-      break;
-    case 'deselect':
-      deselectTask(cursor);
-      break;
-    default:
-      error('Invariant violated, unexpected selectionMode:', selectionMode);
+    if (MULTISELECT) {
+      switch (selectionMode) {
+      case 'none':
+        break;
+      case 'select':
+        selectTask(cursor);
+        break;
+      case 'deselect':
+        deselectTask(cursor);
+        break;
+      default:
+        error('Invariant violated, unexpected selectionMode:', selectionMode);
+      }
     }
   }
 

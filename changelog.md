@@ -59,6 +59,11 @@
 * Using `l` to expand will now move the cursor to the first
   sub-project.
 
+* `x` can no longer be held down to do multiple selections.  This is due
+  to key sequences like `jxjxjxjx` being glitchy.  There is a constant
+  called `MULTISELECT` in the source that can be set to `true` to bring
+  back the multiselection behavior.
+
 * Bump to todoist version 901.
 
 
