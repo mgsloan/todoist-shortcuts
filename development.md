@@ -40,14 +40,10 @@ npm install eslint eslint-config-es5
 
 Then, run `eslint.sh` to use it to do checking.
 
-# TODO "soon"
+# TODO
 
 * Allow using ctrl+arrows while editing text of a task. Instead use
   shift+arrows to shift it around while editing.
-
-* Add a chrome extension icon.
-
-# TODO "one day"
 
 * Is it useful to be able to navigate to first / last task within a section?
 
@@ -63,26 +59,12 @@ of adding tasks.
 * e for Archive and d for Done, # for Delete, are awfully close to
 eachother.  Is archive vs delete useful?
 
-* Use querySelectorAll to simplify code?  Would probably provide worse debug
-diagnostics.
-
 * Display of keybindings directly on elements suggests a library that mixes
 querySelectorAll / mousetrap / the utilities here.  Design it also to be used
 in normal applications?
 
-* Consider using mnemonic navigation for project names, which would use the
-first character of the project when possible.  Tricky to make this consistent
-despite project folding.  Give priority based on lower indent levels?
-
-* Handle more than (26 + 10 - 3 == 33) visible projects for navigation.
-
 * Document usage with vimium.  Right now I have vimium disabled, but my most
 recently accumulated set of key disables was `hjklxvtqaAuspr1234noO`
-
-* The top-bar visibility hack requires knowing which task was last shift-
-clicked.  However, it does not pay attention to user shift-clicks.  This means
-if the last selection was done with the mouse, then some other stuff could get
-randomly selected, which isn't very good.
 
 * Youtube video?
 
