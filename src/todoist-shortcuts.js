@@ -2481,7 +2481,7 @@
     }
     cursor = getCursor();
     if (!cursor) {
-      debug('ensureCursor failed, so aborting modifyCursorIndex');
+      warn('Couldn\'t find a task to select, so not moving cursor.');
     } else {
       var cursorIndex = tasks.indexOf(getCursor());
       if (cursorIndex < 0) {

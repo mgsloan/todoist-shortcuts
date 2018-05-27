@@ -3,7 +3,9 @@
 ## Version 12 ##
 
 * Removed some warnings which can occur during normal operation
-  (particularly when no tasks are visible).
+  (particularly when no tasks are visible). Warnings that can happen
+  during normal operation should only happen when the action can not be
+  performed for some reason, and should be reasonably human readable.
 
 
 ## Version 11 ##
