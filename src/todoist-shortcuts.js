@@ -82,6 +82,8 @@
     ['d', done],
     ['e', archive],
     ['#', deleteTasks],
+    ['l', addLabel],
+    ['y', removeLabel],
     ['1', setPriority('1')],
     ['2', setPriority('2')],
     ['3', setPriority('3')],
@@ -543,6 +545,28 @@
     } else {
       clickMenu(moreMenu, MI_DELETE);
     }
+  }
+
+  // Opens add label menu for selection. If there is no selection, then selects
+  // the cursor.
+  function addLabel() {
+    var isAgenda = checkIsAgendaMode();
+    if (isEmptyMap(getSelectedTaskKeys(isAgenda))) {
+      select();
+    }
+    clickMenu(moreMenu, MI_ADD_LABEL);
+    setTemporarySelectionsClass('ist_complete_select');
+  }
+
+  // Opens add label menu for selection. If there is no selection, then selects
+  // the cursor.
+  function removeLabel() {
+    var isAgenda = checkIsAgendaMode();
+    if (isEmptyMap(getSelectedTaskKeys(isAgenda))) {
+      select();
+    }
+    clickMenu(moreMenu, MI_REMOVE_LABEL);
+    setTemporarySelectionsClass('ist_complete_select');
   }
 
   // Toggles collapse / expand task under the cursor, if it has children.
@@ -1112,7 +1136,12 @@
         ensureCursor(content);
       }, { childList: true, subtree: true });
     });
-    registerMutationObserver(document.body, calendarVisibilityMayHaveChanged);
+    registerMutationObserver(document.body, handleBodyChange);
+  }
+
+  function handleBodyChange() {
+    calendarVisibilityMayHaveChanged();
+    conditionallyClearTempSelections();
   }
 
   function calendarVisibilityMayHaveChanged() {
@@ -1154,6 +1183,28 @@
           debug('Bulk move done because there\'s no next task.');
           exitBulkMove();
         }
+      }
+    }
+  }
+
+  // If this class disappears from the DOM, then remove the selections.
+  var temporarySelectionsClass = null;
+
+  function setTemporarySelectionsClass(cls) {
+    var results = document.getElementsByClassName(cls);
+    if (results.length > 0) {
+      temporarySelectionsClass = cls;
+    } else {
+      error('Attempted to set temporary selections class to something that doesn\'t exist.');
+    }
+  }
+
+  function conditionallyClearTempSelections() {
+    if (temporarySelectionsClass) {
+      var results = document.getElementsByClassName(temporarySelectionsClass);
+      if (results.length === 0) {
+        deselectAll();
+        temporarySelectionsClass = null;
       }
     }
   }
