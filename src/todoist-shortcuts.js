@@ -322,7 +322,7 @@
     if (cursor) {
       toggleSelectTask(cursor);
     } else {
-      warn("No cursor, so can't toggle selection.");
+      info("No cursor, so can't toggle selection.");
     }
   }
 
@@ -333,7 +333,7 @@
     if (cursor) {
       selectTask(cursor);
     } else {
-      warn("No cursor, so can't select.");
+      info("No cursor, so can't select.");
     }
   }
 
@@ -344,7 +344,7 @@
     if (cursor) {
       deselectTask(cursor);
     } else {
-      warn("No cursor, so can't deselect.");
+      info("No cursor, so can't deselect.");
     }
   }
 
@@ -725,7 +725,7 @@
       updateKeymap();
       oneBulkSchedule(cursor);
     } else {
-      warn('Can\'t bulk schedule if there\'s no cursor task.');
+      info('Can\'t bulk schedule if there\'s no cursor task.');
     }
   }
 
@@ -789,7 +789,7 @@
       updateKeymap();
       oneBulkMove();
     } else {
-      warn('Can\'t bulk move if there\'s no cursor task.');
+      info('Can\'t bulk move if there\'s no cursor task.');
     }
   }
 
@@ -1385,9 +1385,9 @@
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
     if (isAgenda) {
-      warn('Indenting task does not work in agenda mode.');
+      info('Indenting task does not work in agenda mode.');
     } else if (!cursor) {
-      warn('No cursor to indent.');
+      info('No cursor to indent.');
     } else {
       dragTaskOver(cursor, function() {
         return {
@@ -1404,9 +1404,9 @@
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
     if (isAgenda) {
-      warn('Dedenting task does not work in agenda mode.');
+      info('Dedenting task does not work in agenda mode.');
     } else if (!cursor) {
-      warn('No cursor to dedent.');
+      info('No cursor to dedent.');
     } else {
       dragTaskOver(cursor, function() {
         return {
@@ -1424,9 +1424,9 @@
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
     if (isAgenda) {
-      warn('Moving task up does not work in agenda mode (yet).');
+      info('Moving task up does not work in agenda mode (yet).');
     } else if (!cursor) {
-      warn('No cursor to move up.');
+      info('No cursor to move up.');
     } else {
       dragTaskOver(cursor, function() {
         var tasks = getTasks();
@@ -1442,11 +1442,11 @@
               verticalOffset: cursor.clientHeight / -3
             };
           } else if (indent < cursorIndent) {
-            warn('Refusing to dedent task to move it up.');
+            info('Refusing to dedent task to move it up.');
             return null;
           }
         }
-        warn('Couldn\'t find task above cursor to move it above.');
+        info('Couldn\'t find task above cursor to move it above.');
         return null;
       });
     }
@@ -1458,9 +1458,9 @@
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
     if (isAgenda) {
-      warn('Moving task down does not work in agenda mode (yet).');
+      info('Moving task down does not work in agenda mode (yet).');
     } else if (!cursor) {
-      warn('No cursor to move down.');
+      info('No cursor to move down.');
     } else {
       dragTaskOver(cursor, function() {
         var tasks = getTasks();
@@ -1480,7 +1480,7 @@
             if (indent === cursorIndent) {
               lastQualifyingTask = task;
             } else if (indent < cursorIndent) {
-              warn('Refusing to dedent task to move it down.');
+              info('Refusing to dedent task to move it down.');
               return null;
             }
           } else if (indent <= cursorIndent) {
@@ -1496,7 +1496,7 @@
             verticalOffset: cursor.clientHeight / 3
           };
         } else {
-          warn('Couldn\'t find task below cursor to move it below.');
+          info('Couldn\'t find task below cursor to move it below.');
           return null;
         }
       });
@@ -1508,7 +1508,7 @@
   function dragTaskOver(sourceTask, findDestination) {
     var sourceY = sourceTask.offsetTop;
     if (dragInProgress) {
-      warn('Not executing drag because one is already in progress.');
+      info('Not executing drag because one is already in progress.');
     } else {
       dragInProgress = true;
       try {
@@ -1543,7 +1543,7 @@
         // FIXME: Sometimes this triggers, particularly when move up / move
         // down key is held down with repeat.  Tried some hacks to resolve,
         // but nothing seems to work well.
-        warn('Couldn\'t find drag_and_drop_handler.');
+        info('Couldn\'t find drag_and_drop_handler.');
         finished();
       }
     } finally {
@@ -1845,7 +1845,7 @@
       for (var i = 0; i < els.length; i++) {
         var el = els[i];
         if (!indent) {
-          warn('getTaskById called in agenda mode but with no indent value.');
+          error('getTaskById called in agenda mode but with no indent value.');
           return el;
         } else if (el.classList.contains(indent)) {
           return el;
@@ -1937,7 +1937,7 @@
             initials: initials
           });
         } else {
-          warn('Couldn\'t figure out text for', li);
+          error('Couldn\'t figure out text for', li);
         }
       });
       withClass(listHolder, 'panel_summary', function(summary) {
@@ -1952,7 +1952,7 @@
           } else if (dataTrack === 'navigation|filters_panel') {
             mustBeKeys = 'tf';
           } else {
-            warn('Unexpected dataTrack value:', dataTrack);
+            error('Unexpected dataTrack value:', dataTrack);
           }
         }
         if (mustBeKeys) {
@@ -2247,7 +2247,7 @@
     // That should have assigned keys to everything, but if there are many
     // similar number of options this case can happen.
     if (items.length !== 0) {
-      warn('There must be many similar sidebar options, couldn\'t find keysequences for', items);
+      info('There must be many similar sidebar options, couldn\'t find keysequences for', items);
     }
     return result;
   }
@@ -2388,7 +2388,7 @@
           '. Due to this mismatch, it might not behave as expected, though usually it will still work fine. Perhaps check for an updated version?';
       }
       if (warningPrefix && warningSuffix) {
-        warn(warningPrefix, 'todoist-shortcuts', warningSuffix);
+        info(warningPrefix, 'todoist-shortcuts', warningSuffix);
         var div = document.createElement('div');
         div.classList.add(TODOIST_SHORTCUTS_WARNING);
         div.appendChild(document.createTextNode(warningPrefix));
@@ -2434,7 +2434,7 @@
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
       if (isAgenda && isTaskIndented(task)) {
-        warn('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #14');
+        info('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #14');
       } else {
         if (shouldScroll === 'scroll') {
           withId('top_bar', function(topBar) {
@@ -2481,7 +2481,7 @@
     }
     cursor = getCursor();
     if (!cursor) {
-      warn('Couldn\'t find a task to select, so not moving cursor.');
+      info('Couldn\'t find a task to select, so not moving cursor.');
     } else {
       var cursorIndex = tasks.indexOf(getCursor());
       if (cursorIndex < 0) {
@@ -2492,16 +2492,18 @@
       }
       var newIndex = f(cursorIndex, tasks);
       if (newIndex < 0) {
+        info('Can\'t move cursor before first task');
         newIndex = 0;
       }
       if (newIndex >= tasks.length) {
+        info('Can\'t move cursor after last task');
         newIndex = tasks.length - 1;
       }
       var newCursor = tasks[newIndex];
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
       if (isAgenda && isTaskIndented(newCursor)) {
-        warn('Skipping cursor over nested sub-projects due to issue #14');
+        info('Skipping cursor over nested sub-projects due to issue #14');
         newCursor = null;
         // Figure out the direction of cursor motion, to determine the direction
         // that should be searched.
@@ -2537,6 +2539,16 @@
       // eslint-disable-next-line no-console
       console.log.apply(null, args);
     }
+  }
+
+  // Used to notify about an issue that's expected to sometimes occur during
+  // normal operation.
+  function info() {
+    var args = [].slice.call(arguments);
+    args.unshift('todoist-shortcuts:');
+    args.push('(this is fine)');
+    // eslint-disable-next-line no-console
+    console.log.apply(null, args);
   }
 
   function warn() {
