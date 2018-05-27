@@ -1,5 +1,9 @@
 # todoist-shortcuts changelog
 
+## Version 11 ##
+
+* Fixed icons
+
 
 ## Version 10 ##
 

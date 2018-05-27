@@ -2,7 +2,7 @@
   "name": "todoist-shortcuts",
   "author": "Michael Sloan",
   "description": "Adds a bunch of keyboard shortcuts to Todoist. More info: https://github.com/mgsloan/todoist-shortcuts",
-  "version": "10",
+  "version": "11",
   "content_scripts": [
   	{
       "matches":
@@ -18,11 +18,18 @@
   	"todoist-shortcuts.js"
   ],
   "icons": {
+    "32": "icon32.png",
     "48": "icon48.png",
+    "64": "icon64.png",
     "128": "icon128.png"
   },
   "browser_action": {
-    "default_icon": "icon48.png"
+    "default_icon": {
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "64": "icon64.png",
+      "128": "icon128.png"
+    }
   },
   "manifest_version": 2
 }
