@@ -64,7 +64,7 @@
   called `MULTISELECT` in the source that can be set to `true` to bring
   back the multiselection behavior.
 
-* Bump to todoist version 901.
+* Bump to todoist version 904.
 
 
 ## Version 9 ##
