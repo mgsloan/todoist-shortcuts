@@ -5,3 +5,4 @@ node_modules
 .git/
 todoist-shortcuts.zip
 etc/secrets.json
+etc/notes.md
