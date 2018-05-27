@@ -49,6 +49,8 @@
     [['l', 'right'], cursorRight],
     ['^', cursorFirst],
     ['$', cursorLast],
+    ['{', cursorUpSection],
+    ['}', cursorDownSection],
     ['g', navigate],
 
     // Manipulation of tasks at cursor
@@ -264,6 +266,42 @@
   }
   function cursorLast() {
     setCursorToLastTask(checkIsAgendaMode(), 'scroll');
+  }
+
+  function cursorUpSection() {
+    var isAgenda = checkIsAgendaMode();
+    var cursor = getCursor();
+    var section = getSection(isAgenda, cursor);
+    var firstTask = getFirstTaskInSection(section);
+    if (firstTask && !sameElement(cursor)(firstTask)) {
+      // Not on first task, so move the cursor.
+      setCursor(isAgenda, firstTask, 'scroll');
+    } else {
+      // If already on the first task of this section, then select first task of
+      // prior populated section, if any exists.
+      section = section.previousSibling;
+      for (; section; section = section.previousSibling) {
+        firstTask = getFirstTaskInSection(section);
+        if (firstTask) {
+          setCursor(isAgenda, firstTask, 'scroll');
+          return;
+        }
+      }
+    }
+  }
+
+  function cursorDownSection() {
+    var isAgenda = checkIsAgendaMode();
+    var cursor = getCursor();
+    var section = getSection(isAgenda, cursor);
+    section = section.nextSibling;
+    for (; section; section = section.nextSibling) {
+      var firstTask = getFirstTaskInSection(section);
+      if (firstTask) {
+        setCursor(isAgenda, firstTask, 'scroll');
+        return;
+      }
+    }
   }
 
   // Edit the task under the cursor.
@@ -1005,10 +1043,7 @@
 
   // Gets the name of the section that a task is in.
   function getSectionName(isAgenda, task) {
-    var predicate = isAgenda
-      ? or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'))
-      : matchingClass('list_editor');
-    var section = findParent(task, predicate);
+    var section = getSection(isAgenda, task);
     var result = null;
     if (section) {
       var header = getUniqueClass(section, 'section_header');
@@ -1023,6 +1058,25 @@
       error('Failed to find section name for', task);
     }
     return result;
+  }
+
+  function getSection(isAgenda, task) {
+    var predicate = isAgenda
+      ? or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'))
+      : matchingClass('list_editor');
+    var section = findParent(task, predicate);
+    if (!isAgenda) {
+      section = section.parentElement;
+      if (!section.classList.contains('project_editor_instance')) {
+        error('Expected', section, 'to have class project_editor_instance');
+        return null;
+      }
+    }
+    return section;
+  }
+
+  function getFirstTaskInSection(section) {
+    return getFirstClass(section, 'task_item', not(matchingClass('reorder_item')));
   }
 
   var lastHash = null;

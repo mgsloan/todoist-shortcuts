@@ -45,16 +45,12 @@ Then, run `eslint.sh` to use it to do checking.
 * Allow using ctrl+arrows while editing text of a task. Instead use
   shift+arrows to shift it around while editing.
 
-* Is it useful to be able to navigate to first / last task within a section?
-
 * In agenda view, cursor should be able to focus empty days, for the purpose
 of adding tasks.
 
 * What is postpone?
 
 * Enter day of month + move between months.
-
-* Remember per project cursor locations.
 
 * e for Archive and d for Done, # for Delete, are awfully close to
 eachother.  Is archive vs delete useful?
