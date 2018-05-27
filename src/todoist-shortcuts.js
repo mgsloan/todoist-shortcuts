@@ -1067,7 +1067,7 @@
       ? or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'))
       : matchingClass('list_editor');
     var section = findParent(task, predicate);
-    if (!isAgenda) {
+    if (section && !isAgenda) {
       section = section.parentElement;
       if (!section.classList.contains('project_editor_instance')) {
         error('Expected', section, 'to have class project_editor_instance');
@@ -2388,7 +2388,7 @@
     var cursor = getCursor();
     if (!cursor) {
       debug('modifyCursorIndex couldn\'t find cursor, so running restoreLastCursor');
-      restoreLastCursor();
+      restoreLastCursor(checkIsAgendaMode());
     }
     cursor = getCursor();
     if (!cursor) {
