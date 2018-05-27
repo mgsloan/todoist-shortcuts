@@ -40,47 +40,6 @@ npm install eslint eslint-config-es5
 
 Then, run `eslint.sh` to use it to do checking.
 
-# TODO
-
-* Allow using ctrl+arrows while editing text of a task. Instead use
-  shift+arrows to shift it around while editing.
-
-* In agenda view, cursor should be able to focus empty days, for the purpose
-of adding tasks.
-
-* What is postpone?
-
-* Enter day of month + move between months.
-
-* e for Archive and d for Done, # for Delete, are awfully close to
-eachother.  Is archive vs delete useful?
-
-* Display of keybindings directly on elements suggests a library that mixes
-querySelectorAll / mousetrap / the utilities here.  Design it also to be used
-in normal applications?
-
-* Document usage with vimium.  Right now I have vimium disabled, but my most
-recently accumulated set of key disables was `hjklxvtqaAuspr1234noO`
-
-* Youtube video?
-
-* Blog post about the overall technique?
-
-* Chrome webstore promotional tile images?
-
-# Changes to todoist that would be very helpful
-
-* Other than things like today / tomorrow / next week / next month, there is
-no good way to reschedule a task to a particular day.  I think it would
-generally be a good improvement if the rescheduling calendar always had a
-box to input textual descriptions of the date.  This would allow things that
-you can't currently easily do, like bulk scheduling tasks with repeating
-dates.
-
-# Todoist issues
-
-* Undo does not work for multiple completions or deletions
-
 # Automated upload of extensions
 
 This is probably only useful to me for uploading the extension, but I figured
