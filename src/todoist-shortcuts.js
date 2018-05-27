@@ -77,6 +77,7 @@
 
     // Manipulation of selected tasks
     ['t', schedule],
+    ['T', scheduleText],
     ['v', moveToProject],
     ['d', done],
     ['e', archive],
@@ -345,7 +346,6 @@
     }
   }
 
-
   // Clicks the 'schedule' link when tasks are selected.  If
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
@@ -365,6 +365,14 @@
         });
       }
     }
+  }
+
+  // Edits the task under the cursor and focuses the textual representation of
+  // when the task is scheduled. Only works for the cursor, not for the
+  // selection.
+  function scheduleText() {
+    edit();
+    focusDueDateInput();
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
@@ -1619,6 +1627,36 @@
   function clickPriorityMenu(isAgenda, menu, level) {
     withUniqueClass(menu, 'cmp_priority' + level, all, function(img) {
       withRestoredSelections(isAgenda, function() { click(img); });
+    });
+  }
+
+  function focusDueDateInput() {
+    withDueDateInput(function(input) {
+      // This logic is needed because it seems that there is some sort of
+      // deferred refocusing of the task content. Rather than having a hacky
+      // timeout to re-focus, the idea is to wait for the blur event, and
+      // refocus the input when that occurs.
+      //
+      // However, if quite a bit of time has past, then this probably hasn't
+      // occurred, so remove the event listener to avoid weird refocusing
+      // behavior.
+      input.focus();
+      input.addEventListener('blur', refocusDueDateInput);
+      setTimeout(function() {
+        input.removeEventListener('blur', refocusDueDateInput);
+      }, 300);
+    });
+  }
+
+  function refocusDueDateInput() {
+    withDueDateInput(function(input) { input.focus(); });
+  }
+
+  function withDueDateInput(f) {
+    withId('editor', function(content) {
+      withUniqueClass(content, 'manager', all, function(manager) {
+        withUniqueClass(manager, 'input_due_date', all, f);
+      });
     });
   }
 

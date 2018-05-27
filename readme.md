@@ -81,6 +81,7 @@ If none are selected, then these will apply to the cursor instead.
 | keys   | action                            |
 | ---    | ---                               |
 | `t`    | schedule                          |
+| `T`    | schedule cursor by editing text   |
 | `d`    | done: mark task as complete       |
 | `e`    | archive                           |
 | `v`    | move to project via search prompt |
@@ -89,6 +90,10 @@ If none are selected, then these will apply to the cursor instead.
 | `2`    | set priority to 2                 |
 | `3`    | set priority to 3                 |
 | `4`    | set priority to 4                 |
+
+Note that the text rescheduling invoked by `T` only works for the current
+cursor. Resolving this is tracked by [this
+issue](https://github.com/mgsloan/todoist-shortcuts/issues/24).
 
 ## Scheduling
 
