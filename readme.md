@@ -84,12 +84,24 @@ If none are selected, then these will apply to the cursor instead.
 | `T`    | schedule cursor by editing text   |
 | `d`    | done: mark task as complete       |
 | `e`    | archive                           |
-| `v`    | move to project via search prompt |
 | `#`    | delete                            |
+| `v`    | move to project via search prompt |
 | `1`    | set priority to 1                 |
 | `2`    | set priority to 2                 |
 | `3`    | set priority to 3                 |
 | `4`    | set priority to 4                 |
+
+Archiving a task via `e` is fairly similar to marking it complete via `d`.  Here
+are the differences:
+
+1. If the task is a child task, if you "Complete" it it will be checked and
+   greyed out (and will remain in the list under the uncompleted parent task
+   until the parent task is completed). If you "Archive" the child task it will
+   be checked and then removed from view.
+
+2. If the task is a Recurring Task (e.g. every day) and you "Complete Task" it
+   will be scheduled for the next date of recurrence. If you "Archive Task" it
+   will be completed and not recur again.
 
 Note that the text rescheduling invoked by `T` only works for the current
 cursor. Resolving this is tracked by [this
