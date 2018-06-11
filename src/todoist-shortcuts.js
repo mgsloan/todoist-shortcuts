@@ -298,7 +298,8 @@
   function cursorDownSection() {
     var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    var section = getSection(isAgenda, cursor);
+    var curSection = getSection(isAgenda, cursor);
+    var section = curSection;
     section = section.nextSibling;
     for (; section; section = section.nextSibling) {
       var firstTask = getFirstTaskInSection(section);
@@ -306,6 +307,13 @@
         setCursor(isAgenda, firstTask, 'scroll');
         return;
       }
+    }
+    // If execution has reached this point, then we must already be on the last
+    // section.
+    var lastTask = getLastTaskInSection(curSection);
+    warn(lastTask);
+    if (lastTask) {
+      setCursor(isAgenda, lastTask, 'scroll');
     }
   }
 
@@ -1111,6 +1119,10 @@
 
   function getFirstTaskInSection(section) {
     return getFirstClass(section, 'task_item', not(matchingClass('reorder_item')));
+  }
+
+  function getLastTaskInSection(section) {
+    return getLastClass(section, 'task_item', not(matchingClass('reorder_item')));
   }
 
   var lastHash = null;
@@ -2652,6 +2664,11 @@
     return findFirst(predicate, parent.getElementsByClassName(cls));
   }
 
+  // Returns last child that matches the specified class and predicate.
+  function getLastClass(parent, cls, predicate) {
+    return findLast(predicate, parent.getElementsByClassName(cls));
+  }
+
   // Checks that there is only one child element that matches the class name and
   // predicate, and returns it. Returns null if it is not found or not unique.
   function getUniqueClass(parent, cls, predicate) {
@@ -2703,6 +2720,19 @@
   function findFirst(predicate, array) {
     var pred = checkedPredicate('findFirst', predicate ? predicate : all);
     for (var i = 0; i < array.length; i++) {
+      var element = array[i];
+      if (pred(element)) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  // Given a predicate, returns the last element that matches. If predicate is
+  // null, then it is treated like 'all'.
+  function findLast(predicate, array) {
+    var pred = checkedPredicate('findLast', predicate ? predicate : all);
+    for (var i = array.length - 1; i >= 0; i--) {
       var element = array[i];
       if (pred(element)) {
         return element;
