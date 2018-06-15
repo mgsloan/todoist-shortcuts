@@ -162,6 +162,10 @@ resolved - see issue
 | `u` or `ctrl+z` | undo        |
 | `f` or `/`      | open search |
 
+Note that undo only works when the "UNDO" button is visible at the bottom of the
+screen. Some actions are not undo-able, such as [deletion or archiving multiple
+tasks](https://github.com/mgsloan/todoist-shortcuts/issues/23)
+
 # How to customize keyboard shortcuts
 
 Ideally, there would be a UI for customizing keyboard shortcuts. However, it
