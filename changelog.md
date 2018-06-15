@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Not yet released ##
+
+* Enter can now be used to confirm deletion.
+
+* Pressing escape will now exit out of inline task adding.
+
+
 ## Version 12 ##
 
 * Removed some warnings which can occur during normal operation
