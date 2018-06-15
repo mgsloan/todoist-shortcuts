@@ -657,9 +657,13 @@
   function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
 
   // Click somewhere on the page that shouldn't do anything in particular except
-  // closing context menus.
+  // closing context menus.  Also clicks 'Cancel' on any task adding.
   function closeContextMenus() {
     click(document.body);
+    withClass(document, 'manager', function(manager) {
+      var cancelBtn = getUniqueClass(manager, 'cancel');
+      click(cancelBtn);
+    });
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
