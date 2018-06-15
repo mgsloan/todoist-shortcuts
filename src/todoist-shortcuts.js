@@ -140,6 +140,10 @@
   var NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
   var NAVIGATE_KEYMAP = 'navigate';
 
+  // Keymap used when there is a floating window
+  var POPUP_BINDINGS = [];
+  var POPUP_KEYMAP = 'popup';
+
   function fallbackHandler(e) {
     if (MULTISELECT && e.key === 'x') {
       if (e.type === 'keydown' && !e.repeat) {
@@ -1227,16 +1231,21 @@
 
   function updateKeymap() {
     if (mousetrap) {
-      if (inBulkScheduleMode) {
-        switchKeymap(BULK_SCHEDULE_KEYMAP);
-      } else if (inBulkMoveMode) {
-        switchKeymap(BULK_MOVE_KEYMAP);
-      } else if (finishNavigate) {
-        switchKeymap(NAVIGATE_KEYMAP);
-      } else if (checkCalendarOpen()) {
-        switchKeymap(SCHEDULE_KEYMAP);
+      var popupWindow = getUniqueClass(document, 'GB_window');
+      if (popupWindow) {
+        switchKeymap(POPUP_KEYMAP);
       } else {
-        switchKeymap(DEFAULT_KEYMAP);
+        if (inBulkScheduleMode) {
+          switchKeymap(BULK_SCHEDULE_KEYMAP);
+        } else if (inBulkMoveMode) {
+          switchKeymap(BULK_MOVE_KEYMAP);
+        } else if (finishNavigate) {
+          switchKeymap(NAVIGATE_KEYMAP);
+        } else if (checkCalendarOpen()) {
+          switchKeymap(SCHEDULE_KEYMAP);
+        } else {
+          switchKeymap(DEFAULT_KEYMAP);
+        }
       }
     }
   }
@@ -3041,6 +3050,7 @@
     registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
     registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
+    registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
 
     // Reset mousetrap on disable
     onDisable(function() { mousetrap.reset(); });
