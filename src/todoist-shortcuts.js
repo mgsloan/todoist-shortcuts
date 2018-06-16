@@ -1234,18 +1234,16 @@
       var popupWindow = getUniqueClass(document, 'GB_window');
       if (popupWindow) {
         switchKeymap(POPUP_KEYMAP);
+      } else if (inBulkScheduleMode) {
+        switchKeymap(BULK_SCHEDULE_KEYMAP);
+      } else if (inBulkMoveMode) {
+        switchKeymap(BULK_MOVE_KEYMAP);
+      } else if (finishNavigate) {
+        switchKeymap(NAVIGATE_KEYMAP);
+      } else if (checkCalendarOpen()) {
+        switchKeymap(SCHEDULE_KEYMAP);
       } else {
-        if (inBulkScheduleMode) {
-          switchKeymap(BULK_SCHEDULE_KEYMAP);
-        } else if (inBulkMoveMode) {
-          switchKeymap(BULK_MOVE_KEYMAP);
-        } else if (finishNavigate) {
-          switchKeymap(NAVIGATE_KEYMAP);
-        } else if (checkCalendarOpen()) {
-          switchKeymap(SCHEDULE_KEYMAP);
-        } else {
-          switchKeymap(DEFAULT_KEYMAP);
-        }
+        switchKeymap(DEFAULT_KEYMAP);
       }
     }
   }
