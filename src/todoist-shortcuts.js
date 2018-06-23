@@ -901,8 +901,15 @@
       'idx =', lastCursorIndex);
   }
 
-  function handleMouseMove() {
+  function handleMouseMove(ev) {
     mouseGotMoved = true;
+    // Have cursor follow mouse even if it is not the drag handle cursor:
+    if (viewMode === 'filter') {
+      var hoveredTask = findParent(ev.target, matchingClass('task_item'));
+      if (hoveredTask) {
+        setCursor(hoveredTask, 'no-scroll');
+      }
+    }
   }
 
   // FIXME: If the select key was very recently released on this task, then this
