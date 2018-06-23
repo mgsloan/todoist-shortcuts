@@ -2,6 +2,11 @@
 
 ## Not yet released ##
 
+
+
+
+## Version 13 ##
+
 * Enter can now be used to confirm deletion.
 
 * Pressing escape will now exit out of inline task adding.
