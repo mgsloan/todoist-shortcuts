@@ -78,11 +78,11 @@
     // Manipulation of selected tasks
     ['t', schedule],
     ['T', scheduleText],
-    ['v', moveToProject],
     ['d', done],
     ['e', archive],
     ['#', deleteTasks],
-    ['l', addLabel],
+    ['v', moveToProject],
+    ['@', addLabel],
     ['y', removeLabel],
     ['1', setPriority('1')],
     ['2', setPriority('2')],

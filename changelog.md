@@ -6,6 +6,9 @@
 
 * Pressing escape will now exit out of inline task adding.
 
+* Change "remove label" keybinding to use `@` instead of `l`.  The old
+  keybinding shadowed the expand + navigate in keybinding.
+
 
 ## Version 12 ##
 

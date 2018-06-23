@@ -86,6 +86,8 @@ If none are selected, then these will apply to the cursor instead.
 | `e`    | archive                           |
 | `#`    | delete                            |
 | `v`    | move to project via search prompt |
+| `@`    | add label                         |
+| `y`    | remove label                      |
 | `1`    | set priority to 1                 |
 | `2`    | set priority to 2                 |
 | `3`    | set priority to 3                 |
