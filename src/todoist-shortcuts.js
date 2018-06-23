@@ -263,28 +263,27 @@
 
   // Move the cursor up and down.
   function cursorDown() {
-    modifyCursorIndex(checkIsAgendaMode(), function(ix) { return ix + 1; });
+    modifyCursorIndex(function(ix) { return ix + 1; });
   }
   function cursorUp() {
-    modifyCursorIndex(checkIsAgendaMode(), function(ix) { return ix - 1; });
+    modifyCursorIndex(function(ix) { return ix - 1; });
   }
 
   // Move the cursor to first / last task.
   function cursorFirst() {
-    setCursorToFirstTask(checkIsAgendaMode(), 'scroll');
+    setCursorToFirstTask('scroll');
   }
   function cursorLast() {
-    setCursorToLastTask(checkIsAgendaMode(), 'scroll');
+    setCursorToLastTask('scroll');
   }
 
   function cursorUpSection() {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    var section = getSection(isAgenda, cursor);
+    var section = getSection(cursor);
     var firstTask = getFirstTaskInSection(section);
     if (firstTask && !sameElement(cursor)(firstTask)) {
       // Not on first task, so move the cursor.
-      setCursor(isAgenda, firstTask, 'scroll');
+      setCursor(firstTask, 'scroll');
     } else {
       // If already on the first task of this section, then select first task of
       // prior populated section, if any exists.
@@ -292,7 +291,7 @@
       for (; section; section = section.previousSibling) {
         firstTask = getFirstTaskInSection(section);
         if (firstTask) {
-          setCursor(isAgenda, firstTask, 'scroll');
+          setCursor(firstTask, 'scroll');
           return;
         }
       }
@@ -300,15 +299,14 @@
   }
 
   function cursorDownSection() {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    var curSection = getSection(isAgenda, cursor);
+    var curSection = getSection(cursor);
     var section = curSection;
     section = section.nextSibling;
     for (; section; section = section.nextSibling) {
       var firstTask = getFirstTaskInSection(section);
       if (firstTask) {
-        setCursor(isAgenda, firstTask, 'scroll');
+        setCursor(firstTask, 'scroll');
         return;
       }
     }
@@ -317,7 +315,7 @@
     var lastTask = getLastTaskInSection(curSection);
     warn(lastTask);
     if (lastTask) {
-      setCursor(isAgenda, lastTask, 'scroll');
+      setCursor(lastTask, 'scroll');
     }
   }
 
@@ -369,10 +367,9 @@
     if (getUniqueClass(document, CALENDAR_CLASS)) {
       debug('Not opening schedule because it is already open.');
     } else {
-      var isAgenda = checkIsAgendaMode();
-      var mutateCursor = getCursorToMutate(isAgenda);
+      var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
-        clickTaskSchedule(isAgenda, mutateCursor);
+        clickTaskSchedule(mutateCursor);
       } else {
         withId(ACTIONS_BAR_CLASS, function(parent) {
           withUniqueClass(parent, MI_SCHEDULE, all, click);
@@ -428,10 +425,9 @@
   // 'all' or 'most', then instead applies to the cursor if there is no
   // selection.
   function moveToProject() {
-    var isAgenda = checkIsAgendaMode();
-    var mutateCursor = getCursorToMutate(isAgenda);
+    var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(isAgenda, mutateCursor, MI_MOVE);
+      clickTaskMenu(mutateCursor, MI_MOVE);
     } else {
       withId(ACTIONS_BAR_CLASS, function(parent) {
         withUniqueClass(parent, MI_MOVE, all, click);
@@ -460,15 +456,14 @@
   // keybindings.
   function setPriority(level) {
     return function() {
-      var isAgenda = checkIsAgendaMode();
-      var mutateCursor = getCursorToMutate(isAgenda);
+      var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
-        withTaskMenu(isAgenda, mutateCursor, function(menu) {
-          clickPriorityMenu(isAgenda, menu, level);
+        withTaskMenu(mutateCursor, function(menu) {
+          clickPriorityMenu(menu, level);
         });
       } else {
         withUniqueClass(document, 'priority_menu', all, function(menu) {
-          clickPriorityMenu(isAgenda, menu, level);
+          clickPriorityMenu(menu, level);
         });
       }
     };
@@ -494,20 +489,19 @@
       } else {
         error('Unrecognized level in selectPriority', level);
       }
-      var isAgenda = checkIsAgendaMode();
       var allTasks = getTasks('include-collapsed');
       var classToMatch = 'priority_' + actualLevel;
-      var selected = getSelectedTaskKeys(isAgenda);
+      var selected = getSelectedTaskKeys();
       var modified = false;
       for (var i = 0; i < allTasks.length; i++) {
         var task = allTasks[i];
         if (task.classList.contains(classToMatch)) {
-          selected[getTaskKey(isAgenda, task)] = true;
+          selected[getTaskKey(task)] = true;
           modified = true;
         }
       }
       if (modified) {
-        setSelections(isAgenda, selected);
+        setSelections(selected);
       }
     };
   }
@@ -520,10 +514,9 @@
   // If WHAT_CURSOR_APPLIES_TO is 'all', then instead applies to the cursor if
   // there is no selection.
   function archive() {
-    var isAgenda = checkIsAgendaMode();
-    var mutateCursor = getCursorToMutate(isAgenda, 'dangerous');
+    var mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
-      clickTaskMenu(isAgenda, mutateCursor, MI_ARCHIVE);
+      clickTaskMenu(mutateCursor, MI_ARCHIVE);
     } else {
       clickMenu(moreMenu, MI_ARCHIVE);
     }
@@ -532,7 +525,7 @@
   // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then
   // instead applies to the cursor if there is no selection.
   function done() {
-    var mutateCursor = getCursorToMutate(checkIsAgendaMode(), 'dangerous');
+    var mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
     } else {
@@ -550,10 +543,9 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the cursor if
   // there is no selection.
   function deleteTasks() {
-    var isAgenda = checkIsAgendaMode();
-    var mutateCursor = getCursorToMutate(isAgenda);
+    var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(isAgenda, mutateCursor, MI_DELETE);
+      clickTaskMenu(mutateCursor, MI_DELETE);
     } else {
       clickMenu(moreMenu, MI_DELETE);
     }
@@ -562,8 +554,7 @@
   // Opens add label menu for selection. If there is no selection, then selects
   // the cursor.
   function addLabel() {
-    var isAgenda = checkIsAgendaMode();
-    if (isEmptyMap(getSelectedTaskKeys(isAgenda))) {
+    if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
     clickMenu(moreMenu, MI_ADD_LABEL);
@@ -573,8 +564,7 @@
   // Opens add label menu for selection. If there is no selection, then selects
   // the cursor.
   function removeLabel() {
-    var isAgenda = checkIsAgendaMode();
-    if (isEmptyMap(getSelectedTaskKeys(isAgenda))) {
+    if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
     clickMenu(moreMenu, MI_REMOVE_LABEL);
@@ -599,7 +589,7 @@
   function cursorRight() {
     if (checkCursorCollapsed()) {
       toggleCollapse();
-      if (!checkIsAgendaMode()) {
+      if (!isAgendaMode()) {
         // Issue #14
         cursorDown();
       }
@@ -624,8 +614,7 @@
         for (var j = i; j >= 0; j--) {
           task = tasks[j];
           if (getUniqueClass(task, EXPANDED_ARROW_CLASS)) {
-            var isAgenda = checkIsAgendaMode();
-            setCursor(isAgenda, task, 'scroll');
+            setCursor(task, 'scroll');
             toggleCollapse();
             break;
           }
@@ -735,9 +724,8 @@
     deselectAll();
     var cursor = getCursor();
     if (cursor) {
-      var isAgenda = checkIsAgendaMode();
       inBulkScheduleMode = true;
-      nextBulkScheduleKey = getTaskKey(isAgenda, cursor);
+      nextBulkScheduleKey = getTaskKey(cursor);
       updateKeymap();
       oneBulkSchedule(cursor);
     } else {
@@ -763,7 +751,6 @@
 
   // NOTE: This is called internally, not intended for use as keybinding action.
   function oneBulkSchedule() {
-    var isAgenda = checkIsAgendaMode();
     var tasks = getTasks();
     if (!nextBulkScheduleKey) {
       debug('Exiting bulk schedule mode because there is nothing left to schedule.');
@@ -777,11 +764,11 @@
       return;
     }
     var nextBulkScheduleTask =
-        getNextCursorableTask(isAgenda, tasks, nextBulkScheduleKey);
-    setCursor(isAgenda, curBulkScheduleTask, 'scroll');
-    clickTaskSchedule(isAgenda, curBulkScheduleTask);
+        getNextCursorableTask(tasks, nextBulkScheduleKey);
+    setCursor(curBulkScheduleTask, 'scroll');
+    clickTaskSchedule(curBulkScheduleTask);
     if (nextBulkScheduleTask) {
-      nextBulkScheduleKey = getTaskKey(isAgenda, nextBulkScheduleTask);
+      nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
     } else {
       nextBulkScheduleKey = null;
     }
@@ -799,9 +786,8 @@
     deselectAll();
     var cursor = getCursor();
     if (cursor) {
-      var isAgenda = checkIsAgendaMode();
       inBulkMoveMode = true;
-      nextBulkMoveKey = getTaskKey(isAgenda, cursor);
+      nextBulkMoveKey = getTaskKey(cursor);
       updateKeymap();
       oneBulkMove();
     } else {
@@ -827,7 +813,6 @@
 
   // NOTE: This is called internally, not intended for use as keybinding action.
   function oneBulkMove() {
-    var isAgenda = checkIsAgendaMode();
     var tasks = getTasks();
     if (!nextBulkMoveKey) {
       debug('Exiting bulk move mode because there is nothing left to move.');
@@ -841,11 +826,11 @@
       return;
     }
     var nextBulkMoveTask =
-        getNextCursorableTask(isAgenda, tasks, nextBulkMoveKey);
-    setCursor(isAgenda, curBulkMoveTask, 'scroll');
-    clickTaskMenu(isAgenda, curBulkMoveTask, MI_MOVE);
+        getNextCursorableTask(tasks, nextBulkMoveKey);
+    setCursor(curBulkMoveTask, 'scroll');
+    clickTaskMenu(curBulkMoveTask, MI_MOVE);
     if (nextBulkMoveTask) {
-      nextBulkMoveKey = getTaskKey(isAgenda, nextBulkMoveTask);
+      nextBulkMoveKey = getTaskKey(nextBulkMoveTask);
     } else {
       nextBulkMoveKey = null;
     }
@@ -873,11 +858,11 @@
 
   // Ensures that the specified task ids are selected (specified by a set-like
   // object).
-  function setSelections(isAgenda, selections) {
+  function setSelections(selections) {
     var allTasks = getTasks('include-collapsed');
     for (var i = 0; i < allTasks.length; i++) {
       var task = allTasks[i];
-      var key = getTaskKey(isAgenda, task);
+      var key = getTaskKey(task);
       if (selections[key]) {
         selectTask(task);
       } else {
@@ -896,7 +881,7 @@
   var selectionMode = 'none';
   var wasEditing = false;
 
-  function storeCursorContext(isAgenda, cursor, editing) {
+  function storeCursorContext(cursor, editing) {
     lastCursorTasks = getTasks();
     lastCursorIndex = lastCursorTasks.indexOf(cursor);
     if (lastCursorIndex < 0) {
@@ -904,7 +889,7 @@
     }
     lastCursorId = cursor.id;
     lastCursorIndent = getTaskIndentClass(cursor);
-    lastCursorSection = getSectionName(isAgenda, cursor);
+    lastCursorSection = getSectionName(cursor);
     mouseGotMoved = false;
     wasEditing = editing;
     handleCursorMove(cursor);
@@ -962,7 +947,6 @@
   // location.
   function ensureCursor(content) {
     debug('ensuring cursor');
-    var isAgenda = checkIsAgendaMode();
     // If there's an editor open to add a task, then set the cursor to the item
     // above.
     var manager = getUniqueClass(content, 'manager');
@@ -972,7 +956,7 @@
         return task.classList.contains('manager');
       });
       if (managerIndex > 0) {
-        storeCursorContext(isAgenda, tasks[managerIndex - 1], true);
+        storeCursorContext(tasks[managerIndex - 1], true);
       } else if (managerIndex < 0) {
         error('There seems to be a task editor, but then couldn\'t find it.');
       }
@@ -991,7 +975,7 @@
     if (cursor && !wasEditing) {
       var cursorIndent = getTaskIndentClass(cursor);
       if (lastCursorId === cursor.id && lastCursorIndent === cursorIndent) {
-        currentSection = getSectionName(isAgenda, cursor);
+        currentSection = getSectionName(cursor);
         debug(
           'Cursor hasn\'t changed task:',
           'currentSection = ', currentSection,
@@ -1003,30 +987,30 @@
         debug('Cursor changed without mouse moving. This can happen on scroll, so attempting to move it back to where it was.');
         var lastCursor = getTaskById(lastCursorId, lastCursorIndent);
         if (lastCursor) {
-          setCursor(isAgenda, lastCursor, 'no-scroll');
+          setCursor(lastCursor, 'no-scroll');
           return;
         } else {
           warn('Expected to find last cursor position, but could\'nt find it.');
         }
       } else {
         debug('Cursor moved by the mouse');
-        storeCursorContext(isAgenda, cursor, false);
+        storeCursorContext(cursor, false);
         return;
       }
     }
     if (cursor && !changedSection) {
-      storeCursorContext(isAgenda, cursor, false);
+      storeCursorContext(cursor, false);
     } else {
       if (changedSection) {
         debug('cursor element changed section, finding new location');
       } else {
         debug('cursor element disappeared, finding new location');
       }
-      restoreLastCursor(isAgenda);
+      restoreLastCursor();
     }
   }
 
-  function restoreLastCursor(isAgenda) {
+  function restoreLastCursor() {
     var found = false;
     var tasks = null;
     if (lastCursorIndex >= 0) {
@@ -1038,7 +1022,7 @@
           if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
             debug('found task that is probably the one that was previously being edited');
             found = true;
-            setCursor(isAgenda, tasks[priorIndex + 1], 'no-scroll');
+            setCursor(tasks[priorIndex + 1], 'no-scroll');
           }
         } else {
           warn('expected to still find task that was above the one being edited.');
@@ -1049,7 +1033,7 @@
           if (oldTask) {
             task = getById(oldTask.id);
             if (task) {
-              var taskSection = getSectionName(isAgenda, task);
+              var taskSection = getSectionName(task);
               // Don't jump back to the same task if it moved changed section.
               if (i !== lastCursorIndex || taskSection === lastCursorSection) {
                 debug(
@@ -1059,7 +1043,7 @@
                   lastCursorIndex,
                   ', setting cursor to it');
                 found = true;
-                setCursor(isAgenda, task, 'no-scroll');
+                setCursor(task, 'no-scroll');
                 break;
               } else {
                 debug('disappeared due to changing section, finding new location');
@@ -1078,22 +1062,22 @@
       }
       if (lastCursorIndex < tasks.length - lastCursorIndex) {
         debug('selecting first task, because it\'s nearer to lastCursorIndex.');
-        setCursorToFirstTask(isAgenda, 'no-scroll');
+        setCursorToFirstTask('no-scroll');
       } else {
         debug('selecting last task, because it\'s nearer to lastCursorIndex.');
-        setCursorToLastTask(isAgenda, 'no-scroll');
+        setCursorToLastTask('no-scroll');
         if (!getCursor()) {
           // This can happen if the last task is a nested sub-project.
           debug('failed to set the cursor to last task, so setting to first');
-          setCursorToFirstTask(isAgenda, 'no-scroll');
+          setCursorToFirstTask('no-scroll');
         }
       }
     }
   }
 
   // Gets the name of the section that a task is in.
-  function getSectionName(isAgenda, task) {
-    var section = getSection(isAgenda, task);
+  function getSectionName(task) {
+    var section = getSection(task);
     var result = null;
     if (section) {
       var header = getUniqueClass(section, 'section_header');
@@ -1110,12 +1094,12 @@
     return result;
   }
 
-  function getSection(isAgenda, task) {
-    var predicate = isAgenda
+  function getSection(task) {
+    var predicate = isAgendaMode()
       ? or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'))
       : matchingClass('list_editor');
     var section = findParent(task, predicate);
-    if (section && !isAgenda) {
+    if (section && !isAgendaMode()) {
       section = section.parentElement;
       if (!section.classList.contains('project_editor_instance')) {
         error('Expected', section, 'to have class project_editor_instance');
@@ -1139,10 +1123,10 @@
     debug('handlePageChange');
     var currentHash = document.location.hash;
     if (lastHash !== currentHash) {
-      var isAgenda = checkIsAgendaMode();
+      updateViewMode();
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
-      setCursorToFirstTask(isAgenda, 'scroll');
+      setCursorToFirstTask('scroll');
     }
   }
 
@@ -1165,7 +1149,6 @@
   }
 
   function calendarVisibilityMayHaveChanged() {
-    var isAgenda;
     var nextTask;
     updateKeymap();
     if (inBulkScheduleMode) {
@@ -1174,7 +1157,6 @@
           nextTask = getTaskByKey(nextBulkScheduleKey);
           if (nextTask) {
             debug('Calendar is closed in bulk schedule mode, so scheduling next task.');
-            isAgenda = checkIsAgendaMode();
             oneBulkSchedule();
           } else {
             error('Could not find next task for bulk schedule.');
@@ -1192,8 +1174,7 @@
           nextTask = getTaskByKey(nextBulkMoveKey);
           if (nextTask) {
             debug('Move-to-project is closed in bulk move mode, so scheduling next task.');
-            isAgenda = checkIsAgendaMode();
-            setCursor(isAgenda, nextTask, 'no-scroll');
+            setCursor(nextTask, 'no-scroll');
             oneBulkMove();
           } else {
             error('Could not find next task for bulk move.');
@@ -1264,12 +1245,12 @@
 
   // For some reason todoist clears the selections even after applying things
   // like priority changes. This restores the selections.
-  function withRestoredSelections(isAgenda, f) {
+  function withRestoredSelections(f) {
     var oldSelections = getSelectedTaskKeys();
     try {
       f();
     } finally {
-      setSelections(isAgenda, oldSelections);
+      setSelections(oldSelections);
     }
   }
 
@@ -1344,15 +1325,15 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  function clickTaskMenu(isAgenda, task, cls) {
-    withTaskMenu(isAgenda, task, function(menu) {
+  function clickTaskMenu(task, cls) {
+    withTaskMenu(task, function(menu) {
       clickMenu(menu, cls);
     });
   }
 
-  function withTaskMenu(isAgenda, task, f) {
+  function withTaskMenu(task, f) {
     withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
-      var menu = isAgenda ? agendaTaskMenu : taskMenu;
+      var menu = isAgendaMode() ? agendaTaskMenu : taskMenu;
       if (hidden(menu)) {
         click(openMenu);
       } else {
@@ -1405,9 +1386,8 @@
 
   // Indent task.
   function moveIn() {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    if (isAgenda) {
+    if (isAgendaMode()) {
       info('Indenting task does not work in agenda mode.');
     } else if (!cursor) {
       info('No cursor to indent.');
@@ -1424,9 +1404,8 @@
 
   // Dedent task.
   function moveOut() {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    if (isAgenda) {
+    if (isAgendaMode()) {
       info('Dedenting task does not work in agenda mode.');
     } else if (!cursor) {
       info('No cursor to dedent.');
@@ -1444,9 +1423,8 @@
   // Move task up, maintaining its indent level and not swizzling any nested
   // structures.
   function moveUp() {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    if (isAgenda) {
+    if (isAgendaMode()) {
       info('Moving task up does not work in agenda mode (yet).');
     } else if (!cursor) {
       info('No cursor to move up.');
@@ -1478,9 +1456,8 @@
   // Move task down, maintaining its indent level and not swizzling any nested
   // structures.
   function moveDown() {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    if (isAgenda) {
+    if (isAgendaMode()) {
       info('Moving task down does not work in agenda mode (yet).');
     } else if (!cursor) {
       info('No cursor to move down.');
@@ -1553,8 +1530,7 @@
   }
 
   function withDragHandle(task, f, finished) {
-    var isAgenda = checkIsAgendaMode();
-    var key = getTaskKey(isAgenda, task);
+    var key = getTaskKey(task);
     task.dispatchEvent(new Event('mouseover'));
     try {
       var handler = getUniqueClass(task, 'drag_and_drop_handler');
@@ -1614,8 +1590,8 @@
     };
   }
 
-  function clickTaskSchedule(isAgenda, task) {
-    withTaskMenu(isAgenda, task, function(menu) {
+  function clickTaskSchedule(task) {
+    withTaskMenu(task, function(menu) {
       withUniqueClass(menu, 'cmp_scheduler_more', all, click);
     });
   }
@@ -1626,22 +1602,21 @@
 
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelow(menuCls) {
-    var isAgenda = checkIsAgendaMode();
     var cursor = getCursor();
-    if (isAgenda || cursor === null) {
-      addToSectionContaining(isAgenda, cursor);
+    if (isAgendaMode() || cursor === null) {
+      addToSectionContaining(cursor);
     } else {
-      clickTaskMenu(isAgenda, cursor, menuCls);
+      clickTaskMenu(cursor, menuCls);
     }
   }
 
   // Clicks the "Add Task" button within the section that contains the specified
   // task.
-  function addToSectionContaining(isAgenda, task) {
+  function addToSectionContaining(task) {
     var section = null;
     if (task) {
-      section = findParentSection(isAgenda, task);
-    } else if (isAgenda) {
+      section = findParentSection(task);
+    } else if (isAgendaMode()) {
       section = getFirstClass(document, 'section_day');
     } else {
       section = getFirstClass(document, 'project_editor_instance');
@@ -1650,7 +1625,7 @@
       error('Couldn\'t find section for task', task);
       return;
     }
-    if (isAgenda) {
+    if (isAgendaMode()) {
       if (section.classList.contains('section_overdue')) {
         section = getFirstClass(document, 'section_day');
       }
@@ -1660,8 +1635,8 @@
     }
   }
 
-  function findParentSection(isAgenda, task) {
-    if (isAgenda) {
+  function findParentSection(task) {
+    if (isAgendaMode()) {
       return findParent(task, or(matchingClass('section_day'), matchingClass('section_overdue')));
     } else {
       return findParent(task, matchingClass('project_editor_instance'));
@@ -1677,11 +1652,11 @@
   // * The cursor exists, and there are no selections
   //
   // * The WHAT_CURSOR_APPLIES_TO setting allows for it.
-  function getCursorToMutate(isAgenda, danger) {
+  function getCursorToMutate(danger) {
     var cursor = getCursor();
     // TODO: Something more efficient than finding all selections if we just
     // want to know if there are any.
-    if (cursor && isEmptyMap(getSelectedTaskKeys(isAgenda))) {
+    if (cursor && isEmptyMap(getSelectedTaskKeys())) {
       // eslint-disable-next-line no-undefined
       if (danger === undefined) {
         if (SHOULD_MUTATE_CURSOR) {
@@ -1698,9 +1673,9 @@
     return null;
   }
 
-  function clickPriorityMenu(isAgenda, menu, level) {
+  function clickPriorityMenu(menu, level) {
     withUniqueClass(menu, 'cmp_priority' + level, all, function(img) {
-      withRestoredSelections(isAgenda, function() { click(img); });
+      withRestoredSelections(function() { click(img); });
     });
   }
 
@@ -1786,13 +1761,13 @@
   //
   // When in agenda mode, also includes the indent level in the key. See
   // 'getTaskById' for why.
-  function getSelectedTaskKeys(isAgenda) {
+  function getSelectedTaskKeys() {
     var results = {};
     var tasks = getTasks('include-collapsed');
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
       if (checkTaskIsSelected(task)) {
-        var key = getTaskKey(isAgenda, task);
+        var key = getTaskKey(task);
         results[key] = true;
       }
     }
@@ -1800,20 +1775,17 @@
   }
 
   // Get key used for the cursor, in the getSelectedTaskKeys map.
-  function getTaskKey(isAgenda, task) {
-    if (isAgenda === true) {
+  function getTaskKey(task) {
+    if (isAgendaMode()) {
       return task.id + ' ' + getTaskIndentClass(task);
-    } else if (isAgenda === false) {
-      return task.id;
     } else {
-      error('getTaskKey called with wrong number of arguments');
-      return null;
+      return task.id;
     }
   }
 
   // eslint-disable-next-line no-unused-vars
-  function makeTaskKey(isAgenda, id, indent) {
-    if (isAgenda) {
+  function makeTaskKey(id, indent) {
+    if (isAgendaMode()) {
       return id + ' ' + indent;
     } else {
       return id;
@@ -1861,7 +1833,7 @@
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
   function getTaskById(id, indent) {
-    if (checkIsAgendaMode()) {
+    if (isAgendaMode()) {
       // In agenda mode, can't rely on uniqueness of ids. So, search for
       // matching 'indent'. Turns out todoist also uses the ids as classes.
       var els = document.getElementsByClassName(id);
@@ -1881,12 +1853,12 @@
   }
 
   // Gets the next task the cursor can be moved to, after the specified task.
-  function getNextCursorableTask(isAgenda, tasks, currentKey) {
+  function getNextCursorableTask(tasks, currentKey) {
     for (var i = 0; i < tasks.length; i++) {
-      if (getTaskKey(isAgenda, tasks[i]) === currentKey) {
+      if (getTaskKey(tasks[i]) === currentKey) {
         for (var j = i + 1; j < tasks.length; j++) {
           var task = tasks[j];
-          if (!isAgenda || !isTaskIndented(task)) {
+          if (!isAgendaMode() || !isTaskIndented(task)) {
             return task;
           }
         }
@@ -2436,27 +2408,27 @@
    */
 
   // Sets the cursor to the first task, if any exists.
-  function setCursorToFirstTask(isAgenda, shouldScroll) {
+  function setCursorToFirstTask(shouldScroll) {
     var tasks = getTasks();
     if (tasks.length > 0) {
-      setCursor(isAgenda, tasks[0], shouldScroll);
+      setCursor(tasks[0], shouldScroll);
     }
   }
 
   // Sets the cursor to the last task, if any exists.
-  function setCursorToLastTask(isAgenda, shouldScroll) {
+  function setCursorToLastTask(shouldScroll) {
     var tasks = getTasks();
     if (tasks.length > 0) {
-      setCursor(isAgenda, tasks[tasks.length - 1], shouldScroll);
+      setCursor(tasks[tasks.length - 1], shouldScroll);
     }
   }
 
   // Given the element for a task, set it as the current selection.
-  function setCursor(isAgenda, task, shouldScroll) {
+  function setCursor(task, shouldScroll) {
     if (task) {
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
-      if (isAgenda && isTaskIndented(task)) {
+      if (isAgendaMode() && isTaskIndented(task)) {
         info('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #14');
       } else {
         if (shouldScroll === 'scroll') {
@@ -2466,7 +2438,7 @@
         } else if (shouldScroll !== 'no-scroll') {
           error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
         }
-        storeCursorContext(isAgenda, task, false);
+        storeCursorContext(task, false);
         task.dispatchEvent(new MouseEvent('mouseover'));
       }
     } else {
@@ -2495,12 +2467,12 @@
   }
 
   // A functional-ish idiom to reduce boilerplate.
-  function modifyCursorIndex(isAgenda, f) {
+  function modifyCursorIndex(f) {
     var tasks = getTasks();
     var cursor = getCursor();
     if (!cursor) {
       debug('modifyCursorIndex couldn\'t find cursor, so running restoreLastCursor');
-      restoreLastCursor(checkIsAgendaMode());
+      restoreLastCursor();
     }
     cursor = getCursor();
     if (!cursor) {
@@ -2525,7 +2497,7 @@
       var newCursor = tasks[newIndex];
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
-      if (isAgenda && isTaskIndented(newCursor)) {
+      if (isAgendaMode() && isTaskIndented(newCursor)) {
         info('Skipping cursor over nested sub-projects due to issue #14');
         newCursor = null;
         // Figure out the direction of cursor motion, to determine the direction
@@ -2542,13 +2514,37 @@
         }
       }
       if (newCursor) {
-        setCursor(isAgenda, newCursor, 'scroll');
+        setCursor(newCursor, 'scroll');
       }
     }
   }
 
-  function checkIsAgendaMode() {
-    return getById(AGENDA_VIEW_ID) !== null;
+  // This function detects which mode Todoist's view is in, since each behaves a
+  // bit differently.  In particular:
+  //
+  // * filter mode does not have drag handles, and so a custom cursor is
+  //   rendered.
+  function getViewMode() {
+    var agendaView = getById(AGENDA_VIEW_ID);
+    if (agendaView === null) {
+      return 'project';
+    } else if (getFirstClass(agendaView, 'section_day') === null) {
+      return 'filter';
+    } else {
+      return 'agenda';
+    }
+  }
+
+  // MUTABLE
+  var viewMode = null;
+
+  function updateViewMode() {
+    viewMode = getViewMode();
+    debug('viewMode = ', viewMode);
+  }
+
+  function isAgendaMode() {
+    return viewMode !== 'project';
   }
 
   /*****************************************************************************
@@ -3039,6 +3035,8 @@
     document.onkeydown = sometimesCallOriginal(window.originalTodoistKeydown);
     document.onkeyup = sometimesCallOriginal(window.originalTodoistKeyup);
     document.onkeypress = sometimesCallOriginal(window.originalTodoistKeypress);
+
+    updateViewMode();
 
     mousetrap = new Mousetrap(document);
 
