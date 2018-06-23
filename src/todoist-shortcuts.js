@@ -589,8 +589,8 @@
   function cursorRight() {
     if (checkCursorCollapsed()) {
       toggleCollapse();
-      if (!isAgendaMode()) {
-        // Issue #14
+      // Issue #26
+      if (viewMode !== 'agenda') {
         cursorDown();
       }
     }
@@ -1095,11 +1095,17 @@
   }
 
   function getSection(task) {
-    var predicate = isAgendaMode()
-      ? or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'))
-      : matchingClass('list_editor');
+    var predicate;
+    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
+      predicate = or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'));
+    } else if (viewMode === 'project') {
+      predicate = matchingClass('list_editor');
+    } else {
+      error('Unexpected viewMode:', viewMode);
+      return null;
+    }
     var section = findParent(task, predicate);
-    if (section && !isAgendaMode()) {
+    if (section && (viewMode === 'project')) {
       section = section.parentElement;
       if (!section.classList.contains('project_editor_instance')) {
         error('Expected', section, 'to have class project_editor_instance');
@@ -1333,7 +1339,15 @@
 
   function withTaskMenu(task, f) {
     withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
-      var menu = isAgendaMode() ? agendaTaskMenu : taskMenu;
+      var menu;
+      if ((viewMode === 'agenda') || (viewMode === 'filter')) {
+        menu = agendaTaskMenu;
+      } else if (viewMode === 'project') {
+        menu = taskMenu;
+      } else {
+        error('Unexpected viewMode:', viewMode);
+        return;
+      }
       if (hidden(menu)) {
         click(openMenu);
       } else {
@@ -1387,36 +1401,48 @@
   // Indent task.
   function moveIn() {
     var cursor = getCursor();
-    if (isAgendaMode()) {
+    if (viewMode === 'agenda') {
       info('Indenting task does not work in agenda mode.');
-    } else if (!cursor) {
-      info('No cursor to indent.');
+    } else if (viewMode === 'filter') {
+      info('Indenting task does not work in filter mode.');
+    } else if (viewMode === 'project') {
+      if (!cursor) {
+        info('No cursor to indent.');
+      } else {
+        dragTaskOver(cursor, function() {
+          return {
+            destination: cursor,
+            horizontalOffset: 28,
+            verticalOffset: 0
+          };
+        });
+      }
     } else {
-      dragTaskOver(cursor, function() {
-        return {
-          destination: cursor,
-          horizontalOffset: 28,
-          verticalOffset: 0
-        };
-      });
+      error('Unexpected viewMode:', viewMode);
     }
   }
 
   // Dedent task.
   function moveOut() {
     var cursor = getCursor();
-    if (isAgendaMode()) {
+    if (viewMode === 'agenda') {
       info('Dedenting task does not work in agenda mode.');
-    } else if (!cursor) {
-      info('No cursor to dedent.');
+    } else if (viewMode === 'filter') {
+      info('Dedenting task does not work in filter mode.');
+    } else if (viewMode === 'project') {
+      if (!cursor) {
+        info('No cursor to dedent.');
+      } else {
+        dragTaskOver(cursor, function() {
+          return {
+            destination: cursor,
+            horizontalOffset: -28,
+            verticalOffset: 0
+          };
+        });
+      }
     } else {
-      dragTaskOver(cursor, function() {
-        return {
-          destination: cursor,
-          horizontalOffset: -28,
-          verticalOffset: 0
-        };
-      });
+      error('Unexpected viewMode:', viewMode);
     }
   }
 
@@ -1424,32 +1450,38 @@
   // structures.
   function moveUp() {
     var cursor = getCursor();
-    if (isAgendaMode()) {
-      info('Moving task up does not work in agenda mode (yet).');
-    } else if (!cursor) {
-      info('No cursor to move up.');
-    } else {
-      dragTaskOver(cursor, function() {
-        var tasks = getTasks();
-        var cursorIndex = tasks.indexOf(cursor);
-        var cursorIndent = getTaskIndentClass(cursor);
-        for (var i = cursorIndex - 1; i >= 0; i--) {
-          var task = tasks[i];
-          var indent = getTaskIndentClass(task);
-          if (indent === cursorIndent) {
-            return {
-              destination: task,
-              horizontalOffset: 0,
-              verticalOffset: cursor.clientHeight / -3
-            };
-          } else if (indent < cursorIndent) {
-            info('Refusing to dedent task to move it up.');
-            return null;
+    if (viewMode === 'agenda') {
+      info('Moving task up does not work in agenda mode.');
+    } else if (viewMode === 'filter') {
+      info('Moving task up does not work in filter mode.');
+    } else if (viewMode === 'project') {
+      if (!cursor) {
+        info('No cursor to move up.');
+      } else {
+        dragTaskOver(cursor, function() {
+          var tasks = getTasks();
+          var cursorIndex = tasks.indexOf(cursor);
+          var cursorIndent = getTaskIndentClass(cursor);
+          for (var i = cursorIndex - 1; i >= 0; i--) {
+            var task = tasks[i];
+            var indent = getTaskIndentClass(task);
+            if (indent === cursorIndent) {
+              return {
+                destination: task,
+                horizontalOffset: 0,
+                verticalOffset: cursor.clientHeight / -3
+              };
+            } else if (indent < cursorIndent) {
+              info('Refusing to dedent task to move it up.');
+              return null;
+            }
           }
-        }
-        info('Couldn\'t find task above cursor to move it above.');
-        return null;
-      });
+          info('Couldn\'t find task above cursor to move it above.');
+          return null;
+        });
+      }
+    } else {
+      error('Unexpected viewMode:', viewMode);
     }
   }
 
@@ -1457,49 +1489,55 @@
   // structures.
   function moveDown() {
     var cursor = getCursor();
-    if (isAgendaMode()) {
-      info('Moving task down does not work in agenda mode (yet).');
-    } else if (!cursor) {
-      info('No cursor to move down.');
-    } else {
-      dragTaskOver(cursor, function() {
-        var tasks = getTasks();
-        var cursorIndex = tasks.indexOf(cursor);
-        var cursorIndent = getTaskIndentClass(cursor);
-        var lastQualifyingTask = null;
-        for (var i = cursorIndex + 1; i < tasks.length; i++) {
-          var task = tasks[i];
-          var indent = getTaskIndentClass(task);
-          // Logic here is a bit tricky.  The first time we encounter a task
-          // at the same indent level, this is the subtree we want to move
-          // past.  So, set lastQualifyingTask to non-null and keep track of
-          // the last one.  After that, when we encounter something at a
-          // lesser or equal indent to cursorIndent, we want to place it after
-          // the last one.
-          if (!lastQualifyingTask) {
-            if (indent === cursorIndent) {
+    if (viewMode === 'agenda') {
+      info('Moving task down does not work in agenda mode.');
+    } else if (viewMode === 'filter') {
+      info('Moving task down does not work in filter mode.');
+    } else if (viewMode === 'project') {
+      if (!cursor) {
+        info('No cursor to move down.');
+      } else {
+        dragTaskOver(cursor, function() {
+          var tasks = getTasks();
+          var cursorIndex = tasks.indexOf(cursor);
+          var cursorIndent = getTaskIndentClass(cursor);
+          var lastQualifyingTask = null;
+          for (var i = cursorIndex + 1; i < tasks.length; i++) {
+            var task = tasks[i];
+            var indent = getTaskIndentClass(task);
+            // Logic here is a bit tricky.  The first time we encounter a task
+            // at the same indent level, this is the subtree we want to move
+            // past.  So, set lastQualifyingTask to non-null and keep track of
+            // the last one.  After that, when we encounter something at a
+            // lesser or equal indent to cursorIndent, we want to place it after
+            // the last one.
+            if (!lastQualifyingTask) {
+              if (indent === cursorIndent) {
+                lastQualifyingTask = task;
+              } else if (indent < cursorIndent) {
+                info('Refusing to dedent task to move it down.');
+                return null;
+              }
+            } else if (indent <= cursorIndent) {
+              break;
+            } else {
               lastQualifyingTask = task;
-            } else if (indent < cursorIndent) {
-              info('Refusing to dedent task to move it down.');
-              return null;
             }
-          } else if (indent <= cursorIndent) {
-            break;
-          } else {
-            lastQualifyingTask = task;
           }
-        }
-        if (lastQualifyingTask) {
-          return {
-            destination: lastQualifyingTask,
-            horizontalOffset: 0,
-            verticalOffset: cursor.clientHeight / 3
-          };
-        } else {
-          info('Couldn\'t find task below cursor to move it below.');
-          return null;
-        }
-      });
+          if (lastQualifyingTask) {
+            return {
+              destination: lastQualifyingTask,
+              horizontalOffset: 0,
+              verticalOffset: cursor.clientHeight / 3
+            };
+          } else {
+            info('Couldn\'t find task below cursor to move it below.');
+            return null;
+          }
+        });
+      }
+    } else {
+      error('Unexpected viewMode:', viewMode);
     }
   }
 
@@ -1603,10 +1641,12 @@
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelow(menuCls) {
     var cursor = getCursor();
-    if (isAgendaMode() || cursor === null) {
+    if ((viewMode === 'agenda') || (viewMode === 'filter') || cursor === null) {
       addToSectionContaining(cursor);
-    } else {
+    } else if (viewMode === 'project') {
       clickTaskMenu(cursor, menuCls);
+    } else {
+      error('Unexpected viewMode:', viewMode);
     }
   }
 
@@ -1614,9 +1654,15 @@
   // task.
   function addToSectionContaining(task) {
     var section = null;
-    if (task) {
+    if (viewMode === 'filter') {
+      // TODO: This works well in labels, but may be a bit unexpected in filters
+      // like "Priority 1", since quick add will not adjust the task such that
+      // it ends up in the filter.
+      quickAddTask();
+      return;
+    } else if (task) {
       section = findParentSection(task);
-    } else if (isAgendaMode()) {
+    } else if (viewMode === 'agenda') {
       section = getFirstClass(document, 'section_day');
     } else {
       section = getFirstClass(document, 'project_editor_instance');
@@ -1625,7 +1671,7 @@
       error('Couldn\'t find section for task', task);
       return;
     }
-    if (isAgendaMode()) {
+    if (viewMode === 'agenda') {
       if (section.classList.contains('section_overdue')) {
         section = getFirstClass(document, 'section_day');
       }
@@ -1636,10 +1682,17 @@
   }
 
   function findParentSection(task) {
-    if (isAgendaMode()) {
+    if (viewMode === 'agenda') {
       return findParent(task, or(matchingClass('section_day'), matchingClass('section_overdue')));
-    } else {
+    } else if (viewMode === 'filter') {
+      // Only one section in filter mode, and its header is directly under the
+      // agenda_view div.
+      return getById(AGENDA_VIEW_ID);
+    } else if (viewMode === 'project') {
       return findParent(task, matchingClass('project_editor_instance'));
+    } else {
+      error('Unexpected value of viewMode:', viewMode);
+      return null;
     }
   }
 
@@ -1776,19 +1829,25 @@
 
   // Get key used for the cursor, in the getSelectedTaskKeys map.
   function getTaskKey(task) {
-    if (isAgendaMode()) {
+    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
       return task.id + ' ' + getTaskIndentClass(task);
-    } else {
+    } else if (viewMode === 'project') {
       return task.id;
+    } else {
+      error('Unexpected viewMode:', viewMode);
+      return null;
     }
   }
 
   // eslint-disable-next-line no-unused-vars
   function makeTaskKey(id, indent) {
-    if (isAgendaMode()) {
+    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
       return id + ' ' + indent;
-    } else {
+    } else if (viewMode === 'project') {
       return id;
+    } else {
+      error('Unexpected viewMode:', viewMode);
+      return null;
     }
   }
 
@@ -1833,7 +1892,7 @@
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
   function getTaskById(id, indent) {
-    if (isAgendaMode()) {
+    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
       // In agenda mode, can't rely on uniqueness of ids. So, search for
       // matching 'indent'. Turns out todoist also uses the ids as classes.
       var els = document.getElementsByClassName(id);
@@ -1847,8 +1906,11 @@
         }
       }
       return null;
-    } else {
+    } else if (viewMode === 'project') {
       return document.getElementById(id);
+    } else {
+      error('Unexpected viewMode:', viewMode);
+      return null;
     }
   }
 
@@ -1858,7 +1920,8 @@
       if (getTaskKey(tasks[i]) === currentKey) {
         for (var j = i + 1; j < tasks.length; j++) {
           var task = tasks[j];
-          if (!isAgendaMode() || !isTaskIndented(task)) {
+          // See issue #26
+          if ((viewMode !== 'agenda') || !isTaskIndented(task)) {
             return task;
           }
         }
@@ -2427,9 +2490,9 @@
   function setCursor(task, shouldScroll) {
     if (task) {
       // Don't attempt to focus nested sub-projects in agenda view, because it
-      // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
-      if (isAgendaMode() && isTaskIndented(task)) {
-        info('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #14');
+      // won't work - see issue #26.
+      if (viewMode === 'agenda' && isTaskIndented(task)) {
+        info('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #26');
       } else {
         if (shouldScroll === 'scroll') {
           withId('top_bar', function(topBar) {
@@ -2439,7 +2502,10 @@
           error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
         }
         storeCursorContext(task, false);
-        task.dispatchEvent(new MouseEvent('mouseover'));
+        updateCursorStyle();
+        if (viewMode !== 'filter') {
+          task.dispatchEvent(new MouseEvent('mouseover'));
+        }
       }
     } else {
       error('Null task passed to setCursor');
@@ -2448,9 +2514,13 @@
 
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    var cursor = getCursorOrOnLeft();
-    // Ignore when items on the left menu are hovered.
-    return cursor === 'OnLeft' ? null : cursor;
+    if (viewMode === 'filter') {
+      return getTaskById(lastCursorId, lastCursorIndent);
+    } else {
+      var cursor = getCursorOrOnLeft();
+      // Ignore when items on the left menu are hovered.
+      return cursor === 'OnLeft' ? null : cursor;
+    }
   }
 
   // Returns the <li> element which corresponds to the current cursor. If the
@@ -2495,10 +2565,10 @@
         newIndex = tasks.length - 1;
       }
       var newCursor = tasks[newIndex];
-      // Don't attempt to focus nested sub-projects in agenda view, because it
-      // won't work: https://github.com/mgsloan/todoist-shortcuts/issues/14
-      if (isAgendaMode() && isTaskIndented(newCursor)) {
-        info('Skipping cursor over nested sub-projects due to issue #14');
+      // Don't attempt to focus nested sub-projects in agenda view, because drag
+      // handles won't be visible, due to issue #26.
+      if (viewMode === 'agenda' && isTaskIndented(newCursor)) {
+        info('Skipping cursor over nested sub-projects due to issue #26');
         newCursor = null;
         // Figure out the direction of cursor motion, to determine the direction
         // that should be searched.
@@ -2541,10 +2611,6 @@
   function updateViewMode() {
     viewMode = getViewMode();
     debug('viewMode = ', viewMode);
-  }
-
-  function isAgendaMode() {
-    return viewMode !== 'project';
   }
 
   /*****************************************************************************
@@ -2962,6 +3028,49 @@
     '  bottom: 0;',
     '}'
   ].join('\n'));
+
+  // A CSS style element, dynamically updated by updateCursorStyle. MUTABLE.
+  var cursorStyle = addCss('');
+
+  // This is unusual. Usually you would not dynamically generate CSS that uses
+  // different IDs. However, this is a nice hack in this case, because todoist
+  // frequently re-creates elements.
+  function updateCursorStyle() {
+    // In all modes but filter mode, the drag handle is used as the cursor. In
+    // filter mode, CSS is used to add a border to the left. See issue #14.
+    if (viewMode === 'filter') {
+      var selecter = getKeySelecter(lastCursorId, lastCursorIndent);
+      cursorStyle.textContent = [
+        selecter + ' {',
+        '  border-left: 2px solid #4d90f0;',
+        '  margin-left: -4px;',
+        '}',
+        selecter + ' .sel_checkbox_td {',
+        '  padding-left: 2px;',
+        '}',
+        // FIXME: This is intended to make the drag and drop handler not move
+        // when the cursor is on it.  Seems to have broken.  There is also a
+        // tricky case when something is a nested task parent.
+        selecter + ' .arrow, ' + selecter + ' .drag_and_drop_handler {',
+        '  margin-left: -16px;',
+        '}'
+      ].join('\n');
+    } else {
+      cursorStyle.textContent = '';
+    }
+  }
+
+  // See comment on 'getTaskById' for explanation
+  function getKeySelecter(id, indent) {
+    if (((viewMode === 'agenda') || (viewMode === 'filter')) && indent !== null) {
+      return '#' + id + '.' + indent;
+    } else if (viewMode === 'project') {
+      return '#' + id;
+    } else {
+      error('Unexpected viewMode:', viewMode);
+      return null;
+    }
+  }
 
   /*****************************************************************************
    * mousetrap v1.6.1 craig.is/killing/mice

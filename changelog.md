@@ -9,6 +9,9 @@
 * Change "remove label" keybinding to use `@` instead of `l`.  The old
   keybinding shadowed the expand + navigate in keybinding.
 
+* Cursor is now visible in filters and labels! See
+  [#14](https://github.com/mgsloan/todoist-shortcuts/issues/14).
+
 
 ## Version 12 ##
 
