@@ -12,6 +12,8 @@
 * Cursor is now visible in filters and labels! See
   [#14](https://github.com/mgsloan/todoist-shortcuts/issues/14).
 
+* Bump to Todoist version 907.
+
 
 ## Version 12 ##
 
