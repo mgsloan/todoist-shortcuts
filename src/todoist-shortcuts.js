@@ -57,6 +57,7 @@
     ['enter', edit],
     ['O', addAbove],
     ['o', addBelow],
+    ['c', comment],
     [['J', 'shift+down'], moveDown],
     [['K', 'shift+up'], moveUp],
     [['H', 'shift+left'], moveOut],
@@ -649,6 +650,9 @@
   // section.
   function addAbove() { addAboveOrBelow(MI_ADD_ABOVE); }
   function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
+
+  // Add a comment to the current task.
+  function comment() { withUniqueClass(getCursor(), 'note_icon', all, click); }
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
