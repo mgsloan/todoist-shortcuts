@@ -1417,7 +1417,7 @@
       if (!cursor) {
         info('No cursor to indent.');
       } else {
-        dragTaskOver(cursor, function() {
+        dragTaskOver(cursor, false, function() {
           return {
             destination: cursor,
             horizontalOffset: 28,
@@ -1441,7 +1441,7 @@
       if (!cursor) {
         info('No cursor to dedent.');
       } else {
-        dragTaskOver(cursor, function() {
+        dragTaskOver(cursor, false, function() {
           return {
             destination: cursor,
             horizontalOffset: -28,
@@ -1466,7 +1466,7 @@
       if (!cursor) {
         info('No cursor to move up.');
       } else {
-        dragTaskOver(cursor, function() {
+        dragTaskOver(cursor, false, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
           var cursorIndent = getTaskIndentClass(cursor);
@@ -1477,7 +1477,7 @@
               return {
                 destination: task,
                 horizontalOffset: 0,
-                verticalOffset: cursor.clientHeight / -3
+                verticalOffset: 0
               };
             } else if (indent < cursorIndent) {
               info('Refusing to dedent task to move it up.');
@@ -1505,7 +1505,7 @@
       if (!cursor) {
         info('No cursor to move down.');
       } else {
-        dragTaskOver(cursor, function() {
+        dragTaskOver(cursor, true, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
           var cursorIndent = getTaskIndentClass(cursor);
@@ -1536,7 +1536,7 @@
             return {
               destination: lastQualifyingTask,
               horizontalOffset: 0,
-              verticalOffset: cursor.clientHeight / 3
+              verticalOffset: -cursor.clientHeight
             };
           } else {
             info('Couldn\'t find task below cursor to move it below.');
@@ -1551,7 +1551,7 @@
 
   var dragInProgress = false;
 
-  function dragTaskOver(sourceTask, findDestination) {
+  function dragTaskOver(sourceTask, isBelow, findDestination) {
     var sourceY = sourceTask.offsetTop;
     if (dragInProgress) {
       info('Not executing drag because one is already in progress.');
@@ -1563,6 +1563,9 @@
           if (result) {
             var deltaX = result.horizontalOffset;
             var deltaY = result.destination.offsetTop - sourceY + result.verticalOffset;
+            if (isBelow) {
+              deltaY += result.destination.clientHeight;
+            }
             animateDrag(el, x, y, x + deltaX, y + deltaY, function() { dragInProgress = false; });
           } else {
             dragInProgress = false;
@@ -1603,7 +1606,7 @@
     el.dispatchEvent(new MouseEvent('mousedown', startParams));
     var startTime = Date.now();
     var duration = 100;
-    var maxFrames = 10;
+    var maxFrames = 5;
     // NOTE: Animating this may seem overkill, but doing a direct move didn't
     // work reliably.  This also makes it clearer what's happening.
     var dragLoop = function() {
@@ -1614,7 +1617,7 @@
         el.dispatchEvent(new MouseEvent('mouseup', params));
         finished();
       } else {
-        params = mkMouseParams(lerp(sx, tx, alpha), lerp(sy, ty, alpha));
+        params = mkMouseParams(coslerp(sx, tx, alpha), coslerp(sy, ty, alpha));
         el.dispatchEvent(new MouseEvent('mousemove', params));
         setTimeout(dragLoop, duration / maxFrames);
       }
@@ -1622,8 +1625,15 @@
     dragLoop();
   }
 
-  function lerp(s, t, a) {
-    return s * (1 - a) + t * a;
+  function lerp(s, e, t) {
+    return s * (1 - t) + e * t;
+  }
+
+  // Using cosine interpolation, since it seems to result in more reliable and
+  // potentially nicer looking drag behavior.
+  // http://paulbourke.net/miscellaneous/interpolation/ but instead uses
+  function coslerp(s, e, t) {
+    return lerp(s, e, (1 - Math.cos(t * Math.PI)) / 2);
   }
 
   function mkMouseParams(x, y) {
