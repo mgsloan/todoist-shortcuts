@@ -1735,7 +1735,7 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    withUniqueClass(menu, 'cmp_priority' + level, all, function(img) {
+    withUniqueClass(menu, 'icon_priority_' + level, all, function(img) {
       withRestoredSelections(function() { click(img); });
     });
   }
