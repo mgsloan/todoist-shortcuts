@@ -2646,6 +2646,7 @@
   function warn() {
     var args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
+    args.push('\n' + getStack());
     // eslint-disable-next-line no-console
     console.warn.apply(null, args);
   }
@@ -2653,9 +2654,19 @@
   function error() {
     var args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
+    args.push(getStack());
     args.push('Please report this as an issue to http://github.com/mgsloan/todoist-shortcuts');
     // eslint-disable-next-line no-console
     console.error.apply(null, arguments);
+  }
+
+  // https://stackoverflow.com/a/41586311/1164871
+  function getStack() {
+    try {
+      throw new Error();
+    } catch(e) {
+      return e.stack;
+    }
   }
 
   // https://github.com/greasemonkey/greasemonkey/issues/2724#issuecomment-354005162
