@@ -2679,7 +2679,7 @@
   function getStack() {
     try {
       throw new Error();
-    } catch(e) {
+    } catch (e) {
       return e.stack;
     }
   }
