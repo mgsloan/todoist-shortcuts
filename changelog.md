@@ -3,6 +3,15 @@
 ## Not yet released ##
 
 
+## Version 14 ##
+
+* Bump to Todoist version 908. This version of the extension fixes
+  issues with todoist-shortcuts due to some recent changes of
+  todoist's DOM structure.
+
+* Improved reliability of task motion commands.
+
+* Adds 'c' keybinding for opening comment dialog.
 
 
 ## Version 13 ##
