@@ -2791,7 +2791,7 @@
     if (result) {
       return f(result);
     } else {
-      warn('Couldn\'t find unique child with tag', tag, 'instead got', result);
+      warn('Couldn\'t find unique child with tag', tag, 'and passing predicate');
       return null;
     }
   }
