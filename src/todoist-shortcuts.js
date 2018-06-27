@@ -201,6 +201,7 @@
   var MI_ARCHIVE = 'menu_item_archive';
   var MI_DUPLICATE = 'menu_item_duplicate';
   var MI_DELETE = 'menu_item_delete';
+  var MI_DELETE_SEL = 'sel_delete_task';
   var MI_ADD_LABEL = 'menu_item_add_label';
   var MI_REMOVE_LABEL = 'menu_item_remove_label';
   var MI_ADD_ABOVE = 'menu_item_add_above';
@@ -212,7 +213,7 @@
   var MORE_MENU_ITEMS =
     [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE, MI_ADD_LABEL, MI_REMOVE_LABEL];
   var TASKMENU_ITEMS =
-    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE, MI_EDIT];
+    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE_SEL, MI_EDIT];
 
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   var TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
@@ -545,7 +546,7 @@
   function deleteTasks() {
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, MI_DELETE);
+      clickTaskMenu(mutateCursor, MI_DELETE_SEL);
     } else {
       clickMenu(moreMenu, MI_DELETE);
     }
@@ -1303,7 +1304,7 @@
 
   function clickMenu(menu, cls) {
     withUniqueClass(menu, cls, all, function(container) {
-      withUniqueTag(container, 'span', all, click);
+      withUniqueClass(container, 'menu_label', all, click);
     });
   }
 
