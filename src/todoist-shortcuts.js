@@ -38,7 +38,7 @@
   var KEY_BINDINGS = [
 
     // Add tasks
-    ['q', quickAddTask],
+    // (see originalHandler) ['q', quickAddTask],
     ['a', addTaskBottom],
     ['A', addTaskTop],
 
@@ -91,20 +91,20 @@
     ['4', setPriority('4')],
 
     // Sorting
-    ['r', sortByAssignee],
-    ['s', sortByDate],
-    ['p', sortByPriority],
+    // (see originalHandler) ['r', sortByAssignee],
+    // (see originalHandler) ['s', sortByDate],
+    // (see originalHandler) ['p', sortByPriority],
 
     // Bulk reschedule / move mode
     ['* t', bulkSchedule],
     ['* v', bulkMove],
 
     // Other
-    [['u', 'ctrl+z'], undo],
-    [['f', '/'], focusSearch],
+    // (see originalHandler) [['u', 'ctrl+z'], undo],
+    [['ctrl+z'], undo],
+    // (see originalHandler) [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
-    ['escape', closeContextMenus],
-    ['fallback', fallbackHandler]
+    ['fallback', defaultFallbackHandler]
   ];
   var DEFAULT_KEYMAP = 'default';
 
@@ -119,14 +119,16 @@
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
     ['r', unschedule],
-    ['escape', closeContextMenus]
+    ['escape', closeContextMenus],
+    ['fallback', originalHandler]
   ];
   var SCHEDULE_KEYMAP = 'schedule';
 
   // Bulk schedule mode keybindings
   var BULK_SCHEDULE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
-    ['s', skipBulkSchedule],
-    ['escape', exitBulkSchedule]
+    [['j', 'ctrl+'], skipBulkSchedule],
+    ['escape', exitBulkSchedule],
+    ['fallback', originalHandler]
   ]);
   var BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
@@ -134,7 +136,7 @@
   //
   // These can't be handled by mousetrap, because they need to be triggered
   // while an input is focused. See 'sometimesCallOriginal'.
-  var BULK_MOVE_BINDINGS = [];
+  var BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
   var BULK_MOVE_KEYMAP = 'bulk_move';
 
   // Navigation mode uses its own key handler.
@@ -142,18 +144,29 @@
   var NAVIGATE_KEYMAP = 'navigate';
 
   // Keymap used when there is a floating window
-  var POPUP_BINDINGS = [];
+  var POPUP_BINDINGS = [['fallback', originalHandler]];
   var POPUP_KEYMAP = 'popup';
 
-  function fallbackHandler(e) {
-    if (MULTISELECT && e.key === 'x') {
-      if (e.type === 'keydown' && !e.repeat) {
+  function defaultFallbackHandler(ev) {
+    if (MULTISELECT && ev.key === 'x') {
+      if (ev.type === 'keydown' && !ev.repeat) {
         selectPressed();
         return false;
-      } else if (e.type === 'keyup') {
+      } else if (ev.type === 'keyup') {
         selectReleased();
         return false;
       }
+    }
+    return originalHandler(ev);
+  }
+
+  function originalHandler(ev) {
+    if (ev.type === 'keydown') {
+      return window.originalTodoistKeydown.apply(document, ev);
+    } else if (ev.type === 'keyup') {
+      return window.originalTodoistKeyup.apply(document, ev);
+    } else if (ev.type === 'keypress') {
+      return window.originalTodoistKeypress.apply(document, ev);
     }
     return true;
   }
@@ -662,6 +675,12 @@
       var cancelBtn = getUniqueClass(manager, 'cancel');
       click(cancelBtn);
     });
+    // Close windows with close buttons, particularly move-to-project
+    withClass(document, 'GB_window', function(gbw) {
+      withClass(gbw, 'close', function(close) {
+        withTag(close, 'div', click);
+      });
+    });
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
@@ -696,18 +715,22 @@
   function addTaskTop() { todoistShortcut('A'); }
 
   // Focus the search bar.
+  // eslint-disable-next-line no-unused-vars
   function focusSearch() { todoistShortcut('/'); }
 
   // Trigger undo by simulating a keypress.
   function undo() { todoistShortcut('u'); }
 
   // Trigger sort-by-date by simulating a keypress.
+  // eslint-disable-next-line no-unused-vars
   function sortByDate() { todoistShortcut('s'); }
 
   // Trigger sort-by-priority by simulating a keypress.
+  // eslint-disable-next-line no-unused-vars
   function sortByPriority() { todoistShortcut('p'); }
 
   // Trigger sort-by-assignee by simulating a keypress.
+  // eslint-disable-next-line no-unused-vars
   function sortByAssignee() { todoistShortcut('r'); }
 
   // Open help documentation.
@@ -2627,7 +2650,8 @@
     }
   }
 
-  // MUTABLE
+  // MUTABLE. Should always correspond to getViewMode result, as it is updated
+  // on load and on some dom mutation.
   var viewMode = null;
 
   function updateViewMode() {
@@ -3150,39 +3174,30 @@
   checkTodoistVersion();
   handlePageChange();
   registerTopMutationObservers();
+  updateViewMode();
 
   setTimeout(function() {
     // Remove todoist's global keyboard handler.
     if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
     if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
     if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
-    // Call global keyboard handler only for escape.
-    function sometimesCallOriginal(f) {
-      return function(ev) {
-        // Escape key is useful for exiting dialogs and other input boxes, so
-        // should also use old todoist handler.
-        if (ev.keyCode === 27) {
-          f.apply(document, ev);
-          // Bulk move keypresses need to happen even though the focus is on the
-          // input box.
-          if (inBulkMoveMode && ev.type === 'keydown') {
-            exitBulkMove();
-          }
-        } /* FIXME: see https://github.com/mgsloan/todoist-shortcuts/issues/21
-            else if (inBulkMoveMode && ev.key === 's') {
-          skipBulkMove();
-        } */
-      };
-    }
-    document.onkeydown = sometimesCallOriginal(window.originalTodoistKeydown);
-    document.onkeyup = sometimesCallOriginal(window.originalTodoistKeyup);
-    document.onkeypress = sometimesCallOriginal(window.originalTodoistKeypress);
 
-    updateViewMode();
+    // Focus is on an input box during bulk move code, and mousetrap doesn't
+    // handle those events.  So this handling needs to be done manually.
+    document.onkeydown = function(ev) {
+      if (ev.keyCode === 27 && ev.type === 'keydown') {
+        closeContextMenus();
+      }
+    };
+    // Clear the other key handlers. Instead fallthrough to Todoist is handled
+    // by 'originalHandler'.
+    document.onkeypress = function() {};
+    document.onkeyup = function() {};
 
+    // Initialize mousetrap.
     mousetrap = new Mousetrap(document);
 
-    // Register key bindings
+    // Register key bindings with mousetrap.
     registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
     registerKeybindings(SCHEDULE_KEYMAP, SCHEDULE_BINDINGS);
     registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
@@ -3190,10 +3205,10 @@
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
 
-    // Reset mousetrap on disable
+    // Reset mousetrap on disable.
     onDisable(function() { mousetrap.reset(); });
 
-    // Register mousemove handler
+    // Register mousemove handler.
     document.addEventListener('mousemove', handleMouseMove);
     onDisable(function() {
       document.removeEventListener('mousemove', handleMouseMove);

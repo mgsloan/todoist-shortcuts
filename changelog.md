@@ -2,6 +2,10 @@
 
 ## Not yet released ##
 
+* Keyboard events not handled by todoist-shortcuts now get passed
+  along to Todoist. See
+  [#25](https://github.com/mgsloan/todoist-shortcuts/issues/25)
+
 
 ## Version 14 ##
 
