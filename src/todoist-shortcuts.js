@@ -2456,6 +2456,7 @@
     } while (toDelete.length > 0);
   }
 
+  // eslint-disable-next-line no-unused-vars
   function checkTodoistVersion() {
     try {
       var el = getUniqueClass(document, 'version');
