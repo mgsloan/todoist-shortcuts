@@ -3171,7 +3171,8 @@
    * Run todoist-shortcuts!
    */
 
-  checkTodoistVersion();
+  // Version check disabled, preparing for potential inclusion in Todoist.
+  // checkTodoistVersion();
   handlePageChange();
   registerTopMutationObservers();
   updateViewMode();
