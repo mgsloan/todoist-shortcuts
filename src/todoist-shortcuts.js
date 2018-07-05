@@ -2009,6 +2009,11 @@
           mustBeKeys = 'g';
         } else if (getUniqueClass(li, 'cmp_filter_days')) {
           mustBeKeys = 'n';
+        } else if (li.classList.contains('top_menu_item')) {
+          withUniqueClass(li, 'item_name', all, function(nameSpan) {
+            text = preprocessItemText(nameSpan.textContent);
+            initials = getItemInitials(nameSpan.textContent);
+          });
         } else {
           withUniqueClass(li, 'name', all, function(nameElement) {
             withUniqueTag(nameElement, 'span', all, function(nameSpan) {
