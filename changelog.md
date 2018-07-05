@@ -2,9 +2,15 @@
 
 ## Not yet released ##
 
+
+## Version 15 ##
+
 * Keyboard events not handled by todoist-shortcuts now get passed
   along to Todoist. See
-  [#25](https://github.com/mgsloan/todoist-shortcuts/issues/25)
+  [#25](https://github.com/mgsloan/todoist-shortcuts/issues/25).
+
+* Now supports navigation to favorite filters / labels. See
+  [#31](https://github.com/mgsloan/todoist-shortcuts/issues/31).
 
 
 ## Version 14 ##
