@@ -235,7 +235,7 @@
   var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
-  var TODOIST_TESTED_VERSION = 908;
+  var TODOIST_TESTED_VERSION = 909;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
