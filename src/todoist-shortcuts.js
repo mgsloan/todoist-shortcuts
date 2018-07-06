@@ -1286,6 +1286,8 @@
 
   // For some reason todoist clears the selections even after applying things
   // like priority changes. This restores the selections.
+  //
+  // eslint-disable-next-line no-unused-vars
   function withRestoredSelections(f) {
     var oldSelections = getSelectedTaskKeys();
     try {
@@ -1773,7 +1775,9 @@
 
   function clickPriorityMenu(menu, level) {
     withUniqueClass(menu, 'icon_priority_' + level, all, function(img) {
-      withRestoredSelections(function() { click(img); });
+      // See https://github.com/mgsloan/todoist-shortcuts/issues/32
+      // withRestoredSelections(function() { click(img); });
+      click(img);
     });
   }
 

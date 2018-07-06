@@ -2,6 +2,10 @@
 
 ## Not yet released ##
 
+* No longer attempts to reselect tasks after priority change as this
+  triggers a bug. See
+  [#32](https://github.com/mgsloan/todoist-shortcuts/issues/32).
+
 
 ## Version 15 ##
 
