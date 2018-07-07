@@ -104,6 +104,10 @@
     [['ctrl+z'], undo],
     // (see originalHandler) [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
+
+    // See https://github.com/mgsloan/todoist-shortcuts/issues/30
+    // ['i', importFromTemplate],
+
     ['fallback', defaultFallbackHandler]
   ];
   var DEFAULT_KEYMAP = 'default';
@@ -738,6 +742,36 @@
     window.open(
       TODOIST_SHORTCUTS_GITHUB + '/blob/v' +
       TODOIST_SHORTCUTS_VERSION + '/readme.md');
+  }
+
+  // Click "import from template" in project menu
+  // eslint-disable-next-line no-unused-vars
+  function importFromTemplate() {
+    var foundItem = null;
+    withClass(document, 'menu_item', function(tr) {
+      withTag(tr, 'td', function(td) {
+        var dataTrack = td.attributes.getNamedItem('data-track');
+        if (dataTrack && dataTrack.nodeValue === 'project|actions_import_from_template') {
+          foundItem = td;
+        }
+      });
+    });
+    if (foundItem) {
+      click(foundItem);
+      var foundInput = null;
+      withClass(document, 'file_input_container', function(container) {
+        withTag(container, 'input', function(input) {
+          foundInput = input;
+        });
+      });
+      if (foundInput) {
+        click(foundInput)
+      } else {
+        warn('Could not find input to click for file input.');
+      }
+    } else {
+      warn('Could not find import from template button.');
+    }
   }
 
   /*****************************************************************************
