@@ -13,6 +13,14 @@ repository, it is also available from the following places:
     ![Firefox Users](https://img.shields.io/amo/users/todoist-shortcuts.svg)
   ](https://addons.mozilla.org/en-US/firefox/addon/todoist-shortcuts/)
 
+These keyboard shortcuts are directly inspired by the shortcuts used for GMail,
+which, in turn were inspired by vim-like keyboard interaction. I highly
+recommend enabling the advanced keyboard shortcuts if you use GMail. So, if the
+choices of keypresses seem strange, stick with it! Many of the keypresses used
+here can also be used in GMail or even vim (or [evil-mode] ;) ).
+
+[evil-mode]: https://github.com/emacs-evil/evil
+
 # Keyboard shortcuts
 
 ## Add tasks
@@ -112,8 +120,9 @@ are the differences:
    will be completed and not recur again.
 
 Note that the text rescheduling invoked by `T` only works for the current
-cursor. Resolving this is tracked by [this
-issue](https://github.com/mgsloan/todoist-shortcuts/issues/24).
+cursor. Resolving this is tracked by [issue #24].
+
+[issue #24]: https://github.com/mgsloan/todoist-shortcuts/issues/24
 
 ## Scheduling
 
