@@ -4,9 +4,14 @@
 bunch of keyboard shortcuts to [Todoist](https://todoist.com). Along with this
 repository, it is also available from the following places:
 
-* [Extension for chrome](https://chrome.google.com/webstore/detail/todoist-shortcuts/dehmghpdcahlffompjagejmgbcfahndp)
+* [ Extension for Google Chrome
+    ![Chrome Users](https://img.shields.io/chrome-web-store/users/dehmghpdcahlffompjagejmgbcfahndp.svg)
+    ![Chrome Rating](https://img.shields.io/chrome-web-store/rating/dehmghpdcahlffompjagejmgbcfahndp.svg)
+  ](https://chrome.google.com/webstore/detail/todoist-shortcuts/dehmghpdcahlffompjagejmgbcfahndp)
 
-* [Extension for firefox](https://addons.mozilla.org/en-US/firefox/addon/todoist-shortcuts/)
+* [ Extension for Mozilla Firefox
+    ![Firefox Users](https://img.shields.io/amo/users/todoist-shortcuts.svg)
+  ](https://addons.mozilla.org/en-US/firefox/addon/todoist-shortcuts/)
 
 # Keyboard shortcuts
 
