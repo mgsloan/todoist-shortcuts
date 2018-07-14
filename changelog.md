@@ -4,6 +4,13 @@
 
 ### Enhancements ###
 
+### Bug fixes ###
+
+
+## Version 16 ##
+
+### Enhancements ###
+
 * Adds support for cursor navigation while in bulk move and bulk
   reschedule mode. Also allows switching between these two bulk
   modes.
