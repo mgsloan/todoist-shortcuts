@@ -3231,6 +3231,9 @@
     // handle those events.  So this handling needs to be done manually.
     document.onkeydown = function(ev) {
       if (ev.keyCode === 27 && ev.type === 'keydown') {
+        if (inBulkMoveMode) {
+          exitBulkMove();
+        }
         closeContextMenus();
       }
     };
