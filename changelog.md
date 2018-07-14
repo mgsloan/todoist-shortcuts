@@ -2,15 +2,23 @@
 
 ## Not yet released ##
 
-* No longer attempts to reselect tasks after priority change as this
-  triggers a bug. See [#32].
+### Enhancements ###
 
-* Fixes a bug where escape would not exit bulk move mode.
+* Adds support for cursor navigation while in bulk move and bulk
+  reschedule mode. Also allows switching between these two bulk
+  modes.
 
 * Adds an internal function for clicking the "import from tempalte" menu
   item.  To avoid binding everything to keys, there is no default
   keybinding for this.  However, if you modify the code for the
   extension then you can use it.  See [#30].
+
+### Bug fixes ###
+
+* No longer attempts to reselect tasks after priority change as this
+  triggers a bug. See [#32].
+
+* Fixes a bug where escape would not exit bulk move mode.
 
 [#30]: https://github.com/mgsloan/todoist-shortcuts/issues/30
 [#32]: https://github.com/mgsloan/todoist-shortcuts/issues/32

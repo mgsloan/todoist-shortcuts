@@ -135,28 +135,27 @@ sort the tasks:
 
 ## Bulk reschedule mode
 
-| keys     | action                             |
-| ---      | ---                                |
-| `* t`    | enter bulk reschedule mode         |
-| `s`      | skip rescheduling the current task |
-| `escape` | exit bulk reschedule mode          |
+| keys           | action                               |
+| ---            | ---                                  |
+| `* t`          | enter bulk reschedule mode           |
+| `v` or `alt+v` | switch to bulk move mode (see below) |
+| `escape`       | exit bulk reschedule mode            |
 
 Once bulk move mode is entered, it will repeatedly bring up the reschedule
-dialog until there are no more tasks after the cursor.
+dialog until there are no more tasks after the cursor.  All of the normal cursor
+navigation keys can be used while in this mode.
 
 ## Bulk move mode
 
-| keys     | action               |
-| ---      | ---                  |
-| `* v`    | enter bulk move mode |
-| `escape` | exit bulk move mode  |
+| keys     | action                                     |
+| ---      | ---                                        |
+| `* v`    | enter bulk move mode                       |
+| `alt+t`  | switch to bulk reschedule mode (see above) |
+| `escape` | exit bulk move mode                        |
 
 Once bulk move mode is entered, it will repeatedly bring up the move-to-project
-dialog until there are no more tasks after the cursor.
-
-There is not yet a way to skip an item in bulk move mode. This will hopefully be
-resolved - see issue
-[#21](https://github.com/mgsloan/todoist-shortcuts/issues/21).
+dialog until there are no more tasks after the cursor. By holding down `alt`,
+you can use the normal cursor navigation keys in this mode.
 
 ## Other
 
