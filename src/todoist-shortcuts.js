@@ -765,7 +765,7 @@
         });
       });
       if (foundInput) {
-        click(foundInput)
+        click(foundInput);
       } else {
         warn('Could not find input to click for file input.');
       }
