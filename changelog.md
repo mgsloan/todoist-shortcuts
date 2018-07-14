@@ -18,10 +18,14 @@
 * No longer attempts to reselect tasks after priority change as this
   triggers a bug. See [#32].
 
+* Fixes a display bug for the navigate mode tips for toggling project /
+  label / filter sections. See [#34].
+
 * Fixes a bug where escape would not exit bulk move mode.
 
 [#30]: https://github.com/mgsloan/todoist-shortcuts/issues/30
 [#32]: https://github.com/mgsloan/todoist-shortcuts/issues/32
+[#34]: https://github.com/mgsloan/todoist-shortcuts/issues/34
 
 
 ## Version 15 ##

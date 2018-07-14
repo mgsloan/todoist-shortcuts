@@ -3165,6 +3165,8 @@
     '  font-weight: normal;',
     '  font-size: 18px;',
     '  color: #dd4b39;',
+    // Ensure that these get displayed over other UI. See issue#34
+    '  z-index: 2147483647',
     '}',
     '',
     '.' + TODOIST_SHORTCUTS_TIP_TYPED + ' {',
