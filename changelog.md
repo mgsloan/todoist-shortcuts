@@ -13,6 +13,8 @@
   keybinding for this.  However, if you modify the code for the
   extension then you can use it.  See [#30].
 
+* Bump to Todoist version 910.
+
 ### Bug fixes ###
 
 * No longer attempts to reselect tasks after priority change as this
