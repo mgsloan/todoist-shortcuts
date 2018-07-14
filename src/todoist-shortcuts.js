@@ -33,16 +33,11 @@
   // heuristics.
   var MULTISELECT = false;
 
-  // Here's where the keybindings get specified. Of course, feel free to modify
-  // this list, or modify this script in general.
-  var KEY_BINDINGS = [
-
-    // Add tasks
-    // (see originalHandler) ['q', quickAddTask],
-    ['a', addTaskBottom],
-    ['A', addTaskTop],
-
-    // Navigation
+  // Cursor navigation.
+  //
+  // Note that modifying these will not affect the cursor motion bindings in
+  // 'handleBulkMoveKey'.
+  var CURSOR_BINDINGS = [
     [['j', 'down'], cursorDown],
     [['k', 'up'], cursorUp],
     [['h', 'left'], cursorLeft],
@@ -50,7 +45,19 @@
     ['^', cursorFirst],
     ['$', cursorLast],
     ['{', cursorUpSection],
-    ['}', cursorDownSection],
+    ['}', cursorDownSection]
+  ];
+
+  // Here's where the keybindings get specified. Of course, feel free to modify
+  // this list, or modify this script in general.
+  var KEY_BINDINGS = Array.concat(CURSOR_BINDINGS, [
+
+    // Add tasks
+    // (see originalHandler) ['q', quickAddTask],
+    ['a', addTaskBottom],
+    ['A', addTaskTop],
+
+    // Navigation
     ['g', navigate],
 
     // Manipulation of tasks at cursor
@@ -109,15 +116,23 @@
     // ['i', importFromTemplate],
 
     ['fallback', defaultFallbackHandler]
-  ];
+  ]);
   var DEFAULT_KEYMAP = 'default';
 
   if (!MULTISELECT) {
     KEY_BINDINGS.push(['x', toggleSelect]);
   }
 
+  // Build cursor movement bindings that can be used in schedule mode
+  var SCHEDULE_CURSOR_BINDINGS = [];
+  for (var cix = 0; cix < CURSOR_BINDINGS.length; cix++) {
+    var binding = CURSOR_BINDINGS[cix];
+    var action = sequence([closeContextMenus, binding[1], schedule]);
+    SCHEDULE_CURSOR_BINDINGS.push([binding[0], action]);
+  }
+
   // Scheduling keybindings (used when scheduler is open)
-  var SCHEDULE_BINDINGS = [
+  var SCHEDULE_BINDINGS = Array.concat(SCHEDULE_CURSOR_BINDINGS, [
     ['d', scheduleToday],
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
@@ -125,12 +140,12 @@
     ['r', unschedule],
     ['escape', closeContextMenus],
     ['fallback', originalHandler]
-  ];
+  ]);
   var SCHEDULE_KEYMAP = 'schedule';
 
   // Bulk schedule mode keybindings
   var BULK_SCHEDULE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
-    [['j', 'ctrl+'], skipBulkSchedule],
+    [['v', 'alt+v'], sequence([exitBulkSchedule, bulkMove])],
     ['escape', exitBulkSchedule],
     ['fallback', originalHandler]
   ]);
@@ -139,9 +154,58 @@
   // Bulk move keybindings
   //
   // These can't be handled by mousetrap, because they need to be triggered
-  // while an input is focused. See 'sometimesCallOriginal'.
+  // while an input is focused. See 'handleBulkMoveKey' below.
   var BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
   var BULK_MOVE_KEYMAP = 'bulk_move';
+
+  function handleBulkMoveKey(ev) {
+    if (ev.keyCode === 27 && ev.type === 'keydown') {
+      exitBulkMove();
+      closeContextMenus();
+    } else if (ev.altKey && !ev.ctrlKey && !ev.metaKey) {
+      if (!ev.shiftKey) {
+        if (ev.key === 't') {
+          // alt+t -> switch to bulk schedule mode
+          exitBulkMove();
+          bulkSchedule();
+          return false;
+        } else if (ev.key === 'j' || ev.keyCode === 40) {
+          // alt-j or alt-down -> mvoe cursor down
+          return wrapBulkMoveCursorChange(cursorDown);
+        } else if (ev.key === 'k' || ev.keyCode === 38) {
+          // alt-k or alt-up-> mvoe cursor up
+          return wrapBulkMoveCursorChange(cursorUp);
+        } else if (ev.key === 'h' || ev.keyCode === 37) {
+          // alt-h or alt-left-> mvoe cursor lef
+          return wrapBulkMoveCursorChange(cursorLeft);
+        } else if (ev.key === 'h' || ev.keyCode === 39) {
+          // alt-l or alt-right -> mvoe cursor right
+          return wrapBulkMoveCursorChange(cursorRight);
+        }
+      }
+      if (ev.key === '^') {
+        // alt-^ -> mvoe cursor to first item
+        return wrapBulkMoveCursorChange(cursorFirst);
+      } else if (ev.key === '$') {
+        // alt-^ -> mvoe cursor to first item
+        return wrapBulkMoveCursorChange(cursorLast);
+      } else if (ev.key === '{') {
+        // alt-{ -> mvoe cursor up section
+        return wrapBulkMoveCursorChange(cursorUpSection);
+      } else if (ev.key === '{') {
+        // alt-{ -> mvoe cursor up section
+        return wrapBulkMoveCursorChange(cursorDownSection);
+      }
+    }
+    return true;
+  }
+
+  function wrapBulkMoveCursorChange(f) {
+    closeContextMenus();
+    f();
+    moveToProject();
+    return false;
+  }
 
   // Navigation mode uses its own key handler.
   var NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
@@ -389,6 +453,9 @@
       var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskSchedule(mutateCursor);
+        if (inBulkScheduleMode) {
+          bulkScheduleCursorChanged();
+        }
       } else {
         withId(ACTIONS_BAR_CLASS, function(parent) {
           withUniqueClass(parent, MI_SCHEDULE, all, click);
@@ -447,6 +514,9 @@
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_MOVE);
+      if (inBulkMoveMode) {
+        bulkMoveCursorChanged();
+      }
     } else {
       withId(ACTIONS_BAR_CLASS, function(parent) {
         withUniqueClass(parent, MI_MOVE, all, click);
@@ -795,15 +865,6 @@
     }
   }
 
-  function skipBulkSchedule() {
-    if (nextBulkScheduleKey) {
-      // Closing the calendar will make it open the next.
-      closeContextMenus();
-    } else {
-      exitBulkSchedule();
-    }
-  }
-
   function exitBulkSchedule() {
     inBulkScheduleMode = false;
     nextBulkScheduleKey = null;
@@ -813,7 +874,6 @@
 
   // NOTE: This is called internally, not intended for use as keybinding action.
   function oneBulkSchedule() {
-    var tasks = getTasks();
     if (!nextBulkScheduleKey) {
       debug('Exiting bulk schedule mode because there is nothing left to schedule.');
       exitBulkSchedule();
@@ -825,15 +885,23 @@
       exitBulkSchedule();
       return;
     }
-    var nextBulkScheduleTask =
-        getNextCursorableTask(tasks, nextBulkScheduleKey);
     setCursor(curBulkScheduleTask, 'scroll');
+    bulkScheduleCursorChanged();
     clickTaskSchedule(curBulkScheduleTask);
-    if (nextBulkScheduleTask) {
-      nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
-    } else {
-      nextBulkScheduleKey = null;
+  }
+
+  function bulkScheduleCursorChanged() {
+    var cursor = getCursor();
+    if (cursor) {
+      var tasks = getTasks();
+      var nextBulkScheduleTask =
+          getNextCursorableTask(tasks, getTaskKey(cursor));
+      if (nextBulkScheduleTask) {
+        nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
+        return;
+      }
     }
+    nextBulkScheduleKey = null;
   }
 
   /*****************************************************************************
@@ -875,7 +943,6 @@
 
   // NOTE: This is called internally, not intended for use as keybinding action.
   function oneBulkMove() {
-    var tasks = getTasks();
     if (!nextBulkMoveKey) {
       debug('Exiting bulk move mode because there is nothing left to move.');
       exitBulkMove();
@@ -887,15 +954,23 @@
       exitBulkMove();
       return;
     }
-    var nextBulkMoveTask =
-        getNextCursorableTask(tasks, nextBulkMoveKey);
     setCursor(curBulkMoveTask, 'scroll');
+    bulkMoveCursorChanged();
     clickTaskMenu(curBulkMoveTask, MI_MOVE);
-    if (nextBulkMoveTask) {
-      nextBulkMoveKey = getTaskKey(nextBulkMoveTask);
-    } else {
-      nextBulkMoveKey = null;
+  }
+
+  function bulkMoveCursorChanged() {
+    var cursor = getCursor();
+    if (cursor) {
+      var tasks = getTasks();
+      var nextBulkMoveTask =
+          getNextCursorableTask(tasks, getTaskKey(cursor));
+      if (nextBulkMoveTask) {
+        nextBulkMoveKey = getTaskKey(nextBulkMoveTask);
+        return;
+      }
     }
+    nextBulkScheduleKey = null;
   }
 
   /*****************************************************************************
@@ -3230,12 +3305,13 @@
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     document.onkeydown = function(ev) {
+      if (inBulkMoveMode) {
+        return handleBulkMoveKey(ev);
+      }
       if (ev.keyCode === 27 && ev.type === 'keydown') {
-        if (inBulkMoveMode) {
-          exitBulkMove();
-        }
         closeContextMenus();
       }
+      return true;
     };
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
