@@ -413,15 +413,12 @@
   // Follow the first link of the task under the cursor.
   function follow() {
     withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, function(content) {
-      var parser = new DOMParser();
-      var pc = parser.parseFromString(content.innerHTML, 'text/html');
-      var link = pc.getElementsByClassName('ex_link')[0].getAttribute('href');
-
-      if (!link.match(/^https?:\/\//i)) {
-        link = 'http://' + link;
+      var link = getFirstClass(content, 'ex_link');
+      if (link) {
+        click(link);
+      } else {
+        info('Didn\'t find a link to click.')
       }
-
-      window.open(link);
     });
   }
 
