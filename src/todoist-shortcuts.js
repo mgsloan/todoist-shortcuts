@@ -62,8 +62,8 @@
 
     // Manipulation of tasks at cursor
     ['enter', edit],
-	['shift+enter', follow],
-	['O', addAbove],
+    ['shift+enter', follow],
+    ['O', addAbove],
     ['o', addBelow],
     ['c', comment],
     [['J', 'shift+down'], moveDown],
@@ -413,16 +413,15 @@
   // Follow the first link of the task under the cursor.
   function follow() {
     withUniqueClass(getCursor(), EDIT_CLICK_CLASS, all, function(content) {
+      var parser = new DOMParser();
+      var pc = parser.parseFromString(content.innerHTML, 'text/html');
+      var link = pc.getElementsByClassName('ex_link')[0].getAttribute('href');
 
-        var parser = new DOMParser();
-        var pc = parser.parseFromString(content.innerHTML, "text/html");
-        var link = pc.getElementsByClassName('ex_link')[0].getAttribute('href');
-        
-        if (!link.match(/^https?:\/\//i)) {
-            link = 'http://' + link;
-        }
+      if (!link.match(/^https?:\/\//i)) {
+        link = 'http://' + link;
+      }
 
-        window.open(link);
+      window.open(link);
     });
   }
 
