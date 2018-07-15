@@ -4,7 +4,14 @@
 
 ### Enhancements ###
 
+* Adds support for clicking the first link in a task via
+  shift+enter. See [#33].
+
+
 ### Bug fixes ###
+
+
+[#33]: https://github.com/mgsloan/todoist-shortcuts/issues/34
 
 
 ## Version 16 ##
