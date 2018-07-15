@@ -271,7 +271,7 @@
   var TODOIST_ROOT_ID = 'todoist_app';
   var AGENDA_VIEW_ID = 'agenda_view';
   var MOVE_TO_PROJECT_ID = 'GB_window';
-  var EDIT_CLICK_CLASS = 'content';
+  var TASK_CONTENT_CLASS = 'content';
   var ACTIONS_BAR_CLASS = 'item_selecter';
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
   var ARROW_CLASS = 'arrow';
@@ -405,14 +405,14 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, all, function(content) {
+    withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, function(content) {
       content.dispatchEvent(new Event('mousedown'));
     });
   }
 
   // Follow the first link of the task under the cursor.
   function follow() {
-    withUniqueClass(getCursor(), EDIT_CLICK_CLASS, all, function(content) {
+    withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, function(content) {
       var parser = new DOMParser();
       var pc = parser.parseFromString(content.innerHTML, 'text/html');
       var link = pc.getElementsByClassName('ex_link')[0].getAttribute('href');
