@@ -417,7 +417,7 @@
       if (link) {
         click(link);
       } else {
-        info('Didn\'t find a link to click.')
+        info('Didn\'t find a link to click.');
       }
     });
   }
@@ -830,7 +830,6 @@
   // Click "import from template" in project menu
   // eslint-disable-next-line no-unused-vars
   function importFromTemplate() {
-    var foundItem = null;
     withClass(document, 'menu_item', function(tr) {
       withUniqueTag(tr, 'td', matchingAttr('data-track', 'project|actions_import_from_template'), function(foundItem) {
         click(foundItem);
@@ -3045,6 +3044,7 @@
   }
 
   // Returns predicate which returns 'true' if text content matches wanted text.
+  // eslint-disable-next-line no-unused-vars
   function matchingText(text) {
     return function(el) {
       return el.textContent === text;
