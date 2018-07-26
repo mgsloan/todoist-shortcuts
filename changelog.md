@@ -4,17 +4,26 @@
 
 ### Enhancements ###
 
-* Adds support for clicking the first link in a task via
-  shift+enter. See [#33].
-
-* Fixes scheduling actions, which no longer worked due to dom
-  updates in Todoist version 911.
-
-
 ### Bug fixes ###
 
 
-[#33]: https://github.com/mgsloan/todoist-shortcuts/issues/34
+
+## Version 17 ##
+
+### Enhancements ###
+
+* Adds support for clicking the first link in a task via
+  shift+enter. See [#33].
+
+* Bump to Todoist version 911.
+
+### Bug fixes ###
+
+* Fixes scheduling actions and navigation to inbox / today / next
+  7 days, which no longer worked due to dom updates in Todoist
+  version 911.
+
+[#33]: https://github.com/mgsloan/todoist-shortcuts/issues/33
 
 
 ## Version 16 ##
