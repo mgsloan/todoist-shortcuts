@@ -2120,11 +2120,11 @@
         var mustBeKeys = null;
         var text = null;
         var initials = null;
-        if (getUniqueClass(li, 'cmp_filter_inbox')) {
+        if (matchingAttr('data-track', 'navigation|inbox')(li)) {
           mustBeKeys = 'i';
-        } else if (getUniqueClass(li, 'cmp_filter_today')) {
+        } else if (matchingAttr('data-track', 'navigation|today')(li)) {
           mustBeKeys = 'g';
-        } else if (getUniqueClass(li, 'cmp_filter_days')) {
+        } else if (matchingAttr('data-track', 'navigation|next_7_days')(li)) {
           mustBeKeys = 'n';
         } else if (li.classList.contains('top_menu_item')) {
           withUniqueClass(li, 'item_name', all, function(nameSpan) {
