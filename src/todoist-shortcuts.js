@@ -488,35 +488,35 @@
   // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
     withCalendar('scheduleToday', function(calendar) {
-      withUniqueClass(calendar, 'icon_today', not(matchingText('X')), click);
+      withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|today'), click);
     });
   }
 
   // Click 'tomorrow' in schedule. Only does anything if schedule is open.
   function scheduleTomorrow() {
     withCalendar('scheduleTomorrow', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_tomorrow', all, click);
+      withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|tomorrow'), click);
     });
   }
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
     withCalendar('scheduleNextWeek', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_next_week', all, click);
+      withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|next_week'), click);
     });
   }
 
   // Click 'next month' in schedule. Only does anything if schedule is open.
   function scheduleNextMonth() {
     withCalendar('scheduleNextMonth', function(calendar) {
-      withUniqueClass(calendar, 'cmp_scheduler_month', all, click);
+      withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|next_month'), click);
     });
   }
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
   function unschedule() {
     withCalendar('unschedule', function(calendar) {
-      withUniqueClass(calendar, 'icon_today', matchingText('X'), click);
+      withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|no_due_date'), click);
     });
   }
 
@@ -832,29 +832,21 @@
   function importFromTemplate() {
     var foundItem = null;
     withClass(document, 'menu_item', function(tr) {
-      withTag(tr, 'td', function(td) {
-        var dataTrack = td.attributes.getNamedItem('data-track');
-        if (dataTrack && dataTrack.nodeValue === 'project|actions_import_from_template') {
-          foundItem = td;
+      withUniqueTag(tr, 'td', matchingAttr('data-track', 'project|actions_import_from_template'), function(foundItem) {
+        click(foundItem);
+        var foundInput = null;
+        withClass(document, 'file_input_container', function(container) {
+          withTag(container, 'input', function(input) {
+            foundInput = input;
+          });
+        });
+        if (foundInput) {
+          click(foundInput);
+        } else {
+          warn('Could not find input to click for file input.');
         }
       });
     });
-    if (foundItem) {
-      click(foundItem);
-      var foundInput = null;
-      withClass(document, 'file_input_container', function(container) {
-        withTag(container, 'input', function(input) {
-          foundInput = input;
-        });
-      });
-      if (foundInput) {
-        click(foundInput);
-      } else {
-        warn('Could not find input to click for file input.');
-      }
-    } else {
-      warn('Could not find import from template button.');
-    }
   }
 
   /*****************************************************************************
@@ -1799,7 +1791,7 @@
 
   function clickTaskSchedule(task) {
     withTaskMenu(task, function(menu) {
-      withUniqueClass(menu, 'cmp_scheduler_more', all, click);
+      withUniqueTag(menu, 'a', matchingAttr('data-track', 'scheduler|more'), click);
     });
   }
 
@@ -3077,6 +3069,18 @@
   function matchingId(id) {
     return function(el) {
       return el.id === id;
+    };
+  }
+
+  // Returns predicate which returns 'true' if the element has the specified attribute.
+  function matchingAttr(k, v) {
+    return function(el) {
+      var attr = el.attributes[k];
+      if (attr) {
+        return attr.value === v;
+      } else {
+        return false;
+      }
     };
   }
 

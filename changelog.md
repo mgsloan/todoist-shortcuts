@@ -7,6 +7,9 @@
 * Adds support for clicking the first link in a task via
   shift+enter. See [#33].
 
+* Fixes scheduling actions, which no longer worked due to dom
+  updates in Todoist version 911.
+
 
 ### Bug fixes ###
 
