@@ -6,6 +6,10 @@
 
 * Adds support for manual sync via `ctrl+s`. See [reddit thread].
 
+* Adds use of backtick and shift+backtick to cycle through top
+  level filters (inbox / today / next 7 days + favorites). This is
+  the same keybinding that GMail uses for a similar purpose.
+
 ### Bug fixes ###
 
 [reddit thread]: https://www.reddit.com/r/todoist/comments/92j1qz/todoistshortcuts_browser_extension_adding/e3a2kbt/

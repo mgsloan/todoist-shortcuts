@@ -59,6 +59,8 @@
 
     // Navigation
     ['g', navigate],
+    ['`', nextTopSection],
+    ['shift+`', prevTopSection],
 
     // Manipulation of tasks at cursor
     ['enter', edit],
@@ -787,6 +789,32 @@
         finishNavigate = null;
       };
       setupNavigate(listHolder);
+    });
+  }
+
+  // Cycles down through top sections (inbox / today / next 7 days + favorites).
+  function nextTopSection() {
+    withTopFilters(function(topItems, current) {
+      // If on the last item, or no item, select the first item.
+      if (current >= topItems.length - 1 || current < 0) {
+        topItems[0].click();
+      // Otherwise, select the next item.
+      } else {
+        topItems[current + 1].click();
+      }
+    });
+  }
+
+  // Cycles up through top sections (inbox / today / next 7 days + favorites).
+  function prevTopSection() {
+    withTopFilters(function(topItems, current) {
+      // If on the first item, or no item, select the last item.
+      if (current <= 0) {
+        topItems[topItems.length - 1].click();
+      // Otherwise, select the previous item.
+      } else {
+        topItems[current - 1].click();
+      }
     });
   }
 
@@ -2577,6 +2605,23 @@
       toDelete = document.getElementsByClassName(TODOIST_SHORTCUTS_TIP);
     } while (toDelete.length > 0);
   }
+
+  // Run a function on the array of top filters, along with the index of the
+  // currently selected one, if any.
+  function withTopFilters(f) {
+    withId('top_filters', function(topFilters) {
+      var topItems = topFilters.getElementsByTagName('li');
+      var current = -1;
+      for (var i = 0; i < topItems.length; i++) {
+        if (matchingClass('current')(topItems[i])) {
+          current = i;
+          break;
+        }
+      }
+      f(topItems, current);
+    });
+  }
+
 
   // eslint-disable-next-line no-unused-vars
   function checkTodoistVersion() {
