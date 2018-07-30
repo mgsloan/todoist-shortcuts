@@ -149,6 +149,7 @@ sort the tasks:
 | `s`  | Sort by date     |
 | `p`  | Sort by priority |
 | `r`  | Sort by assignee |
+| `n`  | Sort by name     |
 
 ## Bulk reschedule mode
 

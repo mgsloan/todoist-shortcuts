@@ -10,9 +10,13 @@
   level filters (inbox / today / next 7 days + favorites). This is
   the same keybinding that GMail uses for a similar purpose.
 
+* Adds support for sorting by name via `n`. See [#36]
+
 ### Bug fixes ###
 
+
 [reddit thread]: https://www.reddit.com/r/todoist/comments/92j1qz/todoistshortcuts_browser_extension_adding/e3a2kbt/
+[#36]: https://github.com/mgsloan/todoist-shortcuts/issues/36
 
 
 ## Version 17 ##

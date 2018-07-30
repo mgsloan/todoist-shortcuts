@@ -104,6 +104,7 @@
     // (see originalHandler) ['r', sortByAssignee],
     // (see originalHandler) ['s', sortByDate],
     // (see originalHandler) ['p', sortByPriority],
+    ['n', sortByName],
 
     // Bulk reschedule / move mode
     ['* t', bulkSchedule],
@@ -848,6 +849,11 @@
   // Trigger sort-by-assignee by simulating a keypress.
   // eslint-disable-next-line no-unused-vars
   function sortByAssignee() { todoistShortcut('r'); }
+
+  // Trigger sort by name by clicking a menu item.
+  function sortByName() {
+    withUniqueTag(document, 'td', matchingAttr('data-track', 'project|actions_sort_by_name'), click);
+  }
 
   // Open help documentation.
   function openShortcutsHelp() {
