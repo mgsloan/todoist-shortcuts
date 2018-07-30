@@ -109,7 +109,7 @@
 
     // Other
     // (see originalHandler) [['u', 'ctrl+z'], undo],
-    [['ctrl+z'], undo],
+    ['ctrl+z', undo],
     // (see originalHandler) [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
 
