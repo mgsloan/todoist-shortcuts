@@ -112,6 +112,7 @@
     ['ctrl+z', undo],
     // (see originalHandler) [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
+    ['ctrl+s', sync],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // ['i', importFromTemplate],
@@ -846,6 +847,10 @@
         }
       });
     });
+  }
+
+  function sync() {
+    withUniqueTag(document, 'td', matchingAttr('data-track', 'navigation|gear_sync'), click);
   }
 
   /*****************************************************************************

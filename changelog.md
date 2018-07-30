@@ -4,8 +4,11 @@
 
 ### Enhancements ###
 
+* Adds support for manual sync via `ctrl+s`. See [reddit thread].
+
 ### Bug fixes ###
 
+[reddit thread]: https://www.reddit.com/r/todoist/comments/92j1qz/todoistshortcuts_browser_extension_adding/e3a2kbt/
 
 
 ## Version 17 ##
