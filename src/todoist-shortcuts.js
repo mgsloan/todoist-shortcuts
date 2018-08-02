@@ -1639,11 +1639,9 @@
   // structures.
   function moveUp() {
     var cursor = getCursor();
-    if (viewMode === 'agenda') {
-      info('Moving task up does not work in agenda mode.');
-    } else if (viewMode === 'filter') {
+    if (viewMode === 'filter') {
       info('Moving task up does not work in filter mode.');
-    } else if (viewMode === 'project') {
+    } else if (viewMode === 'project' || viewMode === 'agenda') {
       if (!cursor) {
         info('No cursor to move up.');
       } else {
@@ -1678,11 +1676,9 @@
   // structures.
   function moveDown() {
     var cursor = getCursor();
-    if (viewMode === 'agenda') {
-      info('Moving task down does not work in agenda mode.');
-    } else if (viewMode === 'filter') {
+    if (viewMode === 'filter') {
       info('Moving task down does not work in filter mode.');
-    } else if (viewMode === 'project') {
+    } else if (viewMode === 'project' || viewMode === 'agenda') {
       if (!cursor) {
         info('No cursor to move down.');
       } else {

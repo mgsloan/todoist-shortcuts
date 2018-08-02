@@ -6,6 +6,10 @@
 
 ### Bug fixes ###
 
+* Moving tasks up and down via `shift-j` / `shift-k` now works in agenda
+  mode (today / next 7 days). I believe this was enabled by a change in
+  Todoist behavior.
+
 
 ## Version 18 ##
 
