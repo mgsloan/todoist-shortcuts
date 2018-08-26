@@ -10,6 +10,8 @@
   mode (today / next 7 days). I believe this was enabled by a change in
   Todoist behavior.
 
+* Fix a bug where moving a task left would sometimes move the task into
+  a project. See [#39].
 
 ## Version 18 ##
 
