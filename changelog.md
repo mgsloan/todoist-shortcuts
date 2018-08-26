@@ -6,6 +6,11 @@
 
 ### Bug fixes ###
 
+
+## Version 19 ##
+
+### Bug fixes ###
+
 * Fixes a bug where it didn't function at all on Firefox, for
   puzzling reasons related to the keypress event handler. See [#40].
 
