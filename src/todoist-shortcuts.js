@@ -1621,19 +1621,17 @@
     } else if (viewMode === 'project') {
       if (!cursor) {
         info('No cursor to dedent.');
+      } else if (getTaskIndentClass(cursor) !== 'indent_1') {
+        // See https://github.com/mgsloan/todoist-shortcuts/issues/39
+        info('Task is already at indent level 1, so not dedenting');
       } else {
-	if (getTaskIndentClass(cursor) !== "indent_1") {
-	  // See https://github.com/mgsloan/todoist-shortcuts/issues/39
-	  info("Task is already at indent level 1, so not dedenting");
-	} else {
-	  dragTaskOver(cursor, false, function() {
-	    return {
-	      destination: cursor,
-	      horizontalOffset: -28,
-	      verticalOffset: 0
-	    };
-	  });
-	}
+        dragTaskOver(cursor, false, function() {
+          return {
+            destination: cursor,
+            horizontalOffset: -28,
+            verticalOffset: 0
+          };
+        });
       }
     } else {
       error('Unexpected viewMode:', viewMode);
