@@ -6,12 +6,19 @@
 
 ### Bug fixes ###
 
+* Fixes a bug where it didn't function at all on Firefox, for
+  puzzling reasons related to the keypress event handler. See [#40].
+
 * Moving tasks up and down via `shift-j` / `shift-k` now works in agenda
   mode (today / next 7 days). I believe this was enabled by a change in
   Todoist behavior.
 
 * Fix a bug where moving a task left would sometimes move the task into
   a project. See [#39].
+
+[#39]: https://github.com/mgsloan/todoist-shortcuts/issues/39
+[#40]: https://github.com/mgsloan/todoist-shortcuts/issues/40
+
 
 ## Version 18 ##
 
