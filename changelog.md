@@ -7,6 +7,16 @@
 ### Bug fixes ###
 
 
+## Version 20 ##
+
+### Bug fixes ###
+
+* The most recent bugfix release broke some keybindings.  This
+  release has a bugfix that works around [mousetrap#430].
+
+[mousetrap#430]: https://github.com/ccampbell/mousetrap/issues/430
+
+
 ## Version 19 ##
 
 ### Bug fixes ###
