@@ -55,7 +55,7 @@
     // Add tasks
     // (see originalHandler) ['q', quickAddTask],
     ['a', addTaskBottom],
-    ['A', addTaskTop],
+    ['shift+a', addTaskTop],
 
     // Navigation
     ['g', navigate],
@@ -65,13 +65,13 @@
     // Manipulation of tasks at cursor
     ['enter', edit],
     ['shift+enter', follow],
-    ['O', addAbove],
+    ['shift+o', addAbove],
     ['o', addBelow],
     ['c', comment],
-    [['J', 'shift+down'], moveDown],
-    [['K', 'shift+up'], moveUp],
-    [['H', 'shift+left'], moveOut],
-    [['L', 'shift+right'], moveIn],
+    [['shift+j', 'shift+down'], moveDown],
+    [['shift+k', 'shift+up'], moveUp],
+    [['shift+h', 'shift+left'], moveOut],
+    [['shift+l', 'shift+right'], moveIn],
 
     // Selection
     //
@@ -88,7 +88,7 @@
 
     // Manipulation of selected tasks
     ['t', schedule],
-    ['T', scheduleText],
+    ['shift+t', scheduleText],
     ['d', done],
     ['e', archive],
     ['#', deleteTasks],
