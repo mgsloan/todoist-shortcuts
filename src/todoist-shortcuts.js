@@ -1621,7 +1621,7 @@
     } else if (viewMode === 'project') {
       if (!cursor) {
         info('No cursor to dedent.');
-      } else if (getTaskIndentClass(cursor) !== 'indent_1') {
+      } else if (getTaskIndentClass(cursor) === 'indent_1') {
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
       } else {
