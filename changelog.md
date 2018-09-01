@@ -6,6 +6,11 @@
 
 ### Bug fixes ###
 
+
+## Version 21 ##
+
+### Bug fixes ###
+
 * Fixes original todoist keybindings `a` / `A` for adding tasks to the
   top / bottom of the list. See [#41]
 
