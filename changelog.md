@@ -9,7 +9,12 @@
 * Fixes original todoist keybindings `a` / `A` for adding tasks to the
   top / bottom of the list. See [#41]
 
+* Fixes bug that prevented Todoist's ability to display a particular
+  task within a listing. See [#42]
+
 [#41]: https://github.com/mgsloan/todoist-shortcuts/issues/41
+[#42]: https://github.com/mgsloan/todoist-shortcuts/issues/42
+
 
 ## Version 20 ##
 

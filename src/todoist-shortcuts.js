@@ -1319,7 +1319,13 @@
       updateViewMode();
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
-      setCursorToFirstTask('scroll');
+      // The reason for 'no-scroll' here is so that Todoist can
+      // navigate to a particular task - see #42.  Ideally in this
+      // case, the cursor would also be placed on the task.
+      // Unfortunately after some poking around I couldn't figure out
+      // how to implement this - I couldn't easily get a debugger
+      // paused while the task is flashing yellow.
+      setCursorToFirstTask('no-scroll');
     }
   }
 
