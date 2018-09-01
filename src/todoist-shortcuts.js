@@ -826,9 +826,11 @@
   }
 
   // Add new task to the bottom of the list.
+  // eslint-disable-next-line no-unused-vars
   function addTaskBottom() { todoistShortcut('a'); }
 
   // Add new task to the top of the list.
+  // eslint-disable-next-line no-unused-vars
   function addTaskTop() { todoistShortcut('A'); }
 
   // Focus the search bar.
