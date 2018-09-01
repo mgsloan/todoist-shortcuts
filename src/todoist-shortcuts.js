@@ -54,8 +54,8 @@
 
     // Add tasks
     // (see originalHandler) ['q', quickAddTask],
-    ['a', addTaskBottom],
-    ['shift+a', addTaskTop],
+    // (see originalHandler) ['a', addTaskBottom],
+    // (see originalHandler) ['shift+a', addTaskTop],
 
     // Navigation
     ['g', navigate],

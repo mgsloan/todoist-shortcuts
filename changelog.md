@@ -6,6 +6,10 @@
 
 ### Bug fixes ###
 
+* Fixes original todoist keybindings `a` / `A` for adding tasks to the
+  top / bottom of the list. See [#41]
+
+[#41]: https://github.com/mgsloan/todoist-shortcuts/issues/41
 
 ## Version 20 ##
 
