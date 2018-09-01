@@ -2775,7 +2775,8 @@
     }
     cursor = getCursor();
     if (!cursor) {
-      info('Couldn\'t find a task to select, so not moving cursor.');
+      info('Couldn\'t find cursor, so selecting first task.');
+      setCursorToFirstTask('scroll');
     } else {
       var cursorIndex = tasks.indexOf(getCursor());
       if (cursorIndex < 0) {
