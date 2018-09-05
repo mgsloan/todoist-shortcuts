@@ -159,7 +159,7 @@ sort the tasks:
 | `v` or `alt+v` | switch to bulk move mode (see below) |
 | `escape`       | exit bulk reschedule mode            |
 
-Once bulk move mode is entered, it will repeatedly bring up the reschedule
+Once bulk reschedule mode is entered, it will repeatedly bring up the reschedule
 dialog until there are no more tasks after the cursor.  All of the normal cursor
 navigation keys can be used while in this mode.
 
