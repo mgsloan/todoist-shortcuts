@@ -4,6 +4,7 @@
   "author": "Michael Sloan",
   "description": "Adds a bunch of keyboard shortcuts to Todoist. More info: https://github.com/mgsloan/todoist-shortcuts",
   "version": "21",
+  "homepage_url": "https://github.com/mgsloan/todoist-shortcuts",
   "content_scripts": [
   	{
       "matches":
