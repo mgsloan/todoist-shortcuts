@@ -175,30 +175,30 @@
           bulkSchedule();
           return false;
         } else if (ev.key === 'j' || ev.keyCode === 40) {
-          // alt-j or alt-down -> mvoe cursor down
+          // alt-j or alt-down -> move cursor down
           return wrapBulkMoveCursorChange(cursorDown);
         } else if (ev.key === 'k' || ev.keyCode === 38) {
-          // alt-k or alt-up-> mvoe cursor up
+          // alt-k or alt-up-> move cursor up
           return wrapBulkMoveCursorChange(cursorUp);
         } else if (ev.key === 'h' || ev.keyCode === 37) {
-          // alt-h or alt-left-> mvoe cursor lef
+          // alt-h or alt-left-> move cursor lef
           return wrapBulkMoveCursorChange(cursorLeft);
         } else if (ev.key === 'h' || ev.keyCode === 39) {
-          // alt-l or alt-right -> mvoe cursor right
+          // alt-l or alt-right -> move cursor right
           return wrapBulkMoveCursorChange(cursorRight);
         }
       }
       if (ev.key === '^') {
-        // alt-^ -> mvoe cursor to first item
+        // alt-^ -> move cursor to first item
         return wrapBulkMoveCursorChange(cursorFirst);
       } else if (ev.key === '$') {
-        // alt-^ -> mvoe cursor to first item
+        // alt-^ -> move cursor to first item
         return wrapBulkMoveCursorChange(cursorLast);
       } else if (ev.key === '{') {
-        // alt-{ -> mvoe cursor up section
+        // alt-{ -> move cursor up section
         return wrapBulkMoveCursorChange(cursorUpSection);
       } else if (ev.key === '{') {
-        // alt-{ -> mvoe cursor up section
+        // alt-{ -> move cursor up section
         return wrapBulkMoveCursorChange(cursorDownSection);
       }
     }
