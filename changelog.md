@@ -1,10 +1,17 @@
 # todoist-shortcuts changelog
 
-## Not yet released ##
-
-### Enhancements ###
+## Version 22 ##
 
 ### Bug fixes ###
+
+* Fixes a bug where project navigation didn't work for some
+  projects with emojis. See [#44]
+
+* Fixes a bug where project navigation didn't work for favorite
+  labels.  I suspect that this is due to a change in CSS class name
+  between version 911 and 914.
+
+[#44]: https://github.com/mgsloan/todoist-shortcuts/issues/44
 
 
 ## Version 21 ##

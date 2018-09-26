@@ -6,7 +6,7 @@
 // @include     http://todoist.com/app*
 // @include     https://beta.todoist.com/app*
 // @include     http://beta.todoist.com/app*
-// @version     21
+// @version     22
 // @grant       none
 // ==/UserScript==
 
@@ -18,7 +18,7 @@
 (function() {
   'use strict';
 
-  var TODOIST_SHORTCUTS_VERSION = 21;
+  var TODOIST_SHORTCUTS_VERSION = 22;
 
   // When true, enables selecting multiple items by holding 'x' and moving the
   // cursor.
@@ -308,7 +308,7 @@
   var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
-  var TODOIST_TESTED_VERSION = 911;
+  var TODOIST_TESTED_VERSION = 914;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
