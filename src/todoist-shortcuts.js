@@ -2172,7 +2172,7 @@
           mustBeKeys = 'g';
         } else if (matchingAttr('data-track', 'navigation|next_7_days')(li)) {
           mustBeKeys = 'n';
-        } else if (li.classList.contains('top_menu_item')) {
+        } else if (li.classList.contains('favorite_item')) {
           withUniqueClass(li, 'item_name', all, function(nameSpan) {
             text = preprocessItemText(nameSpan.textContent);
             initials = getItemInitials(nameSpan.textContent);
