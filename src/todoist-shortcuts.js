@@ -2939,7 +2939,8 @@
     }
   }
 
-  // Invokes the function for every child element that matches the class name.
+  // Invokes the function for every descendant element that matches
+  // the class name.
   function withClass(parent, cls, f) {
     if (arguments.length > 3) {
       error('Too many arguments passed to withClass', arguments);
@@ -2950,7 +2951,8 @@
     }
   }
 
-  // Invokes the function for every child element that matches a tag name.
+  // Invokes the function for every descendant element that matches a
+  // tag name.
   function withTag(parent, tag, f) {
     if (arguments.length > 3) {
       error('Too many arguments passed to withTag', arguments);
@@ -2961,8 +2963,8 @@
     }
   }
 
-  // Finds a parentElement which matches the specified predicate. Returns null
-  // if element is null.
+  // Finds a parentElement which matches the specified
+  // predicate. Returns null if element is null.
   function findParent(element, predicate) {
     if (!element) return null;
     var el = element.parentElement;
@@ -2976,48 +2978,53 @@
     return null;
   }
 
-  // Returns first child that matches the specified class and predicate.
+  // Returns first descendant that matches the specified class and
+  // predicate.
   function getFirstClass(parent, cls, predicate) {
     return findFirst(predicate, parent.getElementsByClassName(cls));
   }
 
-  // Returns last child that matches the specified class and predicate.
+  // Returns last descendant that matches the specified class and
+  // predicate.
   function getLastClass(parent, cls, predicate) {
     return findLast(predicate, parent.getElementsByClassName(cls));
   }
 
-  // Checks that there is only one child element that matches the class name and
+  // Checks that there is only one descendant element that matches the class name and
   // predicate, and returns it. Returns null if it is not found or not unique.
   function getUniqueClass(parent, cls, predicate) {
     return findUnique(predicate, parent.getElementsByClassName(cls));
   }
 
-  // Checks that there is only one child element that matches the class name,
-  // and invokes the function on it. Logs a warning if there isn't exactly one.
+  // Checks that there is only one descendant element that matches the
+  // class name, and invokes the function on it. Logs a warning if
+  // there isn't exactly one.
   function withUniqueClass(parent, cls, predicate, f) {
     var result = getUniqueClass(parent, cls, predicate);
     if (result) {
       return f(result);
     } else {
-      warn('Couldn\'t find unique child with class', cls, 'and matching predicate, instead got', result);
+      warn('Couldn\'t find unique descendant with class', cls, 'and matching predicate, instead got', result);
       return null;
     }
   }
 
-  // Checks that there is only one child element that matches the tag and
-  // predicate, and returns it. Returns null if it is not found or not unique.
+  // Checks that there is only one descendant element that matches the
+  // tag and predicate, and returns it. Returns null if it is not
+  // found or not unique.
   function getUniqueTag(parent, tag, predicate) {
     return findUnique(predicate, parent.getElementsByTagName(tag));
   }
 
-  // Checks that there is only one child element that matches the tag, and
-  // invokes the function on it. Logs a warning if there isn't exactly one.
+  // Checks that there is only one descendant element that matches the
+  // tag, and invokes the function on it. Logs a warning if there
+  // isn't exactly one.
   function withUniqueTag(parent, tag, predicate, f) {
     var result = getUniqueTag(parent, tag, predicate);
     if (result) {
       return f(result);
     } else {
-      warn('Couldn\'t find unique child with tag', tag, 'and passing predicate');
+      warn('Couldn\'t find unique descendant with tag', tag, 'and passing predicate');
       return null;
     }
   }
