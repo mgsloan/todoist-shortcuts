@@ -2179,7 +2179,7 @@
           });
         } else {
           withUniqueClass(li, 'name', all, function(nameElement) {
-            withUniqueTag(nameElement, 'span', all, function(nameSpan) {
+            withUniqueChild(nameElement, matchingTag('span'), function(nameSpan) {
               text = preprocessItemText(nameSpan.textContent);
               initials = getItemInitials(nameSpan.textContent);
             });
@@ -2758,7 +2758,7 @@
   // cursor is currently hovering something on the left menu (project, label,
   // filter), then returns string 'OnLeft'.
   function getCursorOrOnLeft() {
-    var cursor = findParent(getUniqueClass(document, 'drag_and_drop_handler'), matchingTag('LI'));
+    var cursor = findParent(getUniqueClass(document, 'drag_and_drop_handler'), matchingTag('li'));
     // Ignore when items on the left menu are hovered.
     if (findParent(cursor, matchingId('left_menu'))) {
       return 'OnLeft';
@@ -3029,6 +3029,25 @@
     }
   }
 
+  // Given a predicate, returns a value if there is a unique child
+  // which matches it.
+  function getUniqueChild(parent, predicate) {
+    return findUnique(predicate, parent.children);
+  }
+
+  // Checks that there is only one child element that matches the
+  // predicate, and invokes the function on it. Logs a warning if
+  // there isn't exactly one.
+  function withUniqueChild(parent, predicate, f) {
+    var result = getUniqueChild(parent, predicate);
+    if (result) {
+      return f(result);
+    } else {
+      warn('Couldn\'t find unique child and passing predicate');
+      return null;
+    }
+  }
+
   // Returns true if the map-like / set-like object is empty.
   function isEmptyMap(obj) {
     for (var key in obj) {
@@ -3132,7 +3151,7 @@
   // Returns predicate which returns 'true' if the element has the specified tag.
   function matchingTag(tag) {
     return function(el) {
-      return el.tagName === tag;
+      return el.tagName.toLowerCase() === tag;
     };
   }
 
