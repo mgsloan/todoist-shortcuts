@@ -1286,7 +1286,7 @@
   function getSection(task) {
     var predicate;
     if ((viewMode === 'agenda') || (viewMode === 'filter')) {
-      predicate = or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId('agenda_view'));
+      predicate = or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId(AGENDA_VIEW_ID));
     } else if (viewMode === 'project') {
       predicate = matchingClass('list_editor');
     } else {
