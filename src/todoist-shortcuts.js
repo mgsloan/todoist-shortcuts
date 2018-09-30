@@ -1267,7 +1267,6 @@
   // Gets the name of the section that a task is in.
   function getSectionName(task) {
     var section = getSection(task);
-    info('got section', section);
     var result = null;
     if (section) {
       var header = getUniqueClass(section, 'section_header');
