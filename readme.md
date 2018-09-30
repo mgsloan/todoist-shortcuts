@@ -11,6 +11,7 @@ repository, it is also available from the following places:
 
 * [ Extension for Mozilla Firefox
     ![Firefox Users](https://img.shields.io/amo/users/todoist-shortcuts.svg)
+    ![Firefox Rating](https://img.shields.io/amo/rating/todoist-shortcuts.svg)
   ](https://addons.mozilla.org/en-US/firefox/addon/todoist-shortcuts/)
 
 These keyboard shortcuts are directly inspired by the shortcuts used for GMail,
