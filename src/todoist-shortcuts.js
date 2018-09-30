@@ -696,7 +696,7 @@
     if (checkCursorCollapsed()) {
       toggleCollapse();
       // Issue #26
-      if (viewMode !== 'agenda') {
+      if (viewMode !== 'agenda_reorder') {
         cursorDown();
       }
     }
@@ -1086,7 +1086,7 @@
   function handleMouseMove(ev) {
     mouseGotMoved = true;
     // Have cursor follow mouse even if it is not the drag handle cursor:
-    if (viewMode === 'filter') {
+    if (viewMode === 'agenda_no_reorder') {
       var hoveredTask = findParent(ev.target, matchingClass('task_item'));
       if (hoveredTask) {
         setCursor(hoveredTask, 'no-scroll');
@@ -1267,6 +1267,7 @@
   // Gets the name of the section that a task is in.
   function getSectionName(task) {
     var section = getSection(task);
+    info('got section', section);
     var result = null;
     if (section) {
       var header = getUniqueClass(section, 'section_header');
@@ -1285,8 +1286,14 @@
 
   function getSection(task) {
     var predicate;
-    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
-      predicate = or(or(matchingClass('section_overdue'), matchingClass('section_day')), matchingId(AGENDA_VIEW_ID));
+    if (stripPrefix('agenda', viewMode)) {
+      predicate = or(or(or(
+        matchingClass('section_overdue'),
+        matchingClass('section_day')),
+      matchingId(AGENDA_VIEW_ID)),
+        // View all filter looks like agenda view, but really has
+        // multiple project list editors.
+      matchingClass('list_editor'));
     } else if (viewMode === 'project') {
       predicate = matchingClass('list_editor');
     } else {
@@ -1537,7 +1544,7 @@
   function withTaskMenu(task, f) {
     withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
       var menu;
-      if ((viewMode === 'agenda') || (viewMode === 'filter')) {
+      if (stripPrefix('agenda', viewMode)) {
         menu = agendaTaskMenu;
       } else if (viewMode === 'project') {
         menu = taskMenu;
@@ -1598,10 +1605,10 @@
   // Indent task.
   function moveIn() {
     var cursor = getCursor();
-    if (viewMode === 'agenda') {
-      info('Indenting task does not work in agenda mode.');
-    } else if (viewMode === 'filter') {
-      info('Indenting task does not work in filter mode.');
+    if (viewMode === 'agenda_reorder') {
+      info('Indenting task does not work in agenda_reorder mode.');
+    } else if (viewMode === 'agenda_no_reorder') {
+      info('Indenting task does not work in agenda_no_reorder mode.');
     } else if (viewMode === 'project') {
       if (!cursor) {
         info('No cursor to indent.');
@@ -1622,10 +1629,10 @@
   // Dedent task.
   function moveOut() {
     var cursor = getCursor();
-    if (viewMode === 'agenda') {
-      info('Dedenting task does not work in agenda mode.');
-    } else if (viewMode === 'filter') {
-      info('Dedenting task does not work in filter mode.');
+    if (viewMode === 'agenda_reorder') {
+      info('Dedenting task does not work in agenda_reorder mode.');
+    } else if (viewMode === 'agenda_no_reorder') {
+      info('Dedenting task does not work in agenda_no_reorder mode.');
     } else if (viewMode === 'project') {
       if (!cursor) {
         info('No cursor to dedent.');
@@ -1650,9 +1657,9 @@
   // structures.
   function moveUp() {
     var cursor = getCursor();
-    if (viewMode === 'filter') {
+    if (viewMode === 'agenda_no_reorder') {
       info('Moving task up does not work in filter mode.');
-    } else if (viewMode === 'project' || viewMode === 'agenda') {
+    } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
       if (!cursor) {
         info('No cursor to move up.');
       } else {
@@ -1687,9 +1694,9 @@
   // structures.
   function moveDown() {
     var cursor = getCursor();
-    if (viewMode === 'filter') {
+    if (viewMode === 'agenda_no_reorder') {
       info('Moving task down does not work in filter mode.');
-    } else if (viewMode === 'project' || viewMode === 'agenda') {
+    } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
       if (!cursor) {
         info('No cursor to move down.');
       } else {
@@ -1847,7 +1854,7 @@
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelow(menuCls) {
     var cursor = getCursor();
-    if ((viewMode === 'agenda') || (viewMode === 'filter') || cursor === null) {
+    if (stripPrefix('agenda', viewMode) || cursor === null) {
       addToSectionContaining(cursor);
     } else if (viewMode === 'project') {
       clickTaskMenu(cursor, menuCls);
@@ -1860,7 +1867,7 @@
   // task.
   function addToSectionContaining(task) {
     var section = null;
-    if (viewMode === 'filter') {
+    if (viewMode === 'agenda_no_reorder') {
       // TODO: This works well in labels, but may be a bit unexpected in filters
       // like "Priority 1", since quick add will not adjust the task such that
       // it ends up in the filter.
@@ -1868,7 +1875,7 @@
       return;
     } else if (task) {
       section = findParentSection(task);
-    } else if (viewMode === 'agenda') {
+    } else if (stripPrefix('agenda', viewMode)) {
       section = getFirstClass(document, 'section_day');
     } else {
       section = getFirstClass(document, 'project_editor_instance');
@@ -1877,7 +1884,7 @@
       error('Couldn\'t find section for task', task);
       return;
     }
-    if (viewMode === 'agenda') {
+    if (viewMode === 'agenda_reorder') {
       if (section.classList.contains('section_overdue')) {
         section = getFirstClass(document, 'section_day');
       }
@@ -1888,9 +1895,9 @@
   }
 
   function findParentSection(task) {
-    if (viewMode === 'agenda') {
+    if (viewMode === 'agenda_reorder') {
       return findParent(task, or(matchingClass('section_day'), matchingClass('section_overdue')));
-    } else if (viewMode === 'filter') {
+    } else if (viewMode === 'agenda_no_reorder') {
       // Only one section in filter mode, and its header is directly under the
       // agenda_view div.
       return getById(AGENDA_VIEW_ID);
@@ -2037,7 +2044,7 @@
 
   // Get key used for the cursor, in the getSelectedTaskKeys map.
   function getTaskKey(task) {
-    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
+    if (stripPrefix('agenda', viewMode)) {
       return task.id + ' ' + getTaskIndentClass(task);
     } else if (viewMode === 'project') {
       return task.id;
@@ -2049,7 +2056,7 @@
 
   // eslint-disable-next-line no-unused-vars
   function makeTaskKey(id, indent) {
-    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
+    if (stripPrefix('agenda', viewMode)) {
       return id + ' ' + indent;
     } else if (viewMode === 'project') {
       return id;
@@ -2100,7 +2107,7 @@
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
   function getTaskById(id, indent) {
-    if ((viewMode === 'agenda') || (viewMode === 'filter')) {
+    if (stripPrefix('agenda', viewMode)) {
       // In agenda mode, can't rely on uniqueness of ids. So, search for
       // matching 'indent'. Turns out todoist also uses the ids as classes.
       var els = document.getElementsByClassName(id);
@@ -2129,7 +2136,7 @@
         for (var j = i + 1; j < tasks.length; j++) {
           var task = tasks[j];
           // See issue #26
-          if ((viewMode !== 'agenda') || !isTaskIndented(task)) {
+          if ((viewMode !== 'agenda_reorder') || !isTaskIndented(task)) {
             return task;
           }
         }
@@ -2722,7 +2729,7 @@
     if (task) {
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work - see issue #26.
-      if (viewMode === 'agenda' && isTaskIndented(task)) {
+      if (viewMode === 'agenda_reorder' && isTaskIndented(task)) {
         info('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #26');
       } else {
         if (shouldScroll === 'scroll') {
@@ -2734,7 +2741,7 @@
         }
         storeCursorContext(task, false);
         updateCursorStyle();
-        if (viewMode !== 'filter') {
+        if (viewMode !== 'agenda_no_reorder') {
           task.dispatchEvent(new MouseEvent('mouseover'));
         }
       }
@@ -2745,7 +2752,7 @@
 
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    if (viewMode === 'filter') {
+    if (viewMode === 'agenda_no_reorder') {
       return getTaskById(lastCursorId, lastCursorIndent);
     } else {
       var cursor = getCursorOrOnLeft();
@@ -2799,7 +2806,7 @@
       var newCursor = tasks[newIndex];
       // Don't attempt to focus nested sub-projects in agenda view, because drag
       // handles won't be visible, due to issue #26.
-      if (viewMode === 'agenda' && isTaskIndented(newCursor)) {
+      if (stripPrefix('agenda', viewMode) && isTaskIndented(newCursor)) {
         info('Skipping cursor over nested sub-projects due to issue #26');
         newCursor = null;
         // Figure out the direction of cursor motion, to determine the direction
@@ -2830,10 +2837,23 @@
     var agendaView = getById(AGENDA_VIEW_ID);
     if (agendaView === null) {
       return 'project';
-    } else if (getFirstClass(agendaView, 'section_day') === null) {
-      return 'filter';
     } else {
-      return 'agenda';
+      var reorderItem = getFirstClass(agendaView, 'reorder_item');
+      if (reorderItem) {
+        // Custom filters like "today & p1" result in an agenda view
+        // that looks like it might be reorderable. These cases seem
+        // to have the "is_filtered" class on the items list, so if
+        // this is present, don't use the drag handle for the
+        // cursor. See
+        // https://github.com/mgsloan/todoist-shortcuts/commit/4b563f76610a717a8659d5974ae00958fb1e1344#commitcomment-30618923
+        if (matchingClass('is_filtered', reorderItem.parent)) {
+          return 'agenda_no_reorder';
+        } else {
+          return 'agenda_reorder';
+        }
+      } else {
+        return 'agenda_no_reorder';
+      }
     }
   }
 
@@ -3323,7 +3343,7 @@
   function updateCursorStyle() {
     // In all modes but filter mode, the drag handle is used as the cursor. In
     // filter mode, CSS is used to add a border to the left. See issue #14.
-    if (viewMode === 'filter') {
+    if (viewMode === 'agenda_no_reorder') {
       var selecter = getKeySelecter(lastCursorId, lastCursorIndent);
       cursorStyle.textContent = [
         selecter + ' {',
@@ -3347,7 +3367,7 @@
 
   // See comment on 'getTaskById' for explanation
   function getKeySelecter(id, indent) {
-    if (((viewMode === 'agenda') || (viewMode === 'filter')) && indent !== null) {
+    if (stripPrefix('agenda', viewMode) && indent !== null) {
       return '#' + id + '.' + indent;
     } else if (viewMode === 'project') {
       return '#' + id;
