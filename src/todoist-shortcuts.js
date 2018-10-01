@@ -2845,7 +2845,7 @@
         // this is present, don't use the drag handle for the
         // cursor. See
         // https://github.com/mgsloan/todoist-shortcuts/commit/4b563f76610a717a8659d5974ae00958fb1e1344#commitcomment-30618923
-        if (reorderItem.parent && matchingClass('is_filtered')(reorderItem.parent)) {
+        if (reorderItem.parentElement && matchingClass('is_filtered')(reorderItem.parentElement)) {
           return 'agenda_no_reorder';
         } else {
           return 'agenda_reorder';
