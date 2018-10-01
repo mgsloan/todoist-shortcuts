@@ -7,6 +7,11 @@
 * Actual working fix to the bug where no cursor would be displayed
   for a custom filter like "today & p1".
 
+* Fixes `h` and `l`, due to changes in class names used by
+  Todoist.  See [this comment on #46][#46c2]
+
+[#46c2]: https://github.com/mgsloan/todoist-shortcuts/issues/46#issuecomment-425962924
+
 
 ## Version 23 ##
 
