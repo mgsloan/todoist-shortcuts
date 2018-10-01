@@ -280,8 +280,8 @@
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
   var ARROW_CLASS = 'arrow';
   var CALENDAR_CLASS = 'minical_container';
-  var EXPANDED_ARROW_CLASS = 'cmp_open_arrow_down';
-  var COLLAPSED_ARROW_CLASS = 'cmp_open_arrow_right';
+  var EXPANDED_ARROW_CLASS = 'down';
+  var COLLAPSED_ARROW_CLASS = 'right';
 
   var MI_SCHEDULE = 'menu_item_schedule';
   var MI_MOVE = 'menu_item_move';
@@ -2579,7 +2579,7 @@
                 }
               }
               if (!foldingSection && arrow) {
-                if (getUniqueClass(arrow, 'cmp_open_arrow_right')) {
+                if (getUniqueClass(arrow, COLLAPSED_ARROW_CLASS)) {
                   click(arrow);
                 }
               }
