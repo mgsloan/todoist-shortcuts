@@ -1,11 +1,19 @@
 # todoist-shortcuts changelog
 
+## Version 24 ##
+
+### Bug fixes ###
+
+* Actual working fix to the bug where no cursor would be displayed
+  for a custom filter like "today & p1".
+
+
 ## Version 23 ##
 
 ### Bug fixes ###
 
-* Fixes a bug where no cursor would be displayed for a custom
-  filter like "today & p1".
+* Attempted fix of a bug where no cursor would be displayed for a
+  custom filter like "today & p1".
 
 
 ## Version 22 ##
