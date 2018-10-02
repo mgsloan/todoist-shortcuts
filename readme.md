@@ -247,6 +247,17 @@ See the git documentation.  A miscellaneous aside is that I highly recommend
 [git from the bottom up](https://jwiegley.github.io/git-from-the-bottom-up/) as
 a guide to understanding git's data model.
 
+## `todoist-shortcuts` in Todoist Desktop Application
+
+This repository provides browser extentions for both Chrome and Firefox, and
+therefore augments the browser's web client of Todoist. If you wanted the 
+`todoist-shortcuts` in the standalone Todoist desktop application it is not as
+easy/straight-forward. The following article and associated repository outline
+how you can achieve such a solution:
+
+- https://kevinjalbert.com/todoist-with-keyboard-navigation-via-nativefier/
+- https://github.com/kevinjalbert/todoist-shortcuts-nativefier
+
 # Development
 
 Contributions are appreciated. See [development.md](./development.md) for more
