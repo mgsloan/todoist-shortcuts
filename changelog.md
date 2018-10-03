@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 25 ##
+
+### Enhancements ###
+
+* Adds '&' keybinding for task duplication.
+
+
 ## Version 24 ##
 
 ### Bug fixes ###

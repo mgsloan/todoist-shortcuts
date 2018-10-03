@@ -92,6 +92,7 @@
     ['d', done],
     ['e', archive],
     ['#', deleteTasks],
+    ['&', duplicateTasks],
     ['v', moveToProject],
     ['@', addLabel],
     ['y', removeLabel],
@@ -654,6 +655,15 @@
       clickTaskMenu(mutateCursor, MI_DELETE_SEL);
     } else {
       clickMenu(moreMenu, MI_DELETE);
+    }
+  }
+
+  function duplicateTasks() {
+    var mutateCursor = getCursorToMutate();
+    if (mutateCursor) {
+      clickTaskMenu(mutateCursor, MI_DUPLICATE);
+    } else {
+      clickMenu(moreMenu, MI_DUPLICATE);
     }
   }
 
@@ -1290,8 +1300,8 @@
         matchingClass('section_overdue'),
         matchingClass('section_day')),
       matchingId(AGENDA_VIEW_ID)),
-        // View all filter looks like agenda view, but really has
-        // multiple project list editors.
+      // View all filter looks like agenda view, but really has
+      // multiple project list editors.
       matchingClass('list_editor'));
     } else if (viewMode === 'project') {
       predicate = matchingClass('list_editor');
