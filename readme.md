@@ -103,6 +103,7 @@ If none are selected, then these will apply to the cursor instead.
 | `d`    | done: mark task as complete       |
 | `e`    | archive                           |
 | `#`    | delete                            |
+| `&`    | duplicate                         |
 | `v`    | move to project via search prompt |
 | `@`    | add label                         |
 | `y`    | remove label                      |
