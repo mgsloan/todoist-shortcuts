@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 26 ##
+
+### Bug fixes ###
+
+* Collapses nested tasks before moving up / down, makes task
+  movement better behaved. See [#29]
+
+[#29]: https://github.com/mgsloan/todoist-shortcuts/issues/29
+
+
 ## Version 25 ##
 
 ### Enhancements ###
