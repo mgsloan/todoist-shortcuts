@@ -1672,6 +1672,9 @@
       if (!cursor) {
         info('No cursor to move up.');
       } else {
+        // Collapse nested tasks before moving it - see
+        // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
+        collapse();
         dragTaskOver(cursor, false, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
@@ -1709,6 +1712,9 @@
       if (!cursor) {
         info('No cursor to move down.');
       } else {
+        // Collapse nested tasks before moving it - see
+        // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
+        collapse();
         dragTaskOver(cursor, true, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
