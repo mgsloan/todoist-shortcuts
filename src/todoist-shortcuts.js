@@ -2195,9 +2195,11 @@
         } else if (matchingAttr('data-track', 'navigation|next_7_days')(li)) {
           mustBeKeys = 'n';
         } else if (li.classList.contains('favorite_item')) {
-          withUniqueClass(li, 'item_name', all, function(nameSpan) {
-            text = preprocessItemText(nameSpan.textContent);
-            initials = getItemInitials(nameSpan.textContent);
+          withUniqueClass(li, 'item_content', all, function(content) {
+            withUniqueChild(content, matchingTag('span'), function(nameSpan) {
+              text = preprocessItemText(nameSpan.textContent);
+              initials = getItemInitials(nameSpan.textContent);
+            });
           });
         } else {
           withUniqueClass(li, 'name', all, function(nameElement) {

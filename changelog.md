@@ -10,6 +10,10 @@
 
 * In navigation mode, up / down arrows now scroll up / down a bit.
 
+* Fixes navigation to favorite items, broken due to upstream changes
+  of DOM structure.
+
+
 ## Version 26 ##
 
 ### Bug fixes ###
