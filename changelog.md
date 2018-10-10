@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Not yet released
+## Version 27 ##
 
 ### Enhancements ###
 
