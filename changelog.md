@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Not yet released
+
+### Enhancements ###
+
+* `0` is now an alias for level 4 priority, the default priority. So,
+  `0` and `4` do the same thing, as well as `* 0` and `* 4` for
+  selecting tasks with default priority.
+
+
 ## Version 26 ##
 
 ### Bug fixes ###

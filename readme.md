@@ -80,37 +80,37 @@ navigation mode to select the same project again.
 
 ## Selection
 
-| keys  | action                                |
-| ---   | ---                                   |
-| `x`   | add task at cursor to selection       |
-| `* a` | select all tasks                      |
-| `* n` | clear selection                       |
-| `* 1` | add all priority 1 tasks to selection |
-| `* 2` | add all priority 2 tasks to selection |
-| `* 3` | add all priority 3 tasks to selection |
-| `* 4` | add all priority 4 tasks to selection |
-| `* h` | collapses all tasks                   |
-| `* l` | expands all tasks                     |
+| keys           | action                                |
+| ---            | ---                                   |
+| `x`            | add task at cursor to selection       |
+| `* a`          | select all tasks                      |
+| `* n`          | clear selection                       |
+| `* 1`          | add all priority 1 tasks to selection |
+| `* 2`          | add all priority 2 tasks to selection |
+| `* 3`          | add all priority 3 tasks to selection |
+| `* 4` or `* 0` | add all priority 4 tasks to selection |
+| `* h`          | collapses all tasks                   |
+| `* l`          | expands all tasks                     |
 
 ## Manipulation of selected items
 
 If none are selected, then these will apply to the cursor instead.
 
-| keys   | action                            |
-| ---    | ---                               |
-| `t`    | schedule                          |
-| `T`    | schedule cursor by editing text   |
-| `d`    | done: mark task as complete       |
-| `e`    | archive                           |
-| `#`    | delete                            |
-| `&`    | duplicate                         |
-| `v`    | move to project via search prompt |
-| `@`    | add label                         |
-| `y`    | remove label                      |
-| `1`    | set priority to 1                 |
-| `2`    | set priority to 2                 |
-| `3`    | set priority to 3                 |
-| `4`    | set priority to 4                 |
+| keys       | action                            |
+| ---        | ---                               |
+| `t`        | schedule                          |
+| `T`        | schedule cursor by editing text   |
+| `d`        | done: mark task as complete       |
+| `e`        | archive                           |
+| `#`        | delete                            |
+| `&`        | duplicate                         |
+| `v`        | move to project via search prompt |
+| `@`        | add label                         |
+| `y`        | remove label                      |
+| `1`        | set priority to 1                 |
+| `2`        | set priority to 2                 |
+| `3`        | set priority to 3                 |
+| `4` or `0` | set priority to 4                 |
 
 Archiving a task via `e` is fairly similar to marking it complete via `d`.  Here
 are the differences:
@@ -251,7 +251,7 @@ a guide to understanding git's data model.
 ## `todoist-shortcuts` in Todoist Desktop Application
 
 This repository provides browser extentions for both Chrome and Firefox, and
-therefore augments the browser's web client of Todoist. If you wanted the 
+therefore augments the browser's web client of Todoist. If you wanted the
 `todoist-shortcuts` in the standalone Todoist desktop application it is not as
 easy/straight-forward. The following article and associated repository outline
 how you can achieve such a solution:

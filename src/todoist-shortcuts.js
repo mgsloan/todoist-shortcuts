@@ -82,7 +82,7 @@
     ['* 1', selectPriority('1')],
     ['* 2', selectPriority('2')],
     ['* 3', selectPriority('3')],
-    ['* 4', selectPriority('4')],
+    [['* 4', '* 0'], selectPriority('4')],
     ['* h', collapseAll],
     ['* l', expandAll],
 
@@ -99,7 +99,7 @@
     ['1', setPriority('1')],
     ['2', setPriority('2')],
     ['3', setPriority('3')],
-    ['4', setPriority('4')],
+    [['4', '0'], setPriority('4')],
 
     // Sorting
     // (see originalHandler) ['r', sortByAssignee],
