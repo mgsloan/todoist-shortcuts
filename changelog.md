@@ -13,6 +13,10 @@
 * Fixes navigation to favorite items, broken due to upstream changes
   of DOM structure.
 
+* Fixes styling of navigation links, since they were being clipped,
+  due to upstream CSS changes. I like this new approach better anyway,
+  tightens up the tips.
+
 
 ## Version 26 ##
 

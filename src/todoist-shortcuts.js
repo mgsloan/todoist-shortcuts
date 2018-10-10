@@ -276,6 +276,7 @@
   var TODOIST_ROOT_ID = 'todoist_app';
   var AGENDA_VIEW_ID = 'agenda_view';
   var MOVE_TO_PROJECT_ID = 'GB_window';
+  var BACKGROUND_ID = 'page_background';
   var TASK_CONTENT_CLASS = 'content';
   var ACTIONS_BAR_CLASS = 'item_selecter';
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
@@ -3305,6 +3306,15 @@
    * Styling
    */
 
+  var todoistBackgroundColor = 'inherit';
+  withId(BACKGROUND_ID, function(background) {
+    try {
+      todoistBackgroundColor =
+        background.computedStyleMap().get('background-color').toString();
+    } catch (e) {
+      error('Failed to figure out background color:', e);
+    }
+  });
   addCss([
     // Enables positioning of the tips.
     '#projects_list > li, li.filter {',
@@ -3316,13 +3326,16 @@
     '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
     '  margin-top: 4px;',
-    '  margin-left: -40px;',
+    '  margin-left: -22px;',
+    '  width: 22px;',
     '  font-family: monospace;',
     '  font-weight: normal;',
     '  font-size: 18px;',
     '  color: #dd4b39;',
     // Ensure that these get displayed over other UI. See issue#34
-    '  z-index: 2147483647',
+    '  z-index: 2147483647;',
+    // Since these tips overlap expand / collapse arrows, set background.
+    '  background-color: ' + todoistBackgroundColor + ';',
     '}',
     '',
     '.' + TODOIST_SHORTCUTS_TIP_TYPED + ' {',
@@ -3336,7 +3349,7 @@
     '}',
     '',
     '.panel_summary .' + TODOIST_SHORTCUTS_TIP + ' {',
-    '  margin-left: -28px;',
+    '  margin-top: -1px;',
     '}',
     '',
     '#page_background {',
