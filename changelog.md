@@ -8,6 +8,7 @@
   `0` and `4` do the same thing, as well as `* 0` and `* 4` for
   selecting tasks with default priority.
 
+* In navigation mode, up / down arrows now scroll up / down a bit.
 
 ## Version 26 ##
 

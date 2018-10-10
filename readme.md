@@ -56,10 +56,12 @@ described in this document.
 | `` ` ``        | select the next top section (including favorites)     |
 | `` shift+` ``  | select the previous top section (including favorites) |
 
-In "section navigation mode", the different selections in the left pane are
-annotated with the keys to press to navigate to that section. Sometimes the
-sidebar can have more than a screenful of content. While in this mode, you can
-scroll the left pane down and up with `space` and `shift+space`.
+In "section navigation mode", the different selections in the left
+pane are annotated with the keys to press to navigate to that
+section. Sometimes the sidebar can have more than a screenful of
+content. While in this mode, you can scroll the left pane down and up
+with `space` and `shift+space`. For smaller scrolling jumps, you can
+also use up arrow and down arrow.
 
 When projects have sub-projects, they are automatically expanded when the
 project is selected from the list. To collapse the sub-projects, just use

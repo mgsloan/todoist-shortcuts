@@ -2561,6 +2561,18 @@
               leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
             }
           });
+        } else if (ev.keyCode === 38) {
+          // Up arrow to scroll up a little bit.
+          keepGoing = true;
+          withId('left_menu', function(leftMenu) {
+            leftMenu.scrollBy(0, -40);
+          });
+        } else if (ev.keyCode === 40) {
+          // Down arrow to scroll down a little bit.
+          keepGoing = true;
+          withId('left_menu', function(leftMenu) {
+            leftMenu.scrollBy(0, 40);
+          });
         } else {
           var char = ev.key.toLowerCase();
           if (char.length === 1 && lowercaseCharIsAlphanum(char)) {
