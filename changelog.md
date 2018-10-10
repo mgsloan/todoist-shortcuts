@@ -17,6 +17,8 @@
   due to upstream CSS changes. I like this new approach better anyway,
   tightens up the tips.
 
+* Bump to Todoist version 918.
+
 
 ## Version 26 ##
 
