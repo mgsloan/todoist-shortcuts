@@ -464,22 +464,16 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
   function schedule() {
-    // Only open calendar if it isn't already open. This allows 't' to also be
-    // used for selecting 'tomorrow'.
-    if (getUniqueClass(document, CALENDAR_CLASS)) {
-      debug('Not opening schedule because it is already open.');
-    } else {
-      var mutateCursor = getCursorToMutate();
-      if (mutateCursor) {
-        clickTaskSchedule(mutateCursor);
-        if (inBulkScheduleMode) {
-          bulkScheduleCursorChanged();
-        }
-      } else {
-        withId(ACTIONS_BAR_CLASS, function(parent) {
-          withUniqueClass(parent, MI_SCHEDULE, all, click);
-        });
+    var mutateCursor = getCursorToMutate();
+    if (mutateCursor) {
+      clickTaskSchedule(mutateCursor);
+      if (inBulkScheduleMode) {
+        bulkScheduleCursorChanged();
       }
+    } else {
+      withId(ACTIONS_BAR_CLASS, function(parent) {
+        withUniqueClass(parent, MI_SCHEDULE, all, click);
+      });
     }
   }
 
