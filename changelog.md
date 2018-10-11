@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 28 ##
+
+### Enhancements ###
+
+* Updated to work with new scheduler visible on
+  https://beta.todoist.com .  See [#49].
+
+[#49]: https://github.com/mgsloan/todoist-shortcuts/issues/49
+
+
 ## Version 27 ##
 
 ### Enhancements ###
