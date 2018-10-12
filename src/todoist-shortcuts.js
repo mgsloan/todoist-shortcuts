@@ -505,6 +505,7 @@
     } else {
       withId(ACTIONS_BAR_CLASS, function(parent) {
         withUniqueClass(parent, MI_SCHEDULE, all, click);
+        blurSchedulerInput();
       });
     }
   }
@@ -1934,21 +1935,25 @@
     var scheduleIcon = getUniqueClass(task, SCHEDULER_ACTION_CLASS);
     if (scheduleIcon) {
       click(scheduleIcon);
-      setTimeout(function() {
-        var scheduler = findScheduler();
-        if (scheduler) {
-          withTag(scheduler, 'input', function(el) {
-            el.blur();
-          });
-        } else {
-          error('Expected to find scheduler after opening it.');
-        }
-      }, 0);
+      blurSchedulerInput();
     } else {
       withTaskMenu(task, function(menu) {
         withUniqueTag(menu, 'a', matchingAttr('data-track', 'scheduler|more'), click);
       });
     }
+  }
+
+  function blurSchedulerInput() {
+    setTimeout(function() {
+      var scheduler = findScheduler();
+      if (scheduler) {
+        withTag(scheduler, 'input', function(el) {
+          el.blur();
+        });
+      } else {
+        error('Expected to find scheduler after opening it.');
+      }
+    }, 0);
   }
 
   function clickTaskDone(task) {

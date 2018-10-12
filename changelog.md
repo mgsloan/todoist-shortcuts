@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 29
+
+### Bug fixes ###
+
+* Fix behavior of multi selection with new scheduler on
+  https://beta.todoist.com .  See [#49].
+
+
 ## Version 28 ##
 
 ### Enhancements ###
