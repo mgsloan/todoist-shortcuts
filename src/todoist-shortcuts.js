@@ -258,6 +258,7 @@
       if (!(ev.type === 'keyup' && ev.key === 't')) {
         withUniqueClass(scheduler, SCHEDULER_INPUT_CLASS, all, function(inputDiv) {
           withUniqueTag(inputDiv, 'input', all, function(inputEl) {
+            inputEl.value = '';
             inputEl.focus();
             // TODO: this throws an exception, but it works anyway.
             // Wrapping it in a try or timeout seems to cause it to

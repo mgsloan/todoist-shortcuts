@@ -1,6 +1,15 @@
 # todoist-shortcuts changelog
 
-## Version 29
+## Version 30 (not yet released) ##
+
+### Enhancements ###
+
+* With new scheduler on https://beta.todoist.com , typing a
+  non-shortcut key will clear the text entry along with focusing it.
+  I found this much more useful.
+
+
+## Version 29 ##
 
 ### Bug fixes ###
 
