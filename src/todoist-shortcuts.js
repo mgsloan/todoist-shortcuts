@@ -143,6 +143,7 @@
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
+    ['s', scheduleSuggested],
     ['r', unschedule],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback]
@@ -570,6 +571,18 @@
       },
       function() {
         error('schedule next month no longer supported with new Todoist scheduler.');
+      });
+  }
+
+  // Click 'suggested' in schedule. Only does anything if schedule is open.
+  function scheduleSuggested() {
+    withCalendar(
+      'scheduleSuggested',
+      function(calendar) {
+        info('Using suggested date is not supported by todoist-shortcuts + the non-beta version of Todoist.');
+      },
+      function(scheduler) {
+        withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'), click);
       });
   }
 

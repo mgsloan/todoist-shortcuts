@@ -8,6 +8,9 @@
   non-shortcut key will clear the text entry along with focusing it.
   I found this much more useful.
 
+* Also in the new scheduler mode, `s` is now a shortcut for using the
+  "suggested" date.
+
 
 ## Version 29 ##
 
