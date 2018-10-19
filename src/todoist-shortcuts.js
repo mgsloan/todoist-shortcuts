@@ -576,7 +576,7 @@
   function scheduleSuggested() {
     withCalendar(
       'scheduleSuggested',
-      function(calendar) {
+      function() {
         info('Using suggested date is not supported by todoist-shortcuts + the non-beta version of Todoist.');
       },
       function(scheduler) {
