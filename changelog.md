@@ -14,6 +14,8 @@
 * Also in the new scheduler mode, `s` is now a shortcut for using the
   "suggested" date.
 
+* Bump to Todoist version 919
+
 ### Bug fixes ###
 
 * Fixes `enter` binding to edit task text, which seems to have broken
