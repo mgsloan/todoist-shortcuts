@@ -444,7 +444,7 @@
   // Edit the task under the cursor.
   function edit() {
     withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, function(content) {
-      content.dispatchEvent(new Event('mousedown'));
+      click(content);
     });
   }
 
