@@ -135,14 +135,17 @@ cursor. Resolving this is tracked by [issue #24].
 
 When scheduling is opened via `t`, the following keybindings will apply:
 
-| keys | date                                                                 |
-| ---  | ---                                                                  |
-| `d`  | today                                                                |
-| `t`  | tomorrow                                                             |
-| `w`  | next week                                                            |
-| `m`  | in 1 month (no longer on https://beta.todoist.com, might be removed) |
-| `s`  | suggested date (currently, only on https://beta.todoist.com)         |
-| `r`  | remove                                                               |
+| keys                    | date                                                                 |
+| ---                     | ---                                                                  |
+| `d`                     | today                                                                |
+| `t`                     | tomorrow                                                             |
+| `w`                     | next week                                                            |
+| `m`                     | in 1 month (no longer on https://beta.todoist.com, might be removed) |
+| `s`                     | suggested date (currently, only on https://beta.todoist.com)         |
+| `r`                     | remove                                                               |
+| `backspace` or `delete` | clear and focus text date entry                                      |
+| `enter`                 | focus text date entry without clearing it                            |
+| `escape`                | exit scheduling                                                      |
 
 ## Sorting
 

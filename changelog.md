@@ -4,9 +4,12 @@
 
 ### Enhancements ###
 
-* With new scheduler on https://beta.todoist.com , typing a
-  non-shortcut key will clear the text entry along with focusing it.
-  I found this much more useful.
+* Keybindings for interacting with text entry of new scheduler on
+  https://beta.todoist.com :
+
+    - `backspace` or `delete` clears and focuses the text date entry.
+
+    - `enter`focuses the text date entry without clearing it.
 
 * Also in the new scheduler mode, `s` is now a shortcut for using the
   "suggested" date.

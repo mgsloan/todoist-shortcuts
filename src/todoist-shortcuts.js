@@ -250,21 +250,19 @@
     // TODO(new-scheduler)
     var scheduler = findScheduler();
     if (scheduler) {
-      // The idea here is that if the press is not recognized, then
-      // focus the input text box and forward the key event along.
-      //
-      // TODO: document this behavior?
-      //
-      // TODO: Filtering keyup of 't' is an ugly hack
-      if (!(ev.type === 'keyup' && ev.key === 't')) {
+      info(ev);
+      // The idea here is that backspace or delete will clear and
+      // focus the date entry box. Enter will just focus it.
+      if (ev.type === 'keydown' &&
+          (ev.code === 'Backspace' ||
+           ev.code === 'Delete' ||
+           ev.code === 'Enter')) {
         withUniqueClass(scheduler, SCHEDULER_INPUT_CLASS, all, function(inputDiv) {
           withUniqueTag(inputDiv, 'input', all, function(inputEl) {
-            inputEl.value = '';
+            if (ev.code !== 'Enter') {
+              inputEl.value = '';
+            }
             inputEl.focus();
-            // TODO: this throws an exception, but it works anyway.
-            // Wrapping it in a try or timeout seems to cause it to
-            // not work, which is strange.
-            inputEl.dispatchEvent(ev);
           });
         });
         return false;
