@@ -906,32 +906,35 @@
     withId('quick_add_task_holder', click);
   }
 
+  // Trigger undo by simulating a keypress.
+  function undo() { todoistShortcut({ key: 'u', charCode: 117 }); }
+
+  /*
+
+  // NOTE: if bringing back usage of these functions, then be sure to
+  // test on FireFox, it seems that on chrome just `key` is
+  // sufficient, but on FireFox, `charCode` seems to also need to be
+  // set, at least for 'undo', above.
+
   // Add new task to the bottom of the list.
-  // eslint-disable-next-line no-unused-vars
   function addTaskBottom() { todoistShortcut('a'); }
 
   // Add new task to the top of the list.
-  // eslint-disable-next-line no-unused-vars
   function addTaskTop() { todoistShortcut('A'); }
 
   // Focus the search bar.
-  // eslint-disable-next-line no-unused-vars
   function focusSearch() { todoistShortcut('/'); }
 
-  // Trigger undo by simulating a keypress.
-  function undo() { todoistShortcut('u'); }
-
   // Trigger sort-by-date by simulating a keypress.
-  // eslint-disable-next-line no-unused-vars
   function sortByDate() { todoistShortcut('s'); }
 
   // Trigger sort-by-priority by simulating a keypress.
-  // eslint-disable-next-line no-unused-vars
   function sortByPriority() { todoistShortcut('p'); }
 
   // Trigger sort-by-assignee by simulating a keypress.
-  // eslint-disable-next-line no-unused-vars
   function sortByAssignee() { todoistShortcut('r'); }
+
+  */
 
   // Trigger sort by name by clicking a menu item.
   function sortByName() {

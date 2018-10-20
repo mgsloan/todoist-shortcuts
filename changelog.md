@@ -8,6 +8,8 @@
   Todoist keybindings wouldn't work, and even many browser keybindings
   wouldn't work. See [#46]
 
+* Fixes use of `ctrl+z` on FireFox.
+
 [#46]: https://github.com/mgsloan/todoist-shortcuts/issues/46
 
 
