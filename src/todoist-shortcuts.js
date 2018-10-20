@@ -3557,7 +3557,7 @@
     for (var i = 0; i < binds.length; i++) {
       if (binds[i].length === 2) {
         // eslint-disable-next-line no-undefined
-        mousetrap.bind(binds[i][0], callBinding(binds[i][1]), 'keydown', keymap);
+        mousetrap.bind(binds[i][0], callBinding(binds[i][1]), undefined, keymap);
       } else {
         error('Improper binding entry at index', i, 'value is', binds[i]);
       }
