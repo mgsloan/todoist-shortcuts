@@ -237,11 +237,11 @@
 
   function originalHandler(ev) {
     if (ev.type === 'keydown') {
-      return window.originalTodoistKeydown.apply(document, ev);
+      return window.originalTodoistKeydown.apply(document, [ev]);
     } else if (ev.type === 'keyup') {
-      return window.originalTodoistKeyup.apply(document, ev);
+      return window.originalTodoistKeyup.apply(document, [ev]);
     } else if (ev.type === 'keypress') {
-      return window.originalTodoistKeypress.apply(document, ev);
+      return window.originalTodoistKeypress.apply(document, [ev]);
     }
     return true;
   }
@@ -1686,13 +1686,13 @@
     var options = typeof options0 === 'string' ? { key: options0 } : options0;
     var ev = new Event('keydown');
     for (var o in options) { ev[o] = options[o]; }
-    window.originalTodoistKeydown.apply(document, ev);
+    window.originalTodoistKeydown.apply(document, [ev]);
     ev = new Event('keyup');
     for (o in options) { ev[o] = options[o]; }
-    window.originalTodoistKeyup.apply(document, ev);
+    window.originalTodoistKeyup.apply(document, [ev]);
     ev = new Event('keypress');
     for (o in options) { ev[o] = options[o]; }
-    window.originalTodoistKeypress.apply(document, ev);
+    window.originalTodoistKeypress.apply(document, [ev]);
   }
 
   // Indent task.

@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 31 ##
+
+### Bug fixes ###
+
+* Fixes a really bad bug with the extension on FireFox, where original
+  Todoist keybindings wouldn't work, and even many browser keybindings
+  wouldn't work. See [#46]
+
+[#46]: https://github.com/mgsloan/todoist-shortcuts/issues/46
+
+
 ## Version 30 ##
 
 ### Enhancements ###
