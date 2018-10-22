@@ -55,7 +55,7 @@ described in this document.
 | `g`            | enter section navigation mode                                         |
 | `G`            | navigate to task's project, or select in agenda if already on project |
 | `` ` ``        | select the next top section (including favorites)                     |
-| `` shift+` ``  | select the previous top section (including favorites)                 |
+| `~`            | select the previous top section (including favorites)                 |
 
 In "section navigation mode", the different selections in the left
 pane are annotated with the keys to press to navigate to that
