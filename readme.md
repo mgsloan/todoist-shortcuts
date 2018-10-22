@@ -41,20 +41,21 @@ described in this document.
 
 ## Navigation
 
-| keys           | action                                                |
-| ---            | ---                                                   |
-| `j` or `down`  | move cursor down                                      |
-| `k` or `up`    | move cursor up                                        |
-| `h` or `left`  | collapse nested at cursor                             |
-| `l` or `right` | expand nested at cursor                               |
-| `^`            | move cursor to first task                             |
-| `$`            | move cursor to last task                              |
-| `{`            | move cursor up to first section task                  |
-| `}`            | move cursor down to next section                      |
-| `/` or `f`     | focus search input                                    |
-| `g`            | enter section navigation mode                         |
-| `` ` ``        | select the next top section (including favorites)     |
-| `` shift+` ``  | select the previous top section (including favorites) |
+| keys           | action                                                                |
+| ---            | ---                                                                   |
+| `j` or `down`  | move cursor down                                                      |
+| `k` or `up`    | move cursor up                                                        |
+| `h` or `left`  | collapse nested at cursor                                             |
+| `l` or `right` | expand nested at cursor                                               |
+| `^`            | move cursor to first task                                             |
+| `$`            | move cursor to last task                                              |
+| `{`            | move cursor up to first section task                                  |
+| `}`            | move cursor down to next section                                      |
+| `/` or `f`     | focus search input                                                    |
+| `g`            | enter section navigation mode                                         |
+| `G`            | navigate to task's project, or select in agenda if already on project |
+| `` ` ``        | select the next top section (including favorites)                     |
+| `` shift+` ``  | select the previous top section (including favorites)                 |
 
 In "section navigation mode", the different selections in the left
 pane are annotated with the keys to press to navigate to that

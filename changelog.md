@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 32 ##
+
+### Enhancements ###
+
+* Adds a binding, `G`, to navigate to task's project, or select in
+  agenda if already on project.
+
+
 ## Version 31 ##
 
 ### Bug fixes ###

@@ -59,6 +59,7 @@
 
     // Navigation
     ['g', navigate],
+    ['G', navigateToTask],
     ['`', nextTopSection],
     ['shift+`', prevTopSection],
 
@@ -874,6 +875,43 @@
     });
   }
 
+  // When viewing something other than a project, and the current task has a
+  // project associated with it, jumps to the project and reselects the task.
+  //
+  // When viewing a project, and the current task has a time associated with
+  // it that is within the next 7 days, then it jumps to "next 7 days" and
+  // reselects the task.
+  function navigateToTask() {
+    var cursor = getCursor();
+    if (viewMode === 'project') {
+      var dateSpan = getUniqueClass(cursor, 'date');
+      if (dateSpan) {
+        if ( matchingClass('date_future')(dateSpan) ||
+             matchingClass('date_overdue')(dateSpan) ) {
+          withId('top_filters', function(topFilters) {
+            withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|next_7_days'), function(nextSeven) {
+              // Set a variable that will be read by 'handlePageChange',
+              // which will tell it to select this task.
+              selectAfterNavigate = cursor.id;
+              click(nextSeven);
+            });
+          });
+        } else {
+          info('Not switching to "Next 7 days", because this task is not scheduled there.');
+        }
+      } else {
+        info('Not switching to "Next 7 days", because this task is not scheduled.');
+      }
+    } else {
+      withUniqueClass(cursor, 'project_item', matchingClass('clickable'), function(projectEl) {
+        // Set a variable that will be read by 'handlePageChange', which will
+        // tell it to select this task.
+        selectAfterNavigate = cursor.id;
+        click(projectEl);
+      });
+    }
+  }
+
   // Cycles down through top sections (inbox / today / next 7 days + favorites).
   function nextTopSection() {
     withTopFilters(function(topItems, current) {
@@ -1404,7 +1442,12 @@
     return getLastClass(section, 'task_item', not(matchingClass('reorder_item')));
   }
 
+  // MUTABLE. Stores the last page hash, to detect page changes.
   var lastHash = null;
+
+  // MUTABLE. If set, then the specified task ID will be selected after
+  // navigation.
+  var selectAfterNavigate = null;
 
   function handlePageChange() {
     debug('handlePageChange');
@@ -1413,13 +1456,23 @@
       updateViewMode();
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
-      // The reason for 'no-scroll' here is so that Todoist can
-      // navigate to a particular task - see #42.  Ideally in this
-      // case, the cursor would also be placed on the task.
-      // Unfortunately after some poking around I couldn't figure out
-      // how to implement this - I couldn't easily get a debugger
-      // paused while the task is flashing yellow.
-      setCursorToFirstTask('no-scroll');
+      if (selectAfterNavigate) {
+        var newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
+        if (newEl) {
+          setCursor(newEl, 'scroll');
+        } else {
+          warn('Couldn\'t find cursored task after switching to its project');
+        }
+        selectAfterNavigate = null;
+      } else {
+        // The reason for 'no-scroll' here is so that Todoist can
+        // navigate to a particular task - see #42.  Ideally in this
+        // case, the cursor would also be placed on the task.
+        // Unfortunately after some poking around I couldn't figure out
+        // how to implement this - I couldn't easily get a debugger
+        // paused while the task is flashing yellow.
+        setCursorToFirstTask('no-scroll');
+      }
     }
   }
 
@@ -2237,7 +2290,9 @@
       var els = document.getElementsByClassName(id);
       for (var i = 0; i < els.length; i++) {
         var el = els[i];
-        if (!indent) {
+        if (indent === 'ignore-indent') {
+          return el;
+        } else if (!indent) {
           error('getTaskById called in agenda mode but with no indent value.');
           return el;
         } else if (el.classList.contains(indent)) {
