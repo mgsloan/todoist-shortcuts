@@ -7,6 +7,8 @@
 * Adds a binding, `G`, to navigate to task's project, or select in
   agenda if already on project.
 
+* Bump to Todoist version 920
+
 
 ## Version 31 ##
 
