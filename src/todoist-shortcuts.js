@@ -2748,8 +2748,7 @@
             var option = navigateOptions[navigateKeysPressed];
             if (option) {
               var el = option.element;
-              var elToClick = el;
-              var foldingSection = false;
+              var keepGoing = option.keepGoing;
               // If the user is selecting a section like projects / labels /
               // filters, then close the other sections.
               if (el.classList.contains('panel_summary')) {
@@ -2762,27 +2761,26 @@
                   });
                 });
               }
-              // If the user re-selects the same section they are already on,
-              // toggle folding.
               var arrow = getUniqueClass(el, 'arrow');
-              if (el.classList.contains('current')) {
-                var prev = el.previousSibling;
-                if (!prev || !prev.classList.contains('current')) {
-                  if (arrow) {
-                    elToClick = arrow;
-                    foldingSection = true;
+              if (arrow) {
+                // If the user re-selects the same project they are already on,
+                // toggle folding.
+                if (el.classList.contains('current')) {
+                  var prev = el.previousSibling;
+                  if (!prev || !prev.classList.contains('current')) {
+                    click(arrow);
+                    keepGoing = true;
                   }
-                }
-              }
-              if (!foldingSection && arrow) {
-                if (getUniqueClass(arrow, COLLAPSED_ARROW_CLASS)) {
+                // If the user selects a collapsed project, toggle folding.
+                } else if (arrow.classList.contains(COLLAPSED_ARROW_CLASS)) {
                   click(arrow);
+                  keepGoing = true;
                 }
               }
-              click(elToClick);
+              click(el);
               // If we're just changing folding, then the user probably wants to
               // stay in navigation mode, so reset and rerender.
-              if (option.keepGoing || foldingSection) {
+              if (keepGoing) {
                 navigateKeysPressed = '';
                 keepGoing = rerenderTips();
               }

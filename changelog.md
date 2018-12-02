@@ -7,6 +7,14 @@
 * Documents that task indentation is currently broken, and that task
   motion in general is fiddly. See [#50].
 
+* When navigating to a project that has sub-projects that are
+  collapsed, always expands the listing and continues with navigation
+  mode. As a side effect, this nicely adapts to a behavior change
+  included in Todoist version 908, which allows toggling between
+  seeing all sub-projects or just the one parent project. When using
+  keyboard bindings, you will now only encounter the first mode,
+  rather than arbitrarily toggling between the modes.
+
 [#50]: https://github.com/mgsloan/todoist-shortcuts/issues/50
 
 ### Bug fixes ###
