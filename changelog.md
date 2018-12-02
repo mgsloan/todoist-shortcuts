@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 33 (Not yet released) ##
+
+### Enhancements ###
+
+* Documents that task indentation is currently broken, and that task
+  motion in general is fiddly. See [#50].
+
+[#50]: https://github.com/mgsloan/todoist-shortcuts/issues/50
+
+
 ## Version 32 ##
 
 ### Enhancements ###
