@@ -2937,7 +2937,7 @@
         storeCursorContext(task, false);
         updateCursorStyle();
         if (viewMode !== 'agenda_no_reorder') {
-          task.dispatchEvent(new MouseEvent('mouseover'));
+          task.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
         }
       }
     } else {

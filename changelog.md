@@ -9,6 +9,13 @@
 
 [#50]: https://github.com/mgsloan/todoist-shortcuts/issues/50
 
+### Bug fixes ###
+
+* Fixes an issue with moving the cursor between multiple projects,
+  when viewing a parent project. It wouldn't change which project is
+  considered to be focused, and so actions like sorting by priority
+  would apply to the wrong project.
+
 
 ## Version 32 ##
 
