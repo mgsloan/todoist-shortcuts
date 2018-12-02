@@ -24,6 +24,11 @@
   considered to be focused, and so actions like sorting by priority
   would apply to the wrong project.
 
+* When inserting new tasks or editing tasks, the cursor position after
+  editing would often be surprising. I believe this is due to Todoist
+  behavior changes. However, happily the new behavior allows this
+  mechanism to be much more reliable.
+
 
 ## Version 32 ##
 

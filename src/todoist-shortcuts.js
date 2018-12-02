@@ -1269,6 +1269,7 @@
       var managerIndex = tasks.findIndex(function(task) {
         return task.classList.contains('manager');
       });
+      debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
         storeCursorContext(tasks[managerIndex - 1], true);
       } else if (managerIndex < 0) {
@@ -1313,7 +1314,16 @@
       }
     }
     if (cursor && !changedSection) {
-      storeCursorContext(cursor, false);
+      if (wasEditing && !mouseGotMoved) {
+        // This invocation is to handle the circumstance where the user inserts
+        // a task, moving the task list. The task under the mouse then gets
+        // hovered, even if the mouse wasn't moved, which erroneously changes
+        // the cursor.
+        debug('Was just editing, and mouse didn\'t move, so restoring the cursor to last position');
+        restoreLastCursor();
+      } else {
+        storeCursorContext(cursor, false);
+      }
     } else {
       if (changedSection) {
         debug('cursor element changed section, finding new location');
@@ -1331,15 +1341,11 @@
       if (wasEditing) {
         var task = getById(lastCursorTasks[lastCursorIndex].id);
         if (task) {
-          tasks = getTasks();
-          var priorIndex = tasks.indexOf(task);
-          if (priorIndex >= 0 && priorIndex < tasks.length - 1) {
-            debug('found task that is probably the one that was previously being edited');
-            found = true;
-            setCursor(tasks[priorIndex + 1], 'no-scroll');
-          }
+          debug('found task that is probably the one that was previously being edited');
+          found = true;
+          setCursor(task, 'no-scroll');
         } else {
-          warn('expected to still find task that was above the one being edited.');
+          warn('expected to find task that was being edited.');
         }
       } else {
         for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
