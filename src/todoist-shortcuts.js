@@ -2754,7 +2754,7 @@
             var option = navigateOptions[navigateKeysPressed];
             if (option) {
               var el = option.element;
-              var keepGoing = option.keepGoing;
+              keepGoing = option.keepGoing;
               // If the user is selecting a section like projects / labels /
               // filters, then close the other sections.
               if (el.classList.contains('panel_summary')) {
