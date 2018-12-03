@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 34 (Not yet released) ##
+## Version 34 ##
 
 ### Enhancements ###
 
