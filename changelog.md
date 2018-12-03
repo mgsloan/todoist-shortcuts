@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 34 (Not yet released) ##
+
+### Enhancements ###
+
+* Improves support for new scheduler added in Todoist
+  version 925. This scheduler was previously available on
+  beta.todoist.com, and so both schedulers were supported. Since the
+  old scheduler no longer exists, support for it has been removed.
+
+
 ## Version 33 ##
 
 ### Enhancements ###

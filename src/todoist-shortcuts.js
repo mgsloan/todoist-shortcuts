@@ -249,10 +249,8 @@
   }
 
   function schedulerFallback(ev) {
-    // TODO(new-scheduler)
     var scheduler = findScheduler();
     if (scheduler) {
-      info(ev);
       // The idea here is that backspace or delete will clear and
       // focus the date entry box. Enter will just focus it.
       if (ev.type === 'keydown' &&
@@ -272,6 +270,7 @@
         return originalHandler(ev);
       }
     } else {
+      warn('Expected to find scheduler, but it wasn\'t found.');
       return originalHandler(ev);
     }
   }
@@ -312,7 +311,6 @@
   var ACTIONS_BAR_CLASS = 'item_selecter';
   var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
   var ARROW_CLASS = 'arrow';
-  var CALENDAR_CLASS = 'minical_container';
   var EXPANDED_ARROW_CLASS = 'down';
   var COLLAPSED_ARROW_CLASS = 'right';
   var SCHEDULER_CLASS = 'scheduler';
@@ -528,11 +526,8 @@
 
   // Click 'today' in schedule. Only does anything if schedule is open.
   function scheduleToday() {
-    withCalendar(
+    withScheduler(
       'scheduleToday',
-      function(calendar) {
-        withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|today'), click);
-      },
       function(scheduler) {
         withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_today'), click);
       });
@@ -540,11 +535,8 @@
 
   // Click 'tomorrow' in schedule. Only does anything if schedule is open.
   function scheduleTomorrow() {
-    withCalendar(
+    withScheduler(
       'scheduleTomorrow',
-      function(calendar) {
-        withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|tomorrow'), click);
-      },
       function(scheduler) {
         withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_tomorrow'), click);
       });
@@ -552,11 +544,8 @@
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
-    withCalendar(
+    withScheduler(
       'scheduleNextWeek',
-      function(calendar) {
-        withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|next_week'), click);
-      },
       function(scheduler) {
         withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'), click);
       });
@@ -564,11 +553,8 @@
 
   // Click 'next month' in schedule. Only does anything if schedule is open.
   function scheduleNextMonth() {
-    withCalendar(
+    withScheduler(
       'scheduleNextMonth',
-      function(calendar) {
-        withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|next_month'), click);
-      },
       function() {
         error('schedule next month no longer supported with new Todoist scheduler.');
       });
@@ -576,11 +562,8 @@
 
   // Click 'suggested' in schedule. Only does anything if schedule is open.
   function scheduleSuggested() {
-    withCalendar(
+    withScheduler(
       'scheduleSuggested',
-      function() {
-        info('Using suggested date is not supported by todoist-shortcuts + the non-beta version of Todoist.');
-      },
       function(scheduler) {
         withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'), click);
       });
@@ -588,11 +571,8 @@
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
   function unschedule() {
-    withCalendar(
+    withScheduler(
       'unschedule',
-      function(calendar) {
-        withUniqueTag(calendar, 'a', matchingAttr('data-track', 'scheduler|no_due_date'), click);
-      },
       function(scheduler) {
         withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_nodate'), click);
       });
@@ -1033,7 +1013,7 @@
     }
   }
 
-  // FIXME(new-scheduler): Exiting doesn't work immediately - visits an
+  // TODO(new-scheduler): Exiting doesn't work immediately - visits an
   // extra item.
   function exitBulkSchedule() {
     inBulkScheduleMode = false;
@@ -1505,7 +1485,7 @@
     var nextTask;
     updateKeymap();
     if (inBulkScheduleMode) {
-      if (!checkCalendarOpen()) {
+      if (!checkSchedulerOpen()) {
         if (nextBulkScheduleKey) {
           nextTask = getTaskByKey(nextBulkScheduleKey);
           if (nextTask) {
@@ -1574,7 +1554,7 @@
         switchKeymap(BULK_MOVE_KEYMAP);
       } else if (finishNavigate) {
         switchKeymap(NAVIGATE_KEYMAP);
-      } else if (checkCalendarOpen()) {
+      } else if (checkSchedulerOpen()) {
         switchKeymap(SCHEDULE_KEYMAP);
       } else {
         switchKeymap(DEFAULT_KEYMAP);
@@ -1716,31 +1696,20 @@
     return getById(MOVE_TO_PROJECT_ID) !== null;
   }
 
-  function checkCalendarOpen() {
-    return findCalendar() !== null || findScheduler() !== null;
-  }
-
-  function findCalendar() {
-    return getUniqueClass(document, CALENDAR_CLASS);
+  function checkSchedulerOpen() {
+    return findScheduler() !== null;
   }
 
   function findScheduler() {
     return getUniqueClass(document, SCHEDULER_CLASS);
   }
 
-  // TODO(new-scheduler): this takes two functions, the first for the
-  // old calendar, and the other for the new scheduler.
-  function withCalendar(name, f, g) {
-    var calendar = findCalendar();
-    if (calendar) {
-      f(calendar);
+  function withScheduler(name, f) {
+    var scheduler = findScheduler();
+    if (scheduler) {
+      f(scheduler);
     } else {
-      var scheduler = findScheduler();
-      if (scheduler) {
-        g(scheduler);
-      } else {
-        warn('Not performing action', name, 'because calendar is not open');
-      }
+      warn('Not performing action', name, 'because scheduler is not open');
     }
   }
 
@@ -2005,18 +1974,10 @@
   }
 
   function clickTaskSchedule(task) {
-    // TODO(new-scheduler): remove the old code path once todoist.com
-    // updates to match beta.todoist.com.  For now supporting both old
-    // and new scheduler. Some other TODOs are labeled with this too.
-    var scheduleIcon = getUniqueClass(task, SCHEDULER_ACTION_CLASS);
-    if (scheduleIcon) {
-      click(scheduleIcon);
+    withTaskMenu(task, function(menu) {
+      withUniqueTag(menu, 'a', matchingAttr('data-track', 'scheduler|more'), click);
       blurSchedulerInput();
-    } else {
-      withTaskMenu(task, function(menu) {
-        withUniqueTag(menu, 'a', matchingAttr('data-track', 'scheduler|more'), click);
-      });
-    }
+    });
   }
 
   function blurSchedulerInput() {
