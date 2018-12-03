@@ -9,6 +9,8 @@
   beta.todoist.com, and so both schedulers were supported. Since the
   old scheduler no longer exists, support for it has been removed.
 
+* Bump to Todoist version 925
+
 
 ## Version 33 ##
 
@@ -24,6 +26,8 @@
   seeing all sub-projects or just the one parent project. When using
   keyboard bindings, you will now only encounter the first mode,
   rather than arbitrarily toggling between the modes.
+
+* Bump to Todoist version 924
 
 [#50]: https://github.com/mgsloan/todoist-shortcuts/issues/50
 
