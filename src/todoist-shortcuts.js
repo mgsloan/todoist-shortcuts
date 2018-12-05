@@ -6,7 +6,7 @@
 // @include     http://todoist.com/app*
 // @include     https://beta.todoist.com/app*
 // @include     http://beta.todoist.com/app*
-// @version     34
+// @version     35
 // @grant       none
 // ==/UserScript==
 
@@ -18,7 +18,7 @@
 (function() {
   'use strict';
 
-  var TODOIST_SHORTCUTS_VERSION = 34;
+  var TODOIST_SHORTCUTS_VERSION = 35;
 
   // When true, enables selecting multiple items by holding 'x' and moving the
   // cursor.
@@ -2728,6 +2728,43 @@
                   });
                 });
               }
+              // Ensure that the item is visible - first, uncollapsing
+              // the outer section.
+              var collapseParent = findParent(el, matchingClass('collapse'));
+              if (collapseParent && !matchingClass('collapse--entered')(collapseParent)) {
+                var collapseHeader = collapseParent.previousSibling;
+                if (collapseHeader) {
+                  click(collapseHeader);
+                } else {
+                  warn('Expected to find section collapse header, but did\'nt');
+                }
+              }
+              // Second, uncollapse all of the task's parents.
+              var priorIndent = getTaskIndentClass(el);
+              var arrowsToClick = [];
+              for ( var elAbove = el.previousSibling
+                ; elAbove && elAbove.display === 'none'
+                ; elAbove = elAbove.previousSibling
+              ) {
+                var curIndent = getTaskIndentClass(elAbove);
+                if (curIndent < priorIndent) {
+                  priorIndent = curIndent;
+                  var arr = getUniqueClass(elAbove, 'arrow');
+                  if (arr && arr.classList.contains(COLLAPSED_ARROW_CLASS)) {
+                    arrowsToClick.unshift(arr);
+                  } else {
+                    warn('Expected to find collapsed task, but got', elAbove);
+                  }
+                }
+                // If at top level, then we're done uncollapsing.
+                if (curIndent === 'indent_1') {
+                  break;
+                }
+              }
+              for (var i = 0; i < arrowsToClick.length; i++) {
+                click(arrowsToClick[i]);
+              }
+              // Uncollapse the target project, if necessary.
               var arrow = getUniqueClass(el, 'arrow');
               if (arrow) {
                 // If the user re-selects the same project they are already on,
@@ -2745,6 +2782,9 @@
                 }
               }
               click(el);
+              // Scroll the task into view, if needed. The delay is
+              // to give time to the uncollapsing.
+              setTimeout(function() { el.scrollIntoViewIfNeeded(); }, 300);
               // If we're just changing folding, then the user probably wants to
               // stay in navigation mode, so reset and rerender.
               if (keepGoing) {

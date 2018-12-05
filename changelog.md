@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 35 ##
+
+### Enhancements ###
+
+* When navigating to a project / label / filter that is not visible
+  due to collapsed parents, the project will now be made visible.
+
+
 ## Version 34 ##
 
 ### Enhancements ###
