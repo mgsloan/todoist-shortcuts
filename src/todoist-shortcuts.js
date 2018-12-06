@@ -565,7 +565,12 @@
     withScheduler(
       'scheduleSuggested',
       function(scheduler) {
-        withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'), click);
+        var suggested = getUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'));
+        if (suggested) {
+          click(suggested);
+        } else {
+          withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'), click);
+        }
       });
   }
 
