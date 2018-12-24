@@ -3482,14 +3482,22 @@
    */
 
   var todoistBackgroundColor = 'inherit';
-  withId(BACKGROUND_ID, function(background) {
-    try {
-      todoistBackgroundColor =
-        background.computedStyleMap().get('background-color').toString();
-    } catch (e) {
-      error('Failed to figure out background color:', e);
-    }
-  });
+  function updateBackgroundColor() {
+    withId(BACKGROUND_ID, function(background) {
+      try {
+        todoistBackgroundColor =
+          background.computedStyleMap().get('background-color').toString();
+      } catch (e) {
+        error('Failed to figure out background color:', e);
+      }
+    });
+  }
+  updateBackgroundColor();
+  // Sometimes there's a lag for the theme to update, so re-query it a
+  // few times.
+  setTimeout(updateBackgroundColor, 1000);
+  setTimeout(updateBackgroundColor, 5000);
+
   addCss([
     // Enables positioning of the tips.
     '#projects_list > li, li.filter {',

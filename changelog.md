@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 36 (Not yet released) ##
+
+### Bug fixes ###
+
+* On initial login, there was some lag for the theme to be
+  applied. This sometimes caused the background color for navigation
+  tips to be wrong. This version fixes this problem.
+
+
 ## Version 35 ##
 
 ### Enhancements ###
