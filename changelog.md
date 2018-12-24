@@ -2,6 +2,10 @@
 
 ## Version 36 (Not yet released) ##
 
+### Enhancements ###
+
+* When scheduling multiple items, `s` now opens the smart scheduler.
+
 ### Bug fixes ###
 
 * On initial login, there was some lag for the theme to be
