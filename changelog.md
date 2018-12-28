@@ -12,6 +12,10 @@
   applied. This sometimes caused the background color for navigation
   tips to be wrong. This version fixes this problem.
 
+* Fixes updating of internal `viewMode` variable on initial load,
+  likely due to slight changes in Todoist behavior. Without this fix,
+  some functions might not work until after navigation.
+
 
 ## Version 35 ##
 
