@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 36 (Not yet released) ##
+## Version 36 ##
 
 ### Enhancements ###
 
