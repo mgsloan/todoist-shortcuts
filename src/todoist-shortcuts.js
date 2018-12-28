@@ -443,9 +443,7 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, function(content) {
-      click(content);
-    });
+    withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, click);
   }
 
   // Follow the first link of the task under the cursor.
