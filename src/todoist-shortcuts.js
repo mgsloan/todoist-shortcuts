@@ -2143,36 +2143,6 @@
     });
   }
 
-  function focusDueDateInput() {
-    withDueDateInput(function(input) {
-      // This logic is needed because it seems that there is some sort of
-      // deferred refocusing of the task content. Rather than having a hacky
-      // timeout to re-focus, the idea is to wait for the blur event, and
-      // refocus the input when that occurs.
-      //
-      // However, if quite a bit of time has past, then this probably hasn't
-      // occurred, so remove the event listener to avoid weird refocusing
-      // behavior.
-      input.focus();
-      input.addEventListener('blur', refocusDueDateInput);
-      setTimeout(function() {
-        input.removeEventListener('blur', refocusDueDateInput);
-      }, 300);
-    });
-  }
-
-  function refocusDueDateInput() {
-    withDueDateInput(function(input) { input.focus(); });
-  }
-
-  function withDueDateInput(f) {
-    withId('editor', function(content) {
-      withUniqueClass(content, 'manager', all, function(manager) {
-        withUniqueClass(manager, 'input_due_date', all, f);
-      });
-    });
-  }
-
   /*****************************************************************************
    * Enumeration of tasks
    */
