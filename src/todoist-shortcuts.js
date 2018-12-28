@@ -497,6 +497,7 @@
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
+      blurSchedulerInput();
       if (inBulkScheduleMode) {
         bulkScheduleCursorChanged();
       }
@@ -513,12 +514,10 @@
   // selection.
   function scheduleText() {
     var mutateCursor = getCursorToMutate();
-    var schedulerButton = mutateCursor ? getUniqueClass(mutateCursor, SCHEDULER_ACTION_CLASS) : null;
-    if (schedulerButton) {
-      click(schedulerButton);
+    if (mutateCursor) {
+      clickTaskSchedule(mutateCursor);
     } else {
-      edit();
-      focusDueDateInput();
+      info('Can only use shift+t scheduling with one item selected');
     }
   }
 
@@ -1041,6 +1040,7 @@
     setCursor(curBulkScheduleTask, 'scroll');
     bulkScheduleCursorChanged();
     clickTaskSchedule(curBulkScheduleTask);
+    blurSchedulerInput();
   }
 
   function bulkScheduleCursorChanged() {
@@ -2005,10 +2005,12 @@
   }
 
   function clickTaskSchedule(task) {
-    withTaskMenu(task, function(menu) {
-      withUniqueTag(menu, 'a', matchingAttr('data-track', 'scheduler|more'), click);
-      blurSchedulerInput();
-    });
+    var dueDateControls = getUniqueClass(task, 'due_date_controls');
+    if (dueDateControls) {
+      withUniqueClass(dueDateControls, 'date', all, click);
+    } else {
+      withUniqueClass(task, SCHEDULER_ACTION_CLASS, all, click);
+    }
   }
 
   function blurSchedulerInput() {

@@ -11,6 +11,8 @@
 * Fix a crucial bug where most actions weren't working. Adapts to
   changes that affect finding Todoist menus.
 
+* Fixes / improves rescheduling of a single task.
+
 * On initial login, there was some lag for the theme to be
   applied. This sometimes caused the background color for navigation
   tips to be wrong. This version fixes this problem.
