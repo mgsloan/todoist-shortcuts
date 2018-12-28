@@ -681,7 +681,7 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_ARCHIVE);
     } else {
-      clickMenu(moreMenu, MI_ARCHIVE);
+      clickMenu(getMoreMenu(), MI_ARCHIVE);
     }
   }
 
@@ -710,7 +710,7 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_DELETE_SEL);
     } else {
-      clickMenu(moreMenu, MI_DELETE);
+      clickMenu(getMoreMenu(), MI_DELETE);
     }
   }
 
@@ -719,7 +719,7 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_DUPLICATE);
     } else {
-      clickMenu(moreMenu, MI_DUPLICATE);
+      clickMenu(getMoreMenu(), MI_DUPLICATE);
     }
   }
 
@@ -729,7 +729,7 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    clickMenu(moreMenu, MI_ADD_LABEL);
+    clickMenu(getMoreMenu(), MI_ADD_LABEL);
     setTemporarySelectionsClass('ist_complete_select');
   }
 
@@ -739,7 +739,7 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    clickMenu(moreMenu, MI_REMOVE_LABEL);
+    clickMenu(getMoreMenu(), MI_REMOVE_LABEL);
     setTemporarySelectionsClass('ist_complete_select');
   }
 
@@ -1622,9 +1622,37 @@
 
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
-  var moreMenu = findMenu('More...', MORE_MENU_ITEMS);
-  var taskMenu = findMenu('task', TASKMENU_ITEMS, all, 2);
-  var agendaTaskMenu = findMenu('agenda task', TASKMENU_ITEMS, function(el) { return el !== taskMenu; });
+  var moreMenu;
+  var taskMenu;
+  var agendaTaskMenu;
+
+  function getMoreMenu() {
+    if (moreMenu) {
+      return moreMenu;
+    } else {
+      moreMenu = findMenu('More...', MORE_MENU_ITEMS);
+      return moreMenu;
+    }
+  }
+
+  function getTaskMenu() {
+    if (taskMenu) {
+      return taskMenu;
+    } else {
+      taskMenu = findMenu('task', TASKMENU_ITEMS, all, 2);
+      return taskMenu;
+    }
+  }
+
+  function getAgendaTaskMenu() {
+    if (agendaTaskMenu) {
+      return agendaTaskMenu;
+    } else {
+      getTaskMenu();
+      agendaTaskMenu = findMenu('agenda task', TASKMENU_ITEMS, function(el) { return el !== taskMenu; });
+      return agendaTaskMenu;
+    }
+  }
 
   function clickMenu(menu, cls) {
     withUniqueClass(menu, cls, all, function(container) {
@@ -1673,9 +1701,9 @@
     withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
       var menu;
       if (stripPrefix('agenda', viewMode)) {
-        menu = agendaTaskMenu;
+        menu = getAgendaTaskMenu();
       } else if (viewMode === 'project') {
-        menu = taskMenu;
+        menu = getTaskMenu();
       } else {
         error('Unexpected viewMode:', viewMode);
         return;
