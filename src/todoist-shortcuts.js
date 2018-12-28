@@ -167,6 +167,18 @@
   var BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
   var BULK_MOVE_KEYMAP = 'bulk_move';
 
+  var SMART_SCHEDULER_BINDINGS = [
+    ['enter', smartSchedulerUpdate],
+    ['fallback', originalHandler]
+  ];
+  var SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
+
+  function smartSchedulerUpdate() {
+    withUniqueClass(document, 'SmartSchedule', all, function(smartScheduler) {
+      withUniqueClass(smartScheduler, 'submit_btn', all, click);
+    });
+  }
+
   function handleBulkMoveKey(ev) {
     if (ev.keyCode === 27 && ev.type === 'keydown') {
       exitBulkMove();
@@ -1550,7 +1562,12 @@
     if (mousetrap) {
       var popupWindow = getUniqueClass(document, 'GB_window');
       if (popupWindow) {
-        switchKeymap(POPUP_KEYMAP);
+        var smartScheduler = getUniqueClass(popupWindow, 'SmartSchedule');
+        if (smartScheduler) {
+          switchKeymap(SMART_SCHEDULER_KEYMAP);
+        } else {
+          switchKeymap(POPUP_KEYMAP);
+        }
       } else if (inBulkScheduleMode) {
         switchKeymap(BULK_SCHEDULE_KEYMAP);
       } else if (inBulkMoveMode) {
@@ -3709,6 +3726,7 @@
     registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
+    registerKeybindings(SMART_SCHEDULER_KEYMAP, SMART_SCHEDULER_BINDINGS);
 
     // Reset mousetrap on disable.
     onDisable(function() { mousetrap.reset(); });

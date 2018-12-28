@@ -4,7 +4,11 @@
 
 ### Enhancements ###
 
-* When scheduling multiple items, `s` now opens the smart scheduler.
+* When scheduling multiple items, `s` now opens the smart
+  scheduler. Within the smart scheduler, `enter` applies the updates,
+  and `escape` cancels. See [#53]
+
+[#53]: https://github.com/mgsloan/todoist-shortcuts/issues/53
 
 ### Bug fixes ###
 

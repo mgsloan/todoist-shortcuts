@@ -150,12 +150,15 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `d`                     | today                                                                |
 | `t`                     | tomorrow                                                             |
 | `w`                     | next week                                                            |
-| `m`                     | in 1 month (no longer on https://beta.todoist.com, might be removed) |
-| `s`                     | suggested date (currently, only on https://beta.todoist.com)         |
+| `s`                     | suggested date or smart scheduler                                |
 | `r`                     | remove                                                               |
 | `backspace` or `delete` | clear and focus text date entry                                      |
 | `enter`                 | focus text date entry without clearing it                            |
 | `escape`                | exit scheduling                                                      |
+
+The "Smart Scheduler" is opened by pressing `s` when scheduling
+multiple items. Currently there are only two keybindings for the smart
+scheduler: `enter` to apply the choices, and `escape` to cancel.
 
 ## Sorting
 
