@@ -2024,7 +2024,10 @@
   function clickTaskSchedule(task) {
     var dueDateControls = getUniqueClass(task, 'due_date_controls');
     if (dueDateControls) {
+      // For scheduled and unscheduled tasks, both of thse elements
+      // exist, but only one will cause the scheduler to open.
       withUniqueClass(dueDateControls, 'date', all, click);
+      withUniqueClass(dueDateControls, 'scheduler_action', all, click);
     } else {
       withUniqueClass(task, SCHEDULER_ACTION_CLASS, all, click);
     }

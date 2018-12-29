@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 37 ##
+
+### Bug fixes ###
+
+* Fixes scheduling of unscheduled tasks. See [#56]
+
+[#56]: https://github.com/mgsloan/todoist-shortcuts/issues/56
+
+
 ## Version 36 ##
 
 ### Enhancements ###
