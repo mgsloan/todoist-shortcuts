@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 38 (Not yet released) ##
+
+### Bug fixes ###
+
+* On initial login, there was some lag for the theme to be
+  applied. This caused the background color for navigation tips to be
+  wrong. This version fixes this problem.
+
+
 ## Version 37 ##
 
 ### Bug fixes ###
@@ -25,10 +34,6 @@
   changes that affect finding Todoist menus.
 
 * Fixes / improves rescheduling of a single task.
-
-* On initial login, there was some lag for the theme to be
-  applied. This sometimes caused the background color for navigation
-  tips to be wrong. This version fixes this problem.
 
 * Fixes updating of internal `viewMode` variable on initial load,
   likely due to slight changes in Todoist behavior. Without this fix,

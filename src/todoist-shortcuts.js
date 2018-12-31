@@ -3499,21 +3499,27 @@
    * Styling
    */
 
-  var todoistBackgroundColor = 'inherit';
   function updateBackgroundColor() {
     withId(BACKGROUND_ID, function(background) {
       try {
-        todoistBackgroundColor =
+        var todoistBackgroundColor =
           background.computedStyleMap().get('background-color').toString();
+        debug('Background color is', todoistBackgroundColor);
+        addCss([
+          '.' + TODOIST_SHORTCUTS_TIP + ' {',
+          // Since the tips overlap expand / collapse arrows, set
+          // background.
+          '  background-color: ' + todoistBackgroundColor + ';',
+          '}'
+        ]);
       } catch (e) {
         error('Failed to figure out background color:', e);
       }
     });
   }
   updateBackgroundColor();
-  // Sometimes there's a lag for the theme to update, so re-query it a
-  // few times.
-  setTimeout(updateBackgroundColor, 1000);
+  // Sometimes there's a lag for the theme to update, so re-query it
+  // after 5 seconds.
   setTimeout(updateBackgroundColor, 5000);
 
   addCss([
@@ -3535,8 +3541,6 @@
     '  color: #dd4b39;',
     // Ensure that these get displayed over other UI. See issue#34
     '  z-index: 2147483647;',
-    // Since these tips overlap expand / collapse arrows, set background.
-    '  background-color: ' + todoistBackgroundColor + ';',
     '}',
     '',
     '.' + TODOIST_SHORTCUTS_TIP_TYPED + ' {',
