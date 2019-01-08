@@ -111,7 +111,7 @@ If none are selected, then these will apply to the cursor instead.
 | keys       | action                            |
 | ---        | ---                               |
 | `t`        | schedule                          |
-| `T`        | schedule cursor by editing text   |
+| `T`        | schedule by editing text          |
 | `d`        | done: mark task as complete       |
 | `e`        | archive                           |
 | `#`        | delete                            |
@@ -135,11 +135,6 @@ are the differences:
 2. If the task is a Recurring Task (e.g. every day) and you "Complete Task" it
    will be scheduled for the next date of recurrence. If you "Archive Task" it
    will be completed and not recur again.
-
-Note that the text rescheduling invoked by `T` only works for the current
-cursor. Resolving this is tracked by [issue #24].
-
-[issue #24]: https://github.com/mgsloan/todoist-shortcuts/issues/24
 
 ## Scheduling
 

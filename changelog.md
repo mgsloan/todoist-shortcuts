@@ -8,6 +8,11 @@
   applied. This caused the background color for navigation tips to be
   wrong. This version fixes this problem.
 
+* Makes it so that scheduling via text entry (`T`) can work with
+  multiple tasks selected. See [#24].
+
+[#24]: https://github.com/mgsloan/todoist-shortcuts/issues/24
+
 
 ## Version 37 ##
 

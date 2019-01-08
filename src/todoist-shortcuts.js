@@ -529,7 +529,9 @@
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-      info('Can only use shift+t scheduling with one item selected');
+      withId(ACTIONS_BAR_CLASS, function(parent) {
+        withUniqueClass(parent, MI_SCHEDULE, all, click);
+      });
     }
   }
 
