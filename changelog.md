@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 38 (Not yet released) ##
+## Version 38 ##
 
 ### Bug fixes ###
 
