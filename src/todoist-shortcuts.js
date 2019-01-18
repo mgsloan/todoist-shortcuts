@@ -1934,6 +1934,9 @@
     } else {
       dragInProgress = true;
       try {
+        window.scrollBy = function() {
+          debug('Ignored Todoist scrollBy during task drag:', arguments);
+        };
         withDragHandle(sourceTask, function(el, x, y) {
           var result = findDestination();
           if (result) {
@@ -1949,6 +1952,7 @@
         }, function() { dragInProgress = false; });
       } catch (ex) {
         dragInProgress = false;
+        window.scrollBy = window.originalTodoistScrollBy;
         throw ex;
       }
     }
@@ -3677,6 +3681,7 @@
     if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
     if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
     if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
+    if (!window.originalTodoistScrollBy) { window.originalTodoistScrollBy = window.scrollBy; }
 
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
