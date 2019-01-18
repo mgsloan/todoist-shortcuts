@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 39 ##
+
+### Bug fixes ###
+
+* Workaround for an issue where moving / indenting / dedenting a task
+  causes the window to scroll up a bit. See [#58].
+
+[#58]: https://github.com/mgsloan/todoist-shortcuts/issues/58
+
+
 ## Version 38 ##
 
 ### Bug fixes ###
