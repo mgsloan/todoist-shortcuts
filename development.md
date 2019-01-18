@@ -27,8 +27,8 @@ often gets refereshed, so storing references to nodes is often useless.
 comment.
 
 For stuff to work on, take a look at [the issue
-tracker](https://github.com/mgsloan/todoist-shortcuts/issues) or the list of
-TODO items below.
+tracker](https://github.com/mgsloan/todoist-shortcuts/issues). Or,
+propose a new feature!
 
 # Running eslint
 
