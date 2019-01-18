@@ -7,7 +7,11 @@
 * Workaround for an issue where moving / indenting / dedenting a task
   causes the window to scroll up a bit. See [#58].
 
+* Removes note about task indenting not working, as it seems to no
+  longer be a problem. See [#50]
+
 [#58]: https://github.com/mgsloan/todoist-shortcuts/issues/58
+[#50]: https://github.com/mgsloan/todoist-shortcuts/issues/50
 
 
 ## Version 38 ##
