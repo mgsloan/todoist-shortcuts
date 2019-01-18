@@ -81,12 +81,8 @@ navigation mode to select the same project again.
 | `shift+l` or `shift+left`  | dedent task at cursor         |
 | `shift+h` or `shift+right` | indent task at cursor         |
 
-Bug note: Unfortunately, indentation of the task at the cursor no
-longer seems to work, and the issue has been troublesome to diagnose.
-See issue
-[#50](https://github.com/mgsloan/todoist-shortcuts/issues/50). Currently,
-todoist-shortcuts has very few known bugs, but nearly all of them are
-related to task motion, which is quite fiddly - see also
+
+Note that there are some known bugs related to task motion - see
 [#27](https://github.com/mgsloan/todoist-shortcuts/issues/27) and
 [#29](https://github.com/mgsloan/todoist-shortcuts/issues/29).
 

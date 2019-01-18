@@ -1779,7 +1779,6 @@
 
   // Indent task.
   function moveIn() {
-    warn('Task indentation is unfortunately known to be broken - see https://github.com/mgsloan/todoist-shortcuts/issues/50');
     var cursor = getCursor();
     if (viewMode === 'agenda_reorder') {
       info('Indenting task does not work in agenda_reorder mode.');
