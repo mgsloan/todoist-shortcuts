@@ -580,7 +580,12 @@
         if (suggested) {
           click(suggested);
         } else {
-          withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'), click);
+          var smartScheduler = getUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'));
+          if (smartScheduler) {
+            click(smartScheduler);
+          } else {
+            withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_postpone'), click);
+          }
         }
       });
   }

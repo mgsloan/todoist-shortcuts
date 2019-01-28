@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 40 ##
+
+### Enhancements ###
+
+* When scheduling a recurring task, `s` now postpones the task.
+
+
 ## Version 39 ##
 
 ### Bug fixes ###

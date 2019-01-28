@@ -137,16 +137,16 @@ are the differences:
 
 When scheduling is opened via `t`, the following keybindings will apply:
 
-| keys                    | date                                                                 |
-| ---                     | ---                                                                  |
-| `d`                     | today                                                                |
-| `t`                     | tomorrow                                                             |
-| `w`                     | next week                                                            |
-| `s`                     | suggested date or smart scheduler                                |
-| `r`                     | remove                                                               |
-| `backspace` or `delete` | clear and focus text date entry                                      |
-| `enter`                 | focus text date entry without clearing it                            |
-| `escape`                | exit scheduling                                                      |
+| keys                    | date                                                                                |
+| ---                     | ---                                                                                 |
+| `d`                     | today                                                                               |
+| `t`                     | tomorrow                                                                            |
+| `w`                     | next week                                                                           |
+| `s`                     | suggested date (1 task), smart scheduler (many tasks), or postpone (recurring task) |
+| `r`                     | remove                                                                              |
+| `backspace` or `delete` | clear and focus text date entry                                                     |
+| `enter`                 | focus text date entry without clearing it                                           |
+| `escape`                | exit scheduling                                                                     |
 
 The "Smart Scheduler" is opened by pressing `s` when scheduling
 multiple items. Currently there are only two keybindings for the smart
