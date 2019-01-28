@@ -18,8 +18,9 @@ These keyboard shortcuts are directly inspired by the shortcuts used for GMail,
 which, in turn were inspired by vim-like keyboard interaction. I highly
 recommend enabling the advanced keyboard shortcuts if you use GMail.
 
-So, if the choices of keypresses seem strange, stick with it! Many of the
-keypresses used here can also be used in GMail or even vim (or [evil-mode] ;) ).
+So, if the choices of keypresses seem strange, stick with it! Many of
+the keypresses used here can also be used in GMail or even vim (or,
+better yet, [evil-mode] ;) ).
 
 [evil-mode]: https://github.com/emacs-evil/evil
 
