@@ -3014,13 +3014,13 @@
     if (!cursor) {
       debug('modifyCursorIndex couldn\'t find cursor, so running restoreLastCursor');
       restoreLastCursor();
+      cursor = getCursor();
     }
-    cursor = getCursor();
     if (!cursor) {
       info('Couldn\'t find cursor, so selecting first task.');
       setCursorToFirstTask('scroll');
     } else {
-      var cursorIndex = tasks.indexOf(getCursor());
+      var cursorIndex = tasks.indexOf(cursor);
       if (cursorIndex < 0) {
         error(
           'Invariant violation: couldn\'t find', cursor, 'in', tasks,
