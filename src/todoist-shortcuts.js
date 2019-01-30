@@ -2177,18 +2177,20 @@
       return [];
     }
     var results = [];
-    withTag(document, 'li', function(item) {
-      // Skip elements which don't correspond to tasks
-      var classMatches =
-        !item.classList.contains('reorder_item') &&
-        (  item.classList.contains('task_item')
-        || (item.classList.contains('manager') && shouldIncludeEditors)
-        );
-      // Skip nested tasks that are not visible (if includeCollapsed is not set).
-      var visible = shouldIncludeCollapsed || not(hidden(item));
-      if (classMatches && visible) {
-        results.push(item);
-      }
+    withId('content', function(content) {
+      withTag(content, 'li', function(item) {
+        // Skip elements which don't correspond to tasks
+        var classMatches =
+          !item.classList.contains('reorder_item') &&
+          (  item.classList.contains('task_item')
+          || (item.classList.contains('manager') && shouldIncludeEditors)
+          );
+        // Skip nested tasks that are not visible (if includeCollapsed is not set).
+        var visible = shouldIncludeCollapsed || not(hidden(item));
+        if (classMatches && visible) {
+          results.push(item);
+        }
+      });
     });
     return results;
   }
