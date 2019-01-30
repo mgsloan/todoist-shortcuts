@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 41 ##
+
+### Bug fixes ###
+
+* Fixed a bug where cursor movement would select collapsed tasks.
+
+
 ## Version 40 ##
 
 ### Enhancements ###

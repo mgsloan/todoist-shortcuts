@@ -2186,7 +2186,7 @@
           || (item.classList.contains('manager') && shouldIncludeEditors)
           );
         // Skip nested tasks that are not visible (if includeCollapsed is not set).
-        var visible = shouldIncludeCollapsed || not(hidden(item));
+        var visible = shouldIncludeCollapsed || !hidden(item);
         if (classMatches && visible) {
           results.push(item);
         }
