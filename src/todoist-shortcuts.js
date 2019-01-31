@@ -1843,6 +1843,10 @@
       if (!cursor) {
         info('No cursor to move up.');
       } else {
+        if (getSectionName(cursor) === 'OverdueReschedule overdue') {
+          info('Can\'t move cursor down in overdue section');
+          return;
+        }
         // Collapse nested tasks before moving it - see
         // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
         collapse();
@@ -1883,6 +1887,10 @@
       if (!cursor) {
         info('No cursor to move down.');
       } else {
+        if (getSectionName(cursor) === 'OverdueReschedule overdue') {
+          info('Can\'t move cursor down in overdue section');
+          return;
+        }
         // Collapse nested tasks before moving it - see
         // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
         collapse();
