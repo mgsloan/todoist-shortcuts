@@ -307,13 +307,6 @@
   // Set this to true to get more log output.
   var DEBUG = false;
 
-  // Set this to true to get a UI message directly in the page when the Todoist
-  // version number is newer than expected. When false, instead the mismatch
-  // warning just appears in a submenu. Mostly intended for developers of
-  // todoist-shortcuts, as the version bumps too often for it to be reasonable
-  // to do releases of the extension.
-  var NOISY_VERSION_CHECK = false;
-
   // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
   var TODOIST_ROOT_ID = 'todoist_app';
   var AGENDA_VIEW_ID = 'agenda_view';
@@ -354,7 +347,6 @@
   var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
-  var TODOIST_TESTED_VERSION = 935;
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
@@ -2858,68 +2850,6 @@
     });
   }
 
-
-  // eslint-disable-next-line no-unused-vars
-  function checkTodoistVersion() {
-    try {
-      var el = getUniqueClass(document, 'version');
-      var todoistVersion = null;
-      if (el) {
-        var stripped = stripPrefix('Version', el.textContent);
-        if (stripped) {
-          todoistVersion = parseInt(stripped.trim(), 10);
-        }
-      }
-      var warningPrefix = null;
-      var warningSuffix = null;
-      var isTooOld = false;
-      if (todoistVersion && todoistVersion < TODOIST_TESTED_VERSION) {
-        isTooOld = true;
-        warningPrefix =
-          'Note: The version of todoist you are using, version ' +
-          todoistVersion +
-          ', is older than the version that ';
-        warningSuffix =
-          ' was tested with, version ' +
-          TODOIST_TESTED_VERSION +
-          '. Due to this mismatch, it might not behave as expected.';
-      } else if (!todoistVersion || todoistVersion > TODOIST_TESTED_VERSION) {
-        if (todoistVersion) {
-          warningPrefix =
-            'Note: The version of todoist you are using, version ' +
-            todoistVersion +
-            ', is newer than the version that ';
-        } else {
-          warningPrefix =
-            'Note: The version of todoist you are using could not be detected, ' +
-            'which probably means that it is new newer than the version that ';
-        }
-        warningSuffix =
-          ' is tested with, version ' +
-          TODOIST_TESTED_VERSION +
-          '. Due to this mismatch, it might not behave as expected, though usually it will still work fine. Perhaps check for an updated version?';
-      }
-      if (warningPrefix && warningSuffix) {
-        info(warningPrefix, 'todoist-shortcuts', warningSuffix);
-        var div = document.createElement('div');
-        div.classList.add(TODOIST_SHORTCUTS_WARNING);
-        div.appendChild(document.createTextNode(warningPrefix));
-        var a = document.createElement('a');
-        a.href = TODOIST_SHORTCUTS_GITHUB;
-        a.appendChild(document.createTextNode('the todoist-shortcuts extension'));
-        div.appendChild(a);
-        div.appendChild(document.createTextNode(warningSuffix));
-        if (isTooOld || NOISY_VERSION_CHECK) {
-          document.getElementById('page_background').appendChild(div);
-        } else {
-          document.getElementById('last_synced').parentElement.appendChild(div);
-        }
-      }
-    } catch (ex) {
-      error('Exception while checking Todoist version', ex);
-    }
-  }
-
   /** ***************************************************************************
    * Task cursor
    */
@@ -3658,8 +3588,6 @@
    * Run todoist-shortcuts!
    */
 
-  // Version check disabled, preparing for potential inclusion in Todoist.
-  // checkTodoistVersion();
   handlePageChange();
   registerTopMutationObservers();
   updateViewMode();
