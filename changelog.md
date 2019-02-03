@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 43 ##
+
+### Bug fixes ###
+
+* Fixes display of deprecation notice for `d` when displayed in narrow
+  windows (in particular, the iframe used by [Todoist for Gmail]).
+
+
 ## Version 42 ##
 
 ### Enhancements ###
@@ -13,7 +21,7 @@
   Gmail].
 
 [#52]: https://github.com/mgsloan/todoist-shortcuts/issues/52
-[Todoist for GMail]: https://chrome.google.com/webstore/detail/todoist-for-gmail/clgenfnodoocmhnlnpknojdbjjnmecff?hl=en
+[Todoist for Gmail]: https://chrome.google.com/webstore/detail/todoist-for-gmail/clgenfnodoocmhnlnpknojdbjjnmecff?hl=en
 
 
 ## Version 41 ##
