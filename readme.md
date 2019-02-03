@@ -139,7 +139,7 @@ When scheduling is opened via `t`, the following keybindings will apply:
 
 | keys                    | date                                                                                |
 | ---                     | ---                                                                                 |
-| `d`                     | today                                                                               |
+| `c`                     | today (mnemonic is "current day")                                                   |
 | `t`                     | tomorrow                                                                            |
 | `w`                     | next week                                                                           |
 | `s`                     | suggested date (1 task), smart scheduler (many tasks), or postpone (recurring task) |

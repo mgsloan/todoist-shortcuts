@@ -4,9 +4,16 @@
 
 ### Enhancements ###
 
+* Changes the scheduler keybinding for "today" to `c` (instead of
+  `d`). This is to make it less likely that tasks accidentally get
+  marked done. See [#52]
+
 * Keyboard shortcuts now work in todoist iframes.  In particular,
   todoist-shortcuts can now be used along with the [Todoist for
-  Gmail](https://chrome.google.com/webstore/detail/todoist-for-gmail/clgenfnodoocmhnlnpknojdbjjnmecff?hl=en).
+  Gmail].
+
+[#52]: https://github.com/mgsloan/todoist-shortcuts/issues/52
+[Todoist for GMail]: https://chrome.google.com/webstore/detail/todoist-for-gmail/clgenfnodoocmhnlnpknojdbjjnmecff?hl=en
 
 
 ## Version 41 ##

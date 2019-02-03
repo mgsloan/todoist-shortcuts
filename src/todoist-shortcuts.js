@@ -13,7 +13,7 @@
 // See issue #11 for why ItemSelecter is used (it is added to the global scope
 // by Todoist).
 
-/* global ItemSelecter */
+/* global ItemSelecter, svgs */
 
 (function() {
   'use strict';
@@ -141,7 +141,8 @@
 
   // Scheduling keybindings (used when scheduler is open)
   var SCHEDULE_BINDINGS = Array.concat(SCHEDULE_CURSOR_BINDINGS, [
-    ['d', scheduleToday],
+    ['c', scheduleToday],
+    ['d', oldScheduleTodayBindingDeprecated],
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
@@ -976,6 +977,25 @@
 
   function sync() {
     withUniqueTag(document, 'td', matchingAttr('data-track', 'navigation|gear_sync'), click);
+  }
+
+  function oldScheduleTodayBindingDeprecated() {
+    var link = element('a', null, text('this GitHub discussion'));
+    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/52';
+    link.style.color = '';
+    notifyUser(
+      span(null,
+        text('The scheduler shortcut for selecting "Today" has been changed to '),
+        span('ts-note-key', text('c')),
+        text('.'),
+        element('br', null),
+        text('You pressed the old scheduler shortcut for this, '),
+        span('ts-note-key', text('d')),
+        text(', but it now just displays this message.'),
+        element('br', null),
+        text('See '),
+        link,
+        text(' for the reasoning behind this change.')));
   }
 
   /*****************************************************************************
@@ -2126,6 +2146,24 @@
       // See https://github.com/mgsloan/todoist-shortcuts/issues/32
       // withRestoredSelections(function() { click(img); });
       click(img);
+    });
+  }
+
+  function notifyUser(msg) {
+    withId('app_holder', function(appHolder) {
+      var close = div('ts-note-close');
+      close.innerHTML = svgs['sm1/close_small.svg'];
+      var note =
+          div('ts-note',
+            div('ts-note-content',
+              span('ts-note-prefix', text('Note from todoist-shortcuts: ')),
+              element('br', null),
+              typeof msg === 'string' ? text(msg) : msg),
+            close);
+      appHolder.appendChild(note);
+      var closeFunc = function() { appHolder.removeChild(note); };
+      close.onclick = closeFunc;
+      setTimeout(closeFunc, 10000);
     });
   }
 
@@ -3527,6 +3565,53 @@
     'body.mini_version.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
     '  left: 0;',
     '  bottom: 0;',
+    '}',
+    '',
+    // Based directly on Todoist's .notifier
+    '.ts-note {',
+    '  position: fixed;',
+    '  min-height: 22px;',
+    '  background-color: #4c4c4d;',
+    '  right: 24px;',
+    '  bottom: 24px;',
+    '  border-radius: 3px;',
+    '  z-index: 19000;',
+    '  -webkit-transition: opacity .25s ease-in;',
+    '  transition: opacity .25s ease-in;',
+    '  -webkit-box-shadow: rgba(0,0,0,0.156863) 0 2px 3px 0, rgba(0,0,0,0.0588235) 0 1px 10px 0, rgba(0,0,0,0.0196078) 0 4px 6px 0;',
+    '  box-shadow: rgba(0,0,0,0.156863) 0 2px 3px 0, rgba(0,0,0,0.0588235) 0 1px 10px 0, rgba(0,0,0,0.0196078) 0 4px 6px 0;',
+    '}',
+    '',
+    '.ts-note-content {',
+    '  white-space: nowrap;',
+    '  padding: 12px 30px;',
+    '  display: block;',
+    '  margin-top: 1px;',
+    '  color: #fff;',
+    '  line-height: 1.75em;',
+    '}',
+    '',
+    '.ts-note-prefix {',
+    '  color: #de4c4a;',
+    '}',
+    '',
+    '.ts-note a {',
+    '  color: #de4c4a;',
+    '}',
+    '',
+    '.ts-note-key {',
+    '  color: #f59c53;',
+    '  border: 1px solid #ccc;',
+    '  padding: 0.1em;',
+    '  font-size: 150%;',
+    '}',
+    '',
+    '.ts-note-close {',
+    '  position: absolute;',
+    '  top: 5px;',
+    '  right: 5px;',
+    '  color: #282828;',
+    '  cursor: pointer;',
     '}'
   ].join('\n'));
 
