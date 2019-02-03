@@ -613,10 +613,10 @@
   }
 
   // Fills in the text of the project selection completion.
-  function fillProjectInput(text) {
+  function fillProjectInput(txt) {
     withUniqueClass(document, PROJECT_COMPLETE_CLASS, all, function(complete) {
       withUniqueTag(complete, 'input', all, function(input) {
-        input.value = text;
+        input.value = txt;
       });
     });
   }
@@ -2327,7 +2327,7 @@
       var navigateItems = [];
       withTag(listHolder, 'li', function(li) {
         var mustBeKeys = null;
-        var text = null;
+        var txt = null;
         var initials = null;
         if (matchingAttr('data-track', 'navigation|inbox')(li)) {
           mustBeKeys = 'i';
@@ -2338,38 +2338,38 @@
         } else if (li.classList.contains('favorite_item')) {
           withUniqueClass(li, 'item_content', all, function(content) {
             withUniqueChild(content, matchingTag('span'), function(nameSpan) {
-              text = preprocessItemText(nameSpan.textContent);
+              txt = preprocessItemText(nameSpan.textContent);
               initials = getItemInitials(nameSpan.textContent);
             });
           });
         } else {
           withUniqueClass(li, 'name', all, function(nameElement) {
             withUniqueChild(nameElement, matchingTag('span'), function(nameSpan) {
-              text = preprocessItemText(nameSpan.textContent);
+              txt = preprocessItemText(nameSpan.textContent);
               initials = getItemInitials(nameSpan.textContent);
             });
           });
         }
         // Add some stable sequences for common text
-        if (text === 'priority1') { mustBeKeys = 'p1'; }
-        if (text === 'priority2') { mustBeKeys = 'p2'; }
-        if (text === 'priority3') { mustBeKeys = 'p3'; }
-        if (text === 'priority4') { mustBeKeys = 'p4'; }
-        if (text === 'assignedtome') { mustBeKeys = 'am'; }
-        if (text === 'assignedtoothers') { mustBeKeys = 'ao'; }
-        if (text === 'viewall') { mustBeKeys = 'va'; }
-        if (text === 'noduedate') { mustBeKeys = 'dn'; }
+        if (txt === 'priority1') { mustBeKeys = 'p1'; }
+        if (txt === 'priority2') { mustBeKeys = 'p2'; }
+        if (txt === 'priority3') { mustBeKeys = 'p3'; }
+        if (txt === 'priority4') { mustBeKeys = 'p4'; }
+        if (txt === 'assignedtome') { mustBeKeys = 'am'; }
+        if (txt === 'assignedtoothers') { mustBeKeys = 'ao'; }
+        if (txt === 'viewall') { mustBeKeys = 'va'; }
+        if (txt === 'noduedate') { mustBeKeys = 'dn'; }
         if (mustBeKeys) {
           navigateItems.push({
             element: li,
             mustBeKeys: mustBeKeys,
-            text: text,
+            text: txt,
             initials: initials
           });
-        } else if (text) {
+        } else if (txt) {
           navigateItems.push({
             element: li,
-            text: text,
+            text: txt,
             initials: initials
           });
         } else {
@@ -2445,16 +2445,11 @@
         if (!el) {
           error('Missing element for tip', key);
         } else {
-          var div = document.createElement('div');
+          var tip = div(TODOIST_SHORTCUTS_TIP, text(rest));
           if (prefix.length > 0) {
-            var typed = document.createElement('div');
-            typed.appendChild(document.createTextNode(prefix));
-            typed.classList.add(TODOIST_SHORTCUTS_TIP_TYPED);
-            div.appendChild(typed);
+            tip.prepend(div(TODOIST_SHORTCUTS_TIP_TYPED, text(prefix)));
           }
-          div.appendChild(document.createTextNode(rest));
-          div.classList.add(TODOIST_SHORTCUTS_TIP);
-          el.prepend(div);
+          el.prepend(tip);
           renderedAny = true;
         }
       }
@@ -2463,10 +2458,10 @@
   }
 
   // Lowercase and take only alphanumeric.
-  function preprocessItemText(text) {
+  function preprocessItemText(txt) {
     var result = '';
-    for (var i = 0; i < text.length; i++) {
-      var char = text[i];
+    for (var i = 0; i < txt.length; i++) {
+      var char = txt[i];
       var lowerChar = char.toLowerCase();
       if (lowercaseCharIsAlphanum(lowerChar)) {
         result += lowerChar;
@@ -2476,13 +2471,13 @@
   }
 
   // Lowercase and get initials.
-  function getItemInitials(text) {
+  function getItemInitials(txt) {
     var result = '';
-    for (var i = 0; i < text.length; i++) {
-      var char = text[i];
+    for (var i = 0; i < txt.length; i++) {
+      var char = txt[i];
       var lowerChar = char.toLowerCase();
       if (lowercaseCharIsAlphanum(lowerChar) &&
-        (i === 0 || text[i - 1] === ' ' || lowerChar !== char)) {
+        (i === 0 || txt[i - 1] === ' ' || lowerChar !== char)) {
         result += lowerChar;
       }
     }
@@ -3131,9 +3126,9 @@
 
   // Finds a parentElement which matches the specified
   // predicate. Returns null if element is null.
-  function findParent(element, predicate) {
-    if (!element) return null;
-    var el = element.parentElement;
+  function findParent(el0, predicate) {
+    if (!el0) return null;
+    var el = el0.parentElement;
     if (!el) return null;
     do {
       if (predicate(el)) {
@@ -3229,9 +3224,9 @@
   function findFirst(predicate, array) {
     var pred = checkedPredicate('findFirst', predicate ? predicate : all);
     for (var i = 0; i < array.length; i++) {
-      var element = array[i];
-      if (pred(element)) {
-        return element;
+      var el = array[i];
+      if (pred(el)) {
+        return el;
       }
     }
     return null;
@@ -3242,9 +3237,9 @@
   function findLast(predicate, array) {
     var pred = checkedPredicate('findLast', predicate ? predicate : all);
     for (var i = array.length - 1; i >= 0; i--) {
-      var element = array[i];
-      if (pred(element)) {
-        return element;
+      var el = array[i];
+      if (pred(el)) {
+        return el;
       }
     }
     return null;
@@ -3257,12 +3252,12 @@
     var pred = checkedPredicate('findUnique', predicate ? predicate : all);
     var result = null;
     for (var i = 0; i < array.length; i++) {
-      var element = array[i];
-      if (pred(element)) {
+      var el = array[i];
+      if (pred(el)) {
         if (result === null) {
-          result = element;
+          result = el;
         } else {
-          debug('findUnique didn\'t find unique element because there are multiple results. Here are two:', result, element);
+          debug('findUnique didn\'t find unique element because there are multiple results. Here are two:', result, el);
           // Not unique, so return null.
           return null;
         }
@@ -3301,9 +3296,9 @@
 
   // Returns predicate which returns 'true' if text content matches wanted text.
   // eslint-disable-next-line no-unused-vars
-  function matchingText(text) {
+  function matchingText(txt) {
     return function(el) {
-      return el.textContent === text;
+      return el.textContent === txt;
     };
   }
 
@@ -3385,6 +3380,37 @@
       }
       return bool;
     };
+  }
+
+  /*****************************************************************************
+   * Utilities for creating elements
+   */
+
+  function text(x) {
+    return document.createTextNode(x);
+  }
+
+  function span() {
+    var args = [].slice.call(arguments);
+    args.unshift('span');
+    return element.apply(null, args);
+  }
+
+  function div() {
+    var args = [].slice.call(arguments);
+    args.unshift('div');
+    return element.apply(null, args);
+  }
+
+  function element(t, cls) {
+    var el = document.createElement(t);
+    if (cls) {
+      el.classList.add(cls);
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      el.appendChild(arguments[i]);
+    }
+    return el;
   }
 
   /*****************************************************************************
