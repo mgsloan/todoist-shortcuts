@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 42 ##
+
+### Enhancements ###
+
+* Keyboard shortcuts now work in todoist iframes.  In particular,
+  todoist-shortcuts can now be used along with the [Todoist for
+  Gmail](https://chrome.google.com/webstore/detail/todoist-for-gmail/clgenfnodoocmhnlnpknojdbjjnmecff?hl=en).
+
+
 ## Version 41 ##
 
 ### Bug fixes ###
