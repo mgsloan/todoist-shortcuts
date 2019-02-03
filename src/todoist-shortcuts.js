@@ -6,7 +6,7 @@
 // @include     http://todoist.com/app*
 // @include     https://beta.todoist.com/app*
 // @include     http://beta.todoist.com/app*
-// @version     42
+// @version     43
 // @grant       none
 // ==/UserScript==
 
@@ -18,7 +18,7 @@
 (function() {
   'use strict';
 
-  var TODOIST_SHORTCUTS_VERSION = 42;
+  var TODOIST_SHORTCUTS_VERSION = 43;
 
   // When true, enables selecting multiple items by holding 'x' and moving the
   // cursor.
