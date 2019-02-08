@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 44 ##
+
+### Enhancements ###
+
+* Icons that are only visible when a task is hovered, like the
+  comments and [toggl-button], will now move with the cursor.
+
+[toggl-button]: https://toggl.com/toggl-button/
+
+
 ## Version 43 ##
 
 ### Bug fixes ###
