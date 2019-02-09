@@ -102,6 +102,7 @@
     ['2', setPriority('2')],
     ['3', setPriority('3')],
     [['4', '0'], setPriority('4')],
+    ['shift+c', togglButton],
 
     // Sorting
     // (see originalHandler) ['r', sortByAssignee],
@@ -752,6 +753,12 @@
     }
     clickMenu(getMoreMenu(), MI_REMOVE_LABEL);
     setTemporarySelectionsClass('ist_complete_select');
+  }
+
+  // If toggl-button extension is in use, clicks the toggl-button
+  // element in the task.
+  function togglButton() {
+    withUniqueClass(getCursor(), 'toggl-button', all, click);
   }
 
   // Toggles collapse / expand task under the cursor, if it has children.

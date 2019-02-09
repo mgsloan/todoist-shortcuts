@@ -71,21 +71,24 @@ navigation mode to select the same project again.
 
 ## Manipulation of tasks at cursor
 
-| keys                       | action                        |
-| ---                        | ---                           |
-| `enter`                    | edit task at cursor           |
-| `o`                        | add task after cursor         |
-| `shift+o`                  | add task before cursor        |
-| `c`                        | open comments for cursor task |
-| `shift+j` or `shift+down`  | move task at cursor downwards |
-| `shift+k` or `shift+up`    | move task at cursor upwards   |
-| `shift+l` or `shift+left`  | dedent task at cursor         |
-| `shift+h` or `shift+right` | indent task at cursor         |
+| keys                       | action                                                                    |
+| ---                        | ---                                                                       |
+| `enter`                    | edit task at cursor                                                       |
+| `o`                        | add task after cursor                                                     |
+| `shift+o`                  | add task before cursor                                                    |
+| `c`                        | open comments for cursor task                                             |
+| `shift+j` or `shift+down`  | move task at cursor downwards                                             |
+| `shift+k` or `shift+up`    | move task at cursor upwards                                               |
+| `shift+l` or `shift+left`  | dedent task at cursor                                                     |
+| `shift+h` or `shift+right` | indent task at cursor                                                     |
+| `shift+c`                  | clicks [toggl-button (time tracking integration extension)][toggl-button] |
 
 
 Note that there are some known bugs related to task motion - see
 [#27](https://github.com/mgsloan/todoist-shortcuts/issues/27) and
 [#29](https://github.com/mgsloan/todoist-shortcuts/issues/29).
+
+[toggl-button]: https://toggl.com/toggl-button/
 
 ## Selection
 

@@ -4,6 +4,8 @@
 
 ### Enhancements ###
 
+* Adds `shift+c` shortcut for clicking [toggl-button].
+
 * Icons that are only visible when a task is hovered, like the
   comments and [toggl-button], will now move with the cursor.
 
