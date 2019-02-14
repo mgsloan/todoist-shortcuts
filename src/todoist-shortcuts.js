@@ -1479,7 +1479,7 @@
       registerMutationObserver(content, handlePageChange);
       registerMutationObserver(content, function(mutations) {
         // Ignore mutations from toggl-button extension
-        const filtered = mutations.filter(function(mutation) {
+        var filtered = mutations.filter(function(mutation) {
           if (mutation.target.classList.contains('toggl-button')) {
             return false;
           }
@@ -1493,7 +1493,7 @@
               mutation.addedNodes[0].classList.contains('drag_and_drop_handler')) {
             return false;
           }
-          return true
+          return true;
         });
         if (filtered.length > 0) {
           debug('ensuring cursor due to mutations:', mutations);
