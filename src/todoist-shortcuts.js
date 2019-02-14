@@ -1453,10 +1453,10 @@
   var selectAfterNavigate = null;
 
   function handlePageChange() {
-    debug('handlePageChange');
-    updateViewMode();
     var currentHash = document.location.hash;
     if (lastHash !== currentHash) {
+      debug('handlePageChange');
+      updateViewMode();
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
       if (selectAfterNavigate) {
