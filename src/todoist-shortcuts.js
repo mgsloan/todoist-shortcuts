@@ -1257,7 +1257,6 @@
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
   function ensureCursor(content) {
-    debug('ensuring cursor');
     // If there's an editor open to add a task, then set the cursor to the item
     // above.
     var manager = getUniqueClass(content, 'manager');
@@ -1486,8 +1485,28 @@
     withId('editor', function(content) {
       debug('registering top level observer for', content);
       registerMutationObserver(content, handlePageChange);
-      registerMutationObserver(content, function() {
-        ensureCursor(content);
+      registerMutationObserver(content, function(mutations) {
+        // Ignore mutations from toggl-button extension
+        const filtered = mutations.filter(function(mutation) {
+          if (mutation.target.classList.contains('toggl-button')) {
+            return false;
+          }
+          if (mutation.addedNodes.length === 0 &&
+              mutation.removedNodes.length === 1 &&
+              mutation.removedNodes[0].classList.contains('drag_and_drop_handler')) {
+            return false;
+          }
+          if (mutation.addedNodes.length === 1 &&
+              mutation.removedNodes.length === 0 &&
+              mutation.addedNodes[0].classList.contains('drag_and_drop_handler')) {
+            return false;
+          }
+          return true
+        });
+        if (filtered.length > 0) {
+          debug('ensuring cursor due to mutations:', mutations);
+          ensureCursor(content);
+        }
       }, { childList: true, subtree: true });
     });
     registerMutationObserver(document.body, handleBodyChange);

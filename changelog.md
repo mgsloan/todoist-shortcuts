@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 45 ##
+
+### Enhancements ###
+
+* Improved performance when used with [toggl-button] extension.
+
+
 ## Version 44 ##
 
 ### Enhancements ###
