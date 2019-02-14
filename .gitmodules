@@ -1,0 +1,3 @@
+[submodule "mousetrap"]
+        path = mousetrap
+        url = https://github.com/mgsloan/mousetrap
