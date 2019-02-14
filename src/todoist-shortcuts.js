@@ -2935,6 +2935,7 @@
   // Given the element for a task, set it as the current selection.
   function setCursor(task, shouldScroll) {
     if (task) {
+      debug('Setting cursor to', task.innerText);
       // Don't attempt to focus nested sub-projects in agenda view, because it
       // won't work - see issue #26.
       if (viewMode === 'agenda_reorder' && isTaskIndented(task)) {
