@@ -273,7 +273,12 @@ how you can achieve such a solution:
 - https://kevinjalbert.com/todoist-with-keyboard-navigation-via-nativefier/
 - https://github.com/kevinjalbert/todoist-shortcuts-nativefier
 
+An alternative approach, suggested [here][#62], is to use [google
+chrome's "open as window"
+functionality](https://www.howtogeek.com/403399/how-to-make-chrome-open-as-window-shortcuts-now-that-google-killed-them/).
+
 [electron]: https://electronjs.org/
+[#62]: https://github.com/mgsloan/todoist-shortcuts/issues/62
 
 # Development
 
