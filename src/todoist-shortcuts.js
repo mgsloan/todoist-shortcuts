@@ -1206,13 +1206,7 @@
     mouseGotMoved = true;
     var hoveredTask = findParent(ev.target, matchingClass('task_item'));
     if (hoveredTask) {
-      // Have cursor follow mouse even if it is not the drag handle
-      // cursor:
-      if (viewMode === 'agenda_no_reorder') {
-        setCursor(hoveredTask, 'no-scroll');
-      } else {
-        setHoverClass(hoveredTask);
-      }
+      setCursor(hoveredTask, 'no-scroll');
     }
   }
 
@@ -2951,21 +2945,9 @@
         if (viewMode !== 'agenda_no_reorder') {
           task.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
         }
-        setHoverClass(task);
       }
     } else {
       error('Null task passed to setCursor');
-    }
-  }
-
-  function setHoverClass(task) {
-    withId('editor', function(editor) {
-      withClass(editor, 'ts-hover', function(oldHovered) {
-        oldHovered.classList.remove('ts-hover');
-      });
-    });
-    if (task) {
-      task.classList.add('ts-hover');
     }
   }
 
@@ -3652,29 +3634,6 @@
     '  right: 5px;',
     '  color: #282828;',
     '  cursor: pointer;',
-    '}',
-    '',
-    // Hacks to make task icon visibility follow cursor rather than
-    // :hover. This is a little dangerous because if todoist-shortcuts
-    // misbehaves then this might cause some of Todoist's UI to be
-    // missing. Let's see how it goes ¯\_(ツ)_/¯
-    '.task_item:hover .note_icon {',
-    '  visibility: hidden !important;',
-    '}',
-    '.task_item:hover .scheduler_action {',
-    '  visibility: hidden !important;',
-    '}',
-    '.task_item:hover .toggl-button {',
-    '  visibility: hidden !important;',
-    '}',
-    '#editor .task_item.ts-hover .note_icon {',
-    '  visibility: visible !important;',
-    '}',
-    '#editor .task_item.ts-hover .scheduler_action {',
-    '  visibility: visible !important;',
-    '}',
-    '#editor .task_item.ts-hover .toggl-button {',
-    '  visibility: visible !important;',
     '}'
   ].join('\n'));
 

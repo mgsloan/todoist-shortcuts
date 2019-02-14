@@ -6,6 +6,10 @@
 
 * Improved performance when used with [toggl-button] extension.
 
+* Removes the hack making icons visible when task is cursored. Turned
+  out to be more trouble than it was worth, caused some tricky
+  problems.
+
 
 ## Version 44 ##
 
