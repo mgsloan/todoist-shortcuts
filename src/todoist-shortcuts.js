@@ -1216,8 +1216,6 @@
     }
   }
 
-  // FIXME: If the select key was very recently released on this task, then this
-  // should not toggle the state.
   function selectPressed() {
     var cursor = getCursor();
     if (cursor) {
