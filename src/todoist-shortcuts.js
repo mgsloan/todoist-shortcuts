@@ -3659,11 +3659,17 @@
         selecter + ' .sel_checkbox_td {',
         '  padding-left: 2px;',
         '}',
-        // FIXME: This is intended to make the drag and drop handler not move
-        // when the cursor is on it.  Seems to have broken.  There is also a
-        // tricky case when something is a nested task parent.
-        selecter + ' .arrow, ' + selecter + ' .drag_and_drop_handler {',
-        '  margin-left: -16px;',
+        selecter + ' .drag_and_drop_handler {',
+        '  margin-left: -21px;',
+        '}',
+        // TODO: There seems to be a todoist typo in the class name
+        // here, so including a non-typoed one in case they fix this
+        // (margin vs marigin).
+        selecter + ' .drag_and_drop_handler.extra_arrow_marigin, ' + selecter + ' .drag_and_drop_handler.extra_arrow_margin {',
+        '  margin-left: -37px;',
+        '}',
+        selecter + ' .arrow {',
+        '  margin-left: -25px;',
         '}'
       ].join('\n');
     } else {
