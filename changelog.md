@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 47 ##
+
+### Enhancements ###
+
+* Improvement to visual consistency by having the cursor's color match
+  the priority 3 blue.
+
+
 ## Version 46 ##
 
 ### Enhancements ###

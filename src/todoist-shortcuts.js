@@ -3590,7 +3590,7 @@
     var selecter = getKeySelecter(lastCursorId, lastCursorIndent);
     cursorStyle.textContent = [
       selecter + ' {',
-      '  border-left: 2px solid #4d90f0;',
+      '  border-left: 2px solid #4073d6;',
       '  margin-left: -4px;',
       '}',
       selecter + ' .sel_checkbox_td {',
