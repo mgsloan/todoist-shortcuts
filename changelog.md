@@ -2,6 +2,16 @@
 
 ## Version 46 ##
 
+### Enhancements ###
+
+* Switches to only using the blue bar cursor, rather than using the
+  drag handle.  This is more uniform, reduces code complexity,
+  resolves a tricky problem ([#65]), and allows manipulation of nested
+  tasks when viewing Today / Next 7 Days ([#26]).
+
+[#65]: https://github.com/mgsloan/todoist-shortcuts/issues/65
+[#26]: https://github.com/mgsloan/todoist-shortcuts/issues/26
+
 ### Bug fixes ###
 
 * Fixes a bug where cursor movement wouldn't select nested tasks in

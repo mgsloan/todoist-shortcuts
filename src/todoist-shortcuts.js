@@ -779,10 +779,7 @@
   function cursorRight() {
     if (checkCursorCollapsed()) {
       toggleCollapse();
-      // Issue #26
-      if (viewMode !== 'agenda_reorder') {
-        cursorDown();
-      }
+      cursorDown();
     }
   }
 
@@ -1182,12 +1179,9 @@
   var selectionMode = 'none';
   var wasEditing = false;
 
-  function storeCursorContext(cursor, editing) {
-    lastCursorTasks = getTasks();
-    lastCursorIndex = lastCursorTasks.indexOf(cursor);
-    if (lastCursorIndex < 0) {
-      error('Invariant violation - couldn\'t find ', cursor, 'in', lastCursorTasks);
-    }
+  function storeCursorContext(cursor, tasks, index, editing) {
+    lastCursorTasks = tasks;
+    lastCursorIndex = index;
     lastCursorId = cursor.id;
     lastCursorIndent = getTaskIndentClass(cursor);
     lastCursorSection = getSectionName(cursor);
@@ -1202,14 +1196,29 @@
       'idx =', lastCursorIndex);
   }
 
+  function storeNormalContext(cursor) {
+    var tasks = getTasks();
+    var index = tasks.indexOf(cursor);
+    if (index < 0) {
+      error('Invariant violation - couldn\'t find ', cursor, 'in', tasks);
+    }
+    storeCursorContext(cursor, tasks, index, false);
+  }
+
+  function storeEditingContext(cursor, index) {
+    storeCursorContext(cursor, getTasks(), index, true);
+  }
+
   function handleMouseMove(ev) {
     mouseGotMoved = true;
   }
 
   function handleMouseOver(ev) {
     var hoveredTask = findParent(ev.target, matchingClass('task_item'));
-    if (viewMode === 'agenda_no_reorder' && mouseGotMoved && hoveredTask) {
+    if (mouseGotMoved && hoveredTask) {
+      debug('Due to mouse hover, setting cursor');
       setCursor(hoveredTask, 'no-scroll');
+      mouseGotMoved = false;
     }
   }
 
@@ -1256,23 +1265,19 @@
     // above.
     var manager = getUniqueClass(content, 'manager');
     if (manager) {
-      var tasks = getTasks('no-collapsed', 'include-editors');
+      var tasks = getTasks('include-collapsed', 'include-editors');
       var managerIndex = tasks.findIndex(function(task) {
         return task.classList.contains('manager');
       });
       debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
-        storeCursorContext(tasks[managerIndex - 1], true);
+        storeEditingContext(tasks[managerIndex - 1], true);
       } else if (managerIndex < 0) {
         error('There seems to be a task editor, but then couldn\'t find it.');
       }
       return;
     }
-    var cursor = getCursorOrOnLeft();
-    if (cursor === 'OnLeft') {
-      debug('Cursor is in the sidebar, not updating task cursor.');
-      return;
-    }
+    var cursor = getCursor();
     // Detect if the cursor has changed section. This can happen when the user
     // re-schedules it or moves it to a different project. I find it nicer if
     // the cursor doesn't follow the task for these moves, hence this logic.
@@ -1289,23 +1294,10 @@
           'id =', cursor.id,
           'indent =', cursorIndent);
         changedSection = currentSection !== lastCursorSection;
-      } else if (!mouseGotMoved) {
-        debug('Cursor changed without mouse moving. This can happen on scroll, so attempting to move it back to where it was.');
-        var lastCursor = getTaskById(lastCursorId, lastCursorIndent);
-        if (lastCursor) {
-          setCursor(lastCursor, 'no-scroll');
-          return;
-        } else {
-          warn('Expected to find last cursor position, but could\'nt find it.');
-        }
-      } else {
-        debug('Cursor moved by the mouse');
-        storeCursorContext(cursor, false);
-        return;
       }
     }
     if (cursor && !changedSection) {
-      if (wasEditing && !mouseGotMoved) {
+      if (wasEditing) {
         // This invocation is to handle the circumstance where the user inserts
         // a task, moving the task list. The task under the mouse then gets
         // hovered, even if the mouse wasn't moved, which erroneously changes
@@ -1313,7 +1305,7 @@
         debug('Was just editing, and mouse didn\'t move, so restoring the cursor to last position');
         restoreLastCursor();
       } else {
-        storeCursorContext(cursor, false);
+        storeNormalContext(cursor);
       }
     } else {
       if (changedSection) {
@@ -1330,7 +1322,7 @@
     var tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
-        var task = getById(lastCursorTasks[lastCursorIndex].id);
+        var task = getById(lastCursorId);
         if (task) {
           debug('found task that is probably the one that was previously being edited');
           found = true;
@@ -2355,10 +2347,7 @@
       if (getTaskKey(tasks[i]) === currentKey) {
         for (var j = i + 1; j < tasks.length; j++) {
           var task = tasks[j];
-          // See issue #26
-          if ((viewMode !== 'agenda_reorder') || !isTaskIndented(task)) {
-            return task;
-          }
+          return task;
         }
       }
     }
@@ -2933,24 +2922,15 @@
   function setCursor(task, shouldScroll) {
     if (task) {
       debug('Setting cursor to', task.innerText);
-      // Don't attempt to focus nested sub-projects in agenda view, because it
-      // won't work - see issue #26.
-      if (viewMode === 'agenda_reorder' && isTaskIndented(task)) {
-        info('Not attempting to set cursor to nested sub-projects in agenda mode, due to issue #26');
-      } else {
-        if (shouldScroll === 'scroll') {
-          withId('top_bar', function(topBar) {
-            verticalScrollIntoView(task, topBar.clientHeight, 0);
-          });
-        } else if (shouldScroll !== 'no-scroll') {
-          error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
-        }
-        storeCursorContext(task, false);
-        updateCursorStyle();
-        if (viewMode !== 'agenda_no_reorder') {
-          task.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-        }
+      if (shouldScroll === 'scroll') {
+        withId('top_bar', function(topBar) {
+          verticalScrollIntoView(task, topBar.clientHeight, 0);
+        });
+      } else if (shouldScroll !== 'no-scroll') {
+        error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
       }
+      storeNormalContext(task);
+      updateCursorStyle();
     } else {
       error('Null task passed to setCursor');
     }
@@ -2958,26 +2938,7 @@
 
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    if (viewMode === 'agenda_no_reorder') {
-      return getTaskById(lastCursorId, lastCursorIndent);
-    } else {
-      var cursor = getCursorOrOnLeft();
-      // Ignore when items on the left menu are hovered.
-      return cursor === 'OnLeft' ? null : cursor;
-    }
-  }
-
-  // Returns the <li> element which corresponds to the current cursor. If the
-  // cursor is currently hovering something on the left menu (project, label,
-  // filter), then returns string 'OnLeft'.
-  function getCursorOrOnLeft() {
-    var cursor = findParent(getUniqueClass(document, 'drag_and_drop_handler'), matchingTag('li'));
-    // Ignore when items on the left menu are hovered.
-    if (findParent(cursor, matchingId('left_menu'))) {
-      return 'OnLeft';
-    } else {
-      return cursor;
-    }
+    return getTaskById(lastCursorId, lastCursorIndent);
   }
 
   // A functional-ish idiom to reduce boilerplate.
@@ -3010,24 +2971,6 @@
         newIndex = tasks.length - 1;
       }
       var newCursor = tasks[newIndex];
-      // Don't attempt to focus nested sub-projects in agenda view, because drag
-      // handles won't be visible, due to issue #26.
-      if (viewMode === 'agenda_reorder' && isTaskIndented(newCursor)) {
-        info('Skipping cursor over nested sub-projects due to issue #26');
-        newCursor = null;
-        // Figure out the direction of cursor motion, to determine the direction
-        // that should be searched.
-        var increasing = newIndex > cursorIndex;
-        for (
-          ; newIndex >= 0 && newIndex < tasks.length
-          ; increasing ? newIndex++ : newIndex--) {
-          var task = tasks[newIndex];
-          if (!isTaskIndented(task)) {
-            newCursor = task;
-            break;
-          }
-        }
-      }
       if (newCursor) {
         setCursor(newCursor, 'scroll');
       }
@@ -3649,34 +3592,28 @@
   // different IDs. However, this is a nice hack in this case, because todoist
   // frequently re-creates elements.
   function updateCursorStyle() {
-    // In all modes but filter mode, the drag handle is used as the cursor. In
-    // filter mode, CSS is used to add a border to the left. See issue #14.
-    if (viewMode === 'agenda_no_reorder') {
-      var selecter = getKeySelecter(lastCursorId, lastCursorIndent);
-      cursorStyle.textContent = [
-        selecter + ' {',
-        '  border-left: 2px solid #4d90f0;',
-        '  margin-left: -4px;',
-        '}',
-        selecter + ' .sel_checkbox_td {',
-        '  padding-left: 2px;',
-        '}',
-        selecter + ' .drag_and_drop_handler {',
-        '  margin-left: -21px;',
-        '}',
-        // TODO: There seems to be a todoist typo in the class name
-        // here, so including a non-typoed one in case they fix this
-        // (margin vs marigin).
-        selecter + ' .drag_and_drop_handler.extra_arrow_marigin, ' + selecter + ' .drag_and_drop_handler.extra_arrow_margin {',
-        '  margin-left: -37px;',
-        '}',
-        selecter + ' .arrow {',
-        '  margin-left: -25px;',
-        '}'
-      ].join('\n');
-    } else {
-      cursorStyle.textContent = '';
-    }
+    var selecter = getKeySelecter(lastCursorId, lastCursorIndent);
+    cursorStyle.textContent = [
+      selecter + ' {',
+      '  border-left: 2px solid #4d90f0;',
+      '  margin-left: -4px;',
+      '}',
+      selecter + ' .sel_checkbox_td {',
+      '  padding-left: 2px;',
+      '}',
+      selecter + ' .drag_and_drop_handler {',
+      '  margin-left: -21px;',
+      '}',
+      // TODO: There seems to be a todoist typo in the class name
+      // here, so including a non-typoed one in case they fix this
+      // (margin vs marigin).
+      selecter + ' .drag_and_drop_handler.extra_arrow_marigin, ' + selecter + ' .drag_and_drop_handler.extra_arrow_margin {',
+      '  margin-left: -37px;',
+      '}',
+      selecter + ' .arrow {',
+      '  margin-left: -25px;',
+      '}'
+    ].join('\n');
   }
 
   // See comment on 'getTaskById' for explanation
