@@ -3007,7 +3007,7 @@
       var newCursor = tasks[newIndex];
       // Don't attempt to focus nested sub-projects in agenda view, because drag
       // handles won't be visible, due to issue #26.
-      if (stripPrefix('agenda', viewMode) && isTaskIndented(newCursor)) {
+      if (viewMode === 'agenda_reorder' && isTaskIndented(newCursor)) {
         info('Skipping cursor over nested sub-projects due to issue #26');
         newCursor = null;
         // Figure out the direction of cursor motion, to determine the direction

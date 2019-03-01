@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 46 ##
+
+### Bug fixes ###
+
+* Fixes a bug where cursor movement wouldn't select nested tasks in
+  filter or search list. See [#64].
+
+[#64]: https://github.com/mgsloan/todoist-shortcuts/issues/64
+
+
 ## Version 45 ##
 
 ### Enhancements ###
