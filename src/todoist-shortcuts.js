@@ -20,6 +20,9 @@
 
   var TODOIST_SHORTCUTS_VERSION = 45;
 
+  // Set this to true to get more log output.
+  var DEBUG = false;
+
   // When true, enables selecting multiple items by holding 'x' and moving the
   // cursor.
   //
@@ -305,9 +308,6 @@
   // some case there might not be a concise labeling. This sets the limit on key
   // sequence length for things based on prefixes.
   var MAX_NAVIGATE_PREFIX = 2;
-
-  // Set this to true to get more log output.
-  var DEBUG = false;
 
   // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
   var TODOIST_ROOT_ID = 'todoist_app';
