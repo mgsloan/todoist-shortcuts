@@ -1202,10 +1202,13 @@
       'idx =', lastCursorIndex);
   }
 
-  function handleMouseOver(ev) {
+  function handleMouseMove(ev) {
     mouseGotMoved = true;
+  }
+
+  function handleMouseOver(ev) {
     var hoveredTask = findParent(ev.target, matchingClass('task_item'));
-    if (hoveredTask) {
+    if (viewMode === 'agenda_no_reorder' && mouseGotMoved && hoveredTask) {
       setCursor(hoveredTask, 'no-scroll');
     }
   }
@@ -3763,7 +3766,8 @@
     // Reset mousetrap on disable.
     onDisable(function() { mousetrap.reset(); });
 
-    // Register mouseover handler.
+    // Register mouseover / mousemove handler.
+    document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseover', handleMouseOver);
     onDisable(function() {
       document.removeEventListener('mouseover', handleMouseOver);
