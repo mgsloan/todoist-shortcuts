@@ -1488,11 +1488,13 @@
           }
           if (mutation.addedNodes.length === 0 &&
               mutation.removedNodes.length === 1 &&
+              mutation.removedNodes[0].classList &&
               mutation.removedNodes[0].classList.contains('drag_and_drop_handler')) {
             return false;
           }
           if (mutation.addedNodes.length === 1 &&
               mutation.removedNodes.length === 0 &&
+              mutation.addedNodes[0].classList &&
               mutation.addedNodes[0].classList.contains('drag_and_drop_handler')) {
             return false;
           }
