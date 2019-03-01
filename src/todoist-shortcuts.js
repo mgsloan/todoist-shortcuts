@@ -1209,7 +1209,7 @@
     storeCursorContext(cursor, getTasks(), index, true);
   }
 
-  function handleMouseMove(ev) {
+  function handleMouseMove() {
     mouseGotMoved = true;
   }
 
@@ -2278,11 +2278,6 @@
 
   function checkTaskIsSelected(task) {
     return task.classList.contains('selected');
-  }
-
-  function isTaskIndented(task) {
-    var indentClass = getTaskIndentClass(task);
-    return !indentClass || indentClass !== 'indent_1';
   }
 
   function getTaskIndentClass(task) {
