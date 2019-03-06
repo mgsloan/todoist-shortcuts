@@ -2027,7 +2027,7 @@
 
   // Using cosine interpolation, since it seems to result in more reliable and
   // potentially nicer looking drag behavior.
-  // http://paulbourke.net/miscellaneous/interpolation/ but instead uses
+  // See http://paulbourke.net/miscellaneous/interpolation/
   function coslerp(s, e, t) {
     return lerp(s, e, (1 - Math.cos(t * Math.PI)) / 2);
   }
