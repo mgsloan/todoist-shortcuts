@@ -1209,8 +1209,14 @@
     storeCursorContext(cursor, getTasks(), index, true);
   }
 
-  function handleMouseMove() {
-    mouseGotMoved = true;
+  function handleMouseMove(ev) {
+    if (ev.isTrusted) {
+      mouseGotMoved = true;
+    } else {
+      // Synthetic mouse move events are generated when dragging
+      // tasks.
+      debug('handleMouseMove ignoring synthetic mouse move event.');
+    }
   }
 
   function handleMouseOver(ev) {
