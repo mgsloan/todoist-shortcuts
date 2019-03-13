@@ -1280,6 +1280,7 @@
       }
       return;
     }
+    debug('Checking if cursor still exists:', lastCursorId, lastCursorIndent);
     var cursor = getCursor();
     // Detect if the cursor has changed section. This can happen when the user
     // re-schedules it or moves it to a different project. I find it nicer if
