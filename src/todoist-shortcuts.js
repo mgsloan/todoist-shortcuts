@@ -891,7 +891,7 @@
             withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|next_7_days'), function(nextSeven) {
               // Set a variable that will be read by 'handlePageChange',
               // which will tell it to select this task.
-              selectAfterNavigate = cursor.id;
+              selectAfterNavigate = getTaskId(cursor);
               click(nextSeven);
             });
           });
@@ -905,7 +905,7 @@
       withUniqueClass(cursor, 'project_item', matchingClass('clickable'), function(projectEl) {
         // Set a variable that will be read by 'handlePageChange', which will
         // tell it to select this task.
-        selectAfterNavigate = cursor.id;
+        selectAfterNavigate = getTaskId(cursor);
         click(projectEl);
       });
     }
@@ -1182,7 +1182,7 @@
   function storeCursorContext(cursor, tasks, index, editing) {
     lastCursorTasks = tasks;
     lastCursorIndex = index;
-    lastCursorId = cursor.id;
+    lastCursorId = getTaskId(cursor);
     lastCursorIndent = getTaskIndentClass(cursor);
     lastCursorSection = getSectionName(cursor);
     mouseGotMoved = false;
@@ -1288,14 +1288,15 @@
     var changedSection = false;
     var currentSection = null;
     if (cursor && !wasEditing) {
+      var cursorId = getTaskId(cursor);
       var cursorIndent = getTaskIndentClass(cursor);
-      if (lastCursorId === cursor.id && lastCursorIndent === cursorIndent) {
+      if (lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
         currentSection = getSectionName(cursor);
         debug(
           'Cursor hasn\'t changed task:',
           'currentSection = ', currentSection,
           'lastCursorSection = ', lastCursorSection,
-          'id =', cursor.id,
+          'id =', cursorId,
           'indent =', cursorIndent);
         changedSection = currentSection !== lastCursorSection;
       }
@@ -1338,7 +1339,8 @@
         for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
           var oldTask = lastCursorTasks[i];
           if (oldTask) {
-            task = getById(oldTask.id);
+            var oldTaskId = getTaskId(oldTask);
+            task = getById(oldTaskId);
             if (task) {
               var taskSection = getSectionName(task);
               // Don't jump back to the same task if it moved changed section.
@@ -2259,9 +2261,9 @@
   // Get key used for the cursor, in the getSelectedTaskKeys map.
   function getTaskKey(task) {
     if (stripPrefix('agenda', viewMode)) {
-      return task.id + ' ' + getTaskIndentClass(task);
+      return getTaskId(task) + ' ' + getTaskIndentClass(task);
     } else if (viewMode === 'project') {
-      return task.id;
+      return getTaskId(task);
     } else {
       error('Unexpected viewMode:', viewMode);
       return null;
@@ -2282,6 +2284,27 @@
 
   function checkTaskIsSelected(task) {
     return task.classList.contains('selected');
+  }
+
+  function getTaskId(task) {
+    if (task.id) {
+      return task.id;
+    } else {
+      var idViaClass = findUnique(isItemClass, task.classList);
+      if (idViaClass) {
+        // Debug log since I still don't understand quite why this
+        // happens - seems to occur when moving tasks.
+        debug('Encountered curious case where task has item_ class but no id');
+        return idViaClass;
+      } else {
+        error('Couldn\'t find id for task', task);
+        return null;
+      }
+    }
+  }
+
+  function isItemClass(cls) {
+    return cls.startsWith('item_');
   }
 
   function getTaskIndentClass(task) {
