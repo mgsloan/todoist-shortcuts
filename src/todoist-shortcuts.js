@@ -1214,10 +1214,13 @@
   }
 
   function handleMouseOver(ev) {
-    var hoveredTask = findParent(ev.target, matchingClass('task_item'));
-    if (mouseGotMoved && hoveredTask) {
-      debug('Due to mouse hover, setting cursor');
-      setCursor(hoveredTask, 'no-scroll');
+    try {
+      var hoveredTask = findParent(ev.target, matchingClass('task_item'));
+      if (mouseGotMoved && hoveredTask) {
+        debug('Due to mouse hover, setting cursor');
+        setCursor(hoveredTask, 'no-scroll');
+      }
+    } finally {
       mouseGotMoved = false;
     }
   }
