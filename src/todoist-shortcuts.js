@@ -3736,6 +3736,9 @@
 
     // Register mouseover / mousemove handler.
     document.addEventListener('mousemove', handleMouseMove);
+    onDisable(function() {
+      document.removeEventListener('mousemove', handleMouseMove);
+    });
     document.addEventListener('mouseover', handleMouseOver);
     onDisable(function() {
       document.removeEventListener('mouseover', handleMouseOver);
