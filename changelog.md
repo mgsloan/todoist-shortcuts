@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 48 ##
+
+### Bug fixes ###
+
+* Fixes some bugs with moving tasks up / down.  In particular, there
+  was a poor interaction with the new mouse hover code that caused
+  cursor focus to get stuck.
+
+
 ## Version 47 ##
 
 ### Enhancements ###
