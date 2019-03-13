@@ -1310,6 +1310,7 @@
         debug('Was just editing, and mouse didn\'t move, so restoring the cursor to last position');
         restoreLastCursor();
       } else {
+        debug('Found normal cursor, so storing its context');
         storeNormalContext(cursor);
       }
     } else {
