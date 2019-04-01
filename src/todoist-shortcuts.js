@@ -2028,8 +2028,8 @@
       var handler = getUniqueClass(task, 'drag_and_drop_handler');
       if (handler) {
         var handlerOffset = offset(handler);
-        var x = handlerOffset.x - window.scrollX;
-        var y = handlerOffset.y - window.scrollY;
+        var x = handlerOffset.x + handler.offsetWidth / 2 - window.scrollX - 3;
+        var y = handlerOffset.y + handler.offsetHeight / 2 - window.scrollY - 4;
         f(handler, x, y);
       } else {
         // FIXME: Sometimes this triggers, particularly when move up / move
