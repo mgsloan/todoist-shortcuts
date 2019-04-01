@@ -1842,7 +1842,7 @@
         dragTaskOver(cursor, false, function() {
           return {
             destination: cursor,
-            horizontalOffset: 28,
+            horizontalOffset: 40,
             verticalOffset: 0
           };
         });
@@ -1869,7 +1869,7 @@
         dragTaskOver(cursor, false, function() {
           return {
             destination: cursor,
-            horizontalOffset: -28,
+            horizontalOffset: -40,
             verticalOffset: 0
           };
         });
