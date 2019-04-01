@@ -1883,8 +1883,8 @@
   // structures.
   function moveUp() {
     var cursor = getCursor();
-    if (dragInProgress) {
-      info('Not executing drag because one is already in progress.');
+    if (suppressDrag) {
+      info('Not executing drag because one already happened quite recently.');
     } else if (viewMode === 'agenda_no_reorder') {
       info('Moving task up does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
@@ -1929,8 +1929,8 @@
   // structures.
   function moveDown() {
     var cursor = getCursor();
-    if (dragInProgress) {
-      info('Not executing drag because one is already in progress.');
+    if (suppressDrag) {
+      info('Not executing drag because one already happened quite recently.');
     } else if (viewMode === 'agenda_no_reorder') {
       info('Moving task down does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
@@ -1989,33 +1989,51 @@
   }
 
   var dragInProgress = false;
+  var suppressDrag = false;
+
+  function dragStart() {
+    dragInProgress = true;
+    suppressDrag = true;
+    window.scrollBy = function() {
+      debug('Ignored Todoist scrollBy during task drag:', arguments);
+    };
+  }
+
+  function dragDone(task) {
+    dragInProgress = false;
+    // Suppress subsequent drags for 50ms, otherwise glitches occur.
+    setTimeout(function() { suppressDrag = false; }, 0);
+    window.scrollBy = window.originalTodoistScrollBy;
+    if (!task || task.classList.contains('on_drag')) {
+      warn('didn\'t find spot to drop for drag and drop, so cancelling');
+      closeContextMenus();
+    }
+  }
 
   function dragTaskOver(sourceTask, isBelow, findDestination) {
-    var sourceY = sourceTask.offsetTop;
-    if (dragInProgress) {
-      info('Not executing drag because one is already in progress.');
+    var sourceY = offset(sourceTask).y;
+    if (suppressDrag) {
+      info('Not executing drag because one already happened quite recently.');
     } else {
-      dragInProgress = true;
       try {
-        window.scrollBy = function() {
-          debug('Ignored Todoist scrollBy during task drag:', arguments);
-        };
+        dragStart();
+        scrollTaskIntoView(sourceTask);
+        var result = findDestination();
         withDragHandle(sourceTask, function(el, x, y) {
-          var result = findDestination();
           if (result) {
             var deltaX = result.horizontalOffset;
-            var deltaY = result.destination.offsetTop - sourceY + result.verticalOffset;
+            var deltaY = offset(result.destination).y - sourceY + result.verticalOffset;
             if (isBelow) {
               deltaY += result.destination.clientHeight;
             }
-            animateDrag(el, x, y, x + deltaX, y + deltaY, function() { dragInProgress = false; });
+            animateDrag(el, x, y, x + deltaX, y + deltaY,
+              function() { dragDone(sourceTask); });
           } else {
-            dragInProgress = false;
+            dragDone(sourceTask);
           }
-        }, function() { dragInProgress = false; });
+        }, dragDone);
       } catch (ex) {
-        dragInProgress = false;
-        window.scrollBy = window.originalTodoistScrollBy;
+        dragDone(sourceTask);
         throw ex;
       }
     }
@@ -2987,9 +3005,7 @@
   function setCursor(task, shouldScroll) {
     if (task) {
       if (shouldScroll === 'scroll') {
-        withId('top_bar', function(topBar) {
-          verticalScrollIntoView(task, topBar.clientHeight, 0);
-        });
+        scrollTaskIntoView(task);
       } else if (shouldScroll !== 'no-scroll') {
         error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
       }
@@ -2998,6 +3014,12 @@
     } else {
       error('Null task passed to setCursor');
     }
+  }
+
+  function scrollTaskIntoView(task) {
+    withId('top_bar', function(topBar) {
+      verticalScrollIntoView(task, topBar.clientHeight, 0);
+    });
   }
 
   // Returns the <li> element which corresponds to the current cursor.
