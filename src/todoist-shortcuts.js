@@ -1879,7 +1879,9 @@
   // structures.
   function moveUp() {
     var cursor = getCursor();
-    if (viewMode === 'agenda_no_reorder') {
+    if (dragInProgress) {
+      info('Not executing drag because one is already in progress.');
+    } else if (viewMode === 'agenda_no_reorder') {
       info('Moving task up does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
       if (!cursor) {
@@ -1923,7 +1925,9 @@
   // structures.
   function moveDown() {
     var cursor = getCursor();
-    if (viewMode === 'agenda_no_reorder') {
+    if (dragInProgress) {
+      info('Not executing drag because one is already in progress.');
+    } else if (viewMode === 'agenda_no_reorder') {
       info('Moving task down does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
       if (!cursor) {
