@@ -1511,6 +1511,10 @@
       debug('registering top level observer for', content);
       registerMutationObserver(content, handlePageChange);
       registerMutationObserver(content, function(mutations) {
+        if (dragInProgress) {
+          debug('ignoring mutations since drag is in progress:', mutations);
+          return;
+        }
         // Ignore mutations from toggl-button extension
         var filtered = mutations.filter(function(mutation) {
           if (mutation.target.classList.contains('toggl-button')) {
