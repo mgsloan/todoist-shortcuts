@@ -765,14 +765,14 @@
     withUniqueClass(getCursor(), 'toggl-button', all, click);
   }
 
-  // Toggles collapse / expand task under the cursor, if it has children.
-  function toggleCollapse() {
-    withUniqueClass(getCursor(), ARROW_CLASS, all, click);
+  // Toggles collapse / expand of a task, if it has children.
+  function toggleCollapse(task) {
+    withUniqueClass(task ? task : getCursor(), ARROW_CLASS, all, click);
   }
 
   // Collapse cursor. If it is already collapsed, select and collapse parent.
   function cursorLeft() {
-    if (checkCursorExpanded()) {
+    if (checkTaskExpanded(getCursor())) {
       toggleCollapse();
     } else {
       selectAndCollapseParent();
@@ -781,7 +781,7 @@
 
   // Expand cursor and move down.
   function cursorRight() {
-    if (checkCursorCollapsed()) {
+    if (checkTaskCollapsed(getCursor())) {
       toggleCollapse();
       cursorDown();
     }
@@ -790,10 +790,19 @@
   // Collapses or expands task under the cursor, that have children. Does
   // nothing if it's already in the desired state.
 
+  function collapse(task0) {
+    var task = task0 ? task0 : getCursor();
+    if (checkTaskExpanded(task)) {
+      toggleCollapse(task);
+    }
+  }
   // eslint-disable-next-line no-unused-vars
-  function collapse() { if (checkCursorExpanded()) { toggleCollapse(); } }
-  // eslint-disable-next-line no-unused-vars
-  function expand() { if (checkCursorCollapsed()) { toggleCollapse(); } }
+  function expand(task0) {
+    var task = task0 ? task0 : getCursor();
+    if (checkTaskCollapsed(task)) {
+      toggleCollapse(task);
+    }
+  }
 
   // Move selection to parent project.
   function selectAndCollapseParent() {
@@ -806,7 +815,7 @@
           task = tasks[j];
           if (getUniqueClass(task, EXPANDED_ARROW_CLASS)) {
             setCursor(task, 'scroll');
-            toggleCollapse();
+            toggleCollapse(task);
             break;
           }
           // If we hit the top level, then stop looking for a parent.
@@ -1729,14 +1738,14 @@
     });
   }
 
-  // Returns true if the node under the cursor has children and is collapsed.
-  function checkCursorCollapsed() {
-    return getUniqueClass(getCursor(), COLLAPSED_ARROW_CLASS);
+  // Returns true if the task has children and is collapsed.
+  function checkTaskCollapsed(task) {
+    return getUniqueClass(task, COLLAPSED_ARROW_CLASS);
   }
 
-  // Returns true if the node under the cursor has children and is expanded.
-  function checkCursorExpanded() {
-    return getUniqueClass(getCursor(), EXPANDED_ARROW_CLASS);
+  // Returns true if the task has children and is expanded.
+  function checkTaskExpanded(task) {
+    return getUniqueClass(task, EXPANDED_ARROW_CLASS);
   }
 
   // Click elements within the content which match the specified class.
@@ -1897,7 +1906,7 @@
         }
         // Collapse nested tasks before moving it - see
         // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
-        collapse();
+        collapse(cursor);
         dragTaskOver(cursor, false, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
@@ -1906,6 +1915,8 @@
             var task = tasks[i];
             var indent = getTaskIndentClass(task);
             if (indent === cursorIndent) {
+              // Less glitchy if destination is collapsed
+              collapse(task);
               return {
                 destination: task,
                 horizontalOffset: 0,
@@ -1943,7 +1954,7 @@
         }
         // Collapse nested tasks before moving it - see
         // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
-        collapse();
+        collapse(cursor);
         dragTaskOver(cursor, true, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
@@ -1972,6 +1983,8 @@
             }
           }
           if (lastQualifyingTask) {
+            // Less glitchy if destination is collapsed
+            collapse(lastQualifyingTask);
             return {
               destination: lastQualifyingTask,
               horizontalOffset: 0,
