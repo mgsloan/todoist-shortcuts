@@ -1892,7 +1892,7 @@
         info('No cursor to move up.');
       } else {
         if (getSectionName(cursor) === 'OverdueReschedule overdue') {
-          info('Can\'t move cursor down in overdue section');
+          info('Can\'t move cursor up in overdue section');
           return;
         }
         // Collapse nested tasks before moving it - see
