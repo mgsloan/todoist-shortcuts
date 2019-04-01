@@ -1239,14 +1239,20 @@
   }
 
   function handleMouseOver(ev) {
-    try {
-      var hoveredTask = findParent(ev.target, matchingClass('task_item'));
-      if (mouseGotMoved && hoveredTask) {
-        debug('Due to mouse hover, setting cursor');
-        setCursor(hoveredTask, 'no-scroll');
+    if (ev.isTrusted) {
+      try {
+        var hoveredTask = findParent(ev.target, matchingClass('task_item'));
+        if (mouseGotMoved && hoveredTask) {
+          debug('Due to mouse hover, setting cursor');
+          setCursor(hoveredTask, 'no-scroll');
+        }
+      } finally {
+        mouseGotMoved = false;
       }
-    } finally {
-      mouseGotMoved = false;
+    } else {
+      // Synthetic mouse move events are generated when dragging
+      // tasks.
+      debug('handleMouseOver ignoring synthetic mouse hover event.');
     }
   }
 
