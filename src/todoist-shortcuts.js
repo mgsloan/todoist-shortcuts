@@ -2047,13 +2047,14 @@
   function animateDrag(el, sx, sy, tx, ty, finished) {
     var startParams = mkMouseParams(sx, sy);
     el.dispatchEvent(new MouseEvent('mousedown', startParams));
-    var startTime = Date.now();
     var duration = 100;
-    var maxFrames = 5;
+    var frameCount = 5;
+    var currentFrame = 0;
     // NOTE: Animating this may seem overkill, but doing a direct move didn't
     // work reliably.  This also makes it clearer what's happening.
     var dragLoop = function() {
-      var alpha = (Date.now() - startTime) / duration;
+      var alpha = currentFrame / frameCount;
+      currentFrame++;
       if (alpha >= 1) {
         var params = mkMouseParams(tx, ty);
         el.dispatchEvent(new MouseEvent('mousemove', params));
@@ -2062,10 +2063,10 @@
       } else {
         params = mkMouseParams(coslerp(sx, tx, alpha), coslerp(sy, ty, alpha));
         el.dispatchEvent(new MouseEvent('mousemove', params));
-        setTimeout(dragLoop, duration / maxFrames);
+        setTimeout(dragLoop, duration / frameCount);
       }
     };
-    dragLoop();
+    setTimeout(dragLoop, duration / frameCount);
   }
 
   function lerp(s, e, t) {
