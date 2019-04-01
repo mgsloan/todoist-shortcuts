@@ -118,8 +118,12 @@
     ['* v', bulkMove],
 
     // Other
-    // (see originalHandler) [['u', 'ctrl+z'], undo],
-    ['ctrl+z', undo],
+
+    // TODO: Once #67 is resolved, the definition of undo() should be
+    // reverted to what it was, and the binding for 'u' should not be
+    // overridden here.
+    [['u', 'ctrl+z'], undo],
+
     // (see originalHandler) [['f', '/'], focusSearch],
     ['?', openShortcutsHelp],
     ['ctrl+s', sync],
@@ -944,7 +948,22 @@
   }
 
   // Trigger undo by simulating a keypress.
-  function undo() { todoistShortcut({ key: 'u', charCode: 117 }); }
+  function undo() {
+    // TODO: not using this approach due to https://github.com/mgsloan/todoist-shortcuts/issues/67
+    //
+    // todoistShortcut({ key: 'u', charCode: 117 });
+    //
+    // I believe this approach was superior because it worked even
+    // after the todo link disappeared.
+    var undoLink = getById('undo_link');
+    if (undoLink) {
+      click(undoLink);
+    } else {
+      info('Couldn\'t find undo link.',
+        'Once issue #67 is fixed in Todoist (upstream),',
+        'I believe visibility of undo link will not be necessary.');
+    }
+  }
 
   // Trigger sort by name by clicking a menu item.
   function sortByName() {
@@ -1785,6 +1804,7 @@
   }
 
   // Simulate a key press with todoist's global handlers.
+  // eslint-disable-next-line no-unused-vars
   function todoistShortcut(options0) {
     var options = typeof options0 === 'string' ? { key: options0 } : options0;
     var ev = new Event('keydown');
