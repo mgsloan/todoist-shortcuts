@@ -2986,7 +2986,6 @@
   // Given the element for a task, set it as the current selection.
   function setCursor(task, shouldScroll) {
     if (task) {
-      debug('Setting cursor to', task.innerText);
       if (shouldScroll === 'scroll') {
         withId('top_bar', function(topBar) {
           verticalScrollIntoView(task, topBar.clientHeight, 0);
@@ -3145,12 +3144,13 @@
   // view. Does not work well for elements that are larger than half a screen
   // full.
   function verticalScrollIntoView(el, marginTop, marginBottom) {
-    var rect = el.getBoundingClientRect();
-    if (rect.top < marginTop || rect.bottom > window.innerHeight - marginBottom) {
-      var top = rect.top + window.scrollY;
+    var oy = offset(el).y;
+    var cy = oy - window.scrollY;
+    var h = el.offsetHeight;
+    if (cy < marginTop || cy + h > window.innerHeight - marginBottom) {
       // TODO: for very large tasks, this could end up with the whole task not
       // being in view.
-      window.scrollTo(0, top - window.innerHeight / 2);
+      window.scrollTo(0, oy - window.innerHeight / 2);
     }
   }
 
