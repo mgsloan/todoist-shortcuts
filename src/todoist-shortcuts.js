@@ -2027,8 +2027,9 @@
     try {
       var handler = getUniqueClass(task, 'drag_and_drop_handler');
       if (handler) {
-        var x = handler.offsetLeft - window.scrollX;
-        var y = handler.offsetTop - window.scrollY;
+        var handlerOffset = offset(handler);
+        var x = handlerOffset.x - window.scrollX;
+        var y = handlerOffset.y - window.scrollY;
         f(handler, x, y);
       } else {
         // FIXME: Sometimes this triggers, particularly when move up / move
@@ -3355,6 +3356,19 @@
     el.dispatchEvent(new MouseEvent('mousedown', options));
     el.dispatchEvent(new MouseEvent('mouseup', options));
     el.dispatchEvent(new MouseEvent('click', options));
+  }
+
+  // Sum offsetTop / offsetLeft of all offsetParent to compute x / y.
+  function offset(el) {
+    var x = 0;
+    var y = 0;
+    var cur = el;
+    while (cur) {
+      x += cur.offsetLeft;
+      y += cur.offsetTop;
+      cur = cur.offsetParent;
+    }
+    return {x: x, y: y};
   }
 
   /*****************************************************************************
