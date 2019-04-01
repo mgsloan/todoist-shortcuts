@@ -1,5 +1,25 @@
 # todoist-shortcuts changelog
 
+## Version 49 ##
+
+### Bug fixes ###
+
+* Makes moving tasks work with recent Todoist versions. ([#68])
+
+* Workaround (hopefully temporary) for [#67], where Todoist's undo
+  keybinding doesn't work.
+
+* Makes moving tasks around scroll properly.
+
+* If moving a task fails, no longer leaves it in dragging state.
+
+* Improves performance of cursor motion, where there was a regression
+  recently.
+
+[#67]: https://github.com/mgsloan/todoist-shortcuts/issues/67
+[#68]: https://github.com/mgsloan/todoist-shortcuts/issues/68
+
+
 ## Version 48 ##
 
 ### Bug fixes ###
