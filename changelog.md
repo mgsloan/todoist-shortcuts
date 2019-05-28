@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 51 ##
+
+* I fumble fingered "Cancel and disable version" on the mozilla
+  upload, which caused version 50 to not exist in the listing of
+  mozilla extensions.  So creating version 51 to work around that...
+
+
 ## Version 50 ##
 
 ### Bug fixes ###
