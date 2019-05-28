@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 50 ##
+
+### Bug fixes ###
+
+* Changes to Todoist made it so that when Todoist is in 'mini' mode
+  for narrow browsers, pressing 'g' to enter navigation mode no longer
+  caused the sidebar to be displayed.  This is now fixed by making
+  todoist-shortcut's CSS match Todoist's. See [#70].
+
+[#70]: https://github.com/mgsloan/todoist-shortcuts/issues/67
+
+
 ## Version 49 ##
 
 ### Bug fixes ###
