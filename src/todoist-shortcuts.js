@@ -351,6 +351,8 @@
   var TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
   var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
+  var TODOIST_SHORTCUTS_HELP = 'todoist_shortcuts_help';
+  var TODOIST_SHORTCUTS_HELP_CONTAINER = 'todoist_shortcuts_help_container';
 
   var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
 
@@ -866,6 +868,8 @@
         withTag(close, 'div', click);
       });
     });
+    // Close todoist-shortcuts' modals
+    withClass(document, 'ts-modal-close', click);
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
@@ -981,9 +985,19 @@
 
   // Open help documentation.
   function openShortcutsHelp() {
-    window.open(
-      TODOIST_SHORTCUTS_GITHUB + '/blob/v' +
-      TODOIST_SHORTCUTS_VERSION + '/readme.md');
+    var header = element('h1', '', text('Keyboard shortcuts'));
+    var docsLink = element('a', '', text('More detailed todoist-shortcuts documentation'));
+    docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/v' + TODOIST_SHORTCUTS_VERSION + '/readme.md');
+    var originalLink = element('a', '', text('Original Todoist keyboard shortcuts documentation'));
+    originalLink.setAttribute('href', 'https://get.todoist.help/hc/en-us/articles/205063212');
+    var sheetsLink = element('a', '', text('Printable shortcuts guide (displayed below)'));
+    sheetsLink.setAttribute('href', 'https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk');
+    var linksList = element('ul', '', element('li', '', docsLink), element('li', '', originalLink), element('li', '', sheetsLink));
+    var iframe = element('iframe');
+    iframe.setAttribute('src', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5jkiI07g9XoeORQrOQUlAwY4uqJkBDkm-zMUK4WuaFvca0BJ0wPKEM5dw6RgKtcSN33PsZPKiN4G4/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false');
+    iframe.setAttribute('scrolling', 'no');
+    var container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, iframe);
+    displayModal(div('', header, container), TODOIST_SHORTCUTS_HELP);
   }
 
   // Click "import from template" in project menu
@@ -2254,7 +2268,7 @@
       var note =
           div('ts-note',
             div('ts-note-content',
-              span('ts-note-prefix', text('Note from todoist-shortcuts: ')),
+              span('ts-note-prefix', text('Message from todoist-shortcuts: ')),
               element('br', null),
               typeof msg === 'string' ? text(msg) : msg),
             close);
@@ -2263,6 +2277,23 @@
       close.onclick = closeFunc;
       setTimeout(closeFunc, 10000);
     });
+  }
+
+  function displayModal(msg, cls) {
+    var closeFunc;
+    withId('app_holder', function(appHolder) {
+      var close = div('ts-modal-close');
+      close.innerHTML = svgs['sm1/close_small.svg'];
+      var content = div('ts-modal-content', typeof msg === 'string' ? text(msg) : msg);
+      var modal = div('ts-modal', content, close);
+      if (cls) {
+        modal.classList.add(cls);
+      }
+      appHolder.appendChild(modal);
+      closeFunc = function() { appHolder.removeChild(modal); };
+      close.onclick = closeFunc;
+    });
+    return closeFunc;
   }
 
   /*****************************************************************************
@@ -3653,7 +3684,7 @@
     '}',
     '',
     // Based directly on Todoist's .notifier
-    '.ts-note {',
+    '.ts-note, .ts-modal {',
     '  position: fixed;',
     '  min-height: 22px;',
     '  background-color: #4c4c4d;',
@@ -3668,7 +3699,14 @@
     '  max-width: 90%;',
     '}',
     '',
-    '.ts-note-content {',
+    '.ts-modal {',
+    '  left: 10%;',
+    '  width: 80%;',
+    '  top: 10%;',
+    '  overflow: auto;',
+    '}',
+    '',
+    '.ts-note-content, .ts-modal-content {',
     '  padding: 12px 30px;',
     '  display: block;',
     '  margin-top: 1px;',
@@ -3680,7 +3718,7 @@
     '  color: #de4c4a;',
     '}',
     '',
-    '.ts-note a {',
+    '.ts-note a, .ts-modal a {',
     '  color: #de4c4a;',
     '}',
     '',
@@ -3691,12 +3729,33 @@
     '  font-size: 150%;',
     '}',
     '',
-    '.ts-note-close {',
+    '.ts-note-close, .ts-modal-close {',
     '  position: absolute;',
     '  top: 5px;',
     '  right: 5px;',
     '  color: #282828;',
     '  cursor: pointer;',
+    '}',
+    '',
+    '.' + TODOIST_SHORTCUTS_HELP + ' {',
+    '  text-align: center;',
+    '}',
+    '',
+    '.' + TODOIST_SHORTCUTS_HELP_CONTAINER + ' {',
+    '  display: inline-block;', // Causes centering due to text-align above.
+    '  width: 100em;',
+    '  height: 70em;',
+    '}',
+    '',
+    '.' + TODOIST_SHORTCUTS_HELP_CONTAINER + ' iframe {',
+    '  width: 100%;',
+    '  height: 100%;',
+    '}',
+    '',
+    '.' + TODOIST_SHORTCUTS_HELP + ' ul {',
+    '  text-align: initial;',
+    '  font-size: 150%;',
+    '  line-height: 150%;',
     '}'
   ].join('\n'));
 
