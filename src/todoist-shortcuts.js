@@ -964,7 +964,7 @@
     withClass(document, TODOIST_SHORTCUTS_HELP, function(x) { x.parentElement.removeChild(x); });
     // Create new help modal.
     var header = element('h1', '', text('Keyboard shortcuts'));
-    var docsLink = element('a', '', text('More detailed todoist-shortcuts documentation'));
+    var docsLink = element('a', '', text('Full todoist-shortcuts documentation'));
     docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/v' + TODOIST_SHORTCUTS_VERSION + '/readme.md');
     var originalLink = element('a', '', text('Original Todoist keyboard shortcuts documentation'));
     originalLink.setAttribute('href', 'https://get.todoist.help/hc/en-us/articles/205063212');
