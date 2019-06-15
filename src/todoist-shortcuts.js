@@ -80,8 +80,8 @@
 
     // Selection
     //
-    // NOTE: 'x' selection is either handled by fallbackHandler below, or by
-    // adding the binding if MULTISELECT is enabled
+    // NOTE: 'x' selection is either handled by defaultFallbackHandler
+    // below, or by adding the binding if MULTISELECT is enabled
     ['* a', selectAll],
     ['* n', deselectAll],
     ['* 1', selectPriority('1')],
