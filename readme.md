@@ -24,7 +24,16 @@ better yet, [evil-mode] ;) ).
 
 [evil-mode]: https://github.com/emacs-evil/evil
 
-# Keyboard shortcuts
+# Keyboard shortcut cheatsheet
+
+[**See this google sheet for a printable shortcuts
+guide**][google-sheet], created by [kimaero] (see [#71]).
+
+[google-sheet]: https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk
+[kimaero]: https://github.com/kimaero
+[#71]: https://github.com/mgsloan/todoist-shortcuts/issues/71
+
+# Keyboard shortcut details
 
 ## Add tasks
 
