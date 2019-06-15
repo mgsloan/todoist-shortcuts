@@ -110,7 +110,7 @@
     [['u', 'ctrl+z'], undo],
 
     // (see originalHandler) [['f', '/'], focusSearch],
-    ['?', openShortcutsHelp],
+    ['?', openHelpModal],
     ['ctrl+s', sync],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
@@ -952,7 +952,17 @@
   }
 
   // Open help documentation.
-  function openShortcutsHelp() {
+  function openHelpModal() {
+    withUniqueClass(document, TODOIST_SHORTCUTS_HELP, all, function(modal) {
+      modal.style.display = 'inline-block';
+    });
+  }
+
+  // Create DOM nodes for help documentation.
+  function createHelpModal() {
+    // Remove old help modals, if any.
+    withClass(document, TODOIST_SHORTCUTS_HELP, function(x) { x.parentElement.removeChild(x); });
+    // Create new help modal.
     var header = element('h1', '', text('Keyboard shortcuts'));
     var docsLink = element('a', '', text('More detailed todoist-shortcuts documentation'));
     docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/v' + TODOIST_SHORTCUTS_VERSION + '/readme.md');
@@ -965,7 +975,9 @@
     iframe.setAttribute('src', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5jkiI07g9XoeORQrOQUlAwY4uqJkBDkm-zMUK4WuaFvca0BJ0wPKEM5dw6RgKtcSN33PsZPKiN4G4/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false');
     iframe.setAttribute('scrolling', 'no');
     var container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, iframe);
-    displayModal(div('', header, container), TODOIST_SHORTCUTS_HELP);
+    var modal = createModal(div('', header, container));
+    modal.classList.add(TODOIST_SHORTCUTS_HELP);
+    modal.style.display = 'none';
   }
 
   // Click "import from template" in project menu
@@ -2210,21 +2222,17 @@
     });
   }
 
-  function displayModal(msg, cls) {
-    var closeFunc;
+  function createModal(msg) {
+    var modal;
     withId('app_holder', function(appHolder) {
       var close = div('ts-modal-close');
       close.innerHTML = svgs['sm1/close_small.svg'];
       var content = div('ts-modal-content', typeof msg === 'string' ? text(msg) : msg);
-      var modal = div('ts-modal', content, close);
-      if (cls) {
-        modal.classList.add(cls);
-      }
+      modal = div('ts-modal', content, close);
       appHolder.appendChild(modal);
-      closeFunc = function() { appHolder.removeChild(modal); };
-      close.onclick = closeFunc;
+      close.onclick = function() { modal.style.display = 'none'; };
     });
-    return closeFunc;
+    return modal;
   }
 
   /*****************************************************************************
@@ -3825,5 +3833,8 @@
     onDisable(function() {
       document.removeEventListener('mouseover', handleMouseOver);
     });
+
+    // Create help modal dialog.
+    createHelpModal();
   });
 })();
