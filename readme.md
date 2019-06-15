@@ -26,8 +26,7 @@ better yet, [evil-mode] ;) ).
 
 # Keyboard shortcuts guide sheet
 
-[**See this google sheet for a printable shortcuts
-guide**][google-sheet], created by [kimaero] (see [#71]).
+[**See this printable shortcuts guide**][google-sheet], created by [kimaero] (see [#71]).
 
 [google-sheet]: https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk
 [kimaero]: https://github.com/kimaero
