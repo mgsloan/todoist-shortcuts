@@ -23,19 +23,6 @@
   // Set this to true to get more log output.
   var DEBUG = false;
 
-  // When true, enables selecting multiple items by holding 'x' and moving the
-  // cursor.
-  //
-  // While this behavior can be useful, it is not a very good default. Due to
-  // overlapping keypresses this doesn't work very well if the user has a habit
-  // of rapidly using "jxjxjxjx" to select items (such a habit can come from
-  // using the gmail keyboard shortcuts).
-  //
-  // It should be possible to support multi selection without this deficiency,
-  // but it seems like any such solution will necessarily involve some fiddly
-  // heuristics.
-  var MULTISELECT = false;
-
   // Cursor navigation.
   //
   // Note that modifying these will not affect the cursor motion bindings in
@@ -79,9 +66,7 @@
     [['shift+l', 'shift+right'], moveIn],
 
     // Selection
-    //
-    // NOTE: 'x' selection is either handled by defaultFallbackHandler
-    // below, or by adding the binding if MULTISELECT is enabled
+    ['x', toggleSelect],
     ['* a', selectAll],
     ['* n', deselectAll],
     ['* 1', selectPriority('1')],
@@ -131,13 +116,9 @@
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // ['i', importFromTemplate],
 
-    ['fallback', defaultFallbackHandler]
+    ['fallback', originalHandler]
   ]);
   var DEFAULT_KEYMAP = 'default';
-
-  if (!MULTISELECT) {
-    KEY_BINDINGS.push(['x', toggleSelect]);
-  }
 
   // Build cursor movement bindings that can be used in schedule mode
   var SCHEDULE_CURSOR_BINDINGS = [];
@@ -244,19 +225,6 @@
   // Keymap used when there is a floating window
   var POPUP_BINDINGS = [['fallback', originalHandler]];
   var POPUP_KEYMAP = 'popup';
-
-  function defaultFallbackHandler(ev) {
-    if (MULTISELECT && ev.key === 'x') {
-      if (ev.type === 'keydown' && !ev.repeat) {
-        selectPressed();
-        return false;
-      } else if (ev.type === 'keyup') {
-        selectReleased();
-        return false;
-      }
-    }
-    return originalHandler(ev);
-  }
 
   function originalHandler(ev) {
     if (ev.type === 'keydown') {
@@ -1218,7 +1186,6 @@
   var lastCursorIndent = null;
   var lastCursorSection = null;
   var mouseGotMoved = false;
-  var selectionMode = 'none';
   var wasEditing = false;
 
   function storeCursorContext(cursor, tasks, index, editing) {
@@ -1229,7 +1196,6 @@
     lastCursorSection = getSectionName(cursor);
     mouseGotMoved = false;
     wasEditing = editing;
-    handleCursorMove(cursor);
     debug(
       'wrote down cursor context:',
       'id =', lastCursorId,
@@ -1276,41 +1242,6 @@
       // Synthetic mouse move events are generated when dragging
       // tasks.
       debug('handleMouseOver ignoring synthetic mouse hover event.');
-    }
-  }
-
-  function selectPressed() {
-    var cursor = getCursor();
-    if (cursor) {
-      if (checkTaskIsSelected(cursor)) {
-        selectionMode = 'deselect';
-      } else {
-        selectionMode = 'select';
-      }
-    } else {
-      selectionMode = 'select';
-    }
-    handleCursorMove(cursor);
-  }
-
-  function selectReleased() {
-    selectionMode = 'none';
-  }
-
-  function handleCursorMove(cursor) {
-    if (MULTISELECT) {
-      switch (selectionMode) {
-      case 'none':
-        break;
-      case 'select':
-        selectTask(cursor);
-        break;
-      case 'deselect':
-        deselectTask(cursor);
-        break;
-      default:
-        error('Invariant violated, unexpected selectionMode:', selectionMode);
-      }
     }
   }
 
