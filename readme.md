@@ -24,7 +24,7 @@ better yet, [evil-mode] ;) ).
 
 [evil-mode]: https://github.com/emacs-evil/evil
 
-# Keyboard shortcut cheatsheet
+# Keyboard shortcuts guide sheet
 
 [**See this google sheet for a printable shortcuts
 guide**][google-sheet], created by [kimaero] (see [#71]).
