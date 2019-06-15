@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 52 ##
+
+* Add a proper modal which nicely displays keyboard shortcuts.  Thanks
+  to kimaero on GitHub, who created the Google Sheet which gets
+  presented. See [#71].
+
+[#71]: https://github.com/mgsloan/todoist-shortcuts/issues/71
+
+
 ## Version 51 ##
 
 * I fumble fingered "Cancel and disable version" on the mozilla
