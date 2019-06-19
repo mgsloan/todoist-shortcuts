@@ -6,10 +6,11 @@
 
 * Fixes functioning of extension with Todoist version 956.  Thanks to
   quick fixes from [Jed Verity][glortho] and [Adam
-  L. Rich][adamleerich].  See [#73] and [#75].
+  L. Rich][adamleerich].  See [#72], [#73], and [#75].
 
 [glortho]: https://github.com/glortho
 [adamleerich]: https://github.com/adamleerich
+[#72]: https://github.com/mgsloan/todoist-shortcuts/issues/72
 [#73]: https://github.com/mgsloan/todoist-shortcuts/pull/73
 [#75]: https://github.com/mgsloan/todoist-shortcuts/pull/75
 
