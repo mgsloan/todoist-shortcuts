@@ -2,6 +2,8 @@
 
 ## Version 53
 
+### Bug fixes ###
+
 * Fixes functioning of extension with Todoist version 956.  Thanks to
   quick fixes from [Jed Verity][glortho] and [Adam
   L. Rich][adamleerich].  See [#73] and [#75].
@@ -13,6 +15,8 @@
 
 
 ## Version 52 ##
+
+### Enhancements ###
 
 * Add a proper modal which nicely displays keyboard shortcuts.  Thanks
   to kimaero on GitHub, who created the Google Sheet which gets
