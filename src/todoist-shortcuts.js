@@ -40,7 +40,7 @@
 
   // Here's where the keybindings get specified. Of course, feel free to modify
   // this list, or modify this script in general.
-  var KEY_BINDINGS = Array.concat(CURSOR_BINDINGS, [
+  var KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
 
     // Add tasks
     // (see originalHandler) ['q', quickAddTask],
