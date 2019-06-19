@@ -40,7 +40,7 @@
 
   // Here's where the keybindings get specified. Of course, feel free to modify
   // this list, or modify this script in general.
-  var KEY_BINDINGS = Array.concat(CURSOR_BINDINGS, [
+  var KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
 
     // Add tasks
     // (see originalHandler) ['q', quickAddTask],
@@ -129,7 +129,7 @@
   }
 
   // Scheduling keybindings (used when scheduler is open)
-  var SCHEDULE_BINDINGS = Array.concat(SCHEDULE_CURSOR_BINDINGS, [
+  var SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
     ['c', scheduleToday],
     ['d', oldScheduleTodayBindingDeprecated],
     ['t', scheduleTomorrow],
@@ -143,7 +143,7 @@
   var SCHEDULE_KEYMAP = 'schedule';
 
   // Bulk schedule mode keybindings
-  var BULK_SCHEDULE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
+  var BULK_SCHEDULE_BINDINGS = [].concat(SCHEDULE_BINDINGS, [
     [['v', 'alt+v'], sequence([exitBulkSchedule, bulkMove])],
     ['escape', exitBulkSchedule],
     ['fallback', originalHandler]
