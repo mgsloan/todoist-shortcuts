@@ -1,5 +1,33 @@
 # todoist-shortcuts changelog
 
+## Version 52 ##
+
+* Add a proper modal which nicely displays keyboard shortcuts.  Thanks
+  to kimaero on GitHub, who created the Google Sheet which gets
+  presented. See [#71].
+
+[#71]: https://github.com/mgsloan/todoist-shortcuts/issues/71
+
+
+## Version 51 ##
+
+* I fumble fingered "Cancel and disable version" on the mozilla
+  upload, which caused version 50 to not exist in the listing of
+  mozilla extensions.  So creating version 51 to work around that...
+
+
+## Version 50 ##
+
+### Bug fixes ###
+
+* Changes to Todoist made it so that when Todoist is in 'mini' mode
+  for narrow browsers, pressing 'g' to enter navigation mode no longer
+  caused the sidebar to be displayed.  This is now fixed by making
+  todoist-shortcut's CSS match Todoist's. See [#70].
+
+[#70]: https://github.com/mgsloan/todoist-shortcuts/issues/67
+
+
 ## Version 49 ##
 
 ### Bug fixes ###
