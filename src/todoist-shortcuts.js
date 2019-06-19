@@ -129,7 +129,7 @@
   }
 
   // Scheduling keybindings (used when scheduler is open)
-  var SCHEDULE_BINDINGS = Array.concat(SCHEDULE_CURSOR_BINDINGS, [
+  var SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
     ['c', scheduleToday],
     ['d', oldScheduleTodayBindingDeprecated],
     ['t', scheduleTomorrow],
@@ -143,7 +143,7 @@
   var SCHEDULE_KEYMAP = 'schedule';
 
   // Bulk schedule mode keybindings
-  var BULK_SCHEDULE_BINDINGS = Array.concat(SCHEDULE_BINDINGS, [
+  var BULK_SCHEDULE_BINDINGS = [].concat(SCHEDULE_BINDINGS, [
     [['v', 'alt+v'], sequence([exitBulkSchedule, bulkMove])],
     ['escape', exitBulkSchedule],
     ['fallback', originalHandler]
