@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 54
+
+### Bug fixes ###
+
+* Fixes `s` binding for sort by date - see [#76].
+
+[#76]: https://github.com/mgsloan/todoist-shortcuts/issues/76
+
+
 ## Version 53
 
 ### Bug fixes ###
