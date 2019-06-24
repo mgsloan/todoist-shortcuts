@@ -93,10 +93,10 @@
     ['shift+c', togglButton],
 
     // Sorting
-    // (see originalHandler) ['r', sortByAssignee],
-    // (see originalHandler) ['s', sortByDate],
+    ['s', sortByDate],
     // (see originalHandler) ['p', sortByPriority],
-    ['n', sortByName],
+    // (see originalHandler) ['n', sortByName],
+    // (see originalHandler) ['r', sortByAssignee],
 
     // Bulk reschedule / move mode
     ['* t', bulkSchedule],
@@ -946,9 +946,9 @@
     }
   }
 
-  // Trigger sort by name by clicking a menu item.
-  function sortByName() {
-    withUniqueTag(document, 'td', matchingAttr('data-track', 'project|actions_sort_by_name'), click);
+  // Trigger sort by date by clicking a menu item.
+  function sortByDate() {
+    withUniqueTag(document, 'td', matchingAttr('data-track', 'project|actions_sort_by_date'), click);
   }
 
   // Open help documentation.
