@@ -9,8 +9,7 @@
     {
       "matches":
         [ "https://todoist.com/app*"
-        , "https://beta.todoist.com/app*"
-        , "https://gmail.todoist.com/app*"
+        , "https://*.todoist.com/app*"
         ],
       "js": ["inject.js"],
       "all_frames": true
