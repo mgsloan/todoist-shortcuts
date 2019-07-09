@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 55
+
+### Bug fixes ###
+
+* Makes the extension work on `chrome.todoist.com/app`.  See [#78]
+
+[#78]: https://github.com/mgsloan/todoist-shortcuts/issues/78
+
+
 ## Version 54
 
 ### Bug fixes ###
