@@ -2665,15 +2665,8 @@
       for (keys in groups) {
         if (noAliasing(keys)) {
           var groupItems = groups[keys];
-          var isUnique = groupItems.length === 1;
           var qualifies = false;
-          if (mode === 'must-be-unique') {
-            if (!isUnique) {
-              error('keys', keys, 'must be unique.');
-            } else {
-              qualifies = true;
-            }
-          } else if (mode === 'allow-ambiguous') {
+          if (mode === 'no-shortening') {
             qualifies = true;
           } else if (mode === 'try-shortening') {
             // Prefer shortened key sequences if they are unambiguous.
@@ -2701,8 +2694,6 @@
           } else {
             error('Invariant violation: unexpected mode in addViaKeyFunc');
           }
-          // Non-aliasing sequence which is unambiguous if ambiguousAddFirst is
-          // false.
           if (qualifies) {
             qualifying.push([keys, groupItems[0]]);
           }
@@ -2720,10 +2711,10 @@
       }
     };
     // Handle items with 'mustBeKeys' set.
-    addViaKeyFunc('must-be-unique', function(it) { return it.mustBeKeys; });
+    addViaKeyFunc('no-shortening', function(it) { return it.mustBeKeys; });
     // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
     // assigning those.
-    addViaKeyFunc('allow-ambiguous', function(it) {
+    addViaKeyFunc('no-shortening', function(it) {
       var initials = it.initials;
       if (initials.length >= MAX_NAVIGATE_PREFIX) {
         return initials.slice(0, MAX_NAVIGATE_PREFIX);
