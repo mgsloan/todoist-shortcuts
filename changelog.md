@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 56
+
+* Fixes navigation bug when there are navigation items with the same
+  name corresponding to a default key sequence.  See [#79]
+
+[#79]: https://github.com/mgsloan/todoist-shortcuts/issues/79
+
+
 ## Version 55
 
 ### Bug fixes ###
