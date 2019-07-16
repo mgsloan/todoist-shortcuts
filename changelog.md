@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 58
+
+* Fixes toggling visibility of parent projects when navigating to a
+  hidden project.
+
+
 ## Version 57
 
 * Fixes toggling of navigation sections.  See [#80]
