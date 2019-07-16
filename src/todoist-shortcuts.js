@@ -2847,7 +2847,7 @@
               if (collapseParent && !matchingClass('collapse--entered')(collapseParent)) {
                 var collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
-                  click(collapseHeader);
+                  withUniqueClass(collapseHeader, 'expansion_panel__toggle', click);
                 } else {
                   warn('Expected to find section collapse header, but did\'nt');
                 }
@@ -2856,7 +2856,7 @@
               var priorIndent = getIndentClass(el);
               var arrowsToClick = [];
               for ( var elAbove = el.previousSibling
-                ; elAbove && elAbove.display === 'none'
+                ; elAbove
                 ; elAbove = elAbove.previousSibling
               ) {
                 var curIndent = getIndentClass(elAbove);
@@ -2869,8 +2869,8 @@
                     warn('Expected to find collapsed task, but got', elAbove);
                   }
                 }
-                // If at top level, then we're done uncollapsing.
-                if (curIndent === 'indent_1') {
+                // If we've reached a visible list item, we're done uncollapsing.
+                if (elAbove.style.display !== "none") {
                   break;
                 }
               }
