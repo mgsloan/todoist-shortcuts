@@ -2495,7 +2495,7 @@
           error('Couldn\'t figure out text for', li);
         }
       });
-      withClass(listHolder, 'panel_summary', function(summary) {
+      withClass(listHolder, 'expansion_panel__toggle', function(summary) {
         var mustBeKeys = null;
         var dataTrackAttr = summary.attributes['data-track'];
         if (dataTrackAttr) {
@@ -2831,10 +2831,10 @@
               keepGoing = option.keepGoing;
               // If the user is selecting a section like projects / labels /
               // filters, then close the other sections.
-              if (el.classList.contains('panel_summary')) {
+              if (el.classList.contains('expansion_panel__toggle')) {
                 withId('list_holder', function(listHolder) {
-                  withClass(listHolder, 'panel_summary', function(ps) {
-                    var isExpanded = ps.classList.contains('panel_summary--expanded');
+                  withClass(listHolder, 'expansion_panel__toggle', function(ps) {
+                    var isExpanded = ps.attributes['aria-expanded'].value === 'true';
                     if (!sameElement(el)(ps) && isExpanded) {
                       ps.click();
                     }
@@ -3584,7 +3584,7 @@
     '  margin-left: -20px;',
     '}',
     '',
-    '.panel_summary .' + TODOIST_SHORTCUTS_TIP + ' {',
+    '.expansion_panel__toggle .' + TODOIST_SHORTCUTS_TIP + ' {',
     '  margin-top: -1px;',
     '}',
     '',
