@@ -2852,7 +2852,7 @@
                   warn('Expected to find section collapse header, but did\'nt');
                 }
               }
-              // Second, uncollapse all of the task's parents.
+              // Second, uncollapse all of the project's parents.
               var priorIndent = getTaskIndentClass(el);
               var arrowsToClick = [];
               for ( var elAbove = el.previousSibling
