@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 57
+
+* Fixes toggling of navigation sections.  See [#80]
+
+[#80]: https://github.com/mgsloan/todoist-shortcuts/issues/80
+
+
 ## Version 56
 
 * Fixes navigation bug when there are navigation items with the same
