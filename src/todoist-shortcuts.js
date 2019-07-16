@@ -789,7 +789,7 @@
             break;
           }
           // If we hit the top level, then stop looking for a parent.
-          if (getTaskIndentClass(task) === 'indent_1') {
+          if (getIndentClass(task) === 'indent_1') {
             break;
           }
         }
@@ -1204,7 +1204,7 @@
     lastCursorTasks = tasks;
     lastCursorIndex = index;
     lastCursorId = getTaskId(cursor);
-    lastCursorIndent = getTaskIndentClass(cursor);
+    lastCursorIndent = getIndentClass(cursor);
     lastCursorSection = getSectionName(cursor);
     mouseGotMoved = false;
     wasEditing = editing;
@@ -1286,7 +1286,7 @@
     var currentSection = null;
     if (cursor && !wasEditing) {
       var cursorId = getTaskId(cursor);
-      var cursorIndent = getTaskIndentClass(cursor);
+      var cursorIndent = getIndentClass(cursor);
       if (lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
         currentSection = getSectionName(cursor);
         debug(
@@ -1828,7 +1828,7 @@
     } else if (viewMode === 'project') {
       if (!cursor) {
         info('No cursor to dedent.');
-      } else if (getTaskIndentClass(cursor) === 'indent_1') {
+      } else if (getIndentClass(cursor) === 'indent_1') {
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
       } else {
@@ -1867,10 +1867,10 @@
         dragTaskOver(cursor, false, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
-          var cursorIndent = getTaskIndentClass(cursor);
+          var cursorIndent = getIndentClass(cursor);
           for (var i = cursorIndex - 1; i >= 0; i--) {
             var task = tasks[i];
-            var indent = getTaskIndentClass(task);
+            var indent = getIndentClass(task);
             if (indent === cursorIndent) {
               // Less glitchy if destination is collapsed
               collapse(task);
@@ -1915,11 +1915,11 @@
         dragTaskOver(cursor, true, function() {
           var tasks = getTasks();
           var cursorIndex = tasks.indexOf(cursor);
-          var cursorIndent = getTaskIndentClass(cursor);
+          var cursorIndent = getIndentClass(cursor);
           var lastQualifyingTask = null;
           for (var i = cursorIndex + 1; i < tasks.length; i++) {
             var task = tasks[i];
-            var indent = getTaskIndentClass(task);
+            var indent = getIndentClass(task);
             // Logic here is a bit tricky.  The first time we encounter a task
             // at the same indent level, this is the subtree we want to move
             // past.  So, set lastQualifyingTask to non-null and keep track of
@@ -2305,7 +2305,7 @@
   // Get key used for the cursor, in the getSelectedTaskKeys map.
   function getTaskKey(task) {
     if (stripPrefix('agenda', viewMode)) {
-      return getTaskId(task) + ' ' + getTaskIndentClass(task);
+      return getTaskId(task) + ' ' + getIndentClass(task);
     } else if (viewMode === 'project') {
       return getTaskId(task);
     } else {
@@ -2351,7 +2351,7 @@
     return cls.startsWith('item_');
   }
 
-  function getTaskIndentClass(task) {
+  function getIndentClass(task) {
     return findUnique(isIndentClass, task.classList);
   }
 
@@ -2853,13 +2853,13 @@
                 }
               }
               // Second, uncollapse all of the project's parents.
-              var priorIndent = getTaskIndentClass(el);
+              var priorIndent = getIndentClass(el);
               var arrowsToClick = [];
               for ( var elAbove = el.previousSibling
                 ; elAbove && elAbove.display === 'none'
                 ; elAbove = elAbove.previousSibling
               ) {
-                var curIndent = getTaskIndentClass(elAbove);
+                var curIndent = getIndentClass(elAbove);
                 if (curIndent < priorIndent) {
                   priorIndent = curIndent;
                   var arr = getUniqueClass(elAbove, 'arrow');
