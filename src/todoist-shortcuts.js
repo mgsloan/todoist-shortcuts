@@ -2865,7 +2865,7 @@
                   var arr = getUniqueClass(elAbove, 'arrow');
                   if (arr && arr.classList.contains(COLLAPSED_ARROW_CLASS)) {
                     arrowsToClick.unshift(arr);
-                  } else {
+                  } else if (elAbove.style.display === 'none') {
                     warn('Expected to find collapsed task, but got', elAbove);
                   }
                 }
