@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 59
+
+* Fix some bugs with things misbehaving after navigating to a
+  different project.  See [#81]
+
+[#81]: https://github.com/mgsloan/todoist-shortcuts/issues/81
+
+
 ## Version 58
 
 * Fixes toggling visibility of parent projects when navigating to a
