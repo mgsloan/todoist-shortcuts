@@ -1473,8 +1473,7 @@
   // Registers mutation observers on elements that never get removed from the
   // DOM.  Run on initialization of todoist-shortcuts.
   function registerTopMutationObservers() {
-    withId('editor', function(content) {
-      debug('registering top level observer for', content);
+    withId('content', function(content) {
       registerMutationObserver(content, handlePageChange);
       registerMutationObserver(content, function(mutations) {
         if (dragInProgress) {
