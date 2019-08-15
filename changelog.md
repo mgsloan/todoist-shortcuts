@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 60
+
+* Adds documentation of `?` for bringing up the keyboard shortcuts
+  guide.  See [comments on #81]
+
+* Loading of help modal iframe now deferred to first use
+
+[comments on #81]: https://github.com/mgsloan/todoist-shortcuts/issues/71#issuecomment-521128504
+
+
 ## Version 59
 
 * Fix some bugs with things misbehaving after navigating to a
