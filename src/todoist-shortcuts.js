@@ -953,9 +953,12 @@
 
   // Open help documentation.
   function openHelpModal() {
-    withUniqueClass(document, TODOIST_SHORTCUTS_HELP, all, function(modal) {
-      modal.style.display = 'inline-block';
-    });
+    var modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
+    if (modal === null) {
+      createHelpModal();
+      modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
+    }
+    modal.style.display = 'inline-block';
   }
 
   // Create DOM nodes for help documentation.
@@ -3823,8 +3826,5 @@
     onDisable(function() {
       document.removeEventListener('mouseover', handleMouseOver);
     });
-
-    // Create help modal dialog.
-    createHelpModal();
   });
 })();
