@@ -2,6 +2,8 @@
 
 ## Version 61
 
+### Bug fixes ###
+
 * Fixes scheduling shortcuts broken in Todoist Version 968. See [#85]
 
 [#85]: https://github.com/mgsloan/todoist-shortcuts/issues/85
@@ -9,15 +11,21 @@
 
 ## Version 60
 
-* Adds documentation of `?` for bringing up the keyboard shortcuts
-  guide.  See [comments on #81]
+### Enhancements ###
 
 * Loading of help modal iframe now deferred to first use
+
+### Bug fixes ###
+
+* Adds documentation of `?` for bringing up the keyboard shortcuts
+  guide.  See [comments on #81]
 
 [comments on #81]: https://github.com/mgsloan/todoist-shortcuts/issues/71#issuecomment-521128504
 
 
 ## Version 59
+
+### Bug fixes ###
 
 * Fix some bugs with things misbehaving after navigating to a
   different project.  See [#81]
@@ -27,11 +35,15 @@
 
 ## Version 58
 
+### Bug fixes ###
+
 * Fixes toggling visibility of parent projects when navigating to a
   hidden project.
 
 
 ## Version 57
+
+### Bug fixes ###
 
 * Fixes toggling of navigation sections.  See [#80]
 
@@ -39,6 +51,8 @@
 
 
 ## Version 56
+
+### Bug fixes ###
 
 * Fixes navigation bug when there are navigation items with the same
   name corresponding to a default key sequence.  See [#79]
