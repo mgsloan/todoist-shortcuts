@@ -62,7 +62,6 @@
     [['shift+j', 'shift+down'], moveDown],
     [['shift+k', 'shift+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
-    // NOTE: This is broken - see #50
     [['shift+l', 'shift+right'], moveIn],
 
     // Selection
