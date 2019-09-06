@@ -508,7 +508,7 @@
     withScheduler(
       'scheduleToday',
       function(scheduler) {
-        withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_today'), click);
+        withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_today'), click);
       });
   }
 
@@ -517,7 +517,7 @@
     withScheduler(
       'scheduleTomorrow',
       function(scheduler) {
-        withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_tomorrow'), click);
+        withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_tomorrow'), click);
       });
   }
 
@@ -526,7 +526,7 @@
     withScheduler(
       'scheduleNextWeek',
       function(scheduler) {
-        withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'), click);
+        withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'), click);
       });
   }
 
@@ -552,7 +552,7 @@
           if (smartScheduler) {
             click(smartScheduler);
           } else {
-            withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_postpone'), click);
+            withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_postpone'), click);
           }
         }
       });
@@ -563,7 +563,7 @@
     withScheduler(
       'unschedule',
       function(scheduler) {
-        withUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_nodate'), click);
+        withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_nodate'), click);
       });
   }
 

@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 61
+
+* Fixes scheduling shortcuts broken in Todoist Version 968. See [#85]
+
+[#85]: https://github.com/mgsloan/todoist-shortcuts/issues/85
+
+
 ## Version 60
 
 * Adds documentation of `?` for bringing up the keyboard shortcuts
