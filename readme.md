@@ -203,13 +203,13 @@ you can use the normal cursor navigation keys in this mode.
 
 ## Other
 
-| keys            | action                                                 |
-| ---             | ---                                                    |
-| `u` or `ctrl+z` | undo                                                   |
-| `f` or `/`      | open search                                            |
-| `shift+enter`   | clicks first link in the task the cursor is on         |
-| `ctrl+s`        | manually synchronize state with server                 |
-| `?`             | display [keyboard shortcuts guide sheet](google-sheet) |
+| keys                   | action                                                 |
+| ---                    | ---                                                    |
+| `u` or `z` or `ctrl+z` | undo                                                   |
+| `f` or `/`             | open search                                            |
+| `shift+enter`          | clicks first link in the task the cursor is on         |
+| `ctrl+s`               | manually synchronize state with server                 |
+| `?`                    | display [keyboard shortcuts guide sheet](google-sheet) |
 
 Note that undo only works when the "UNDO" button is visible at the bottom of the
 screen. Some actions are not undo-able, such as [deletion or archiving multiple

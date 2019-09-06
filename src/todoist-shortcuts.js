@@ -107,7 +107,7 @@
     // TODO: Once #67 is resolved, the definition of undo() should be
     // reverted to what it was, and the binding for 'u' should not be
     // overridden here.
-    [['u', 'ctrl+z'], undo],
+    [['u', 'z', 'ctrl+z'], undo],
 
     // (see originalHandler) [['f', '/'], focusSearch],
     ['?', openHelpModal],

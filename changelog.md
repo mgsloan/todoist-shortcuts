@@ -2,6 +2,10 @@
 
 ## Version 61
 
+### Enhancements ###
+
+* Just `z` alone now undos, matching GMail keyboard shortcuts.
+
 ### Bug fixes ###
 
 * Fixes scheduling shortcuts broken in Todoist Version 968. See [#85]
