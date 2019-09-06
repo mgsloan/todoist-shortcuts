@@ -8,9 +8,14 @@
 
 ### Bug fixes ###
 
-* Fixes scheduling shortcuts broken in Todoist Version 968. See [#85]
+* Fixes scheduling shortcuts which broke due to changes in Todoist
+  Version 968. See [#85]
+
+* Fixes bulk archive, bulk delete, and labeling shortcuts which broke
+  due to changes in Todoist Version 968. See [#84]
 
 [#85]: https://github.com/mgsloan/todoist-shortcuts/issues/85
+[#84]: https://github.com/mgsloan/todoist-shortcuts/issues/85
 
 
 ## Version 60

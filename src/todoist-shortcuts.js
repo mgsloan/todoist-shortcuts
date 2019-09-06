@@ -84,8 +84,7 @@
     ['#', deleteTasks],
     ['&', duplicateTasks],
     ['v', moveToProject],
-    ['@', addLabel],
-    ['y', removeLabel],
+    [['y', '@'], openLabelMenu],
     ['1', setPriority('1')],
     ['2', setPriority('2')],
     ['3', setPriority('3')],
@@ -302,8 +301,6 @@
   var MI_DUPLICATE = 'menu_item_duplicate';
   var MI_DELETE = 'menu_item_delete';
   var MI_DELETE_SEL = 'sel_delete_task';
-  var MI_ADD_LABEL = 'menu_item_add_label';
-  var MI_REMOVE_LABEL = 'menu_item_remove_label';
   var MI_ADD_ABOVE = 'menu_item_add_above';
   var MI_ADD_BELOW = 'menu_item_add_below';
   var MI_EDIT = 'menu_item_edit';
@@ -311,7 +308,7 @@
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
   var MORE_MENU_ITEMS =
-    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE, MI_ADD_LABEL, MI_REMOVE_LABEL];
+    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE];
   var TASKMENU_ITEMS =
     [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE_SEL, MI_EDIT];
 
@@ -709,23 +706,14 @@
     }
   }
 
-  // Opens add label menu for selection. If there is no selection, then selects
-  // the cursor.
-  function addLabel() {
+  // Opens the label toggling menu.
+  function openLabelMenu() {
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    clickMenu(getMoreMenu(), MI_ADD_LABEL);
-    setTemporarySelectionsClass('ist_complete_select');
-  }
-
-  // Opens add label menu for selection. If there is no selection, then selects
-  // the cursor.
-  function removeLabel() {
-    if (isEmptyMap(getSelectedTaskKeys())) {
-      select();
-    }
-    clickMenu(getMoreMenu(), MI_REMOVE_LABEL);
+    withId(ACTIONS_BAR_CLASS, function(parent) {
+      withUniqueClass(parent, 'item_action', all, click);
+    });
     setTemporarySelectionsClass('ist_complete_select');
   }
 
