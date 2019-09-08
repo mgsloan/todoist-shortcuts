@@ -3027,10 +3027,7 @@
   }
 
   // This function detects which mode Todoist's view is in, since each behaves a
-  // bit differently.  In particular:
-  //
-  // * filter mode does not have drag handles, and so a custom cursor is
-  //   rendered.
+  // bit differently.
   function getViewMode() {
     var agendaView = getById(AGENDA_VIEW_ID);
     if (agendaView === null) {
