@@ -7,6 +7,14 @@
 * Previously, quickly typing editor actions would result in keystrokes
   in the textual time input.  This is now fixed!
 
+### Bug fixes ###
+
+* Now ignores most keystrokes when Todoist modal dialogs are
+  displayed.  For the task deletion and discarding modals, `Enter`
+  will now accept the action, while `Escape` will cancel it. See [#82]
+
+[#82]: https://github.com/mgsloan/todoist-shortcuts/issues/82
+
 
 ## Version 61
 

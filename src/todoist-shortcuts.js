@@ -3743,9 +3743,14 @@
 
   function callBinding(f) {
     return function() {
-      var result = f.apply(null, arguments);
-      // Default to stopping propagation.
-      return result === true;
+      // Don't handle keybindings when modal is open.
+      if (todoistModalIsOpen()) {
+        return false;
+      } else {
+        var result = f.apply(null, arguments);
+        // Default to stopping propagation.
+        return result === true;
+      }
     };
   }
 
@@ -3788,6 +3793,59 @@
     return result;
   }
 
+  function todoistModalIsOpen() {
+    var result = document.getElementsByClassName('reactist_modal_box').item(0) !== null;
+    if (!result) {
+      sawEscapeDown = false;
+    }
+    return result;
+  }
+
+  function originalHandlerForModal(ev) {
+    if (todoistModalIsOpen()) {
+      return modalKeyHandler(ev);
+    } else {
+      return true;
+    }
+  }
+
+  var sawEscapeDown = false;
+
+  function modalKeyHandler(ev) {
+    var uniqueModal = getUniqueClass(document, 'reactist_modal_box');
+    if (uniqueModal) {
+      // Special handling for the modal that appears when confirming
+      // task discard (esc after q), and for the deletion confirmation
+      // modal.
+      var cancelButton = null;
+      var acceptButton = null;
+      withClass(uniqueModal, 'ist_button', function(el) {
+        if (el.innerText === 'Cancel') {
+          cancelButton = el;
+        } else if (el.innerText === 'Discard task' || el.innerText === 'Delete') {
+          acceptButton = el;
+        }
+      });
+      if (cancelButton && acceptButton) {
+        if (ev.key === 'Escape' || ev.key === 'Esc') {
+          if (ev.type === 'keydown') {
+            sawEscapeDown = true;
+            return false;
+          } else if (ev.type === 'keyup' && sawEscapeDown) {
+            click(cancelButton);
+            return false;
+          }
+        } else if (ev.key === 'Enter') {
+          if (ev.type === 'keyup') {
+            click(acceptButton);
+            return false;
+          }
+        }
+      }
+    }
+    return originalHandler(ev);
+  }
+
   /*****************************************************************************
    * Run todoist-shortcuts!
    */
@@ -3806,6 +3864,9 @@
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     document.onkeydown = function(ev) {
+      if (todoistModalIsOpen()) {
+        return modalKeyHandler(ev);
+      }
       if (inBulkMoveMode) {
         return handleBulkMoveKey(ev);
       }
@@ -3821,8 +3882,8 @@
     };
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
-    document.onkeypress = function() {};
-    document.onkeyup = function() {};
+    document.onkeypress = originalHandlerForModal;
+    document.onkeyup = originalHandlerForModal;
 
     // Initialize mousetrap.
     mousetrap = new Mousetrap(document);
