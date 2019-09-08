@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 62
+
+### Enhancements ###
+
+* Previously, quickly typing editor actions would result in keystrokes
+  in the textual time input.  This is now fixed!
+
+
 ## Version 61
 
 ### Enhancements ###

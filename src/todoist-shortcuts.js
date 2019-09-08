@@ -2081,14 +2081,19 @@
   }
 
   function blurSchedulerInput() {
+    enterDeferLastBinding();
     setTimeout(function() {
-      var scheduler = findScheduler();
-      if (scheduler) {
-        withTag(scheduler, 'input', function(el) {
-          el.blur();
-        });
-      } else {
-        error('Expected to find scheduler after opening it.');
+      try {
+        var scheduler = findScheduler();
+        if (scheduler) {
+          withTag(scheduler, 'input', function(el) {
+            el.blur();
+          });
+        } else {
+          error('Expected to find scheduler after opening it.');
+        }
+      } finally {
+        exitDeferLastBinding();
       }
     }, 0);
   }
@@ -3755,6 +3760,34 @@
     }
   }
 
+  var deferLastKeyDownEnabled = false;
+  var lastDeferredEvent = null;
+
+  function enterDeferLastBinding() {
+    deferLastKeyDownEnabled = true;
+    lastDeferredEvent = null;
+  }
+
+  function exitDeferLastBinding() {
+    deferLastKeyDownEnabled = false;
+    if (lastDeferredEvent) {
+      document.dispatchEvent(copyKeyPressEvent(lastDeferredEvent));
+      lastDeferredEvent = null;
+    }
+  }
+
+  // Not sure why this is needed, but otherwise exceptions get thrown.
+  function copyKeyPressEvent(ev) {
+    var result = new Event('keypress');
+    result.key = ev.key;
+    result.keyCode = ev.keyCode;
+    result.shiftKey = ev.shiftKey;
+    result.altKey = ev.altKey;
+    result.ctrlKey = ev.ctrlKey;
+    result.metaKey = ev.metaKey;
+    return result;
+  }
+
   /*****************************************************************************
    * Run todoist-shortcuts!
    */
@@ -3779,7 +3812,12 @@
       if (ev.keyCode === 27 && ev.type === 'keydown') {
         closeContextMenus();
       }
-      return true;
+      if (deferLastKeyDownEnabled) {
+        lastDeferredEvent = ev;
+        return false;
+      } else {
+        return true;
+      }
     };
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
