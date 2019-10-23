@@ -1722,7 +1722,7 @@
   }
 
   function withTaskMenu(task, f) {
-    withUniqueTag(task, 'div', matchingClass('menu'), function(openMenu) {
+    withUniqueTag(task, 'div', and(matchingClass('menu'), not(matchingClass('icon'))), function(openMenu) {
       var menu;
       if (stripPrefix('agenda', viewMode)) {
         menu = getAgendaTaskMenu();
