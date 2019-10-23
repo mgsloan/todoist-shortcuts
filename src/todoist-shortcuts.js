@@ -1853,7 +1853,7 @@
       if (!cursor) {
         info('No cursor to move up.');
       } else {
-        if (getSectionName(cursor) === 'OverdueReschedule overdue') {
+        if (getSectionName(cursor) === 'OverdueReschedule') {
           info('Can\'t move cursor up in overdue section');
           return;
         }
@@ -1901,7 +1901,7 @@
       if (!cursor) {
         info('No cursor to move down.');
       } else {
-        if (getSectionName(cursor) === 'OverdueReschedule overdue') {
+        if (getSectionName(cursor) === 'OverdueReschedule') {
           info('Can\'t move cursor down in overdue section');
           return;
         }
