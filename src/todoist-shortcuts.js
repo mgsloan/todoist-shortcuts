@@ -1381,12 +1381,19 @@
       if (!header) {
         header = getUniqueClass(section, 'subsection_header');
       }
+      if (!header) {
+        header = getUniqueClass(section, 'view_header');
+      }
       if (header) {
         result = header.textContent;
       }
-    }
-    if (!result) {
-      error('Failed to find section name for', task);
+      if (!result) {
+        error('Failed to find section name for', task);
+      } else {
+        debug('Section name is', result);
+      }
+    } else {
+      error('Failed to find section div for', task);
     }
     return result;
   }
