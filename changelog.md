@@ -1,5 +1,19 @@
 # todoist-shortcuts changelog
 
+## Version 63
+
+### Bug fixes ###
+
+* Fixed opening of task menu with Todoist version 972. This caused
+  various shortcuts to not work on individual tasks. See [#87]
+
+* Fixed getting the name of the section a task is in. This fixes some
+  logic that prevents task motion in the overdue list, and causes the
+  cursor to not follow a task if it changes section.
+
+[#87]: https://github.com/mgsloan/todoist-shortcuts/issues/87
+
+
 ## Version 62
 
 ### Enhancements ###
