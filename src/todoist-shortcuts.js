@@ -699,7 +699,6 @@
     withId(ACTIONS_BAR_CLASS, function(parent) {
       withUniqueClass(parent, 'item_action', all, click);
     });
-    setTemporarySelectionsClass('ist_complete_select');
   }
 
   // If toggl-button extension is in use, clicks the toggl-button
@@ -1493,7 +1492,6 @@
 
   function handleBodyChange() {
     calendarVisibilityMayHaveChanged();
-    conditionallyClearTempSelections();
   }
 
   function calendarVisibilityMayHaveChanged() {
@@ -1532,28 +1530,6 @@
           debug('Bulk move done because there\'s no next task.');
           exitBulkMove();
         }
-      }
-    }
-  }
-
-  // If this class disappears from the DOM, then remove the selections.
-  var temporarySelectionsClass = null;
-
-  function setTemporarySelectionsClass(cls) {
-    var results = document.getElementsByClassName(cls);
-    if (results.length > 0) {
-      temporarySelectionsClass = cls;
-    } else {
-      error('Attempted to set temporary selections class to something that doesn\'t exist.');
-    }
-  }
-
-  function conditionallyClearTempSelections() {
-    if (temporarySelectionsClass) {
-      var results = document.getElementsByClassName(temporarySelectionsClass);
-      if (results.length === 0) {
-        deselectAll();
-        temporarySelectionsClass = null;
       }
     }
   }
