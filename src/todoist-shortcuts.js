@@ -286,7 +286,6 @@
   var BACKGROUND_ID = 'page_background';
   var TASK_CONTENT_CLASS = 'content';
   var ACTIONS_BAR_CLASS = 'item_selecter';
-  var PROJECT_COMPLETE_CLASS = 'ist_complete_select';
   var ARROW_CLASS = 'arrow';
   var EXPANDED_ARROW_CLASS = 'down';
   var COLLAPSED_ARROW_CLASS = 'right';
@@ -578,19 +577,6 @@
         withUniqueClass(parent, MI_MOVE, all, click);
       });
     }
-    // The keyboard shortcut used to invoke this also ends up in the completion
-    // box. I thought stopPropagation would fix this, but it doesn't. So, empty
-    // the completion input.
-    setTimeout(function() { fillProjectInput(''); });
-  }
-
-  // Fills in the text of the project selection completion.
-  function fillProjectInput(txt) {
-    withUniqueClass(document, PROJECT_COMPLETE_CLASS, all, function(complete) {
-      withUniqueTag(complete, 'input', all, function(input) {
-        input.value = txt;
-      });
-    });
   }
 
   // Sets the priority of the selected tasks to the specified level. If
