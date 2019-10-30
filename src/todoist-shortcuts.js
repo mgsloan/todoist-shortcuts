@@ -543,7 +543,7 @@
         if (suggested) {
           click(suggested);
         } else {
-          var smartScheduler = getUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'));
+          var smartScheduler = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'));
           if (smartScheduler) {
             click(smartScheduler);
           } else {
