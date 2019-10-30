@@ -7,6 +7,9 @@
 * Fixed smart scheduler on multiple items, from changes in Todoist
   elements. See [#90]
 
+* Adds an empty keymap for when new task view pane is visible.  This
+  way keypresses don't manipulated tasks that are obscured.
+
 [#90]: https://github.com/mgsloan/todoist-shortcuts/issues/90
 
 

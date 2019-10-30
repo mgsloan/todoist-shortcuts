@@ -161,6 +161,9 @@
   ];
   var SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
+  var TASK_VIEW_BINDINGS = [];
+  var TASK_VIEW_KEYMAP = "task_view";
+
   function smartSchedulerUpdate() {
     withUniqueClass(document, 'SmartSchedule', all, function(smartScheduler) {
       withUniqueClass(smartScheduler, 'submit_btn', all, click);
@@ -1427,8 +1430,8 @@
 
   function handlePageChange() {
     var currentHash = document.location.hash;
-    if (lastHash !== currentHash) {
-      debug('handlePageChange');
+    var isTaskViewHash = currentHash.startsWith('#task');
+    if (lastHash !== currentHash && !isTaskViewHash) {
       updateViewMode();
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
@@ -1544,6 +1547,8 @@
         } else {
           switchKeymap(POPUP_KEYMAP);
         }
+      } else if (checkTaskViewOpen()) {
+        switchKeymap(TASK_VIEW_KEYMAP);
       } else if (inBulkScheduleMode) {
         switchKeymap(BULK_SCHEDULE_KEYMAP);
       } else if (inBulkMoveMode) {
@@ -1561,6 +1566,10 @@
   function switchKeymap(keymap) {
     debug('Setting keymap to', keymap);
     mousetrap.switchKeymap(keymap);
+  }
+
+  function checkTaskViewOpen() {
+    return getUniqueClass(document, "side_panel") !== null;
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -3865,6 +3874,7 @@
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
     registerKeybindings(SMART_SCHEDULER_KEYMAP, SMART_SCHEDULER_BINDINGS);
+    registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
 
     // Reset mousetrap on disable.
     onDisable(function() { mousetrap.reset(); });
