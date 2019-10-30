@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 64
+
+### Bug fixes ###
+
+* Fixed smart scheduler on multiple items, from changes in Todoist
+  elements. See [#90]
+
+[#90]: https://github.com/mgsloan/todoist-shortcuts/issues/90
+
+
 ## Version 63
 
 ### Bug fixes ###
