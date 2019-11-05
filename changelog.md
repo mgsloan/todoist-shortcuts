@@ -10,7 +10,10 @@
 * Adds an empty keymap for when new task view pane is visible.  This
   way keypresses don't manipulated tasks that are obscured.
 
+* Fixes schedule keybinding on beta.todoist.com. See [#92]
+
 [#90]: https://github.com/mgsloan/todoist-shortcuts/issues/90
+[#92]: https://github.com/mgsloan/todoist-shortcuts/issues/92
 
 
 ## Version 63
