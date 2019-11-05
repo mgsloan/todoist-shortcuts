@@ -162,7 +162,7 @@
   var SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
   var TASK_VIEW_BINDINGS = [];
-  var TASK_VIEW_KEYMAP = "task_view";
+  var TASK_VIEW_KEYMAP = 'task_view';
 
   function smartSchedulerUpdate() {
     withUniqueClass(document, 'SmartSchedule', all, function(smartScheduler) {
@@ -1569,7 +1569,7 @@
   }
 
   function checkTaskViewOpen() {
-    return getUniqueClass(document, "side_panel") !== null;
+    return getUniqueClass(document, 'side_panel') !== null;
   }
 
   // Registers a mutation observer that just observes modifications to its
