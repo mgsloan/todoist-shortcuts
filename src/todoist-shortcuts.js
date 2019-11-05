@@ -2047,14 +2047,16 @@
   }
 
   function clickTaskSchedule(task) {
-    var dueDateControls = getUniqueClass(task, 'due_date_controls');
-    if (dueDateControls) {
-      // For scheduled and unscheduled tasks, both of these elements
-      // exist, but only one will cause the scheduler to open.
-      withUniqueClass(dueDateControls, 'date', all, click);
-      withClass(dueDateControls, SCHEDULER_ACTION_CLASS, click);
+    var schedulerAction = getUniqueClass(task, SCHEDULER_ACTION_CLASS);
+    if (schedulerAction) {
+      click(schedulerAction);
     } else {
-      withClass(task, SCHEDULER_ACTION_CLASS, click);
+      withUniqueClass(task, 'due_date_controls', all, function(dueDateControls) {
+        // For scheduled and unscheduled tasks, both of these elements
+        // exist, but only one will cause the scheduler to open.
+        withUniqueClass(dueDateControls, 'date', all, click);
+        withClass(dueDateControls, SCHEDULER_ACTION_CLASS, click);
+      });
     }
   }
 
