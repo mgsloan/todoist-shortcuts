@@ -58,6 +58,7 @@
     ['shift+enter', follow],
     ['shift+o', addAbove],
     ['o', addBelow],
+    ['i', openTaskView],
     ['c', openComments],
     ['shift+r', openReminders],
     [['shift+j', 'shift+down'], moveDown],
@@ -113,7 +114,7 @@
     ['ctrl+s', sync],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
-    // ['i', importFromTemplate],
+    // [???, importFromTemplate],
 
     ['fallback', originalHandler]
   ]);
@@ -162,7 +163,25 @@
   ];
   var SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
-  var TASK_VIEW_BINDINGS = [];
+  var TASK_VIEW_BINDINGS = [
+    [['i', 'escape'], taskViewClose],
+    ['s', taskViewSubtasks],
+    ['c', taskViewComments],
+    ['h', taskViewParent],
+    ['shift+h', taskViewActivity],
+    // TODO(#94): proper bindings for o / O.
+    [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
+    ['t', taskViewSchedule],
+    ['v', taskViewMoveToProject],
+    [['y', '@'], taskViewLabel],
+    ['1', taskViewSetPriority('1')],
+    ['2', taskViewSetPriority('2')],
+    ['3', taskViewSetPriority('3')],
+    [['4', '0'], taskViewSetPriority('4')],
+    ['shift+r', taskViewOpenReminders],
+    ['e', taskViewArchive],
+    ['#', taskViewDelete]
+  ];
   var TASK_VIEW_KEYMAP = 'task_view';
 
   function smartSchedulerUpdate() {
@@ -780,6 +799,9 @@
   // Open reminders dialog
   function openReminders() { clickTaskMenu(requireCursor(), 'menu_item_reminders'); }
 
+  // Open the task view sidepane.
+  function openTaskView() { withUniqueClass(getCursor(), 'task_info', all, click); }
+
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
   function closeContextMenus() {
@@ -964,6 +986,101 @@
 
   function sync() {
     withUniqueTag(document, 'td', matchingAttr('data-track', 'navigation|gear_sync'), click);
+  }
+
+  function taskViewClose() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_detail_close', all, click);
+    });
+  }
+
+  function taskViewSubtasks() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-subtasks'), click);
+    });
+  }
+
+  function taskViewComments() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-comments'), click);
+    });
+  }
+
+  function taskViewActivity() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-activity'), click);
+    });
+  }
+
+  function taskViewParent() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_detail_parent_info', all, click);
+    });
+  }
+
+  function taskViewAddSubtask() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      taskViewSubtasks();
+      withUniqueClass(sidePanel, 'plus_add_button', all, click);
+    });
+  }
+
+  function taskViewSchedule() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_due_selector', all, click);
+    });
+  }
+
+  function taskViewMoveToProject() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Select a project'), click);
+    });
+  }
+
+  function taskViewLabel() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Add label(s)'), click);
+    });
+  }
+
+  function taskViewSetPriority(level) {
+    return function() {
+      withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+        if (!getUniqueClass(document, 'priority_picker')) {
+          withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Set the priority'), click);
+        }
+        withUniqueClass(document, 'priority_picker', all, function(picker) {
+          withUniqueTag(picker, 'li', matchingAttr('aria-label', level), click);
+        });
+      });
+    };
+  }
+
+  function taskViewOpenReminders() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Add reminder(s)'), click);
+    });
+  }
+
+  function taskViewArchive() {
+    withTaskViewMoreMenu(function(menu) {
+      withUniqueTag(menu, 'li', matchingText('Archive task'), click);
+    });
+  }
+
+  function taskViewDelete() {
+    withTaskViewMoreMenu(function(menu) {
+      withUniqueTag(menu, 'li', matchingText('Delete task'), click);
+    });
+  }
+
+  function withTaskViewMoreMenu(f) {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      if (!getUniqueClass(document, 'ul', matchingAttr('aria-label', 'task edit menu'))) {
+        withUniqueClass(sidePanel, 'item_actions_more', all, click);
+      }
+      withUniqueTag(document, 'ul', matchingAttr('aria-label', 'task edit menu'), f);
+    });
   }
 
   function oldScheduleTodayBindingDeprecated() {
@@ -3325,7 +3442,6 @@
   }
 
   // Returns predicate which returns 'true' if text content matches wanted text.
-  // eslint-disable-next-line no-unused-vars
   function matchingText(txt) {
     return function(el) {
       return el.textContent === txt;
@@ -3338,6 +3454,29 @@
       return el.classList.contains(cls);
     };
   }
+
+  // Returns predicate which returns 'true' if the element has the specified class suffix.
+  //
+  // eslint-disable-next-line no-unused-vars
+  function matchingClassSuffix(suffix) {
+    return function(el) {
+      for (var i = 0; i < el.classList.length; i++) {
+        var cl = el.classList.item(i);
+        if (cl.endsWith(suffix)) {
+          return true;
+        }
+      }
+      return false;
+    };
+  }
+
+  // Returns predicate which returns 'true' if the element has the specified id suffix.
+  function matchingIdSuffix(suffix) {
+    return function(el) {
+      return el.id.endsWith(suffix);
+    };
+  }
+
 
   // Returns predicate which returns 'true' if the element has the specified tag.
   function matchingTag(tag) {
