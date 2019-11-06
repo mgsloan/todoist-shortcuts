@@ -4,7 +4,7 @@
 
 ### Enhancements ###
 
-* Adds `r` keybinding to open reminders dialog.
+* Adds `shift+r` keybinding to open reminders dialog.
 
 * Improves error handling for the case where there is no cursor.
 

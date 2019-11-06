@@ -59,7 +59,7 @@
     ['shift+o', addAbove],
     ['o', addBelow],
     ['c', openComments],
-    ['r', openReminders],
+    ['shift+r', openReminders],
     [['shift+j', 'shift+down'], moveDown],
     [['shift+k', 'shift+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
