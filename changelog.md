@@ -4,9 +4,24 @@
 
 ### Enhancements ###
 
-* Adds `shift+r` keybinding to open reminders dialog.
+* Adds shortcuts for the new task view side pane. See [#88][]. Many familiar
+  shortcuts work in that view. The new ones are:
+
+  - `i` to open the task view.
+
+  - `s` to view subtasks section.
+
+  - `c` to view comments section.
+
+  - `shift+h` to view activity section.
+
+  - `h` to navigate to parent task.
+
+* Adds `shift+r` shortcut to open reminders dialog.
 
 * Improves error handling for the case where there is no cursor.
+
+[#88]: https://github.com/mgsloan/todoist-shortcuts/issues/88
 
 
 ## Version 64
