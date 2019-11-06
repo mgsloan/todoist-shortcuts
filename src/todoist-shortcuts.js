@@ -457,15 +457,15 @@
   }
 
   // Toggles selection of the task focused by the cursor.
-  function toggleSelect() { toggleSelectTask(requireCursor); }
+  function toggleSelect() { toggleSelectTask(requireCursor()); }
 
   // Selects the task focused by the cursor.
   // eslint-disable-next-line no-unused-vars
-  function select() { selectTask(requireCursor); }
+  function select() { selectTask(requireCursor()); }
 
   // Deselects the task focused by the cursor.
   // eslint-disable-next-line no-unused-vars
-  function deselect() { deselectTask(requireCursor); }
+  function deselect() { deselectTask(requireCursor()); }
 
   // Clicks the 'schedule' link when tasks are selected.  If
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
