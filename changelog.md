@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 65
+
+### Enhancements ###
+
+* Adds `r` keybinding to open reminders dialog.
+
+* Improves error handling for the case where there is no cursor.
+
+
 ## Version 64
 
 ### Bug fixes ###
