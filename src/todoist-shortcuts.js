@@ -795,7 +795,14 @@
   function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
 
   // Add a comment to the current task.
-  function comment() { withUniqueClass(getCursor(), 'note_icon', all, click); }
+  function comment() {
+    var cursor = getCursor();
+    if (cursor) {
+      withUniqueClass(cursor, 'note_icon', all, click);
+    } else {
+      warn('no cursor to comment on');
+    }
+  }
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
