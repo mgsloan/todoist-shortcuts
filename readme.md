@@ -128,8 +128,7 @@ If none are selected, then these will apply to the cursor instead.
 | `#`        | delete                            |
 | `&`        | duplicate                         |
 | `v`        | move to project via search prompt |
-| `@`        | add label                         |
-| `y`        | remove label                      |
+| `@` or `y` | open label dialog                 |
 | `1`        | set priority to 1                 |
 | `2`        | set priority to 2                 |
 | `3`        | set priority to 3                 |
