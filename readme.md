@@ -86,7 +86,8 @@ navigation mode to select the same project again.
 | `enter`                    | edit task at cursor                                                       |
 | `o`                        | add task after cursor                                                     |
 | `shift+o`                  | add task before cursor                                                    |
-| `c`                        | open comments for cursor task                                             |
+| `c`                        | open comments for task at cursor                                          |
+| `r`                        | open reminders for task at cursor                                         |
 | `shift+j` or `shift+down`  | move task at cursor downwards                                             |
 | `shift+k` or `shift+up`    | move task at cursor upwards                                               |
 | `shift+l` or `shift+left`  | dedent task at cursor                                                     |
