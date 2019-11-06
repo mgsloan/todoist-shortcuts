@@ -58,7 +58,7 @@
     ['shift+enter', follow],
     ['shift+o', addAbove],
     ['o', addBelow],
-    ['c', comment],
+    ['c', openComments],
     [['shift+j', 'shift+down'], moveDown],
     [['shift+k', 'shift+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
@@ -794,8 +794,8 @@
   function addAbove() { addAboveOrBelow(MI_ADD_ABOVE); }
   function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
 
-  // Add a comment to the current task.
-  function comment() {
+  // Open comments sidepane
+  function openComments() {
     var cursor = getCursor();
     if (cursor) {
       withUniqueClass(cursor, 'note_icon', all, click);
