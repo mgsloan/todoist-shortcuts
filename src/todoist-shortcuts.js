@@ -59,6 +59,7 @@
     ['shift+o', addAbove],
     ['o', addBelow],
     ['c', openComments],
+    ['r', openReminders],
     [['shift+j', 'shift+down'], moveDown],
     [['shift+k', 'shift+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
@@ -775,6 +776,9 @@
 
   // Open comments sidepane
   function openComments() { withUniqueClass(requireCursor(), 'note_icon', all, click); }
+
+  // Open reminders dialog
+  function openReminders() { clickTaskMenu(requireCursor(), 'menu_item_reminders'); }
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
