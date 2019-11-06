@@ -378,7 +378,7 @@
   }
 
   function cursorUpSection() {
-    var cursor = getCursor();
+    var cursor = requireCursor();
     var section = getSection(cursor);
     var firstTask = getFirstTaskInSection(section);
     if (firstTask && !sameElement(cursor)(firstTask)) {
@@ -399,7 +399,7 @@
   }
 
   function cursorDownSection() {
-    var cursor = getCursor();
+    var cursor = requireCursor();
     var curSection = getSection(cursor);
     var section = curSection;
     section = section.nextSibling;
@@ -421,12 +421,12 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, click);
+    withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, click);
   }
 
   // Follow the first link of the task under the cursor.
   function follow() {
-    withUniqueClass(getCursor(), TASK_CONTENT_CLASS, all, function(content) {
+    withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, function(content) {
       var link = getFirstClass(content, 'ex_link');
       if (link) {
         click(link);
@@ -437,36 +437,15 @@
   }
 
   // Toggles selection of the task focused by the cursor.
-  function toggleSelect() {
-    var cursor = getCursor();
-    if (cursor) {
-      toggleSelectTask(cursor);
-    } else {
-      info("No cursor, so can't toggle selection.");
-    }
-  }
+  function toggleSelect() { toggleSelectTask(requireCursor); }
 
   // Selects the task focused by the cursor.
   // eslint-disable-next-line no-unused-vars
-  function select() {
-    var cursor = getCursor();
-    if (cursor) {
-      selectTask(cursor);
-    } else {
-      info("No cursor, so can't select.");
-    }
-  }
+  function select() { selectTask(requireCursor); }
 
   // Deselects the task focused by the cursor.
   // eslint-disable-next-line no-unused-vars
-  function deselect() {
-    var cursor = getCursor();
-    if (cursor) {
-      deselectTask(cursor);
-    } else {
-      info("No cursor, so can't deselect.");
-    }
-  }
+  function deselect() { deselectTask(requireCursor); }
 
   // Clicks the 'schedule' link when tasks are selected.  If
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
@@ -707,17 +686,17 @@
   // If toggl-button extension is in use, clicks the toggl-button
   // element in the task.
   function togglButton() {
-    withUniqueClass(getCursor(), 'toggl-button', all, click);
+    withUniqueClass(requireCursor(), 'toggl-button', all, click);
   }
 
   // Toggles collapse / expand of a task, if it has children.
   function toggleCollapse(task) {
-    withUniqueClass(task ? task : getCursor(), ARROW_CLASS, all, click);
+    withUniqueClass(task ? task : requireCursor(), ARROW_CLASS, all, click);
   }
 
   // Collapse cursor. If it is already collapsed, select and collapse parent.
   function cursorLeft() {
-    if (checkTaskExpanded(getCursor())) {
+    if (checkTaskExpanded(requireCursor())) {
       toggleCollapse();
     } else {
       selectAndCollapseParent();
@@ -726,7 +705,7 @@
 
   // Expand cursor and move down.
   function cursorRight() {
-    if (checkTaskCollapsed(getCursor())) {
+    if (checkTaskCollapsed(requireCursor())) {
       toggleCollapse();
       cursorDown();
     }
@@ -736,14 +715,14 @@
   // nothing if it's already in the desired state.
 
   function collapse(task0) {
-    var task = task0 ? task0 : getCursor();
+    var task = task0 ? task0 : requireCursor();
     if (checkTaskExpanded(task)) {
       toggleCollapse(task);
     }
   }
   // eslint-disable-next-line no-unused-vars
   function expand(task0) {
-    var task = task0 ? task0 : getCursor();
+    var task = task0 ? task0 : requireCursor();
     if (checkTaskCollapsed(task)) {
       toggleCollapse(task);
     }
@@ -751,7 +730,7 @@
 
   // Move selection to parent project.
   function selectAndCollapseParent() {
-    var cursor = getCursor();
+    var cursor = requireCursor();
     var tasks = getTasks();
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
@@ -795,14 +774,7 @@
   function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
 
   // Open comments sidepane
-  function openComments() {
-    var cursor = getCursor();
-    if (cursor) {
-      withUniqueClass(cursor, 'note_icon', all, click);
-    } else {
-      warn('no cursor to comment on');
-    }
-  }
+  function openComments() { withUniqueClass(requireCursor(), 'note_icon', all, click); }
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
@@ -848,7 +820,7 @@
   // it that is within the next 7 days, then it jumps to "next 7 days" and
   // reselects the task.
   function navigateToTask() {
-    var cursor = getCursor();
+    var cursor = requireCursor();
     if (viewMode === 'project') {
       var dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
@@ -1019,15 +991,11 @@
 
   function bulkSchedule() {
     deselectAll();
-    var cursor = getCursor();
-    if (cursor) {
-      inBulkScheduleMode = true;
-      nextBulkScheduleKey = getTaskKey(cursor);
-      updateKeymap();
-      oneBulkSchedule(cursor);
-    } else {
-      info('Can\'t bulk schedule if there\'s no cursor task.');
-    }
+    var cursor = requireCursor();
+    inBulkScheduleMode = true;
+    nextBulkScheduleKey = getTaskKey(cursor);
+    updateKeymap();
+    oneBulkSchedule(cursor);
   }
 
   // TODO(new-scheduler): Exiting doesn't work immediately - visits an
@@ -1082,15 +1050,11 @@
 
   function bulkMove() {
     deselectAll();
-    var cursor = getCursor();
-    if (cursor) {
-      inBulkMoveMode = true;
-      nextBulkMoveKey = getTaskKey(cursor);
-      updateKeymap();
-      oneBulkMove();
-    } else {
-      info('Can\'t bulk move if there\'s no cursor task.');
-    }
+    var cursor = requireCursor();
+    inBulkMoveMode = true;
+    nextBulkMoveKey = getTaskKey(cursor);
+    updateKeymap();
+    oneBulkMove();
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -1770,23 +1734,19 @@
 
   // Indent task.
   function moveIn() {
-    var cursor = getCursor();
     if (viewMode === 'agenda_reorder') {
       info('Indenting task does not work in agenda_reorder mode.');
     } else if (viewMode === 'agenda_no_reorder') {
       info('Indenting task does not work in agenda_no_reorder mode.');
     } else if (viewMode === 'project') {
-      if (!cursor) {
-        info('No cursor to indent.');
-      } else {
-        dragTaskOver(cursor, false, function() {
-          return {
-            destination: cursor,
-            horizontalOffset: 40,
-            verticalOffset: 0
-          };
-        });
-      }
+      var cursor = requireCursor();
+      dragTaskOver(cursor, false, function() {
+        return {
+          destination: cursor,
+          horizontalOffset: 40,
+          verticalOffset: 0
+        };
+      });
     } else {
       error('Unexpected viewMode:', viewMode);
     }
@@ -1794,15 +1754,13 @@
 
   // Dedent task.
   function moveOut() {
-    var cursor = getCursor();
     if (viewMode === 'agenda_reorder') {
       info('Dedenting task does not work in agenda_reorder mode.');
     } else if (viewMode === 'agenda_no_reorder') {
       info('Dedenting task does not work in agenda_no_reorder mode.');
     } else if (viewMode === 'project') {
-      if (!cursor) {
-        info('No cursor to dedent.');
-      } else if (getIndentClass(cursor) === 'indent_1') {
+      var cursor = requireCursor();
+      if (getIndentClass(cursor) === 'indent_1') {
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
       } else {
@@ -1822,46 +1780,42 @@
   // Move task up, maintaining its indent level and not swizzling any nested
   // structures.
   function moveUp() {
-    var cursor = getCursor();
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else if (viewMode === 'agenda_no_reorder') {
       info('Moving task up does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
-      if (!cursor) {
-        info('No cursor to move up.');
-      } else {
-        if (getSectionName(cursor) === 'OverdueReschedule') {
-          info('Can\'t move cursor up in overdue section');
-          return;
-        }
-        // Collapse nested tasks before moving it - see
-        // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
-        collapse(cursor);
-        dragTaskOver(cursor, false, function() {
-          var tasks = getTasks();
-          var cursorIndex = tasks.indexOf(cursor);
-          var cursorIndent = getIndentClass(cursor);
-          for (var i = cursorIndex - 1; i >= 0; i--) {
-            var task = tasks[i];
-            var indent = getIndentClass(task);
-            if (indent === cursorIndent) {
-              // Less glitchy if destination is collapsed
-              collapse(task);
-              return {
-                destination: task,
-                horizontalOffset: 0,
-                verticalOffset: 0
-              };
-            } else if (indent < cursorIndent) {
-              info('Refusing to dedent task to move it up.');
-              return null;
-            }
-          }
-          info('Couldn\'t find task above cursor to move it above.');
-          return null;
-        });
+      var cursor = requireCursor();
+      if (getSectionName(cursor) === 'OverdueReschedule') {
+        info('Can\'t move cursor up in overdue section');
+        return;
       }
+      // Collapse nested tasks before moving it - see
+      // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
+      collapse(cursor);
+      dragTaskOver(cursor, false, function() {
+        var tasks = getTasks();
+        var cursorIndex = tasks.indexOf(cursor);
+        var cursorIndent = getIndentClass(cursor);
+        for (var i = cursorIndex - 1; i >= 0; i--) {
+          var task = tasks[i];
+          var indent = getIndentClass(task);
+          if (indent === cursorIndent) {
+            // Less glitchy if destination is collapsed
+            collapse(task);
+            return {
+              destination: task,
+              horizontalOffset: 0,
+              verticalOffset: 0
+            };
+          } else if (indent < cursorIndent) {
+            info('Refusing to dedent task to move it up.');
+            return null;
+          }
+        }
+        info('Couldn\'t find task above cursor to move it above.');
+        return null;
+      });
     } else {
       error('Unexpected viewMode:', viewMode);
     }
@@ -1870,63 +1824,59 @@
   // Move task down, maintaining its indent level and not swizzling any nested
   // structures.
   function moveDown() {
-    var cursor = getCursor();
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else if (viewMode === 'agenda_no_reorder') {
       info('Moving task down does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
-      if (!cursor) {
-        info('No cursor to move down.');
-      } else {
-        if (getSectionName(cursor) === 'OverdueReschedule') {
-          info('Can\'t move cursor down in overdue section');
-          return;
-        }
-        // Collapse nested tasks before moving it - see
-        // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
-        collapse(cursor);
-        dragTaskOver(cursor, true, function() {
-          var tasks = getTasks();
-          var cursorIndex = tasks.indexOf(cursor);
-          var cursorIndent = getIndentClass(cursor);
-          var lastQualifyingTask = null;
-          for (var i = cursorIndex + 1; i < tasks.length; i++) {
-            var task = tasks[i];
-            var indent = getIndentClass(task);
-            // Logic here is a bit tricky.  The first time we encounter a task
-            // at the same indent level, this is the subtree we want to move
-            // past.  So, set lastQualifyingTask to non-null and keep track of
-            // the last one.  After that, when we encounter something at a
-            // lesser or equal indent to cursorIndent, we want to place it after
-            // the last one.
-            if (!lastQualifyingTask) {
-              if (indent === cursorIndent) {
-                lastQualifyingTask = task;
-              } else if (indent < cursorIndent) {
-                info('Refusing to dedent task to move it down.');
-                return null;
-              }
-            } else if (indent <= cursorIndent) {
-              break;
-            } else {
-              lastQualifyingTask = task;
-            }
-          }
-          if (lastQualifyingTask) {
-            // Less glitchy if destination is collapsed
-            collapse(lastQualifyingTask);
-            return {
-              destination: lastQualifyingTask,
-              horizontalOffset: 0,
-              verticalOffset: -cursor.clientHeight
-            };
-          } else {
-            info('Couldn\'t find task below cursor to move it below.');
-            return null;
-          }
-        });
+      var cursor = requireCursor();
+      if (getSectionName(cursor) === 'OverdueReschedule') {
+        info('Can\'t move cursor down in overdue section');
+        return;
       }
+      // Collapse nested tasks before moving it - see
+      // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
+      collapse(cursor);
+      dragTaskOver(cursor, true, function() {
+        var tasks = getTasks();
+        var cursorIndex = tasks.indexOf(cursor);
+        var cursorIndent = getIndentClass(cursor);
+        var lastQualifyingTask = null;
+        for (var i = cursorIndex + 1; i < tasks.length; i++) {
+          var task = tasks[i];
+          var indent = getIndentClass(task);
+          // Logic here is a bit tricky.  The first time we encounter a task
+          // at the same indent level, this is the subtree we want to move
+          // past.  So, set lastQualifyingTask to non-null and keep track of
+          // the last one.  After that, when we encounter something at a
+          // lesser or equal indent to cursorIndent, we want to place it after
+          // the last one.
+          if (!lastQualifyingTask) {
+            if (indent === cursorIndent) {
+              lastQualifyingTask = task;
+            } else if (indent < cursorIndent) {
+              info('Refusing to dedent task to move it down.');
+              return null;
+            }
+          } else if (indent <= cursorIndent) {
+            break;
+          } else {
+            lastQualifyingTask = task;
+          }
+        }
+        if (lastQualifyingTask) {
+          // Less glitchy if destination is collapsed
+          collapse(lastQualifyingTask);
+          return {
+            destination: lastQualifyingTask,
+            horizontalOffset: 0,
+            verticalOffset: -cursor.clientHeight
+          };
+        } else {
+          info('Couldn\'t find task below cursor to move it below.');
+          return null;
+        }
+      });
     } else {
       error('Unexpected viewMode:', viewMode);
     }
@@ -2157,10 +2107,10 @@
   //
   // * The WHAT_CURSOR_APPLIES_TO setting allows for it.
   function getCursorToMutate(danger) {
-    var cursor = getCursor();
     // TODO: Something more efficient than finding all selections if we just
     // want to know if there are any.
-    if (cursor && isEmptyMap(getSelectedTaskKeys())) {
+    if (isEmptyMap(getSelectedTaskKeys())) {
+      var cursor = requireCursor();
       // eslint-disable-next-line no-undefined
       if (danger === undefined) {
         if (SHOULD_MUTATE_CURSOR) {
@@ -2977,6 +2927,22 @@
     });
   }
 
+  // Exception thrown by requireCursor.
+  function CursorRequired() {
+    this.message = 'Shortcut requires a cursored task, but none found.';
+  }
+
+  // Returns the <li> element of the current cursor.  If there is
+  // none, throws an exception.
+  function requireCursor() {
+    var cursor = getCursor();
+    if (cursor) {
+      return cursor;
+    } else {
+      throw new CursorRequired();
+    }
+  }
+
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
     return getTaskById(lastCursorId, lastCursorIndent);
@@ -3728,15 +3694,24 @@
    * Mousetrap utilities
    */
 
-  function callBinding(f) {
+  function callBinding(bind) {
     return function() {
       // Don't handle keybindings when modal is open.
       if (todoistModalIsOpen()) {
         return false;
       } else {
-        var result = f.apply(null, arguments);
-        // Default to stopping propagation.
-        return result === true;
+        try {
+          var result = bind[1].apply(null, arguments);
+          // Default to stopping propagation.
+          return result === true;
+        } catch (ex) {
+          if (ex instanceof CursorRequired) {
+            warn('Shortcut for keys ' + bind[0] + ' requires a cursored task, but none found.');
+            return false;
+          } else {
+            throw ex;
+          }
+        }
       }
     };
   }
@@ -3745,7 +3720,7 @@
     for (var i = 0; i < binds.length; i++) {
       if (binds[i].length === 2) {
         // eslint-disable-next-line no-undefined
-        mousetrap.bind(binds[i][0], callBinding(binds[i][1]), undefined, keymap);
+        mousetrap.bind(binds[i][0], callBinding(binds[i]), undefined, keymap);
       } else {
         error('Improper binding entry at index', i, 'value is', binds[i]);
       }
