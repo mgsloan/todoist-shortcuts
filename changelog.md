@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 66
+
+### Bug fixes ###
+
+* Fixes task selection, a bug introduced when improving no-cursor handling.
+  See [#95][].
+  
+[#95]: https://github.com/mgsloan/todoist-shortcuts/issues/95
+
+
 ## Version 65
 
 ### Enhancements ###
