@@ -71,6 +71,7 @@
     ['x', toggleSelect],
     ['* a', selectAll],
     ['* n', deselectAll],
+    ['* o', selectAllOverdue],
     ['* 1', selectPriority('1')],
     ['* 2', selectPriority('2')],
     ['* 3', selectPriority('3')],
@@ -786,6 +787,21 @@
     var allTasks = getTasks('include-collapsed');
     for (var i = 0; i < allTasks.length; i++) {
       selectTask(allTasks[i]);
+    }
+  }
+
+  // Selects all overdue tasks.
+  function selectAllOverdue() {
+    if (stripPrefix('agenda', viewMode)) {
+      var allTasks = getTasks();
+      for (var i = 0; i < allTasks.length; i++) {
+        var sectionName = getSectionName(allTasks[i]);
+        if (sectionName == 'OverdueReschedule') {
+          selectTask(allTasks[i]);
+        }
+      }
+    } else {
+      info('Can only select all overdue in agenda mode');
     }
   }
 
