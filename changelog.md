@@ -4,9 +4,12 @@
 
 ### Enhancements ###
 
-* New keyboard shortcut - `+` opens assign dialog. See [#89][].
+* New keyboard shortcut, `+`, which opens assign dialog. See [#89][].
+
+* New keyboard shortcut, `* o`, which selects overdue tasks. See [#91][].
 
 [#89]: https://github.com/mgsloan/todoist-shortcuts/issues/89
+[#91]: https://github.com/mgsloan/todoist-shortcuts/issues/91
 
 
 ## Version 66
