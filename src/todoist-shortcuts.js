@@ -61,6 +61,7 @@
     ['i', openTaskView],
     ['c', openComments],
     ['shift+r', openReminders],
+    ['+', openAssign],
     [['shift+j', 'shift+down'], moveDown],
     [['shift+k', 'shift+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
@@ -172,6 +173,7 @@
     // TODO(#94): proper bindings for o / O.
     [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
     ['t', taskViewSchedule],
+    ['+', taskViewOpenAssign],
     ['v', taskViewMoveToProject],
     [['y', '@'], taskViewLabel],
     ['1', taskViewSetPriority('1')],
@@ -799,6 +801,16 @@
   // Open reminders dialog
   function openReminders() { clickTaskMenu(requireCursor(), 'menu_item_reminders'); }
 
+  // Open assign dialog
+  function openAssign() {
+    var assignButton = getUniqueClass(requireCursor(), 'assign_user');
+    if (assignButton) {
+      click(assignButton);
+    } else {
+      info('Could not find assign button, perhaps this project is not shared?');
+    }
+  }
+
   // Open the task view sidepane.
   function openTaskView() { withUniqueClass(getCursor(), 'task_info', all, click); }
 
@@ -1028,6 +1040,19 @@
   function taskViewSchedule() {
     withUniqueClass(document, 'side_panel', all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_due_selector', all, click);
+    });
+  }
+
+  function taskViewOpenAssign() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_overview_sub', all, function(itemOverview) {
+        var assignButton = getUniqueTag(itemOverview, 'button', matchingClass('person_picker__toggle'));
+        if (assignButton) {
+          click(assignButton);
+        } else {
+          info('Could not find assign button, perhaps this project is not shared?');
+        }
+      });
     });
   }
 

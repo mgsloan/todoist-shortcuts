@@ -89,6 +89,7 @@ navigation mode to select the same project again.
 | `i`                        | open task side panel (see [side panel section][], below)                  |
 | `c`                        | open comments for task at cursor                                          |
 | `shift+r`                  | open reminders for task at cursor                                         |
+| `+`                        | open assign dialog for task at cursor                                     |
 | `shift+j` or `shift+down`  | move task at cursor downwards                                             |
 | `shift+k` or `shift+up`    | move task at cursor upwards                                               |
 | `shift+l` or `shift+left`  | dedent task at cursor                                                     |
@@ -231,6 +232,7 @@ contexts. Listed here for completeness:
 | `3`               | set priority to 3                 |
 | `4` or `0`        | set priority to 4                 |
 | `shift+r`         | open reminders                    |
+| `+`               | open assignee dialog              |
 | `e`               | archive                           |
 | `#`               | delete                            |
 
