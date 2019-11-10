@@ -796,7 +796,7 @@
       var allTasks = getTasks();
       for (var i = 0; i < allTasks.length; i++) {
         var sectionName = getSectionName(allTasks[i]);
-        if (sectionName == 'OverdueReschedule') {
+        if (sectionName === 'OverdueReschedule') {
           selectTask(allTasks[i]);
         }
       }
@@ -833,8 +833,8 @@
     // why we can't use the typical functions which expect
     // uniqueness. See #96
     var taskViewButtons = requireCursor().getElementsByClassName('task_info');
-    if (taskViewButtons.length == 0) {
-      warning('Could not find any task_view buttons');
+    if (taskViewButtons.length === 0) {
+      warn('Could not find any task_view buttons');
     } else {
       click(taskViewButtons[taskViewButtons.length - 1]);
     }
