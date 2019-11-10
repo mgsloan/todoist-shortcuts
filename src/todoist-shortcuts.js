@@ -4028,6 +4028,9 @@
     registerKeybindings(SMART_SCHEDULER_KEYMAP, SMART_SCHEDULER_BINDINGS);
     registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
 
+    // Update the keymap.  Necessary now that the side panel can start out visible.
+    updateKeymap();
+
     // Reset mousetrap on disable.
     onDisable(function() { mousetrap.reset(); });
 
