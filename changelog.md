@@ -1,12 +1,21 @@
 # todoist-shortcuts changelog
 
+## Unreleased changes
+
+### Enhancements ###
+
+* New keyboard shortcut - `+` opens assign dialog. See [#89][].
+
+[#89]: https://github.com/mgsloan/todoist-shortcuts/issues/89
+
+
 ## Version 66
 
 ### Bug fixes ###
 
 * Fixes task selection, a bug introduced when improving no-cursor handling.
   See [#95][].
-  
+
 [#95]: https://github.com/mgsloan/todoist-shortcuts/issues/95
 
 
