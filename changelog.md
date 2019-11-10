@@ -11,6 +11,13 @@
 [#89]: https://github.com/mgsloan/todoist-shortcuts/issues/89
 [#91]: https://github.com/mgsloan/todoist-shortcuts/issues/91
 
+### Bug fixes ###
+
+* Fixes "i" for opening task view when the toggl-button extension is
+  also being used. See [#96].
+
+[#96]: https://github.com/mgsloan/todoist-shortcuts/issues/96
+
 
 ## Version 66
 

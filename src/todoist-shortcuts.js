@@ -828,7 +828,17 @@
   }
 
   // Open the task view sidepane.
-  function openTaskView() { withUniqueClass(getCursor(), 'task_info', all, click); }
+  function openTaskView() {
+    // toggl-button extension copies the task_info class, so that's
+    // why we can't use the typical functions which expect
+    // uniqueness. See #96
+    var taskViewButtons = requireCursor().getElementsByClassName('task_info');
+    if (taskViewButtons.length == 0) {
+      warning('Could not find any task_view buttons');
+    } else {
+      click(taskViewButtons[taskViewButtons.length - 1]);
+    }
+  }
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
