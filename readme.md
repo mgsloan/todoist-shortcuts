@@ -64,7 +64,7 @@ described in this document.
 | `}`            | move cursor down to next section                                      |
 | `/` or `f`     | focus search input                                                    |
 | `g`            | enter section navigation mode                                         |
-| `G`            | navigate to task's project, or select in agenda if already on project |
+| `shift+g`      | navigate to task's project, or select in agenda if already on project |
 | `` ` ``        | select the next top section (including favorites)                     |
 | `~`            | select the previous top section (including favorites)                 |
 
