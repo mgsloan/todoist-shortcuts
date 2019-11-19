@@ -3978,7 +3978,7 @@
   var sawEscapeDown = false;
 
   function modalKeyHandler(ev) {
-    var uniqueModal = getUniqueClass(document, 'reactist_modal_box');
+    var uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(matchingClass('quick_add')));
     if (uniqueModal) {
       // Special handling for the modal that appears when confirming
       // task discard (esc after q), and for the deletion confirmation
