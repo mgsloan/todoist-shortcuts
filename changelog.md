@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Unreleased changes
+
+### Enhancements ###
+
+* Adds `shift+c` shortcut for clicking toggl button in task view.
+
+
 ## Version 68
 
 ### Bug fixes ###
