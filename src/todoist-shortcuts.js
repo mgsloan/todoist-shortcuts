@@ -3204,6 +3204,16 @@
     }
   }
 
+  function debugWithStack() {
+    if (DEBUG) {
+      var args = [].slice.call(arguments);
+      args.unshift('todoist-shortcuts:');
+      args.push('\n' + getStack());
+      // eslint-disable-next-line no-console
+      console.log.apply(null, args);
+    }
+  }
+
   // Used to notify about an issue that's expected to sometimes occur during
   // normal operation.
   function info() {
@@ -3442,7 +3452,7 @@
         if (result === null) {
           result = el;
         } else {
-          debug('findUnique didn\'t find unique element because there are multiple results. Here are two:', result, el);
+          debugWithStack('findUnique didn\'t find unique element because there are multiple results. Here are two:', result, el);
           // Not unique, so return null.
           return null;
         }
