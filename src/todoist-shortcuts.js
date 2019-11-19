@@ -183,7 +183,8 @@
     [['4', '0'], taskViewSetPriority('4')],
     ['shift+r', taskViewOpenReminders],
     ['e', taskViewArchive],
-    ['#', taskViewDelete]
+    ['#', taskViewDelete],
+    ['shift+c', taskViewTogglButton]
   ];
   var TASK_VIEW_KEYMAP = 'task_view';
 
@@ -1122,6 +1123,12 @@
   function taskViewDelete() {
     withTaskViewMoreMenu(function(menu) {
       withUniqueTag(menu, 'li', matchingText('Delete task'), click);
+    });
+  }
+
+  function taskViewTogglButton() {
+    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'toggl-button', all, click);
     });
   }
 
