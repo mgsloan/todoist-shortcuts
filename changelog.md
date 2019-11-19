@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 68
+
+### Bug fixes ###
+
+* Fixes keyboard interaction with "Are you sure you want to discard
+  your current task?" modal when cancelling quick-add.
+
+
 ## Version 67
 
 ### Enhancements ###
