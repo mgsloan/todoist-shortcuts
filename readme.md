@@ -221,20 +221,21 @@ following shortcuts:
 The rest of the bindings match the shortcuts used in other
 contexts. Listed here for completeness:
 
-| keys              | action                            |
-| ---               | ---                               |
-| `q` or `a` or `A` | add a subtask                     |
-| `t`               | schedule                          |
-| `v`               | move to project via search prompt |
-| `y` or `@`        | open label dialog                 |
-| `1`               | set priority to 1                 |
-| `2`               | set priority to 2                 |
-| `3`               | set priority to 3                 |
-| `4` or `0`        | set priority to 4                 |
-| `shift+r`         | open reminders                    |
-| `+`               | open assignee dialog              |
-| `e`               | archive                           |
-| `#`               | delete                            |
+| keys              | action                                                                    |
+| ---               | ---                                                                       |
+| `q` or `a` or `A` | add a subtask                                                             |
+| `t`               | schedule                                                                  |
+| `v`               | move to project via search prompt                                         |
+| `y` or `@`        | open label dialog                                                         |
+| `1`               | set priority to 1                                                         |
+| `2`               | set priority to 2                                                         |
+| `3`               | set priority to 3                                                         |
+| `4` or `0`        | set priority to 4                                                         |
+| `shift+r`         | open reminders                                                            |
+| `+`               | open assignee dialog                                                      |
+| `e`               | archive                                                                   |
+| `#`               | delete                                                                    |
+| `shift+c`         | clicks [toggl-button (time tracking integration extension)][toggl-button] |
 
 There are not yet shortcuts for subtask manipulation in the task view,
 though this is a planned future addition.  See [#94][]
