@@ -6,6 +6,10 @@
 
 * Adds `shift+c` shortcut for clicking toggl button in task view.
 
+### Bug fixes ###
+
+* Fixes `t s` shortcut for clicking suggested date in scheduler.
+
 
 ## Version 68
 
