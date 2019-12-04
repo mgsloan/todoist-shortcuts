@@ -545,7 +545,7 @@
     withScheduler(
       'scheduleSuggested',
       function(scheduler) {
-        var suggested = getUniqueTag(scheduler, 'div', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'));
+        var suggested = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'));
         if (suggested) {
           click(suggested);
         } else {
