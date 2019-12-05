@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Unreleased changes
+## Version 69
 
 ### Enhancements ###
 
