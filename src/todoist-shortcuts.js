@@ -1646,10 +1646,6 @@
   }
 
   function handleBodyChange() {
-    calendarVisibilityMayHaveChanged();
-  }
-
-  function calendarVisibilityMayHaveChanged() {
     var nextTask;
     updateKeymap();
     if (inBulkScheduleMode) {
