@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 70
+
+### Bug fixes ###
+
+* Fixes a bug where the keymap would get stuck on task view even
+  though the task view was not open.
+
+* Makes it so that the keymap does not switch away from navigate mode
+  until it is finished.
+
+
 ## Version 69
 
 ### Enhancements ###
