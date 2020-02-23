@@ -873,6 +873,8 @@
       finishNavigate = function() {
         unregisterListener();
         finishNavigate = null;
+        switchKeymap(DEFAULT_KEYMAP);
+        updateKeymap();
       };
       setupNavigate(listHolder);
     });
@@ -1689,6 +1691,10 @@
 
   function updateKeymap() {
     if (mousetrap) {
+      // Navigation mode manages switching away from NAVIGATE_KEYMAP.
+      if (currentKeymap === NAVIGATE_KEYMAP) {
+        return;
+      }
       var popupWindow = getUniqueClass(document, 'GB_window');
       if (popupWindow) {
         var smartScheduler = getUniqueClass(popupWindow, 'SmartSchedule');
@@ -1703,8 +1709,6 @@
         switchKeymap(BULK_SCHEDULE_KEYMAP);
       } else if (inBulkMoveMode) {
         switchKeymap(BULK_MOVE_KEYMAP);
-      } else if (finishNavigate) {
-        switchKeymap(NAVIGATE_KEYMAP);
       } else if (checkSchedulerOpen()) {
         switchKeymap(SCHEDULE_KEYMAP);
       } else {
@@ -1713,9 +1717,13 @@
     }
   }
 
+  // MUTABLE. Currently set mousetrap keymap.
+  var currentKeymap = DEFAULT_KEYMAP;
+
   function switchKeymap(keymap) {
     debug('Setting keymap to', keymap);
     mousetrap.switchKeymap(keymap);
+    currentKeymap = keymap;
   }
 
   function checkTaskViewOpen() {
@@ -2550,6 +2558,7 @@
   // displayed. It overrides the keyboard handler such that it temporarily
   // expects a key.
   function setupNavigate(listHolder) {
+    switchKeymap(NAVIGATE_KEYMAP);
     document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
@@ -2652,7 +2661,6 @@
       if (!rerenderTips() && finishNavigate) {
         finishNavigate();
       }
-      updateKeymap();
     } catch (ex) {
       if (finishNavigate) { finishNavigate(); }
       removeOldTips();
