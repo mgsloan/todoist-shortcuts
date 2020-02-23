@@ -1581,6 +1581,7 @@
   var selectAfterNavigate = null;
 
   function handlePageChange() {
+    updateKeymap();
     var currentHash = document.location.hash;
     var isTaskViewHash = currentHash.startsWith('#task');
     if (lastHash !== currentHash && !isTaskViewHash) {
