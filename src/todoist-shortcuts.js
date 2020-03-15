@@ -4115,7 +4115,6 @@
   updateViewMode();
 
   setTimeout(function() {
-    // Remove todoist's global keyboard handler.
     if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
     if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
     if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
