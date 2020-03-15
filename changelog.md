@@ -9,6 +9,8 @@
 
 * Fixes setting priority on multiple tasks at once. See [#106][].
 
+* Fixes `shift+enter` shortcut to open links. See [#107][].
+
 * Fixes a bug where "discard task" dialog would not display reliably
   when pressing escape on quick add dialog.
 
@@ -17,6 +19,7 @@
 
 [#105]: https://github.com/mgsloan/todoist-shortcuts/issues/105
 [#106]: https://github.com/mgsloan/todoist-shortcuts/issues/106
+[#107]: https://github.com/mgsloan/todoist-shortcuts/issues/107
 
 
 ## Version 70
