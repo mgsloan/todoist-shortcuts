@@ -4,11 +4,16 @@
 
 ### Bug fixes ###
 
+* Fixes task editing and task view keybindings on
+  beta.todoist.com. See [#105][].
+
 * Fixes a bug where "discard task" dialog would not display reliably
   when pressing escape on quick add dialog.
 
 * Now ignores scrolling shortly after keyboard shortcuts open task
   menu (occurs when item is near bottom of window).
+
+[#105]: https://github.com/mgsloan/todoist-shortcuts/issues/105
 
 
 ## Version 70
