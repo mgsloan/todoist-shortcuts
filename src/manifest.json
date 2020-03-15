@@ -16,7 +16,7 @@
     }
   ],
   "web_accessible_resources": [
-  	"todoist-shortcuts.js"
+    "todoist-shortcuts.js"
   ],
   "icons": {
     "32": "icon32.png",
