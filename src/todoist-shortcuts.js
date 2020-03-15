@@ -445,7 +445,7 @@
 
   // Edit the task under the cursor.
   function edit() {
-    withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, click);
+    clickTaskMenu(requireCursor(), MI_EDIT);
   }
 
   // Follow the first link of the task under the cursor.
