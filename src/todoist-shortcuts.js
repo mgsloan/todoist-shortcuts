@@ -1030,51 +1030,55 @@
     withUniqueTag(document, 'td', matchingAttr('data-track', 'navigation|gear_sync'), click);
   }
 
+  // TODO: Remove once side_panel is gone (currently it's needed for
+  // todoist.com but not beta.todoist.com).
+  var TASK_VIEW_CLS = ['side_panel', 'detail_modal'];
+
   function taskViewClose() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_detail_close', all, click);
     });
   }
 
   function taskViewSubtasks() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-subtasks'), click);
     });
   }
 
   function taskViewComments() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-comments'), click);
     });
   }
 
   function taskViewActivity() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-activity'), click);
     });
   }
 
   function taskViewParent() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_detail_parent_info', all, click);
     });
   }
 
   function taskViewAddSubtask() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       taskViewSubtasks();
       withUniqueClass(sidePanel, 'plus_add_button', all, click);
     });
   }
 
   function taskViewSchedule() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_due_selector', all, click);
     });
   }
 
   function taskViewOpenAssign() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_overview_sub', all, function(itemOverview) {
         var assignButton = getUniqueTag(itemOverview, 'button', matchingClass('person_picker__toggle'));
         if (assignButton) {
@@ -1087,20 +1091,20 @@
   }
 
   function taskViewMoveToProject() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Select a project'), click);
     });
   }
 
   function taskViewLabel() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Add label(s)'), click);
     });
   }
 
   function taskViewSetPriority(level) {
     return function() {
-      withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+      withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
         if (!getUniqueClass(document, 'priority_picker')) {
           withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Set the priority'), click);
         }
@@ -1112,7 +1116,7 @@
   }
 
   function taskViewOpenReminders() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Add reminder(s)'), click);
     });
   }
@@ -1130,13 +1134,13 @@
   }
 
   function taskViewTogglButton() {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'toggl-button', all, click);
     });
   }
 
   function withTaskViewMoreMenu(f) {
-    withUniqueClass(document, 'side_panel', all, function(sidePanel) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       if (!getUniqueClass(document, 'ul', matchingAttr('aria-label', 'task edit menu'))) {
         withUniqueClass(sidePanel, 'item_actions_more', all, click);
       }
@@ -1727,7 +1731,7 @@
   }
 
   function checkTaskViewOpen() {
-    return getUniqueClass(document, 'side_panel') !== null;
+    return getUniqueClass(document, TASK_VIEW_CLS) !== null;
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -3419,7 +3423,15 @@
   // Checks that there is only one descendant element that matches the class name and
   // predicate, and returns it. Returns null if it is not found or not unique.
   function getUniqueClass(parent, cls, predicate) {
-    return findUnique(predicate, parent.getElementsByClassName(cls));
+    var foundElements = [];
+    if (cls.constructor === Array) {
+      for (var i = 0; i < cls.length; i++) {
+        foundElements = foundElements.concat(Array.from(parent.getElementsByClassName(cls[i])));
+      }
+    } else {
+      foundElements = parent.getElementsByClassName(cls);
+    }
+    return findUnique(predicate, foundElements);
   }
 
   // Checks that there is only one descendant element that matches the
