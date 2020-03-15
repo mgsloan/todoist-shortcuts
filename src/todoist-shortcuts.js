@@ -451,9 +451,10 @@
   // Follow the first link of the task under the cursor.
   function followLink() {
     withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, function(content) {
-      var link = getFirstClass(content, 'ex_link');
+      var link = getFirstTag(content, 'a');
       if (link) {
-        click(link);
+        var middleClick = new MouseEvent( 'click', { 'button': 1, 'which': 2 });
+        link.dispatchEvent(middleClick);
       } else {
         info('Didn\'t find a link to click.');
       }
@@ -3450,6 +3451,12 @@
       warn('Couldn\'t find unique descendant with class', cls, 'and matching predicate, instead got', result);
       return null;
     }
+  }
+
+  // Returns first descendant that matches the specified tag and
+  // predicate.
+  function getFirstTag(parent, tag, predicate) {
+    return findFirst(predicate, parent.getElementsByTagName(tag));
   }
 
   // Checks that there is only one descendant element that matches the
