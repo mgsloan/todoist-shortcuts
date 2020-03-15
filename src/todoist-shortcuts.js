@@ -55,7 +55,7 @@
 
     // Manipulation of tasks at cursor
     ['enter', edit],
-    ['shift+enter', follow],
+    ['shift+enter', followLink],
     ['shift+o', addAbove],
     ['o', addBelow],
     ['i', openTaskView],
@@ -449,7 +449,7 @@
   }
 
   // Follow the first link of the task under the cursor.
-  function follow() {
+  function followLink() {
     withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, function(content) {
       var link = getFirstClass(content, 'ex_link');
       if (link) {
