@@ -7,6 +7,9 @@
 * Fixes a bug where "discard task" dialog would not display reliably
   when pressing escape on quick add dialog.
 
+* Now ignores scrolling shortly after keyboard shortcuts open task
+  menu (occurs when item is near bottom of window).
+
 
 ## Version 70
 

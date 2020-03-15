@@ -574,7 +574,7 @@
   function moveToProject() {
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, MI_MOVE);
+      clickTaskMenu(mutateCursor, MI_MOVE, true);
       if (inBulkMoveMode) {
         bulkMoveCursorChanged();
       }
@@ -595,7 +595,7 @@
     return function() {
       var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
-        withTaskMenu(mutateCursor, function(menu) {
+        withTaskMenu(mutateCursor, false, function(menu) {
           clickPriorityMenu(menu, level);
         });
       } else {
@@ -1269,7 +1269,7 @@
     }
     setCursor(curBulkMoveTask, 'scroll');
     bulkMoveCursorChanged();
-    clickTaskMenu(curBulkMoveTask, MI_MOVE);
+    clickTaskMenu(curBulkMoveTask, MI_MOVE, true);
   }
 
   function bulkMoveCursorChanged() {
@@ -1850,13 +1850,21 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  function clickTaskMenu(task, cls) {
-    withTaskMenu(task, function(menu) {
+  function clickTaskMenu(task, cls, shouldScroll) {
+    withTaskMenu(task, shouldScroll, function(menu) {
       clickMenu(menu, cls);
     });
   }
 
-  function withTaskMenu(task, f) {
+  function withTaskMenu(task, shouldScroll, f) {
+    if (shouldScroll) {
+      withTaskMenuImpl(task, f);
+    } else {
+      withScrollIgnoredFor(400, function() { withTaskMenuImpl(task, f); });
+    }
+  }
+
+  function withTaskMenuImpl(task, f) {
     withUniqueTag(task, 'div', and(matchingClass('menu'), not(matchingClass('icon'))), function(openMenu) {
       var menu;
       if (stripPrefix('agenda', viewMode)) {
@@ -2068,22 +2076,69 @@
     }
   }
 
+  var timeToRestoreScroll = null;
+  var scrollTimeoutCount = 0;
+
+  function withScrollIgnoredFor(millis, f) {
+    try {
+      ignoreScroll();
+      f();
+    } finally {
+      var restoreTime = new Date((new Date()).getTime() + millis);
+      if (timeToRestoreScroll === null || restoreTime > timeToRestoreScroll) {
+        timeToRestoreScroll = restoreTime;
+      }
+      scrollTimeoutCount += 1;
+      setTimeout(scrollTimeoutHandler, millis);
+    }
+  }
+
+  function scrollTimeoutHandler() {
+    scrollTimeoutCount -= 1;
+    var now = new Date();
+    if (timeToRestoreScroll === null || now > timeToRestoreScroll) {
+      restoreScroll();
+    } else if (scrollTimeoutCount === 0) {
+      debug('trying again');
+      scrollTimeoutCount += 1;
+      setTimeout(scrollTimeoutHandler, 50);
+    }
+  }
+
+  function ignoreScroll() {
+    debug('ignoring scroll');
+    window.scroll = function() {
+      debug('Ignored Todoist scroll:', arguments);
+    };
+    window.scrollBy = function() {
+      debug('Ignored Todoist scrollBy:', arguments);
+    };
+    window.scrollTo = function() {
+      debug('Ignored Todoist scrollTo:', arguments);
+    };
+  }
+
+  function restoreScroll() {
+    debug('restoring scroll');
+    window.scroll = window.originalTodoistScroll;
+    window.scrollBy = window.originalTodoistScrollBy;
+    window.scrollTo = window.originalTodoistScrollTo;
+  }
+
   var dragInProgress = false;
   var suppressDrag = false;
 
   function dragStart() {
     dragInProgress = true;
     suppressDrag = true;
-    window.scrollBy = function() {
-      debug('Ignored Todoist scrollBy during task drag:', arguments);
-    };
+    ignoreScroll();
   }
 
   function dragDone(task) {
     dragInProgress = false;
     // Suppress subsequent drags for 50ms, otherwise glitches occur.
     setTimeout(function() { suppressDrag = false; }, 0);
-    window.scrollBy = window.originalTodoistScrollBy;
+    restoreScroll();
     if (!task || task.classList.contains('on_drag')) {
       warn('didn\'t find spot to drop for drag and drop, so cancelling');
       closeContextMenus();
@@ -2231,7 +2286,7 @@
     if (stripPrefix('agenda', viewMode) || cursor === null) {
       addToSectionContaining(cursor);
     } else if (viewMode === 'project') {
-      clickTaskMenu(cursor, menuCls);
+      clickTaskMenu(cursor, menuCls, true);
     } else {
       error('Unexpected viewMode:', viewMode);
     }
@@ -4041,7 +4096,9 @@
     if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
     if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
     if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
+    if (!window.originalTodoistScroll) { window.originalTodoistScroll = window.scroll; }
     if (!window.originalTodoistScrollBy) { window.originalTodoistScrollBy = window.scrollBy; }
+    if (!window.originalTodoistScrollTo) { window.originalTodoistScrollTo = window.scrollTo; }
 
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
