@@ -599,7 +599,12 @@
           clickPriorityMenu(menu, level);
         });
       } else {
-        withUniqueClass(document, 'priority_menu', all, function(menu) {
+        withId('item_selecter', function(selecter) {
+          withUniqueTag(selecter, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_flag.svg'), function(selecterSvg) {
+            click(selecterSvg.parentElement);
+          });
+        });
+        withUniqueClass(document, 'priority_picker', all, function(menu) {
           clickPriorityMenu(menu, level);
         });
       }
@@ -2374,10 +2379,10 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    withUniqueClass(menu, 'icon_priority_' + level, all, function(img) {
+    withUniqueTag(menu, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'), function(svg) {
       // See https://github.com/mgsloan/todoist-shortcuts/issues/32
       // withRestoredSelections(function() { click(img); });
-      click(img);
+      click(svg.parentElement);
     });
   }
 

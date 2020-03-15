@@ -7,6 +7,8 @@
 * Fixes task editing and task view keybindings on
   beta.todoist.com. See [#105][].
 
+* Fixes setting priority on multiple tasks at once. See [#106][].
+
 * Fixes a bug where "discard task" dialog would not display reliably
   when pressing escape on quick add dialog.
 
@@ -14,6 +16,7 @@
   menu (occurs when item is near bottom of window).
 
 [#105]: https://github.com/mgsloan/todoist-shortcuts/issues/105
+[#106]: https://github.com/mgsloan/todoist-shortcuts/issues/106
 
 
 ## Version 70
