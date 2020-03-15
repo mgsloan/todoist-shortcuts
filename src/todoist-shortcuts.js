@@ -1718,9 +1718,11 @@
   var currentKeymap = DEFAULT_KEYMAP;
 
   function switchKeymap(keymap) {
-    debug('Setting keymap to', keymap);
-    mousetrap.switchKeymap(keymap);
-    currentKeymap = keymap;
+    if (currentKeymap !== keymap) {
+      debug('Setting keymap to', keymap);
+      mousetrap.switchKeymap(keymap);
+      currentKeymap = keymap;
+    }
   }
 
   function checkTaskViewOpen() {
