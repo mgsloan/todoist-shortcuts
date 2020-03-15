@@ -835,7 +835,8 @@
     // uniqueness. See #96
     var taskViewButtons = requireCursor().getElementsByClassName('task_info');
     if (taskViewButtons.length === 0) {
-      warn('Could not find any task_view buttons');
+      warn('Could not find any task_view buttons, falling back on clicking task content');
+      withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, click);
     } else {
       click(taskViewButtons[taskViewButtons.length - 1]);
     }
