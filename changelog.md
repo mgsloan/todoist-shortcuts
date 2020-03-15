@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 71
+
+### Bug fixes ###
+
+* Fixes a bug where "discard task" dialog would not display reliably
+  when pressing escape on quick add dialog.
+
+
 ## Version 70
 
 ### Bug fixes ###

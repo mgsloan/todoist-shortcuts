@@ -4022,6 +4022,8 @@
           }
         }
       }
+    } else {
+      sawEscapeDown = false;
     }
     return originalHandler(ev);
   }
