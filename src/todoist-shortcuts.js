@@ -23,6 +23,9 @@
   // Set this to true to get more log output.
   var DEBUG = false;
 
+  // TODO: remove this once feasible
+  var IS_BETA = window.location.host === 'beta.todoist.com';
+
   // Cursor navigation.
   //
   // Note that modifying these will not affect the cursor motion bindings in
@@ -3848,12 +3851,12 @@
     '  position: static;',
     '}',
     '',
-    '@media (max-width: 750px) {',
+    IS_BETA ? '' : '@media (max-width: 750px) {',
     '  body.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
     '    left: 0;',
     '    bottom: 0;',
     '  }',
-    '}',
+    IS_BETA ? '' : '}',
     '',
     // Based directly on Todoist's .notifier
     '.ts-note, .ts-modal {',
