@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 72
+
+### Bug fixes ###
+
+* Fixes navigation pane position on non-beta todoist. See [#109][].
+
+[#109]: https://github.com/mgsloan/todoist-shortcuts/issues/109
+
+
 ## Version 71
 
 ### Bug fixes ###
