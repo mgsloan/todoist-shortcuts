@@ -256,11 +256,17 @@
 
   function originalHandler(ev) {
     if (ev.type === 'keydown') {
-      return window.originalTodoistKeydown.apply(document, [ev]);
+      if (window.originalTodoistKeydown) {
+        return window.originalTodoistKeydown.apply(document, [ev]);
+      }
     } else if (ev.type === 'keyup') {
-      return window.originalTodoistKeyup.apply(document, [ev]);
+      if (window.originalTodoistKeyup) {
+        return window.originalTodoistKeyup.apply(document, [ev]);
+      }
     } else if (ev.type === 'keypress') {
-      return window.originalTodoistKeypress.apply(document, [ev]);
+      if (window.originalTodoistKeypress) {
+        return window.originalTodoistKeypress.apply(document, [ev]);
+      }
     }
     return true;
   }
@@ -1936,13 +1942,19 @@
     var options = typeof options0 === 'string' ? { key: options0 } : options0;
     var ev = new Event('keydown');
     for (var o in options) { ev[o] = options[o]; }
-    window.originalTodoistKeydown.apply(document, [ev]);
+    if (window.originalTodoistKeydown) {
+      window.originalTodoistKeydown.apply(document, [ev]);
+    }
     ev = new Event('keyup');
     for (o in options) { ev[o] = options[o]; }
-    window.originalTodoistKeyup.apply(document, [ev]);
+    if (window.originalTodoistKeyup) {
+      window.originalTodoistKeyup.apply(document, [ev]);
+    }
     ev = new Event('keypress');
     for (o in options) { ev[o] = options[o]; }
-    window.originalTodoistKeypress.apply(document, [ev]);
+    if (window.originalTodoistKeypress) {
+      window.originalTodoistKeypress.apply(document, [ev]);
+    }
   }
 
   // Indent task.
@@ -4131,6 +4143,10 @@
     if (!window.originalTodoistScroll) { window.originalTodoistScroll = window.scroll; }
     if (!window.originalTodoistScrollBy) { window.originalTodoistScrollBy = window.scrollBy; }
     if (!window.originalTodoistScrollTo) { window.originalTodoistScrollTo = window.scrollTo; }
+
+    if (!window.originalTodoistKeydown) { warn('Expected document.onkeydown to be set, but it wasn\'t'); }
+    if (!window.originalTodoistKeyup) { warn('Expected document.onkeyup to be set, but it wasn\'t'); }
+    if (!window.originalTodoistKeypress && !IS_BETA) { warn('Expected document.onkeypress to be set, but it wasn\'t'); }
 
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
