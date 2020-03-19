@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 73
+
+### Bug fixes ###
+
+* Fixes an issue where the extension failed to initialize properly if
+  Todoist didn't already initialize some parts of the UI.
+
+
 ## Version 72
 
 ### Bug fixes ###
