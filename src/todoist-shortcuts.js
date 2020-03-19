@@ -1627,7 +1627,7 @@
   function registerTopMutationObservers() {
     var content = getById('content');
     if (content === null) {
-      warn('Waiting a bit again to register mutation observer on #content');
+      info('Waiting a bit again to register mutation observer on #content');
       setTimeout(registerTopMutationObservers, 50);
     } else {
       info('Found #content div to register mutation observer');
