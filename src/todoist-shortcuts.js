@@ -1625,7 +1625,12 @@
   // Registers mutation observers on elements that never get removed from the
   // DOM.  Run on initialization of todoist-shortcuts.
   function registerTopMutationObservers() {
-    withId('content', function(content) {
+    var content = getById('content');
+    if (content === null) {
+      warn('Waiting a bit again to register mutation observer on #content');
+      setTimeout(registerTopMutationObservers, 50);
+    } else {
+      info('Found #content div to register mutation observer');
       registerMutationObserver(content, handlePageChange);
       registerMutationObserver(content, function(mutations) {
         if (dragInProgress) {
@@ -1656,7 +1661,7 @@
           ensureCursor(content);
         }
       }, { childList: true, subtree: true });
-    });
+    }
     registerMutationObserver(document.body, handleBodyChange);
   }
 
