@@ -1630,44 +1630,37 @@
 
   // Registers mutation observers on elements that never get removed from the
   // DOM.  Run on initialization of todoist-shortcuts.
-  function registerTopMutationObservers() {
-    var content = getById('content');
-    if (content === null) {
-      info('Waiting a bit again to register mutation observer on #content');
-      setTimeout(registerTopMutationObservers, 50);
-    } else {
-      info('Found #content div to register mutation observer');
-      registerMutationObserver(content, handlePageChange);
-      registerMutationObserver(content, function(mutations) {
-        if (dragInProgress) {
-          debug('ignoring mutations since drag is in progress:', mutations);
-          return;
+  function registerTopMutationObservers(content) {
+    registerMutationObserver(content, handlePageChange);
+    registerMutationObserver(content, function(mutations) {
+      if (dragInProgress) {
+        debug('ignoring mutations since drag is in progress:', mutations);
+        return;
+      }
+      // Ignore mutations from toggl-button extension
+      var filtered = mutations.filter(function(mutation) {
+        if (mutation.target.classList.contains('toggl-button')) {
+          return false;
         }
-        // Ignore mutations from toggl-button extension
-        var filtered = mutations.filter(function(mutation) {
-          if (mutation.target.classList.contains('toggl-button')) {
-            return false;
-          }
-          if (mutation.addedNodes.length === 0 &&
-              mutation.removedNodes.length === 1 &&
-              mutation.removedNodes[0].classList &&
-              mutation.removedNodes[0].classList.contains('drag_and_drop_handler')) {
-            return false;
-          }
-          if (mutation.addedNodes.length === 1 &&
-              mutation.removedNodes.length === 0 &&
-              mutation.addedNodes[0].classList &&
-              mutation.addedNodes[0].classList.contains('drag_and_drop_handler')) {
-            return false;
-          }
-          return true;
-        });
-        if (filtered.length > 0) {
-          debug('ensuring cursor due to mutations:', mutations);
-          ensureCursor(content);
+        if (mutation.addedNodes.length === 0 &&
+            mutation.removedNodes.length === 1 &&
+            mutation.removedNodes[0].classList &&
+            mutation.removedNodes[0].classList.contains('drag_and_drop_handler')) {
+          return false;
         }
-      }, { childList: true, subtree: true });
-    }
+        if (mutation.addedNodes.length === 1 &&
+            mutation.removedNodes.length === 0 &&
+            mutation.addedNodes[0].classList &&
+            mutation.addedNodes[0].classList.contains('drag_and_drop_handler')) {
+          return false;
+        }
+        return true;
+      });
+      if (filtered.length > 0) {
+        debug('ensuring cursor due to mutations:', mutations);
+        ensureCursor(content);
+      }
+    }, { childList: true, subtree: true });
     registerMutationObserver(document.body, handleBodyChange);
   }
 
@@ -4132,11 +4125,10 @@
    * Run todoist-shortcuts!
    */
 
-  handlePageChange();
-  registerTopMutationObservers();
-  updateViewMode();
+  function initialize() {
+    handlePageChange();
+    updateViewMode();
 
-  setTimeout(function() {
     if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
     if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
     if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
@@ -4200,5 +4192,19 @@
     onDisable(function() {
       document.removeEventListener('mouseover', handleMouseOver);
     });
-  });
+  }
+
+  function initializeWhenContentAppears() {
+    var content = getById('content');
+    if (content === null) {
+      info('Waiting for #content appears before initializing todoist-shortcuts');
+      setTimeout(initializeWhenContentAppears, 50);
+    } else {
+      info('Found #content div - initializing todoist-shortcuts!');
+      registerTopMutationObservers(content);
+      initialize();
+    }
+  }
+
+  initializeWhenContentAppears();
 })();
