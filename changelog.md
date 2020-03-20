@@ -1,5 +1,18 @@
 # todoist-shortcuts changelog
 
+## Version 74
+
+### Bug fixes ###
+
+* Fixes an issue on beta.todoist.com where a mix of todoist-shortcuts
+  and Todoist's keyboard handling was being used. See [#111][].
+
+* Further improvement to handling of Todoist's deferred
+  initialization.
+
+[#111]: https://github.com/mgsloan/todoist-shortcuts/issues/111
+
+
 ## Version 73
 
 ### Bug fixes ###
