@@ -1633,6 +1633,11 @@
   function registerTopMutationObservers(content) {
     registerMutationObserver(content, handlePageChange);
     registerMutationObserver(content, function(mutations) {
+      // Not sure how to do this at intelligent times. Instead doing
+      // it all the time.
+      if (!INITIALIZING) {
+        overwriteKeyHandlers();
+      }
       if (dragInProgress) {
         debug('ignoring mutations since drag is in progress:', mutations);
         return;
@@ -4121,25 +4126,7 @@
     return originalHandler(ev);
   }
 
-  /*****************************************************************************
-   * Run todoist-shortcuts!
-   */
-
-  function initialize() {
-    handlePageChange();
-    updateViewMode();
-
-    if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
-    if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
-    if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
-    if (!window.originalTodoistScroll) { window.originalTodoistScroll = window.scroll; }
-    if (!window.originalTodoistScrollBy) { window.originalTodoistScrollBy = window.scrollBy; }
-    if (!window.originalTodoistScrollTo) { window.originalTodoistScrollTo = window.scrollTo; }
-
-    if (!window.originalTodoistKeydown) { warn('Expected document.onkeydown to be set, but it wasn\'t'); }
-    if (!window.originalTodoistKeyup) { warn('Expected document.onkeyup to be set, but it wasn\'t'); }
-    if (!window.originalTodoistKeypress && !IS_BETA) { warn('Expected document.onkeypress to be set, but it wasn\'t'); }
-
+  function overwriteKeyHandlers() {
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     document.onkeydown = function(ev) {
@@ -4163,6 +4150,30 @@
     // by 'originalHandler'.
     document.onkeypress = originalHandlerForModal;
     document.onkeyup = originalHandlerForModal;
+  }
+
+  /*****************************************************************************
+   * Run todoist-shortcuts!
+   */
+
+  var INITIALIZING = true;
+
+  function initialize() {
+    handlePageChange();
+    updateViewMode();
+
+    if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
+    if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
+    if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
+    if (!window.originalTodoistScroll) { window.originalTodoistScroll = window.scroll; }
+    if (!window.originalTodoistScrollBy) { window.originalTodoistScrollBy = window.scrollBy; }
+    if (!window.originalTodoistScrollTo) { window.originalTodoistScrollTo = window.scrollTo; }
+
+    if (!window.originalTodoistKeydown) { warn('Expected document.onkeydown to be set, but it wasn\'t'); }
+    if (!window.originalTodoistKeyup) { warn('Expected document.onkeyup to be set, but it wasn\'t'); }
+    if (!window.originalTodoistKeypress && !IS_BETA) { warn('Expected document.onkeypress to be set, but it wasn\'t'); }
+
+    overwriteKeyHandlers();
 
     // Initialize mousetrap.
     mousetrap = new Mousetrap(document);
@@ -4192,6 +4203,8 @@
     onDisable(function() {
       document.removeEventListener('mouseover', handleMouseOver);
     });
+
+    INITIALIZING = false;
   }
 
   function initializeWhenContentAppears() {
