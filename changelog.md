@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 75
+
+### Bug fixes ###
+
+* Better fix to the recent changes in Todoist's registration of
+  keyboard events. See [#111][] and [#112][].
+
+[#112]: https://github.com/mgsloan/todoist-shortcuts/issues/112
+
+
 ## Version 74
 
 ### Bug fixes ###
