@@ -255,6 +255,7 @@
   var POPUP_KEYMAP = 'popup';
 
   function originalHandler(ev) {
+    debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
     if (ev.type === 'keydown') {
       if (window.originalTodoistKeydown) {
         return window.originalTodoistKeydown.apply(document, [ev]);
