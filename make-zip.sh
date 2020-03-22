@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -ex
 
 # Ensure that eslint passes.
 ./eslint.sh
