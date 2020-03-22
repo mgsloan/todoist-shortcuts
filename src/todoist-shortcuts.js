@@ -4127,30 +4127,41 @@
     return originalHandler(ev);
   }
 
-  function overwriteKeyHandlers() {
+  function keydownHandler(ev) {
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
-    document.onkeydown = function(ev) {
-      if (todoistModalIsOpen()) {
-        return modalKeyHandler(ev);
-      }
-      if (inBulkMoveMode) {
-        return handleBulkMoveKey(ev);
-      }
-      if (ev.keyCode === 27 && ev.type === 'keydown') {
-        closeContextMenus();
-      }
-      if (deferLastKeyDownEnabled) {
-        lastDeferredEvent = ev;
-        return false;
-      } else {
-        return true;
-      }
-    };
+    if (todoistModalIsOpen()) {
+      return modalKeyHandler(ev);
+    }
+    if (inBulkMoveMode) {
+      return handleBulkMoveKey(ev);
+    }
+    if (ev.keyCode === 27 && ev.type === 'keydown') {
+      closeContextMenus();
+    }
+    if (deferLastKeyDownEnabled) {
+      lastDeferredEvent = ev;
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  function overwriteKeyHandlers() {
+    if (document.onkeydown !== keydownHandler) {
+      window.originalTodoistKeydown = document.onkeydown;
+      document.onkeydown = keydownHandler;
+    }
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
-    document.onkeypress = originalHandlerForModal;
-    document.onkeyup = originalHandlerForModal;
+    if (document.onkeypress !== originalHandlerForModal) {
+      window.originalTodoistKeypress = document.onkeypress;
+      document.onkeypress = originalHandlerForModal;
+    }
+    if (document.onkeyup !== originalHandlerForModal) {
+      window.originalTodoistKeyup = document.onkeyup;
+      document.onkeyup = originalHandlerForModal;
+    }
   }
 
   /*****************************************************************************
@@ -4163,16 +4174,9 @@
     handlePageChange();
     updateViewMode();
 
-    if (!window.originalTodoistKeydown) { window.originalTodoistKeydown = document.onkeydown; }
-    if (!window.originalTodoistKeyup) { window.originalTodoistKeyup = document.onkeyup; }
-    if (!window.originalTodoistKeypress) { window.originalTodoistKeypress = document.onkeypress; }
     if (!window.originalTodoistScroll) { window.originalTodoistScroll = window.scroll; }
     if (!window.originalTodoistScrollBy) { window.originalTodoistScrollBy = window.scrollBy; }
     if (!window.originalTodoistScrollTo) { window.originalTodoistScrollTo = window.scrollTo; }
-
-    if (!window.originalTodoistKeydown) { warn('Expected document.onkeydown to be set, but it wasn\'t'); }
-    if (!window.originalTodoistKeyup) { warn('Expected document.onkeyup to be set, but it wasn\'t'); }
-    if (!window.originalTodoistKeypress && !IS_BETA) { warn('Expected document.onkeypress to be set, but it wasn\'t'); }
 
     overwriteKeyHandlers();
 
