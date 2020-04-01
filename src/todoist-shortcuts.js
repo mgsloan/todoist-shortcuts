@@ -140,7 +140,7 @@
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
-    ['s', scheduleSuggested],
+    [['s', 'p'], scheduleSuggested],
     ['r', unschedule],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback]
