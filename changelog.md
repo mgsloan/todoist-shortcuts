@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 76
+
+### Enhancements ###
+
+* Added `p` alias (mnemonic "postpone") in scheduler shortcuts for
+  postpone / smart schedule. See [#113][].
+
+[#113]: https://github.com/mgsloan/todoist-shortcuts/issues/113
+
+
 ## Version 75
 
 ### Bug fixes ###
