@@ -343,10 +343,9 @@ Much of the work on this has been kindly supported by Amir Salihefendic of Doist
 company. They're awesome!
 
 In response to a ["Need a way of buying beer"][] issue, I've created a
-"Buy Me a Coffee" account.  If you feel the urge to send me a few
-dollars in support of my work on this project, then feel free to do
-so. If not, that's fine too, I hope you enjoy using todoist-shortcuts
-:)
+"Buy Me a Coffee" account.  If you feel the urge to show some
+appreciation for this project, feel free to send me a few dollars. If
+not, that's fine too, I hope you enjoy using todoist-shortcuts :)
 
 ["Need a way of buying beer"]: https://github.com/mgsloan/todoist-shortcuts/issues/45
 
