@@ -846,16 +846,7 @@
 
   // Open the task view sidepane.
   function openTaskView() {
-    // toggl-button extension copies the task_info class, so that's
-    // why we can't use the typical functions which expect
-    // uniqueness. See #96
-    var taskViewButtons = requireCursor().getElementsByClassName('task_info');
-    if (taskViewButtons.length === 0) {
-      warn('Could not find any task_view buttons, falling back on clicking task content');
-      withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, click);
-    } else {
-      click(taskViewButtons[taskViewButtons.length - 1]);
-    }
+    withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, click);
   }
 
   // Click somewhere on the page that shouldn't do anything in particular except
