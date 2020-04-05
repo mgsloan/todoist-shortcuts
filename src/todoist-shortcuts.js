@@ -26,6 +26,8 @@
   // TODO: remove this once feasible
   var IS_BETA = window.location.host === 'beta.todoist.com';
 
+  var IS_CHROME = /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+
   // Cursor navigation.
   //
   // Note that modifying these will not affect the cursor motion bindings in
@@ -463,8 +465,12 @@
     withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, function(content) {
       var link = getFirstTag(content, 'a');
       if (link) {
-        var middleClick = new MouseEvent( 'click', { 'button': 1, 'which': 2 });
-        link.dispatchEvent(middleClick);
+        if (IS_CHROME) {
+          var middleClick = new MouseEvent( 'click', { 'button': 1, 'which': 2 });
+          link.dispatchEvent(middleClick);
+        } else {
+          click(link);
+        }
       } else {
         info('Didn\'t find a link to click.');
       }
