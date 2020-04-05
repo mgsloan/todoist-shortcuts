@@ -256,22 +256,33 @@
   var POPUP_BINDINGS = [['fallback', originalHandler]];
   var POPUP_KEYMAP = 'popup';
 
+  // In some cases it looks like Todoist ends up invoking this
+  // function. This variable prevents direct re-entry.
+  var originalHandlerReentered = false;
+
   function originalHandler(ev) {
     debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
+    var result = true;
+    if (originalHandlerReentered) {
+      warn('Ignored re-entry of key handler. Weird!');
+      return result;
+    }
+    originalHandlerReentered = true;
     if (ev.type === 'keydown') {
       if (window.originalTodoistKeydown) {
-        return window.originalTodoistKeydown.apply(document, [ev]);
+        result = window.originalTodoistKeydown.apply(document, [ev]);
       }
     } else if (ev.type === 'keyup') {
       if (window.originalTodoistKeyup) {
-        return window.originalTodoistKeyup.apply(document, [ev]);
+        result = window.originalTodoistKeyup.apply(document, [ev]);
       }
     } else if (ev.type === 'keypress') {
       if (window.originalTodoistKeypress) {
-        return window.originalTodoistKeypress.apply(document, [ev]);
+        result = window.originalTodoistKeypress.apply(document, [ev]);
       }
     }
-    return true;
+    originalHandlerReentered = false;
+    return result;
   }
 
   function schedulerFallback(ev) {
