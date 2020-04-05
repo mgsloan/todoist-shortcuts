@@ -2,6 +2,15 @@
 
 ## Version 76
 
+### Bug fixes###
+
+* Fixes shift+enter to open links on Firefox. See issue [#117][].
+
+[#117]: https://github.com/mgsloan/todoist-shortcuts/issues/117
+
+
+## Version 76
+
 ### Enhancements ###
 
 * Added `p` alias (mnemonic "postpone") in scheduler shortcuts for
