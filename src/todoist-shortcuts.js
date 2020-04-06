@@ -4026,6 +4026,7 @@
         return false;
       } else {
         try {
+          debug('Invoking action bound to', bind[0]);
           var result = bind[1].apply(null, arguments);
           // Default to stopping propagation.
           return result === true;
