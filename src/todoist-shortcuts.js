@@ -4081,25 +4081,27 @@
   }
 
   function todoistModalIsOpen() {
-    var result = document.getElementsByClassName('reactist_modal_box').item(0) !== null;
-    if (!result) {
+    var modal = document.getElementsByClassName('reactist_modal_box').item(0);
+    if (!modal || matchingClass('detail_modal')(modal)) {
       sawEscapeDown = false;
+      return false;
+    } else {
+      return true;
     }
-    return result;
   }
 
   function originalHandlerForModal(ev) {
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
     } else {
-      return true;
+      return mousetrap.handleKeyEvent(ev);
     }
   }
 
   var sawEscapeDown = false;
 
   function modalKeyHandler(ev) {
-    var uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(matchingClass('quick_add')));
+    var uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(or(matchingClass('quick_add'), matchingClass('detail_modal'))));
     if (uniqueModal) {
       // Special handling for the modal that appears when confirming
       // task discard (esc after q), and for the deletion confirmation
@@ -4151,7 +4153,7 @@
       lastDeferredEvent = ev;
       return false;
     } else {
-      return true;
+      return mousetrap.handleKeyEvent(ev);
     }
   }
 
