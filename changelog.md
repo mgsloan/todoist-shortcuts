@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 76
+## Version 77
 
 ### Bug fixes###
 
