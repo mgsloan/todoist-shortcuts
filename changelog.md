@@ -4,8 +4,11 @@
 
 ### Bug fixes###
 
+* Fixes keyboard interaction with task view. See issue [#114][].
+
 * Fixes shift+enter to open links on Firefox. See issue [#117][].
 
+[#114]: https://github.com/mgsloan/todoist-shortcuts/issues/114
 [#117]: https://github.com/mgsloan/todoist-shortcuts/issues/117
 
 
