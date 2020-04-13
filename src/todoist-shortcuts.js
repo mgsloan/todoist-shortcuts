@@ -2273,7 +2273,7 @@
   }
 
   function overshootCoslerp(s, e, t, mt, f) {
-    const m = lerp(s, e, f);
+    var m = lerp(s, e, f);
     if (t < mt) {
       return coslerp(s, m, t / mt);
     } else {
