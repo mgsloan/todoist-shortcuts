@@ -2239,8 +2239,8 @@
   function animateDrag(el, sx, sy, tx, ty, finished) {
     var startParams = mkMouseParams(sx, sy);
     el.dispatchEvent(new MouseEvent('mousedown', startParams));
-    var duration = 100;
-    var frameCount = 5;
+    var duration = 50;
+    var frameCount = 10;
     var currentFrame = 0;
     // NOTE: Animating this may seem overkill, but doing a direct move didn't
     // work reliably.  This also makes it clearer what's happening.
@@ -2253,7 +2253,7 @@
         el.dispatchEvent(new MouseEvent('mouseup', params));
         finished();
       } else {
-        params = mkMouseParams(coslerp(sx, tx, alpha), coslerp(sy, ty, alpha));
+        params = mkMouseParams(overshootCoslerp(sx, tx, alpha, 0.3, 1.5), overshootCoslerp(sy, ty, alpha, 0.3, 1.5));
         el.dispatchEvent(new MouseEvent('mousemove', params));
         setTimeout(dragLoop, duration / frameCount);
       }
@@ -2270,6 +2270,15 @@
   // See http://paulbourke.net/miscellaneous/interpolation/
   function coslerp(s, e, t) {
     return lerp(s, e, (1 - Math.cos(t * Math.PI)) / 2);
+  }
+
+  function overshootCoslerp(s, e, t, mt, f) {
+    const m = lerp(s, e, f);
+    if (t < mt) {
+      return coslerp(s, m, t / mt);
+    } else {
+      return coslerp(m, e, (t - mt) / (1 - mt));
+    }
   }
 
   function mkMouseParams(x, y) {
