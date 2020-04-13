@@ -1,5 +1,19 @@
 # todoist-shortcuts changelog
 
+## Version 78
+
+### Bug fixes###
+
+* Works around a weird issue where there are missing drag-and-drop
+  targets when dragging tasks upwards. The workaround is to overshoot
+  the drag and then bring it back to where it should go. See [#120][].
+
+* When tasks are dragged beyond the viewport, they now get scrolled
+  into view.
+
+[#120]: https://github.com/mgsloan/todoist-shortcuts/issues/120
+
+
 ## Version 77
 
 ### Bug fixes###
