@@ -2177,6 +2177,7 @@
     // Suppress subsequent drags for 50ms, otherwise glitches occur.
     setTimeout(function() { suppressDrag = false; }, 0);
     restoreScroll();
+    scrollTaskIntoView(getCursor());
     if (!task || task.classList.contains('on_drag')) {
       warn('didn\'t find spot to drop for drag and drop, so cancelling');
       closeContextMenus();
@@ -2190,7 +2191,6 @@
     } else {
       try {
         dragStart();
-        scrollTaskIntoView(sourceTask);
         var result = findDestination();
         withDragHandle(sourceTask, function(el, x, y) {
           if (result) {
