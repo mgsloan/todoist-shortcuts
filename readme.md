@@ -81,27 +81,31 @@ navigation mode to select the same project again.
 
 ## Manipulation of tasks at cursor
 
-| keys                       | action                                                                    |
-| ---                        | ---                                                                       |
-| `enter`                    | edit task at cursor                                                       |
-| `o`                        | add task after cursor                                                     |
-| `shift+o`                  | add task before cursor                                                    |
-| `i`                        | open task side panel (see [side panel section][], below)                  |
-| `c`                        | open comments for task at cursor                                          |
-| `shift+r`                  | open reminders for task at cursor                                         |
-| `+`                        | open assign dialog for task at cursor                                     |
-| `shift+j` or `shift+down`  | move task at cursor downwards                                             |
-| `shift+k` or `shift+up`    | move task at cursor upwards                                               |
-| `shift+l` or `shift+left`  | dedent task at cursor                                                     |
-| `shift+h` or `shift+right` | indent task at cursor                                                     |
-| `shift+c`                  | clicks [toggl-button (time tracking integration extension)][toggl-button] |
+| keys                       | action                                                   |
+| ---                        | ---                                                      |
+| `enter`                    | edit task at cursor                                      |
+| `o`                        | add task after cursor                                    |
+| `shift+o`                  | add task before cursor                                   |
+| `i`                        | open task side panel (see [side panel section][], below) |
+| `c`                        | open comments for task at cursor                         |
+| `shift+r`                  | open reminders for task at cursor                        |
+| `+`                        | open assign dialog for task at cursor                    |
+| `shift+j` or `shift+down`  | move task at cursor downwards                            |
+| `shift+k` or `shift+up`    | move task at cursor upwards                              |
+| `shift+l` or `shift+left`  | dedent task at cursor                                    |
+| `shift+h` or `shift+right` | indent task at cursor                                    |
+| `shift+c`                  | clicks [toggl][] or [clockify][] time tracking button    |
 
 
 Note that there are some known bugs related to task motion - see
 [#27](https://github.com/mgsloan/todoist-shortcuts/issues/27) and
 [#29](https://github.com/mgsloan/todoist-shortcuts/issues/29).
 
-[toggl-button]: https://toggl.com/toggl-button/
+`shift+c` clicking of time tracking buttons supports both the
+[toggl-button extension][toggl] and [clockify extension][clockify].
+
+[toggl]: https://toggl.com/toggl-button/
+[clockify]: https://chrome.google.com/webstore/detail/clockify-time-tracker/pmjeegjhjdlccodhacdgbgfagbpmccpe
 [side panel section]: #task-side-panel
 
 ## Selection
