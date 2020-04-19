@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 79
+
+### Enhancements ###
+
+* Add support for clicking clockify extension buttons via `ctrl+c`
+  (also works for toggl button, as before). See [#121][].
+
+[#121]: https://github.com/mgsloan/todoist-shortcuts/issues/121
+
+
 ## Version 78
 
 ### Bug fixes###
