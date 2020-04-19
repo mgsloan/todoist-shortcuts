@@ -97,7 +97,7 @@
     ['2', setPriority('2')],
     ['3', setPriority('3')],
     [['4', '0'], setPriority('4')],
-    ['shift+c', togglButton],
+    ['shift+c', toggleTimer],
 
     // Sorting
     ['s', sortByDate],
@@ -189,7 +189,7 @@
     ['shift+r', taskViewOpenReminders],
     ['e', taskViewArchive],
     ['#', taskViewDelete],
-    ['shift+c', taskViewTogglButton]
+    ['shift+c', taskViewToggleTimer]
   ];
   var TASK_VIEW_KEYMAP = 'task_view';
 
@@ -740,10 +740,12 @@
     });
   }
 
-  // If toggl-button extension is in use, clicks the toggl-button
-  // element in the task.
-  function togglButton() {
-    withUniqueClass(requireCursor(), 'toggl-button', all, click);
+  var TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
+
+  // If toggl-button or clockify extension is in use, clicks the
+  // button element in the task.
+  function toggleTimer() {
+    withUniqueClass(requireCursor(), TIMER_CLASSES, all, click);
   }
 
   // Toggles collapse / expand of a task, if it has children.
@@ -1157,9 +1159,9 @@
     });
   }
 
-  function taskViewTogglButton() {
+  function taskViewToggleTimer() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
-      withUniqueClass(sidePanel, 'toggl-button', all, click);
+      withUniqueClass(sidePanel, TIMER_CLASSES, all, click);
     });
   }
 
