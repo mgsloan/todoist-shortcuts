@@ -6,7 +6,7 @@
 // @include     http://todoist.com/app*
 // @include     https://beta.todoist.com/app*
 // @include     http://beta.todoist.com/app*
-// @version     78
+// @version     79
 // @grant       none
 // ==/UserScript==
 
@@ -18,7 +18,7 @@
 (function() {
   'use strict';
 
-  var TODOIST_SHORTCUTS_VERSION = 78;
+  var TODOIST_SHORTCUTS_VERSION = 79;
 
   // Set this to true to get more log output.
   var DEBUG = false;
