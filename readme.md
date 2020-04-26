@@ -227,6 +227,7 @@ contexts. Listed here for completeness:
 
 | keys              | action                                                                    |
 | ---               | ---                                                                       |
+| `d`               | done: mark task as complete                                               |
 | `q` or `a` or `A` | add a subtask                                                             |
 | `t`               | schedule                                                                  |
 | `v`               | move to project via search prompt                                         |

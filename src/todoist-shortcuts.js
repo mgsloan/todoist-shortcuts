@@ -171,6 +171,7 @@
   var SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
   var TASK_VIEW_BINDINGS = [
+    ['d', taskViewDone],
     [['i', 'escape'], taskViewClose],
     ['s', taskViewSubtasks],
     ['c', taskViewComments],
@@ -1059,6 +1060,14 @@
   // TODO: Remove once side_panel is gone (currently it's needed for
   // todoist.com but not beta.todoist.com).
   var TASK_VIEW_CLS = ['side_panel', 'detail_modal'];
+
+  function taskViewDone() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_overview', all, function(overview) {
+        withUniqueClass(overview, 'item_checkbox', all, click);
+      });
+    });
+  }
 
   function taskViewClose() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {

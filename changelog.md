@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 80
+
+### Enhancements ###
+
+* Adds support for marking a task complete in the task view via `d`.
+
+
 ## Version 79
 
 ### Enhancements ###
