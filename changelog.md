@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 82
+
+### Bug fixes ###
+
+* Fixes multi task operations. The toolbar no longer has an id
+  attribute, so matching on a class instead.
+
+
 ## Version 81
 
 ### Bug fixes ###
