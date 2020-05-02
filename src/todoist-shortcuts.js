@@ -336,7 +336,7 @@
   var MOVE_TO_PROJECT_ID = 'GB_window';
   var BACKGROUND_ID = 'page_background';
   var TASK_CONTENT_CLASS = 'content';
-  var ACTIONS_BAR_CLASS = 'item_selecter';
+  var ACTIONS_BAR_CLASS = 'multi_select_toolbar';
   var ARROW_CLASS = 'arrow';
   var EXPANDED_ARROW_CLASS = 'down';
   var COLLAPSED_ARROW_CLASS = 'right';
@@ -512,7 +512,7 @@
         bulkScheduleCursorChanged();
       }
     } else {
-      withId(ACTIONS_BAR_CLASS, function(parent) {
+      withUniqueClass(document, ACTIONS_BAR_CLASS, all, function(parent) {
         withUniqueClass(parent, MI_SCHEDULE, all, click);
         blurSchedulerInput();
       });
@@ -527,7 +527,7 @@
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-      withId(ACTIONS_BAR_CLASS, function(parent) {
+      withUniqueClass(document, ACTIONS_BAR_CLASS, all, function(parent) {
         withUniqueClass(parent, MI_SCHEDULE, all, click);
       });
     }
@@ -736,7 +736,7 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    withId(ACTIONS_BAR_CLASS, function(parent) {
+    withUniqueClass(document, ACTIONS_BAR_CLASS, all, function(parent) {
       withUniqueClass(parent, 'item_action', all, click);
     });
   }
