@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 81
+
+### Bug fixes ###
+
+* Fixes task selection, broken in Todoist version 1000.  See [#127][].
+
+[#127]: https://github.com/mgsloan/todoist-shortcuts/issues/127
+
+
 ## Version 80
 
 ### Enhancements ###
