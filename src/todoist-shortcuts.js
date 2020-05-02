@@ -1331,18 +1331,18 @@
    */
 
   function toggleSelectTask(task) {
-    ItemSelecter.toggle(task);
+    ItemSelecter.selectClick(task);
   }
 
   function selectTask(task) {
     if (!checkTaskIsSelected(task)) {
-      ItemSelecter.toggle(task);
+      ItemSelecter.selectClick(task);
     }
   }
 
   function deselectTask(task) {
     if (checkTaskIsSelected(task)) {
-      ItemSelecter.toggle(task);
+      ItemSelecter.selectClick(task);
     }
   }
 
