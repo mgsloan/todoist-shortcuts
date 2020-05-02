@@ -1538,10 +1538,10 @@
         tasks = getTasks();
       }
       if (lastCursorIndex < tasks.length - lastCursorIndex) {
-        debug('selecting first task, because it\'s nearer to lastCursorIndex.');
+        debug('cursoring first task, because it\'s nearer to lastCursorIndex.');
         setCursorToFirstTask('no-scroll');
       } else {
-        debug('selecting last task, because it\'s nearer to lastCursorIndex.');
+        debug('cursoring last task, because it\'s nearer to lastCursorIndex.');
         setCursorToLastTask('no-scroll');
         if (!getCursor()) {
           // This can happen if the last task is a nested sub-project.
@@ -3257,7 +3257,7 @@
       cursor = getCursor();
     }
     if (!cursor) {
-      info('Couldn\'t find cursor, so selecting first task.');
+      info('Couldn\'t find cursor, so cursoring first task.');
       setCursorToFirstTask('scroll');
     } else {
       var cursorIndex = tasks.indexOf(cursor);
