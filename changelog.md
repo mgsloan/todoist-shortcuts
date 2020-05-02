@@ -19,7 +19,7 @@
 
 ## Version 78
 
-### Bug fixes###
+### Bug fixes ###
 
 * Works around a weird issue where there are missing drag-and-drop
   targets when dragging tasks upwards. The workaround is to overshoot
