@@ -688,7 +688,16 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_ARCHIVE);
     } else {
-      clickMenu(getMoreMenu(), MI_ARCHIVE);
+      var link = element('a', null, text('#132'));
+      link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/132';
+      link.style.color = '';
+      notifyUser(
+        span(null,
+             text('Todoist no longer has a button for archiving multiple tasks. '),
+             text('Consider completing or deleting them instead. '),
+             text('For more info, see todoist-shortcuts issue '),
+             link,
+             text('.')));
     }
   }
 
