@@ -336,7 +336,6 @@
   var MOVE_TO_PROJECT_ID = 'GB_window';
   var BACKGROUND_ID = 'page_background';
   var TASK_CONTENT_CLASS = ['content', 'task_list_item__body'];
-  var ACTIONS_BAR_CLASS = 'multi_select_toolbar';
   var ARROW_CLASS = 'arrow';
   var EXPANDED_ARROW_CLASS = 'down';
   var COLLAPSED_ARROW_CLASS = 'right';
@@ -512,8 +511,9 @@
         bulkScheduleCursorChanged();
       }
     } else {
-      withUniqueClass(document, ACTIONS_BAR_CLASS, all, function(parent) {
-        withUniqueClass(parent, MI_SCHEDULE, all, click);
+      // TODO(#130): Don't use innerText to disambiguate.
+      withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), function(button) {
+        click(button);
         blurSchedulerInput();
       });
     }
@@ -527,9 +527,8 @@
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-      withUniqueClass(document, ACTIONS_BAR_CLASS, all, function(parent) {
-        withUniqueClass(parent, MI_SCHEDULE, all, click);
-      });
+      // TODO(#130): Don't use innerText to disambiguate.
+      withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), click);
     }
   }
 
@@ -608,9 +607,8 @@
         bulkMoveCursorChanged();
       }
     } else {
-      withId(ACTIONS_BAR_CLASS, function(parent) {
-        withUniqueClass(parent, MI_MOVE, all, click);
-      });
+      // TODO(#130): Don't use innerText to disambiguate.
+      withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Move to project'), click);
     }
   }
 
@@ -628,12 +626,12 @@
           clickPriorityMenu(menu, level);
         });
       } else {
-        withId('item_selecter', function(selecter) {
-          withUniqueTag(selecter, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_flag.svg'), function(selecterSvg) {
+        withUniqueClass(document, 'multi_select_toolbar', all, function(toolbar) {
+          withUniqueTag(toolbar, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_flag.svg'), function(selecterSvg) {
             click(selecterSvg.parentElement);
           });
         });
-        withUniqueClass(document, 'priority_picker', all, function(menu) {
+        withUniqueClass(document, 'dialog', all, function(menu) {
           clickPriorityMenu(menu, level);
         });
       }
@@ -726,7 +724,8 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_DELETE_SEL);
     } else {
-      clickMenu(getMoreMenu(), MI_DELETE);
+      // TODO(#130): Don't use innerText to disambiguate.
+      withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Delete'), click);
     }
   }
 
@@ -735,7 +734,8 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_DUPLICATE);
     } else {
-      clickMenu(getMoreMenu(), MI_DUPLICATE);
+      // TODO(#130): Don't use innerText to disambiguate.
+      withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Duplicate'), click);
     }
   }
 
@@ -744,9 +744,8 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    withUniqueClass(document, ACTIONS_BAR_CLASS, all, function(parent) {
-      withUniqueClass(parent, 'item_action', all, click);
-    });
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Labels'), click);
   }
 
   var TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
@@ -1821,6 +1820,16 @@
     }
   }
 
+  function openMoreMenu() {
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('More'), click);
+    var result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
+    if (!result) {
+      throw 'Failed to find "More" menu';
+    }
+    return result;
+  }
+
   // Finds a menu element. These do not have any unique class or ID, so instead
   // need to do it by looking at text content of the options.
   function findMenu(name, expectedItems, predicate0, expectedCount0) {
@@ -1851,18 +1860,8 @@
 
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
-  var moreMenu;
   var taskMenu;
   var agendaTaskMenu;
-
-  function getMoreMenu() {
-    if (moreMenu) {
-      return moreMenu;
-    } else {
-      moreMenu = findMenu('More...', MORE_MENU_ITEMS);
-      return moreMenu;
-    }
-  }
 
   function getTaskMenu() {
     if (taskMenu) {
