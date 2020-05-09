@@ -343,11 +343,9 @@
   var SCHEDULER_ACTION_CLASS = 'scheduler_action';
   var SCHEDULER_INPUT_CLASS = 'scheduler-input';
 
-  var MI_SCHEDULE = 'menu_item_schedule';
   var MI_MOVE = 'menu_item_move';
   var MI_ARCHIVE = 'menu_item_archive';
   var MI_DUPLICATE = 'menu_item_duplicate';
-  var MI_DELETE = 'menu_item_delete';
   var MI_DELETE_SEL = 'sel_delete_task';
   var MI_ADD_ABOVE = 'menu_item_add_above';
   var MI_ADD_BELOW = 'menu_item_add_below';
@@ -355,8 +353,6 @@
 
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
-  var MORE_MENU_ITEMS =
-    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE];
   var TASKMENU_ITEMS =
     [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE_SEL, MI_EDIT];
 
@@ -691,11 +687,11 @@
       link.style.color = '';
       notifyUser(
         span(null,
-             text('Todoist no longer has a button for archiving multiple tasks. '),
-             text('Consider completing or deleting them instead. '),
-             text('For more info, see todoist-shortcuts issue '),
-             link,
-             text('.')));
+          text('Todoist no longer has a button for archiving multiple tasks. '),
+          text('Consider completing or deleting them instead. '),
+          text('For more info, see todoist-shortcuts issue '),
+          link,
+          text('.')));
     }
   }
 
@@ -1430,8 +1426,9 @@
     if (ev.isTrusted) {
       try {
         // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-        var predicate = or(matchingClass('task_item'),
-                           matchingClass('task_list_item'));
+        var predicate =
+            or(matchingClass('task_item'),
+              matchingClass('task_list_item'));
         var hoveredTask = findParent(ev.target, predicate);
         if (mouseGotMoved && hoveredTask) {
           debug('Due to mouse hover, setting cursor');
@@ -1825,9 +1822,14 @@
     withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('More'), click);
     var result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
     if (!result) {
-      throw 'Failed to find "More" menu';
+      throw new MoreMenuMissing();
     }
     return result;
+  }
+
+  // Exception thrown by openMoreMenu.
+  function MoreMenuMissing() {
+    this.message = 'Failed to find "More" menu';
   }
 
   // Finds a menu element. These do not have any unique class or ID, so instead
@@ -1935,7 +1937,7 @@
 
   function withTaskMenuImpl(task, f) {
     if (isUpcomingView()) {
-      withUniqueTag(task, 'button', matchingClass('more_actions_button'), function (openMenu) {
+      withUniqueTag(task, 'button', matchingClass('more_actions_button'), function(openMenu) {
         click(openMenu);
         withUniqueClass(document, 'ist_popover_content', all, f);
       });
@@ -2625,11 +2627,11 @@
   }
 
   function getIndentClass(task) {
-    const indentClass = findUnique(isIndentClass, task.classList);
+    var indentClass = findUnique(isIndentClass, task.classList);
     if (indentClass) {
       return indentClass;
     } else {
-      const indentAttribute = task.attributes['data-item-indent'];
+      var indentAttribute = task.attributes['data-item-indent'];
       if (indentAttribute) {
         return 'indent_' + indentAttribute.value;
       } else {
@@ -2653,15 +2655,17 @@
     } else {
       var itemCheckbox = getUniqueClass(task, 'item_checkbox');
       if (itemCheckbox) {
-        var priorityClass = findUnique(isPriorityClass, itemCheckbox.classList);
+        priorityClass = findUnique(isPriorityClass, itemCheckbox.classList);
         if (priorityClass) {
           return stripPriorityClass(priorityClass);
         } else {
+          warn('failed to parse task priority');
           return null;
         }
       }
-      warning('didn\'t find task priority');
+      warn('didn\'t find task priority');
     }
+    return null;
   }
 
   function isPriorityClass(cls) {
@@ -2696,13 +2700,16 @@
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
   function getTaskById(id, indent) {
+    var els;
+    var i;
+    var el;
     if (stripPrefix('agenda', viewMode)) {
       // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
       if (isUpcomingView()) {
         var indentNumber = indent ? stripIndentClass(indent) : null;
-        var els = document.getElementsByClassName('task_list_item');
-        for (var i = 0; i < els.length; i++) {
-          var el = els[i];
+        els = document.getElementsByClassName('task_list_item');
+        for (i = 0; i < els.length; i++) {
+          el = els[i];
           if (el.attributes['data-item-id'].value === id) {
             if (indent === 'ignore-indent') {
               return el;
@@ -2717,9 +2724,9 @@
       } else {
         // In agenda mode, can't rely on uniqueness of ids. So, search for
         // matching 'indent'. Turns out todoist also uses the ids as classes.
-        var els = document.getElementsByClassName(id);
-        for (var i = 0; i < els.length; i++) {
-          var el = els[i];
+        els = document.getElementsByClassName(id);
+        for (i = 0; i < els.length; i++) {
+          el = els[i];
           if (indent === 'ignore-indent') {
             return el;
           } else if (!indent) {
@@ -2737,6 +2744,8 @@
       error('Unexpected viewMode:', viewMode);
       return null;
     }
+    error('Invariant violated in getTaskById');
+    return null;
   }
 
   // Gets the next task the cursor can be moved to, after the specified task.
@@ -3388,7 +3397,7 @@
   // This function detects which mode Todoist's view is in, since each behaves a
   // bit differently.
   function getViewMode() {
-    var agendaView = getById(AGENDA_VIEW_ID) || getUniqueClass(document, "upcoming_view");
+    var agendaView = getById(AGENDA_VIEW_ID) || getUniqueClass(document, 'upcoming_view');
     if (agendaView === null) {
       return 'project';
     } else {
@@ -4130,7 +4139,7 @@
   }
 
   function isUpcomingView() {
-    return getUniqueClass(document, "upcoming_view") !== null;
+    return getUniqueClass(document, 'upcoming_view') !== null;
   }
 
   /*****************************************************************************
