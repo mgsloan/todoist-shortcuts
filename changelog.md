@@ -1,5 +1,22 @@
 # todoist-shortcuts changelog
 
+## Version 83
+
+### Bug fixes ###
+
+* Fixes operations on multiple tasks after more changes in Todoist.
+  Unfortunately, those changes in Todoist mean there are no longer
+  informative attributes to disambiguate the buttons. So, the
+  workaround relies on English text, and so these operations are still
+  broken for non-english locales. See [#129][].
+
+* Now pops up a notification that Todoist no longer supports archive
+  on multiple tasks. See [#132][].
+
+[#129]: https://github.com/mgsloan/todoist-shortcuts/issues/129
+[#132]: https://github.com/mgsloan/todoist-shortcuts/issues/132
+
+
 ## Version 82
 
 ### Bug fixes ###
