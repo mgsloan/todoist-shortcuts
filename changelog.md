@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 84
+
+### Bug fixes ###
+
+* Fixes `g` navigation to `Upcoming` section.  Reuses the character
+  `n`, for the benefit of those with muscle memory for the old `Next 7
+  days`.
+
+
 ## Version 83
 
 ### Bug fixes ###

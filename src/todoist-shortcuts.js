@@ -2794,7 +2794,7 @@
           mustBeKeys = 'i';
         } else if (matchingAttr('data-track', 'navigation|today')(li)) {
           mustBeKeys = 'g';
-        } else if (matchingAttr('data-track', 'navigation|next_7_days')(li)) {
+        } else if (matchingAttr('data-track', 'navigation|upcoming')(li)) {
           mustBeKeys = 'n';
         } else if (li.classList.contains('favorite_item')) {
           withUniqueClass(li, 'item_content', all, function(content) {
