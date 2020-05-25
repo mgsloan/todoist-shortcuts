@@ -420,52 +420,60 @@
 
   // Move the cursor to first / last task.
   function cursorFirst() {
-    setCursorToFirstTask('scroll');
+    disabledWithLazyLoading('Cursoring first task', function() {
+      setCursorToFirstTask('scroll');
+    });
   }
   function cursorLast() {
-    setCursorToLastTask('scroll');
+    disabledWithLazyLoading('Cursoring last task', function() {
+      setCursorToLastTask('scroll');
+    });
   }
 
   function cursorUpSection() {
-    var cursor = requireCursor();
-    var section = getSection(cursor);
-    var firstTask = getFirstTaskInSection(section);
-    if (firstTask && !sameElement(cursor)(firstTask)) {
-      // Not on first task, so move the cursor.
-      setCursor(firstTask, 'scroll');
-    } else {
-      // If already on the first task of this section, then select first task of
-      // prior populated section, if any exists.
-      section = section.previousSibling;
-      for (; section; section = section.previousSibling) {
-        firstTask = getFirstTaskInSection(section);
+    disabledWithLazyLoading('Moving cursor up a section', function() {
+      var cursor = requireCursor();
+      var section = getSection(cursor);
+      var firstTask = getFirstTaskInSection(section);
+      if (firstTask && !sameElement(cursor)(firstTask)) {
+        // Not on first task, so move the cursor.
+        setCursor(firstTask, 'scroll');
+      } else {
+        // If already on the first task of this section, then select first task of
+        // prior populated section, if any exists.
+        section = section.previousSibling;
+        for (; section; section = section.previousSibling) {
+          firstTask = getFirstTaskInSection(section);
+          if (firstTask) {
+            setCursor(firstTask, 'scroll');
+            return;
+          }
+        }
+      }
+    });
+  }
+
+  function cursorDownSection() {
+    disabledWithLazyLoading('Moving cursor down a section', function() {
+      var cursor = requireCursor();
+      var curSection = getSection(cursor);
+      var section = curSection;
+      section = section.nextSibling;
+      for (; section; section = section.nextSibling) {
+        var firstTask = getFirstTaskInSection(section);
         if (firstTask) {
           setCursor(firstTask, 'scroll');
           return;
         }
       }
-    }
-  }
-
-  function cursorDownSection() {
-    var cursor = requireCursor();
-    var curSection = getSection(cursor);
-    var section = curSection;
-    section = section.nextSibling;
-    for (; section; section = section.nextSibling) {
-      var firstTask = getFirstTaskInSection(section);
-      if (firstTask) {
-        setCursor(firstTask, 'scroll');
-        return;
+      // If execution has reached this point, then we must already be on the last
+      // section.
+      var lastTask = getLastTaskInSection(curSection);
+      warn(lastTask);
+      if (lastTask) {
+        setCursor(lastTask, 'scroll');
       }
-    }
-    // If execution has reached this point, then we must already be on the last
-    // section.
-    var lastTask = getLastTaskInSection(curSection);
-    warn(lastTask);
-    if (lastTask) {
-      setCursor(lastTask, 'scroll');
-    }
+    });
   }
 
   // Edit the task under the cursor.
@@ -4149,6 +4157,15 @@
 
   function isUpcomingView() {
     return getUniqueClass(document, 'upcoming_view') !== null;
+  }
+
+  function disabledWithLazyLoading(action, f) {
+    if (isUpcomingView()) {
+      warn(action, ' disabled in upcoming view is disabled as it doesn\'t work properly due to lazy loading.');
+      return;
+    } else {
+      f();
+    }
   }
 
   /*****************************************************************************
