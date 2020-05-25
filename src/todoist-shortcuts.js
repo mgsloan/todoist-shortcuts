@@ -1678,7 +1678,9 @@
     registerMutationObserver(content, function(mutations) {
       // Not sure how to do this at intelligent times. Instead doing
       // it all the time.
-      if (!INITIALIZING) {
+      //
+      // TODO: remove this once unnecessary.
+      if (!initializing) {
         overwriteKeyHandlers();
       }
       if (dragInProgress) {
@@ -4324,7 +4326,8 @@
    * Run todoist-shortcuts!
    */
 
-  var INITIALIZING = true;
+  // MUTABLE
+  var initializing = true;
 
   function initialize() {
     handlePageChange();
@@ -4365,7 +4368,7 @@
       document.removeEventListener('mouseover', handleMouseOver);
     });
 
-    INITIALIZING = false;
+    initializing = false;
   }
 
   function initializeWhenContentAppears() {
