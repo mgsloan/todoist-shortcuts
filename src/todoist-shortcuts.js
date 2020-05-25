@@ -218,7 +218,7 @@
           // alt-k or alt-up-> move cursor up
           return wrapBulkMoveCursorChange(cursorUp);
         } else if (ev.key === 'h' || ev.keyCode === 37) {
-          // alt-h or alt-left-> move cursor lef
+          // alt-h or alt-left-> move cursor left
           return wrapBulkMoveCursorChange(cursorLeft);
         } else if (ev.key === 'h' || ev.keyCode === 39) {
           // alt-l or alt-right -> move cursor right
@@ -253,7 +253,7 @@
   var NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
   var NAVIGATE_KEYMAP = 'navigate';
 
-  // Keymap used when there is a floating window
+  // Keymap used when there is a floating window.
   var POPUP_BINDINGS = [['fallback', originalHandler]];
   var POPUP_KEYMAP = 'popup';
 
