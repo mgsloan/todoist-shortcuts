@@ -4302,16 +4302,19 @@
 
   function overwriteKeyHandlers() {
     if (document.onkeydown !== keydownHandler) {
+      debug('overwrote onkeydown');
       window.originalTodoistKeydown = document.onkeydown;
       document.onkeydown = keydownHandler;
     }
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
     if (document.onkeypress !== originalHandlerForModal) {
+      debug('overwrote onkeypress');
       window.originalTodoistKeypress = document.onkeypress;
       document.onkeypress = originalHandlerForModal;
     }
     if (document.onkeyup !== originalHandlerForModal) {
+      debug('overwrote onkeyup');
       window.originalTodoistKeyup = document.onkeyup;
       document.onkeyup = originalHandlerForModal;
     }
