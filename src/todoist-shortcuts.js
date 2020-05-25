@@ -4235,7 +4235,8 @@
     }
   }
 
-  function originalHandlerForModal(ev) {
+  function genericKeyHandler(ev) {
+    debug('genericKeyHandler', ev);
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
     } else {
@@ -4283,6 +4284,7 @@
   }
 
   function keydownHandler(ev) {
+    debug('keydownHandler', ev);
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     if (todoistModalIsOpen()) {
@@ -4310,15 +4312,15 @@
     }
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
-    if (document.onkeypress !== originalHandlerForModal) {
+    if (document.onkeypress !== genericKeyHandler) {
       debug('overwrote onkeypress');
       window.originalTodoistKeypress = document.onkeypress;
-      document.onkeypress = originalHandlerForModal;
+      document.onkeypress = genericKeyHandler;
     }
-    if (document.onkeyup !== originalHandlerForModal) {
+    if (document.onkeyup !== genericKeyHandler) {
       debug('overwrote onkeyup');
       window.originalTodoistKeyup = document.onkeyup;
-      document.onkeyup = originalHandlerForModal;
+      document.onkeyup = genericKeyHandler;
     }
   }
 
