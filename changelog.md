@@ -8,6 +8,11 @@
   `n`, for the benefit of those with muscle memory for the old `Next 7
   days`.
 
+* Fixes `h` key (cursor left) - it was being interpreted as a new
+  native Todoist shortcut to switch to upcoming view. See [#134][].
+
+[#134]: https://github.com/mgsloan/todoist-shortcuts/issues/134
+
 
 ## Version 83
 
