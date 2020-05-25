@@ -2744,7 +2744,8 @@
       error('Unexpected viewMode:', viewMode);
       return null;
     }
-    error('Invariant violated in getTaskById');
+    debug('No task found by getTaskById. ',
+      'viewMode = ', viewMode, '; id = ', id, '; indent = ', indent);
     return null;
   }
 
