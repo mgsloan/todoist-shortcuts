@@ -262,6 +262,12 @@
   var originalHandlerReentered = false;
 
   function originalHandler(ev) {
+    // Todoist is handling the 'h' key's keydown to switch to the
+    // upcoming view, so this workaround skips it - see #134.
+    if (ev.key === 'h' && ev.target === document.body && ev.type === 'keydown') {
+      debug('skipping todoist handler for "h" to workaround #134.', ev);
+      return false;
+    }
     debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
     var result = true;
     if (originalHandlerReentered) {
