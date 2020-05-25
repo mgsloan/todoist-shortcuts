@@ -412,10 +412,17 @@
 
   // Move the cursor up and down.
   function cursorDown() {
-    modifyCursorIndex(function(ix) { return ix + 1; });
+    var cursorChanged = modifyCursorIndex(function(ix) { return ix + 1; });
+    if (!cursorChanged && isUpcomingView()) {
+      scrollTaskToTop(getCursor());
+    }
   }
   function cursorUp() {
-    modifyCursorIndex(function(ix) { return ix - 1; });
+    var cursorChanged = modifyCursorIndex(function(ix) { return ix - 1; });
+    if (!cursorChanged && isUpcomingView()) {
+      info('scrolling task to bottom');
+      scrollTaskToBottom(getCursor());
+    }
   }
 
   // Move the cursor to first / last task.
@@ -3349,9 +3356,32 @@
   }
 
   function scrollTaskIntoView(task) {
-    withId('top_bar', function(topBar) {
-      verticalScrollIntoView(task, topBar.clientHeight, 0);
-    });
+    verticalScrollIntoView(task, getTopHeight(), 0, false, 0.5);
+  }
+
+  function scrollTaskToBottom(task) {
+    verticalScrollIntoView(task, getTopHeight(), 0, true, 0.9);
+    scrollTaskIntoView(task);
+  }
+
+  function scrollTaskToTop(task) {
+    verticalScrollIntoView(task, getTopHeight(), 0, true, 0.1);
+    scrollTaskIntoView(task);
+  }
+
+  function getTopHeight() {
+    var upcomingHeader = getUniqueClass(document, 'upcoming_view__calendar');
+    if (upcomingHeader) {
+      return upcomingHeader.clientHeight;
+    } else {
+      var topBar = getById('top_bar');
+      if (topBar) {
+        return topBar.clientHeight;
+      } else {
+        error ('No top bar to measure.');
+        return 0;
+      }
+    }
   }
 
   // Exception thrown by requireCursor.
@@ -3384,9 +3414,11 @@
       restoreLastCursor();
       cursor = getCursor();
     }
+    var cursorChanged = false;
     if (!cursor) {
       info('Couldn\'t find cursor, so cursoring first task.');
       setCursorToFirstTask('scroll');
+      cursorChanged = true;
     } else {
       var cursorIndex = tasks.indexOf(cursor);
       if (cursorIndex < 0) {
@@ -3404,11 +3436,15 @@
         info('Can\'t move cursor after last task');
         newIndex = tasks.length - 1;
       }
-      var newCursor = tasks[newIndex];
-      if (newCursor) {
-        setCursor(newCursor, 'scroll');
+      cursorChanged = newIndex !== cursorIndex;
+      if (cursorChanged) {
+        var newCursor = tasks[newIndex];
+        if (newCursor) {
+          setCursor(newCursor, 'scroll');
+        }
       }
     }
+    return cursorChanged;
   }
 
   // This function detects which mode Todoist's view is in, since each behaves a
@@ -3520,14 +3556,14 @@
   // element in the middle of the window, but only if necessary to bring it into
   // view. Does not work well for elements that are larger than half a screen
   // full.
-  function verticalScrollIntoView(el, marginTop, marginBottom) {
+  function verticalScrollIntoView(el, marginTop, marginBottom, skipCheck, t) {
     var oy = offset(el).y;
     var cy = oy - window.scrollY;
     var h = el.offsetHeight;
-    if (cy < marginTop || cy + h > window.innerHeight - marginBottom) {
+    if (skipCheck || cy < marginTop || cy + h > window.innerHeight - marginBottom) {
       // TODO: for very large tasks, this could end up with the whole task not
       // being in view.
-      window.scrollTo(0, oy - window.innerHeight / 2);
+      window.scrollTo(0, oy - lerp(0, window.innerHeight, t));
     }
   }
 
