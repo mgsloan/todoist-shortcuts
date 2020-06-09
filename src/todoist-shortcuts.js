@@ -960,13 +960,10 @@
         info('Not switching to "Next 7 days", because this task is not scheduled.');
       }
     } else {
-      // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-      var projectEl = getUniqueClass(cursor, 'project_item', matchingClass('clickable'));
-      if (!projectEl) {
-        var projectSpanEl = getUniqueClass(cursor, 'task_list_item__project');
-        if (projectSpanEl) {
-          projectEl = getUniqueTag(projectSpanEl, 'span');
-        }
+      var projectEl = null;
+      var projectSpanEl = getUniqueClass(cursor, 'task_list_item__project');
+      if (projectSpanEl) {
+        projectEl = getUniqueTag(projectSpanEl, 'span');
       }
       if (projectEl) {
         // Set a variable that will be read by 'handlePageChange', which will
@@ -1446,10 +1443,7 @@
   function handleMouseOver(ev) {
     if (ev.isTrusted) {
       try {
-        // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-        var predicate =
-            or(matchingClass('task_item'),
-              matchingClass('task_list_item'));
+        var predicate = matchingClass('task_list_item');
         var hoveredTask = findParent(ev.target, predicate);
         if (mouseGotMoved && hoveredTask) {
           debug('Due to mouse hover, setting cursor');
@@ -1959,36 +1953,10 @@
   }
 
   function withTaskMenuImpl(task, f) {
-    if (isUpcomingView()) {
-      withUniqueTag(task, 'button', matchingClass('more_actions_button'), function(openMenu) {
-        click(openMenu);
-        withUniqueClass(document, 'ist_popover_content', all, f);
-      });
-    } else {
-      withUniqueTag(task, 'div', and(matchingClass('menu'), not(matchingClass('icon'))), function(openMenu) {
-        var menu;
-        if (stripPrefix('agenda', viewMode)) {
-          menu = getAgendaTaskMenu();
-        } else if (viewMode === 'project') {
-          menu = getTaskMenu();
-        } else {
-          error('Unexpected viewMode:', viewMode);
-          return;
-        }
-        if (hidden(menu)) {
-          click(openMenu);
-        } else {
-          // If it's already visible, it might be for the wrong task.
-          click(openMenu);
-          // If it hides after clicking, then it was already associated with the
-          // right task, click it again.
-          if (hidden(menu)) {
-            click(openMenu);
-          }
-        }
-        f(menu);
-      });
-    }
+    withUniqueTag(task, 'button', matchingClass('more_actions_button'), function(openMenu) {
+      click(openMenu);
+      withUniqueClass(document, 'ist_popover_content', all, f);
+    });
   }
 
   function checkMoveToProjectOpen() {
@@ -2393,8 +2361,7 @@
   }
 
   function clickTaskDone(task) {
-    // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-    withUniqueClass(task, ['ist_checkbox', 'item_checkbox'], all, click);
+    withUniqueClass(task, 'item_checkbox', all, click);
   }
 
   // Common code implementing addAbove / addBelow.
@@ -2548,12 +2515,9 @@
     withId('content', function(content) {
       withTag(content, 'li', function(item) {
         // Skip elements which don't correspond to tasks
-        //
-        // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
         var classMatches =
           !item.classList.contains('reorder_item') &&
-          (  item.classList.contains('task_item')
-          || item.classList.contains('task_list_item')
+          (  item.classList.contains('task_list_item')
           || (item.classList.contains('manager') && shouldIncludeEditors)
           );
         // Skip nested tasks that are not visible (if includeCollapsed is not set).
@@ -2623,25 +2587,12 @@
   }
 
   function getTaskId(task) {
-    if (task.id) {
-      return task.id;
+    var idViaAttr = task.attributes['data-item-id'];
+    if (idViaAttr) {
+      return idViaAttr.value;
     } else {
-      var idViaClass = findUnique(isItemClass, task.classList);
-      if (idViaClass) {
-        // Debug log since I still don't understand quite why this
-        // happens - seems to occur when moving tasks.
-        debug('Encountered curious case where task has item_ class but no id');
-        return idViaClass;
-      } else {
-        // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-        var idViaAttr = task.attributes['data-item-id'];
-        if (idViaAttr) {
-          return idViaAttr.value;
-        } else {
-          error('Couldn\'t find id for task', task);
-          return null;
-        }
-      }
+      error('Couldn\'t find id for task', task);
+      return null;
     }
   }
 
@@ -2726,46 +2677,20 @@
     var els;
     var i;
     var el;
-    if (stripPrefix('agenda', viewMode)) {
-      // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-      if (isUpcomingView()) {
-        var indentNumber = indent ? stripIndentClass(indent) : null;
-        els = document.getElementsByClassName('task_list_item');
-        for (i = 0; i < els.length; i++) {
-          el = els[i];
-          if (el.attributes['data-item-id'].value === id) {
-            if (indent === 'ignore-indent') {
-              return el;
-            } else if (!indent) {
-              error('getTaskById called in agenda mode but with no indent value.');
-              return el;
-            } else if (el.attributes['data-item-indent'].value === indentNumber) {
-              return el;
-            }
-          }
+    var indentNumber = indent ? stripIndentClass(indent) : null;
+    els = document.getElementsByClassName('task_list_item');
+    for (i = 0; i < els.length; i++) {
+      el = els[i];
+      if (el.attributes['data-item-id'].value === id) {
+        if (indent === 'ignore-indent') {
+          return el;
+        } else if (!indent) {
+          error('getTaskById called with no indent value.');
+          return el;
+        } else if (el.attributes['data-item-indent'].value === indentNumber) {
+          return el;
         }
-      } else {
-        // In agenda mode, can't rely on uniqueness of ids. So, search for
-        // matching 'indent'. Turns out todoist also uses the ids as classes.
-        els = document.getElementsByClassName(id);
-        for (i = 0; i < els.length; i++) {
-          el = els[i];
-          if (indent === 'ignore-indent') {
-            return el;
-          } else if (!indent) {
-            error('getTaskById called in agenda mode but with no indent value.');
-            return el;
-          } else if (el.classList.contains(indent)) {
-            return el;
-          }
-        }
-        return null;
       }
-    } else if (viewMode === 'project') {
-      return document.getElementById(id);
-    } else {
-      error('Unexpected viewMode:', viewMode);
-      return null;
     }
     debug('No task found by getTaskById. ',
       'viewMode = ', viewMode, '; id = ', id, '; indent = ', indent);
@@ -4175,20 +4100,8 @@
 
   // See comment on 'getTaskById' for explanation
   function getKeySelecter(id, indent) {
-    if (stripPrefix('agenda', viewMode) && indent !== null) {
-      if (isUpcomingView()) {
-        // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-        return '.task_list_item[data-item-id="' + id + '"]' +
-          '[data-item-indent="' + stripIndentClass(indent) + '"]';
-      } else {
-        return '#' + id + '.' + indent;
-      }
-    } else if (viewMode === 'project') {
-      return '#' + id;
-    } else {
-      error('Unexpected viewMode:', viewMode);
-      return null;
-    }
+    return '.task_list_item[data-item-id="' + id + '"]' +
+      '[data-item-indent="' + stripIndentClass(indent) + '"]';
   }
 
   function isUpcomingView() {
