@@ -268,7 +268,7 @@
       debug('skipping todoist handler for "h" to workaround #134.', ev);
       return false;
     }
-    debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
+    // debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
     var result = true;
     if (originalHandlerReentered) {
       warn('Ignored re-entry of key handler. Weird!');
@@ -4229,7 +4229,7 @@
         return false;
       } else {
         try {
-          debug('Invoking action bound to', bind[0]);
+          // debug('Invoking action bound to', bind[0]);
           var result = bind[1].apply(null, arguments);
           // Default to stopping propagation.
           return result === true;
@@ -4295,7 +4295,6 @@
   }
 
   function genericKeyHandler(ev) {
-    debug('genericKeyHandler', ev);
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
     } else {
