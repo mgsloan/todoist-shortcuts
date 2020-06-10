@@ -3357,7 +3357,7 @@
       if (topBar) {
         return topBar.clientHeight;
       } else {
-        error ('No top bar to measure.');
+        error('No top bar to measure.');
         return 0;
       }
     }
@@ -3404,7 +3404,7 @@
         error(
           'Invariant violation: couldn\'t find', cursor, 'in', tasks,
           ', so aborting modifyCursorIndex');
-        return;
+        return false;
       }
       var newIndex = f(cursorIndex, tasks);
       if (newIndex < 0) {
@@ -4162,9 +4162,9 @@
     return getUniqueClass(document, 'upcoming_view') !== null;
   }
 
-  function disabledWithLazyLoading(action, f) {
+  function disabledWithLazyLoading(actionName, f) {
     if (isUpcomingView()) {
-      warn(action, ' disabled in upcoming view is disabled as it doesn\'t work properly due to lazy loading.');
+      warn(actionName, ' disabled in upcoming view is disabled as it doesn\'t work properly due to lazy loading.');
       return;
     } else {
       f();
