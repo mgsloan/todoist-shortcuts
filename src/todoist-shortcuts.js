@@ -868,7 +868,12 @@
   function openComments() { withUniqueClass(requireCursor(), 'note_icon', all, click); }
 
   // Open reminders dialog
-  function openReminders() { clickTaskMenu(requireCursor(), 'menu_item_reminders'); }
+  function openReminders() {
+    // TODO(#137): English only
+    withTaskMenu(requireCursor(), false, function(menu) {
+      withUniqueClass(menu, 'menu_item', matchingText('Reminders'), click);
+    });
+  }
 
   // Open assign dialog
   function openAssign() {
