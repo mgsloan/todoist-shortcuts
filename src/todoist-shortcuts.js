@@ -1251,12 +1251,28 @@
   var nextBulkScheduleKey = null;
 
   function bulkSchedule() {
+    bulkOperationsDisabled();
+    /*
     deselectAll();
     var cursor = requireCursor();
     inBulkScheduleMode = true;
     nextBulkScheduleKey = getTaskKey(cursor);
     updateKeymap();
     oneBulkSchedule(cursor);
+    */
+  }
+
+  // FIXME(#137)
+  function bulkOperationsDisabled() {
+    var link = element('a', null, text('#137'));
+    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/137';
+    link.style.color = '';
+    notifyUser(
+      span(null,
+        text('todoist-shortcuts bulk operations are disabled (hopefully temporarily). '),
+        text('For more info, see issue '),
+        link,
+        text('.')));
   }
 
   // TODO(new-scheduler): Exiting doesn't work immediately - visits an
@@ -1310,12 +1326,15 @@
   var nextBulkMoveKey = null;
 
   function bulkMove() {
+    bulkOperationsDisabled();
+    /*
     deselectAll();
     var cursor = requireCursor();
     inBulkMoveMode = true;
     nextBulkMoveKey = getTaskKey(cursor);
     updateKeymap();
     oneBulkMove();
+    */
   }
 
   // eslint-disable-next-line no-unused-vars
