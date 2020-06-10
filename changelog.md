@@ -1,5 +1,26 @@
 # todoist-shortcuts changelog
 
+## Version 85
+
+### Bug fixes ###
+
+* Lots of fixes to work with Todoist version 1006. See [#135][] and
+  [#136][]. The DOM changes that started in the Upcoming view haver
+  rolled out everywhere else.  Unfortunately, now most functionality
+  only works for the english version. This is hopefully temporary -
+  see [#137][].
+
+* One aspect of the workaround is that when there are no tasks
+  selected, and the operation modifies the task under the cursor, it
+  will become selected.  One happy consequence of this is that I
+  believe most functionality now works in the 'Upcoming' view [#110][].
+
+[#110]: https://github.com/mgsloan/todoist-shortcuts/issues/110
+[#135]: https://github.com/mgsloan/todoist-shortcuts/issues/135
+[#136]: https://github.com/mgsloan/todoist-shortcuts/issues/136
+[#137]: https://github.com/mgsloan/todoist-shortcuts/issues/137
+
+
 ## Version 84
 
 ### Bug fixes ###
