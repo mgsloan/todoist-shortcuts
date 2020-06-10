@@ -329,7 +329,7 @@
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
-  var WHAT_CURSOR_APPLIES_TO = 'all';
+  // var WHAT_CURSOR_APPLIES_TO = 'all';
 
   // 'navigate' (g) attempts to assign keys to items based on their names. In
   // some case there might not be a concise labeling. This sets the limit on key
@@ -350,17 +350,19 @@
   var SCHEDULER_INPUT_CLASS = 'scheduler-input';
 
   var MI_MOVE = 'menu_item_move';
-  var MI_ARCHIVE = 'menu_item_archive';
-  var MI_DUPLICATE = 'menu_item_duplicate';
-  var MI_DELETE_SEL = 'sel_delete_task';
+  // var MI_ARCHIVE = 'menu_item_archive';
+  // var MI_DUPLICATE = 'menu_item_duplicate';
+  // var MI_DELETE_SEL = 'sel_delete_task';
   var MI_ADD_ABOVE = 'menu_item_add_above';
   var MI_ADD_BELOW = 'menu_item_add_below';
   var MI_EDIT = 'menu_item_edit';
 
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
+  /*
   var TASKMENU_ITEMS =
     [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE_SEL, MI_EDIT];
+  */
 
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   var TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
@@ -520,6 +522,7 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
   function schedule() {
+    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
@@ -528,25 +531,30 @@
         bulkScheduleCursorChanged();
       }
     } else {
-      // TODO(#130): Don't use innerText to disambiguate.
-      withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), function(button) {
-        click(button);
-        blurSchedulerInput();
-      });
-    }
+    */
+    selectCursorIfNoneSelected();
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), function(button) {
+      click(button);
+      blurSchedulerInput();
+    });
+    // }
   }
 
   // Edits the task under the cursor and focuses the textual representation of
   // when the task is scheduled. Only works for the cursor, not for the
   // selection.
   function scheduleText() {
+    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-      // TODO(#130): Don't use innerText to disambiguate.
-      withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), click);
-    }
+    */
+    selectCursorIfNoneSelected();
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), click);
+    // }
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
@@ -617,6 +625,7 @@
   // 'all' or 'most', then instead applies to the cursor if there is no
   // selection.
   function moveToProject() {
+    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_MOVE, true);
@@ -624,9 +633,11 @@
         bulkMoveCursorChanged();
       }
     } else {
-      // TODO(#130): Don't use innerText to disambiguate.
-      withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Move to project'), click);
-    }
+    */
+    selectCursorIfNoneSelected();
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Move to project'), click);
+    // }
   }
 
   // Sets the priority of the selected tasks to the specified level. If
@@ -637,21 +648,24 @@
   // keybindings.
   function setPriority(level) {
     return function() {
+      /*
       var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         withTaskMenu(mutateCursor, false, function(menu) {
           clickPriorityMenu(menu, level);
         });
       } else {
-        withUniqueClass(document, 'multi_select_toolbar', all, function(toolbar) {
-          withUniqueTag(toolbar, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_flag.svg'), function(selecterSvg) {
-            click(selecterSvg.parentElement);
-          });
+      */
+      selectCursorIfNoneSelected();
+      withUniqueClass(document, 'multi_select_toolbar', all, function(toolbar) {
+        withUniqueTag(toolbar, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_flag.svg'), function(selecterSvg) {
+          click(selecterSvg.parentElement);
         });
-        withUniqueClass(document, 'dialog', all, function(menu) {
-          clickPriorityMenu(menu, level);
-        });
-      }
+      });
+      withUniqueClass(document, 'dialog', all, function(menu) {
+        clickPriorityMenu(menu, level);
+      });
+      // }
     };
   }
 
@@ -699,37 +713,43 @@
   // If WHAT_CURSOR_APPLIES_TO is 'all', then instead applies to the cursor if
   // there is no selection.
   function archive() {
+    /*
     var mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_ARCHIVE);
     } else {
-      var link = element('a', null, text('#132'));
-      link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/132';
-      link.style.color = '';
-      notifyUser(
-        span(null,
-          text('Todoist no longer has a button for archiving multiple tasks. '),
-          text('Consider completing or deleting them instead. '),
-          text('For more info, see todoist-shortcuts issue '),
-          link,
-          text('.')));
-    }
+    */
+    selectCursorIfNoneSelected();
+    var link = element('a', null, text('#132'));
+    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/132';
+    link.style.color = '';
+    notifyUser(
+      span(null,
+        text('Todoist no longer has a button for archiving multiple tasks. '),
+        text('Consider completing or deleting them instead. '),
+        text('For more info, see todoist-shortcuts issue '),
+        link,
+        text('.')));
+    // }
   }
 
   // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then
   // instead applies to the cursor if there is no selection.
   function done() {
+    /*
     var mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
     } else {
-      // For some reason, only one task can be marked once at a time. So, the
-      // timeout hack.  Means that the user will see intermediate UI updates,
-      // but hey, it works.
-      withSelectedTasks(function(task) {
-        setTimeout(function() { clickTaskDone(task); });
-      });
-    }
+    */
+    selectCursorIfNoneSelected();
+    // For some reason, only one task can be marked once at a time. So, the
+    // timeout hack.  Means that the user will see intermediate UI updates,
+    // but hey, it works.
+    withSelectedTasks(function(task) {
+      setTimeout(function() { clickTaskDone(task); });
+    });
+    // }
   }
 
   // Delete selected tasks. Todoist will prompt for deletion. Since todoist
@@ -737,23 +757,29 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the cursor if
   // there is no selection.
   function deleteTasks() {
+    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_DELETE_SEL);
     } else {
-      // TODO(#130): Don't use innerText to disambiguate.
-      withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Delete'), click);
-    }
+    */
+    selectCursorIfNoneSelected();
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Delete'), click);
+    // }
   }
 
   function duplicateTasks() {
+    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, MI_DUPLICATE);
     } else {
-      // TODO(#130): Don't use innerText to disambiguate.
-      withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Duplicate'), click);
-    }
+    */
+    selectCursorIfNoneSelected();
+    // TODO(#130): Don't use innerText to disambiguate.
+    withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Duplicate'), click);
+    // }
   }
 
   // Opens the label toggling menu.
@@ -1690,14 +1716,12 @@
     var taskEl = getTaskById(taskId, 'ignore-indent');
     if (taskEl) {
       setCursor(taskEl, 'scroll');
+    } else if (retriesLeft > 1) {
+      setTimeout(function() {
+        persistentlySelectAfterNavigate(taskId, retriesLeft - 1);
+      }, 10);
     } else {
-      if (retriesLeft > 1) {
-        setTimeout(function() {
-          persistentlySelectAfterNavigate(taskId, retriesLeft - 1);
-        }, 10);
-      } else {
-        warn('Giving up on finding task to select.');
-      }
+      warn('Giving up on finding task to select.');
     }
   }
 
@@ -1866,6 +1890,7 @@
 
   // Finds a menu element. These do not have any unique class or ID, so instead
   // need to do it by looking at text content of the options.
+  /*
   function findMenu(name, expectedItems, predicate0, expectedCount0) {
     var predicate = predicate0 ? predicate0 : all;
     var expectedCount = expectedCount0 ? expectedCount0 : 1;
@@ -1891,9 +1916,11 @@
       return null;
     }
   }
+  */
 
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
+  /*
   var taskMenu;
   var agendaTaskMenu;
 
@@ -1915,6 +1942,7 @@
       return agendaTaskMenu;
     }
   }
+  */
 
   function clickMenu(menu, cls) {
     withUniqueClass(menu, cls, all, function(container) {
@@ -2437,6 +2465,7 @@
     }
   }
 
+  /*
   var SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';
   var SHOULD_UNSAFE_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all';
 
@@ -2465,6 +2494,14 @@
       }
     }
     return null;
+  }
+  */
+
+  // TODO(#130: Once resolved, don't select tasks to mutate them.
+  function selectCursorIfNoneSelected() {
+    if (isEmptyMap(getSelectedTaskKeys())) {
+      selectTask(requireCursor());
+    }
   }
 
   function clickPriorityMenu(menu, level) {
@@ -2611,9 +2648,11 @@
     }
   }
 
+  /*
   function isItemClass(cls) {
     return cls.startsWith('item_');
   }
+  */
 
   function getIndentClass(task) {
     var indentClass = findUnique(isIndentClass, task.classList);
