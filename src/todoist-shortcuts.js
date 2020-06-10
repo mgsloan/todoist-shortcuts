@@ -943,21 +943,16 @@
     if (viewMode === 'project') {
       var dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
-        if ( matchingClass('date_future')(dateSpan) ||
-             matchingClass('date_overdue')(dateSpan) ) {
-          withId('top_filters', function(topFilters) {
-            withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|next_7_days'), function(nextSeven) {
-              // Set a variable that will be read by 'handlePageChange',
-              // which will tell it to select this task.
-              selectAfterNavigate = getTaskId(cursor);
-              click(nextSeven);
-            });
+        withId('top_filters', function(topFilters) {
+          withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|upcoming'), function(upcoming) {
+            // Set a variable that will be read by 'handlePageChange',
+            // which will tell it to select this task.
+            selectAfterNavigate = getTaskId(cursor);
+            click(upcoming);
           });
-        } else {
-          info('Not switching to "Next 7 days", because this task is not scheduled there.');
-        }
+        });
       } else {
-        info('Not switching to "Next 7 days", because this task is not scheduled.');
+        info('Not switching to "Upcoming", because this task is not scheduled.');
       }
     } else {
       var projectEl = null;
@@ -1670,6 +1665,11 @@
         var newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
         if (newEl) {
           setCursor(newEl, 'scroll');
+        } else if (isUpcomingView()) {
+          var taskId = selectAfterNavigate;
+          setTimeout(function() {
+            persistentlySelectAfterNavigate(taskId, 100);
+          }, 10);
         } else {
           warn('Couldn\'t find cursored task after switching to its project');
         }
@@ -1682,6 +1682,21 @@
         // how to implement this - I couldn't easily get a debugger
         // paused while the task is flashing yellow.
         setCursorToFirstTask('no-scroll');
+      }
+    }
+  }
+
+  function persistentlySelectAfterNavigate(taskId, retriesLeft) {
+    var taskEl = getTaskById(taskId, 'ignore-indent');
+    if (taskEl) {
+      setCursor(taskEl, 'scroll');
+    } else {
+      if (retriesLeft > 1) {
+        setTimeout(function() {
+          persistentlySelectAfterNavigate(taskId, retriesLeft - 1);
+        }, 10);
+      } else {
+        warn('Giving up on finding task to select.');
       }
     }
   }
