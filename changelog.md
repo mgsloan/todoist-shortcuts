@@ -1,5 +1,20 @@
 # todoist-shortcuts changelog
 
+## Version 88
+
+### Bug fixes ###
+
+* Fixes editing of tasks. See [#138][].
+
+* Fixes `o` + `shift+o` bindings for adding task before / after. See
+  [#139][] / [#137][].
+
+* Fixes `r` for opening reminders.
+
+[#138]: https://github.com/mgsloan/todoist-shortcuts/issues/138
+[#139]: https://github.com/mgsloan/todoist-shortcuts/issues/139
+
+
 ## Version 87
 
 ### Bug fixes ###
