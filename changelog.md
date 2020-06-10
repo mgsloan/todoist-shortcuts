@@ -1,5 +1,18 @@
 # todoist-shortcuts changelog
 
+## Version 87
+
+### Bug fixes ###
+
+* Binds `e` shortcut to task deletion, since the concept of task
+  archiving no longer exists in Todoist.  See [#132][].
+
+* Bulk reschedule / move now popup a dialog explaining why they are
+  disabled.
+
+[#132]: https://github.com/mgsloan/todoist-shortcuts/issues/132
+
+
 ## Version 86
 
 ### Bug fixes ###
