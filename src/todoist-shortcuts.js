@@ -1,15 +1,3 @@
-// ==UserScript==
-// @name        todoist-shortcuts
-// @namespace   http://mgsloan.com
-// @description Todoist keyboard shortcuts
-// @include     https://todoist.com/app*
-// @include     http://todoist.com/app*
-// @include     https://beta.todoist.com/app*
-// @include     http://beta.todoist.com/app*
-// @version     84
-// @grant       none
-// ==/UserScript==
-
 // See issue #11 for why ItemSelecter is used (it is added to the global scope
 // by Todoist).
 
