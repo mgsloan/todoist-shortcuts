@@ -76,7 +76,7 @@
     ['t', schedule],
     ['shift+t', scheduleText],
     ['d', done],
-    ['e', archive],
+    [['e', '#'], deleteTasks],
     ['#', deleteTasks],
     ['&', duplicateTasks],
     ['v', moveToProject],
@@ -691,34 +691,6 @@
         setSelections(selected);
       }
     };
-  }
-
-  // Archive selected tasks. This seems to be similar to marking a task
-  // complete.  The main variation in behavior between this and 'done' is that
-  // for nested tasks, 'done' keeps them in the list but checks them off. Note
-  // that this appears to be the same thing as marking a task complete.
-  //
-  // If WHAT_CURSOR_APPLIES_TO is 'all', then instead applies to the cursor if
-  // there is no selection.
-  function archive() {
-    /*
-    var mutateCursor = getCursorToMutate('dangerous');
-    if (mutateCursor) {
-      clickTaskMenu(mutateCursor, MI_ARCHIVE);
-    } else {
-    */
-    selectCursorIfNoneSelected();
-    var link = element('a', null, text('#132'));
-    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/132';
-    link.style.color = '';
-    notifyUser(
-      span(null,
-        text('Todoist no longer has a button for archiving multiple tasks. '),
-        text('Consider completing or deleting them instead. '),
-        text('For more info, see todoist-shortcuts issue '),
-        link,
-        text('.')));
-    // }
   }
 
   // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then

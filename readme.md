@@ -131,8 +131,7 @@ If none are selected, then these will apply to the cursor instead.
 | `t`        | schedule                          |
 | `T`        | schedule by editing text          |
 | `d`        | done: mark task as complete       |
-| `e`        | archive                           |
-| `#`        | delete                            |
+| `e` or `#` | delete                            |
 | `&`        | duplicate                         |
 | `v`        | move to project via search prompt |
 | `@` or `y` | open label dialog                 |
