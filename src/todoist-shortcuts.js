@@ -6,7 +6,7 @@
 (function() {
   'use strict';
 
-  var TODOIST_SHORTCUTS_VERSION = 86;
+  var TODOIST_SHORTCUTS_VERSION = 87;
 
   // Set this to true to get more log output.
   var DEBUG = false;
