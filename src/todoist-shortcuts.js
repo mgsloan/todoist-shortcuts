@@ -338,12 +338,6 @@
   var SCHEDULER_INPUT_CLASS = 'scheduler-input';
 
   var MI_MOVE = 'menu_item_move';
-  // var MI_ARCHIVE = 'menu_item_archive';
-  // var MI_DUPLICATE = 'menu_item_duplicate';
-  // var MI_DELETE_SEL = 'sel_delete_task';
-  var MI_ADD_ABOVE = 'menu_item_add_above';
-  var MI_ADD_BELOW = 'menu_item_add_below';
-  var MI_EDIT = 'menu_item_edit';
 
   // NOTE: These do not need to be exhaustive, they just need to be sufficient
   // to uniquely identify the menu. At least in their current usage.
@@ -867,8 +861,8 @@
   // Add a task above / below cursor. Unfortunately these options do not exist
   // in agenda mode, so in that case, instead it is added to the current
   // section.
-  function addAbove() { addAboveOrBelow(MI_ADD_ABOVE); }
-  function addBelow() { addAboveOrBelow(MI_ADD_BELOW); }
+  function addAbove() { addAboveOrBelow('Add task above'); }
+  function addBelow() { addAboveOrBelow('Add task below'); }
 
   // Open comments sidepane
   function openComments() { withUniqueClass(requireCursor(), 'note_icon', all, click); }
@@ -2399,12 +2393,15 @@
   }
 
   // Common code implementing addAbove / addBelow.
-  function addAboveOrBelow(menuCls) {
+  function addAboveOrBelow(menuText) {
     var cursor = getCursor();
     if (stripPrefix('agenda', viewMode) || cursor === null) {
       addToSectionContaining(cursor);
     } else if (viewMode === 'project') {
-      clickTaskMenu(cursor, menuCls, true);
+      // TODO(#137): Remove hacks that only work in english localization
+      withTaskMenu(cursor, true, function(menu) {
+        withUniqueClass(menu, 'menu_item', matchingText(menuText), click);
+      });
     } else {
       error('Unexpected viewMode:', viewMode);
     }
