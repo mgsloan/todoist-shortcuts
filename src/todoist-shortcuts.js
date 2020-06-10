@@ -1536,7 +1536,7 @@
     var tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
-        var task = getById(lastCursorId);
+        var task = getTaskById(lastCursorId, 'ignore-indent');
         if (task) {
           debug('found task that is probably the one that was previously being edited');
           found = true;
@@ -1549,7 +1549,7 @@
           var oldTask = lastCursorTasks[i];
           if (oldTask) {
             var oldTaskId = getTaskId(oldTask);
-            task = getById(oldTaskId);
+            task = getTaskById(oldTaskId, 'ignore-indent');
             if (task) {
               var taskSection = getSectionName(task);
               // Don't jump back to the same task if it moved changed section.

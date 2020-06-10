@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 86
+
+### Bug fixes ###
+
+* Fixes restoring cursor position after an operation.
+
+
 ## Version 85
 
 ### Bug fixes ###
