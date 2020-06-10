@@ -475,7 +475,19 @@
 
   // Edit the task under the cursor.
   function edit() {
-    clickTaskMenu(requireCursor(), MI_EDIT);
+    withUniqueClass(requireCursor(), 'task_content', all, function(content) {
+      var options = {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        button: 0,
+        which: 1,
+        altKey: true
+      };
+      content.dispatchEvent(new MouseEvent( 'mousedown', options));
+      content.dispatchEvent(new MouseEvent( 'mouseup', options));
+      content.dispatchEvent(new MouseEvent( 'click', options));
+    });
   }
 
   // Follow the first link of the task under the cursor.
