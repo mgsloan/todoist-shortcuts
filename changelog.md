@@ -6,6 +6,8 @@
 
 * Fixes `c` shortcut for opening comments. See [#140][]
 
+* Fixes `u` shortcut for undo.
+
 [#140]: https://github.com/mgsloan/todoist-shortcuts/issues/140
 
 
