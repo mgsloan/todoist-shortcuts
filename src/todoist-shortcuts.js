@@ -865,7 +865,7 @@
   function addBelow() { addAboveOrBelow('Add task below'); }
 
   // Open comments sidepane
-  function openComments() { withUniqueClass(requireCursor(), 'note_icon', all, click); }
+  function openComments() { withUniqueClass(requireCursor(), 'task_list_item__comments_button', all, click); }
 
   // Open reminders dialog
   function openReminders() {
