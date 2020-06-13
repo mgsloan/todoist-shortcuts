@@ -286,7 +286,7 @@
           (ev.code === 'Backspace' ||
            ev.code === 'Delete' ||
            ev.code === 'Enter')) {
-        withUniqueClass(scheduler, SCHEDULER_INPUT_CLASS, all, function(inputDiv) {
+        withUniqueClass(scheduler, 'scheduler-input', all, function(inputDiv) {
           withUniqueTag(inputDiv, 'input', all, function(inputEl) {
             if (ev.code !== 'Enter') {
               inputEl.value = '';
@@ -321,28 +321,6 @@
   // sequence length for things based on prefixes.
   var MAX_NAVIGATE_PREFIX = 2;
 
-  // Constants for various todoist ids, classes, and text. Non-exhaustive. TODO: make it exhaustive.
-  var TODOIST_ROOT_ID = 'todoist_app';
-  var AGENDA_VIEW_ID = 'agenda_view';
-  var MOVE_TO_PROJECT_ID = 'GB_window';
-  var BACKGROUND_ID = 'page_background';
-  var TASK_CONTENT_CLASS = ['content', 'task_list_item__body'];
-  var ARROW_CLASS = 'arrow';
-  var EXPANDED_ARROW_CLASS = 'down';
-  var COLLAPSED_ARROW_CLASS = 'right';
-  var SCHEDULER_CLASS = 'scheduler';
-  var SCHEDULER_ACTION_CLASS = 'scheduler_action';
-  var SCHEDULER_INPUT_CLASS = 'scheduler-input';
-
-  var MI_MOVE = 'menu_item_move';
-
-  // NOTE: These do not need to be exhaustive, they just need to be sufficient
-  // to uniquely identify the menu. At least in their current usage.
-  /*
-  var TASKMENU_ITEMS =
-    [MI_ARCHIVE, MI_DUPLICATE, MI_DELETE_SEL, MI_EDIT];
-  */
-
   var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   var TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
   var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
@@ -354,7 +332,7 @@
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
-  var todoistRootDiv = document.getElementById(TODOIST_ROOT_ID);
+  var todoistRootDiv = document.getElementById('todoist_app');
   if (!todoistRootDiv) return;
 
   // Set on initialization to mousetrap instance.
@@ -483,7 +461,7 @@
 
   // Follow the first link of the task under the cursor.
   function followLink() {
-    withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, function(content) {
+    withUniqueClass(requireCursor(), ['content', 'task_list_item__body'], all, function(content) {
       var link = getFirstTag(content, 'a');
       if (link) {
         if (IS_CHROME) {
@@ -764,7 +742,7 @@
 
   // Toggles collapse / expand of a task, if it has children.
   function toggleCollapse(task) {
-    withUniqueClass(task ? task : requireCursor(), ARROW_CLASS, all, click);
+    withUniqueClass(task ? task : requireCursor(), 'arrow', all, click);
   }
 
   // Collapse cursor. If it is already collapsed, select and collapse parent.
@@ -810,7 +788,7 @@
       if (task === cursor) {
         for (var j = i; j >= 0; j--) {
           task = tasks[j];
-          if (getUniqueClass(task, EXPANDED_ARROW_CLASS)) {
+          if (getUniqueClass(task, 'down')) {
             setCursor(task, 'scroll');
             toggleCollapse(task);
             break;
@@ -826,8 +804,8 @@
   }
 
   // Collapses or expands all tasks.
-  function collapseAll() { repeatedlyClickArrows(EXPANDED_ARROW_CLASS); }
-  function expandAll() { repeatedlyClickArrows(COLLAPSED_ARROW_CLASS); }
+  function collapseAll() { repeatedlyClickArrows('down'); }
+  function expandAll() { repeatedlyClickArrows('right'); }
 
   // Clears all selections.
   function deselectAll() { ItemSelecter.deselectAll(); }
@@ -884,7 +862,7 @@
 
   // Open the task view sidepane.
   function openTaskView() {
-    withUniqueClass(requireCursor(), TASK_CONTENT_CLASS, all, click);
+    withUniqueClass(requireCursor(), ['content', 'task_list_item__body'], all, click);
   }
 
   // Click somewhere on the page that shouldn't do anything in particular except
@@ -1352,7 +1330,7 @@
     }
     setCursor(curBulkMoveTask, 'scroll');
     bulkMoveCursorChanged();
-    clickTaskMenu(curBulkMoveTask, MI_MOVE, true);
+    // clickTaskMenu(curBulkMoveTask, MI_MOVE, true);
   }
 
   function bulkMoveCursorChanged() {
@@ -1633,7 +1611,7 @@
       predicate = or(or(or(or(
         matchingClass('section_overdue'),
         matchingClass('section_day')),
-      matchingId(AGENDA_VIEW_ID)),
+      matchingId('agenda_view')),
       // View all filter looks like agenda view, but really has
       // multiple project list editors.
       matchingClass('list_editor')),
@@ -1933,22 +1911,22 @@
       return agendaTaskMenu;
     }
   }
-  */
 
   function clickMenu(menu, cls) {
     withUniqueClass(menu, cls, all, function(container) {
       withUniqueClass(container, 'menu_label', all, click);
     });
   }
+  */
 
   // Returns true if the task has children and is collapsed.
   function checkTaskCollapsed(task) {
-    return getUniqueClass(task, COLLAPSED_ARROW_CLASS);
+    return getUniqueClass(task, 'right');
   }
 
   // Returns true if the task has children and is expanded.
   function checkTaskExpanded(task) {
-    return getUniqueClass(task, EXPANDED_ARROW_CLASS);
+    return getUniqueClass(task, 'down');
   }
 
   // Click elements within the content which match the specified class.
@@ -1972,11 +1950,13 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
+  /*
   function clickTaskMenu(task, cls, shouldScroll) {
     withTaskMenu(task, shouldScroll, function(menu) {
       clickMenu(menu, cls);
     });
   }
+  */
 
   function withTaskMenu(task, shouldScroll, f) {
     if (shouldScroll) {
@@ -1994,7 +1974,7 @@
   }
 
   function checkMoveToProjectOpen() {
-    return getById(MOVE_TO_PROJECT_ID) !== null;
+    return getById('GB_window') !== null;
   }
 
   function checkSchedulerOpen() {
@@ -2002,7 +1982,7 @@
   }
 
   function findScheduler() {
-    return getUniqueClass(document, SCHEDULER_CLASS);
+    return getUniqueClass(document, 'scheduler');
   }
 
   function withScheduler(name, f) {
@@ -2363,7 +2343,7 @@
   }
 
   function clickTaskSchedule(task) {
-    var schedulerAction = getUniqueClass(task, SCHEDULER_ACTION_CLASS);
+    var schedulerAction = getUniqueClass(task, 'scheduler_action');
     if (schedulerAction) {
       click(schedulerAction);
     } else {
@@ -2371,7 +2351,7 @@
         // For scheduled and unscheduled tasks, both of these elements
         // exist, but only one will cause the scheduler to open.
         withUniqueClass(dueDateControls, 'date', all, click);
-        withClass(dueDateControls, SCHEDULER_ACTION_CLASS, click);
+        withClass(dueDateControls, 'scheduler_action', click);
       });
     }
   }
@@ -2450,7 +2430,7 @@
     } else if (viewMode === 'agenda_no_reorder') {
       // Only one section in filter mode, and its header is directly under the
       // agenda_view div.
-      return getById(AGENDA_VIEW_ID);
+      return getById('agenda_view');
     } else if (viewMode === 'project') {
       return findParent(task, matchingClass('project_editor_instance'));
     } else {
@@ -3201,7 +3181,7 @@
                 if (curIndent < priorIndent) {
                   priorIndent = curIndent;
                   var arr = getUniqueClass(elAbove, 'arrow');
-                  if (arr && arr.classList.contains(COLLAPSED_ARROW_CLASS)) {
+                  if (arr && arr.classList.contains('right')) {
                     arrowsToClick.unshift(arr);
                   } else if (elAbove.style.display === 'none') {
                     warn('Expected to find collapsed task, but got', elAbove);
@@ -3227,7 +3207,7 @@
                     keepGoing = true;
                   }
                 // If the user selects a collapsed project, toggle folding.
-                } else if (arrow.classList.contains(COLLAPSED_ARROW_CLASS)) {
+                } else if (arrow.classList.contains('right')) {
                   click(arrow);
                   keepGoing = true;
                 }
@@ -3423,7 +3403,7 @@
   // This function detects which mode Todoist's view is in, since each behaves a
   // bit differently.
   function getViewMode() {
-    var agendaView = getById(AGENDA_VIEW_ID) || getUniqueClass(document, 'upcoming_view');
+    var agendaView = getById('agenda_view') || getUniqueClass(document, 'upcoming_view');
     if (agendaView === null) {
       return 'project';
     } else {
@@ -3957,7 +3937,7 @@
    */
 
   function updateBackgroundColor() {
-    withId(BACKGROUND_ID, function(background) {
+    withId('page_background', function(background) {
       try {
         var todoistBackgroundColor =
           background.computedStyleMap().get('background-color').toString();
