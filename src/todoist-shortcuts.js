@@ -11,9 +11,6 @@
   // Set this to true to get more log output.
   var DEBUG = false;
 
-  // TODO: remove this once feasible
-  var IS_BETA = window.location.host === 'beta.todoist.com';
-
   var IS_CHROME = /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
   // Cursor navigation.
@@ -4035,12 +4032,10 @@
     '  position: static;',
     '}',
     '',
-    IS_BETA ? '' : '@media (max-width: 750px) {',
-    '  body.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
-    '    left: 0;',
-    '    bottom: 0;',
-    '  }',
-    IS_BETA ? '' : '}',
+    'body.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
+    '  left: 0;',
+    '  bottom: 0;',
+    '}',
     '',
     // Based directly on Todoist's .notifier
     '.ts-note, .ts-modal {',
