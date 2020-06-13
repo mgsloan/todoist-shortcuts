@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 89
+
+### Bug fixes ###
+
+* Fixes `c` shortcut for opening comments. See [#140][]
+
+[#140]: https://github.com/mgsloan/todoist-shortcuts/issues/140
+
+
 ## Version 88
 
 ### Bug fixes ###
