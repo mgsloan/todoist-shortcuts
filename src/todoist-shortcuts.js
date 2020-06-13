@@ -1008,7 +1008,11 @@
     //
     // I believe this approach was superior because it worked even
     // after the todo link disappeared.
-    var undoLink = getById('undo_link');
+    var undoToast = getUniqueClass(document, "undo_toast")
+    var undoLink = null;
+    if (undoToast) {
+      undoLink = getUniqueTag(undoToast, 'button', not(matchingClass('hide_link')));
+    }
     if (undoLink) {
       click(undoLink);
     } else {
