@@ -3958,8 +3958,6 @@
     '  position: relative;',
     '}',
     '',
-    // TODO: I'd like to have these be to the left, but I think that would
-    // require absolute positioning or similar.  They get clipped by overflow.
     '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
     '  margin-top: 4px;',
