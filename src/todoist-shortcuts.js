@@ -3159,7 +3159,7 @@
               if (collapseParent && !matchingClass('collapse--entered')(collapseParent)) {
                 var collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
-                  withUniqueClass(collapseHeader, 'expansion_panel__toggle', click);
+                  withUniqueClass(collapseHeader, 'expansion_panel__toggle', all, click);
                 } else {
                   warn('Expected to find section collapse header, but did\'nt');
                 }
