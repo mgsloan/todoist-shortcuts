@@ -3133,6 +3133,10 @@
           withId('left_menu', function(leftMenu) {
             leftMenu.scrollBy(0, 40);
           });
+        } else if (ev.keyCode === 8) {
+          // Backspace removes keys from list of pressed keys.
+          navigateKeysPressed = navigateKeysPressed.slice(0, -1);
+          keepGoing = rerenderTips();
         } else {
           var char = ev.key.toLowerCase();
           if (char.length === 1 && lowercaseCharIsAlphanum(char)) {

@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 90 (unreleased)
+
+### Enhancements ###
+
+* In navigate mode (`g`), backspace now deletes the last typed
+  character, instead of exiting navigate mode.
+
+
 ## Version 89
 
 ### Bug fixes ###
