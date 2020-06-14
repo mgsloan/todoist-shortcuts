@@ -6,3 +6,4 @@ node_modules
 todoist-shortcuts.zip
 etc/secrets.json
 etc/notes.md
+/package-lock.json
