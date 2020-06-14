@@ -332,7 +332,7 @@
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
   var todoistRootDiv = document.getElementById('todoist_app');
-  if (!todoistRootDiv) throw 'no div with id "todoist_app"';
+  if (!todoistRootDiv) throw new Error('no div with id "todoist_app"');
 
   // Set on initialization to mousetrap instance.
   var mousetrap = null;
@@ -1846,14 +1846,9 @@
     withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('More'), click);
     var result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
     if (!result) {
-      throw new MoreMenuMissing();
+      throw new Error('Failed to find "More" menu');
     }
     return result;
-  }
-
-  // Exception thrown by openMoreMenu.
-  function MoreMenuMissing() {
-    this.message = 'Failed to find "More" menu';
   }
 
   // Finds a menu element. These do not have any unique class or ID, so instead
@@ -3862,8 +3857,7 @@
     return function(x) {
       var bool = predicate(x);
       if (typeof bool !== 'boolean') {
-        // TODO: perhaps an exception would be better.
-        error('In ' + context + ', expected boolean result from predicate. Instead got', bool);
+        throw new Error('In ' + context + ', expected boolean result from predicate. Instead got', bool);
       }
       return bool;
     };
