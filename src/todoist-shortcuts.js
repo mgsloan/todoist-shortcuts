@@ -2878,7 +2878,7 @@
         } else {
           var tip = div(TODOIST_SHORTCUTS_TIP, text(rest));
           if (prefix.length > 0) {
-            tip.prepend(div(TODOIST_SHORTCUTS_TIP_TYPED, text(prefix)));
+            tip.prepend(span(TODOIST_SHORTCUTS_TIP_TYPED, text(prefix)));
           }
           el.prepend(tip);
           renderedAny = true;
@@ -3972,7 +3972,6 @@
     '}',
     '',
     '.' + TODOIST_SHORTCUTS_TIP_TYPED + ' {',
-    '  display: inline;',
     '  color: #aaa;',
     '}',
     '',
