@@ -1,11 +1,10 @@
+'use strict';
+
 // See issue #11 for why ItemSelecter is used (it is added to the global scope
 // by Todoist).
-
 /* global ItemSelecter, svgs */
 
-(function() {
-  'use strict';
-
+{
   var TODOIST_SHORTCUTS_VERSION = 89;
 
   // Set this to true to get more log output.
@@ -333,7 +332,7 @@
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
   var todoistRootDiv = document.getElementById('todoist_app');
-  if (!todoistRootDiv) return;
+  if (!todoistRootDiv) throw 'no div with id "todoist_app"';
 
   // Set on initialization to mousetrap instance.
   var mousetrap = null;
@@ -4396,4 +4395,4 @@
   }
 
   initializeWhenContentAppears();
-})();
+}
