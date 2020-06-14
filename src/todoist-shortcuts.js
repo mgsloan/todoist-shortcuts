@@ -178,6 +178,16 @@
   ];
   var TASK_VIEW_KEYMAP = 'task_view';
 
+  // Keycode constants
+  var LEFT_ARROW_KEYCODE = 37;
+  var UP_ARROW_KEYCODE = 38;
+  var RIGHT_ARROW_KEYCODE = 39;
+  var DOWN_ARROW_KEYCODE = 40;
+  var BACKSPACE_KEYCODE = 8;
+  var DELETE_KEYCODE = 46;
+  var ENTER_KEYCODE = 13;
+  var ESCAPE_KEYCODE = 27;
+
   function smartSchedulerUpdate() {
     withUniqueClass(document, 'SmartSchedule', all, function(smartScheduler) {
       withUniqueClass(smartScheduler, 'submit_btn', all, click);
@@ -185,7 +195,7 @@
   }
 
   function handleBulkMoveKey(ev) {
-    if (ev.keyCode === 27 && ev.type === 'keydown') {
+    if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
       exitBulkMove();
       closeContextMenus();
     } else if (ev.altKey && !ev.ctrlKey && !ev.metaKey) {
@@ -195,16 +205,16 @@
           exitBulkMove();
           bulkSchedule();
           return false;
-        } else if (ev.key === 'j' || ev.keyCode === 40) {
+        } else if (ev.key === 'j' || ev.keyCode === DOWN_ARROW_KEYCODE) {
           // alt-j or alt-down -> move cursor down
           return wrapBulkMoveCursorChange(cursorDown);
-        } else if (ev.key === 'k' || ev.keyCode === 38) {
+        } else if (ev.key === 'k' || ev.keyCode === UP_ARROW_KEYCODE) {
           // alt-k or alt-up-> move cursor up
           return wrapBulkMoveCursorChange(cursorUp);
-        } else if (ev.key === 'h' || ev.keyCode === 37) {
+        } else if (ev.key === 'h' || ev.keyCode === LEFT_ARROW_KEYCODE) {
           // alt-h or alt-left-> move cursor left
           return wrapBulkMoveCursorChange(cursorLeft);
-        } else if (ev.key === 'h' || ev.keyCode === 39) {
+        } else if (ev.key === 'h' || ev.keyCode === RIGHT_ARROW_KEYCODE) {
           // alt-l or alt-right -> move cursor right
           return wrapBulkMoveCursorChange(cursorRight);
         }
@@ -282,12 +292,12 @@
       // The idea here is that backspace or delete will clear and
       // focus the date entry box. Enter will just focus it.
       if (ev.type === 'keydown' &&
-          (ev.code === 'Backspace' ||
-           ev.code === 'Delete' ||
-           ev.code === 'Enter')) {
+          (ev.keyCode === BACKSPACE_KEYCODE ||
+           ev.keyCode === DELETE_KEYCODE ||
+           ev.keyCode === ENTER_KEYCODE)) {
         withUniqueClass(scheduler, 'scheduler-input', all, function(inputDiv) {
           withUniqueTag(inputDiv, 'input', all, function(inputEl) {
-            if (ev.code !== 'Enter') {
+            if (ev.keyCode !== ENTER_KEYCODE) {
               inputEl.value = '';
             }
             inputEl.focus();
@@ -3121,19 +3131,19 @@
               leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
             }
           });
-        } else if (ev.keyCode === 38) {
+        } else if (ev.keyCode === UP_ARROW_KEYCODE) {
           // Up arrow to scroll up a little bit.
           keepGoing = true;
           withId('left_menu', function(leftMenu) {
             leftMenu.scrollBy(0, -40);
           });
-        } else if (ev.keyCode === 40) {
+        } else if (ev.keyCode === DOWN_ARROW_KEYCODE) {
           // Down arrow to scroll down a little bit.
           keepGoing = true;
           withId('left_menu', function(leftMenu) {
             leftMenu.scrollBy(0, 40);
           });
-        } else if (ev.keyCode === 8) {
+        } else if (ev.keyCode === BACKSPACE_KEYCODE) {
           // Backspace removes keys from list of pressed keys.
           navigateKeysPressed = navigateKeysPressed.slice(0, -1);
           keepGoing = rerenderTips();
@@ -4266,7 +4276,7 @@
         }
       });
       if (cancelButton && acceptButton) {
-        if (ev.key === 'Escape' || ev.key === 'Esc') {
+        if (ev.keyCode === ESCAPE_KEYCODE) {
           if (ev.type === 'keydown') {
             sawEscapeDown = true;
             return false;
@@ -4274,7 +4284,7 @@
             click(cancelButton);
             return false;
           }
-        } else if (ev.key === 'Enter') {
+        } else if (ev.keyCode === ENTER_KEYCODE) {
           if (ev.type === 'keyup') {
             click(acceptButton);
             return false;
@@ -4297,7 +4307,7 @@
     if (inBulkMoveMode) {
       return handleBulkMoveKey(ev);
     }
-    if (ev.keyCode === 27 && ev.type === 'keydown') {
+    if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
       closeContextMenus();
     }
     if (deferLastKeyDownEnabled) {
