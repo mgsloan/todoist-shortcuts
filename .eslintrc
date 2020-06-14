@@ -6,5 +6,6 @@
     "spaced-comment": "off",
     "guard-for-in": "off",
     "no-else-return": "off",
+    "no-lone-blocks": "off",
   }
 }
