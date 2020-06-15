@@ -3116,16 +3116,14 @@
   }
 
   function handleNavigateKey(ev) {
-    var keepGoing = false;
     if (keyIsModifier(ev)) {
       return;
     }
     if (ev.type === 'keydown') {
+      var keepGoing = false;
       try {
         // Space to scroll down.  Shift+space to scroll up.
-        if (ev.key === 'Shift') {
-          keepGoing = true;
-        } else if (ev.key === ' ') {
+        if (ev.key === ' ') {
           keepGoing = true;
           withId('left_menu', function(leftMenu) {
             if (ev.shiftKey) {
