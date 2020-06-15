@@ -3117,6 +3117,9 @@
 
   function handleNavigateKey(ev) {
     var keepGoing = false;
+    if (keyIsModifier(ev)) {
+      return;
+    }
     if (ev.type === 'keydown') {
       try {
         // Space to scroll down.  Shift+space to scroll up.
@@ -3248,6 +3251,13 @@
         }
       }
     }
+  }
+
+  function keyIsModifier(ev) {
+    return (ev.key === 'Shift') ||
+      (ev.key === 'Meta') ||
+      (ev.key === 'Control') ||
+      (ev.key === 'Alt');
   }
 
   // Remove old tips if any still exist.
