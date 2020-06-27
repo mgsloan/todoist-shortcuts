@@ -1729,13 +1729,13 @@
         if (mutation.addedNodes.length === 0 &&
             mutation.removedNodes.length === 1 &&
             mutation.removedNodes[0].classList &&
-            mutation.removedNodes[0].classList.contains('drag_and_drop_handler')) {
+            mutation.removedNodes[0].classList.contains('item_dnd_handle')) {
           return false;
         }
         if (mutation.addedNodes.length === 1 &&
             mutation.removedNodes.length === 0 &&
             mutation.addedNodes[0].classList &&
-            mutation.addedNodes[0].classList.contains('drag_and_drop_handler')) {
+            mutation.addedNodes[0].classList.contains('item_dnd_handle')) {
           return false;
         }
         return true;
@@ -2274,7 +2274,7 @@
     var key = getTaskKey(task);
     task.dispatchEvent(new Event('mouseover'));
     try {
-      var handler = getUniqueClass(task, 'drag_and_drop_handler');
+      var handler = getUniqueClass(task, 'item_dnd_handle');
       if (handler) {
         var handlerOffset = offset(handler);
         var x = handlerOffset.x + handler.offsetWidth / 2 - window.scrollX - 3;
@@ -2284,7 +2284,7 @@
         // FIXME: Sometimes this triggers, particularly when move up / move
         // down key is held down with repeat.  Tried some hacks to resolve,
         // but nothing seems to work well.
-        info('Couldn\'t find drag_and_drop_handler.');
+        info('Couldn\'t find item_dnd_handle.');
         finished();
       }
     } finally {
@@ -4200,18 +4200,6 @@
       '}',
       selecter + ' .sel_checkbox_td {',
       '  padding-left: 2px;',
-      '}',
-      selecter + ' .drag_and_drop_handler {',
-      '  margin-left: -21px;',
-      '}',
-      // TODO: There seems to be a todoist typo in the class name
-      // here, so including a non-typoed one in case they fix this
-      // (margin vs marigin).
-      selecter + ' .drag_and_drop_handler.extra_arrow_marigin, ' + selecter + ' .drag_and_drop_handler.extra_arrow_margin {',
-      '  margin-left: -37px;',
-      '}',
-      selecter + ' .arrow {',
-      '  margin-left: -25px;',
       '}'
     ].join('\n');
   }

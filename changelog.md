@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 91 (unreleased)
+
+### Bug fixes ###
+
+* Fixes task movement (mostly - there are still rough edges). See
+  [#141][].
+
+[#141]: https://github.com/mgsloan/todoist-shortcuts/issues/141
+
+
 ## Version 90
 
 ### Bug fixes ###
