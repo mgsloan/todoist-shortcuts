@@ -3419,6 +3419,7 @@
         error(
           'Invariant violation: couldn\'t find', cursor, 'in', tasks,
           ', so aborting modifyCursorIndex');
+        cursorFirst();
         return false;
       }
       var newIndex = f(cursorIndex, tasks);
