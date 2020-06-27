@@ -58,8 +58,8 @@
 
     // Selection
     ['x', toggleSelect],
-    ['* a', selectAll],
-    ['* n', deselectAll],
+    ['* a', selectAllTasks],
+    ['* n', deselectAllTasks],
     ['* o', selectAllOverdue],
     ['* 1', selectPriority('1')],
     ['* 2', selectPriority('2')],
@@ -73,7 +73,6 @@
     ['shift+t', scheduleText],
     ['d', done],
     [['e', '#'], deleteTasks],
-    ['#', deleteTasks],
     ['&', duplicateTasks],
     ['v', moveToProject],
     [['y', '@'], openLabelMenu],
@@ -115,8 +114,10 @@
   var SCHEDULE_CURSOR_BINDINGS = [];
   for (var cix = 0; cix < CURSOR_BINDINGS.length; cix++) {
     var binding = CURSOR_BINDINGS[cix];
-    var action = sequence([closeContextMenus, binding[1], schedule]);
-    SCHEDULE_CURSOR_BINDINGS.push([binding[0], action]);
+    SCHEDULE_CURSOR_BINDINGS.push([
+      binding[0],
+      sequence([closeContextMenus, binding[1], schedule])
+    ]);
   }
 
   // Scheduling keybindings (used when scheduler is open)
@@ -172,8 +173,7 @@
     ['3', taskViewSetPriority('3')],
     [['4', '0'], taskViewSetPriority('4')],
     ['shift+r', taskViewOpenReminders],
-    ['e', taskViewArchive],
-    ['#', taskViewDelete],
+    [['e', '#'], taskViewDelete],
     ['shift+c', taskViewToggleTimer]
   ];
   var TASK_VIEW_KEYMAP = 'task_view';
@@ -511,8 +511,9 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), function(button) {
+    var predicate = or(matchingText('Schedule'),
+      matchingAction('multi-select-toolbar-scheduler'));
+    withUniqueTag(document, 'button', predicate, function(button) {
       click(button);
       blurSchedulerInput();
     });
@@ -530,8 +531,9 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Schedule'), click);
+    var predicate = or(matchingText('Schedule'),
+      matchingAction('multi-select-toolbar-scheduler'));
+    withUniqueTag(document, 'button', predicate, click);
     // }
   }
 
@@ -613,8 +615,9 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Move to project'), click);
+    var predicate = or(matchingText('Move to project'),
+      matchingAction('multi-select-toolbar-project-picker'));
+    withUniqueTag(document, 'button', predicate, click);
     // }
   }
 
@@ -640,7 +643,7 @@
           click(selecterSvg.parentElement);
         });
       });
-      withUniqueClass(document, 'dialog', all, function(menu) {
+      withUniqueClass(document, 'priority_picker', all, function(menu) {
         clickPriorityMenu(menu, level);
       });
       // }
@@ -654,19 +657,7 @@
   // keybindings.
   function selectPriority(level) {
     return function() {
-      var actualLevel = '';
-      // Yup, todoist has mixed up conventions for priority number...
-      if (level === '1') {
-        actualLevel = '4';
-      } else if (level === '2') {
-        actualLevel = '3';
-      } else if (level === '3') {
-        actualLevel = '2';
-      } else if (level === '4') {
-        actualLevel = '1';
-      } else {
-        error('Unrecognized level in selectPriority', level);
-      }
+      var actualLevel = invertPriorityLevel(level);
       var allTasks = getTasks('include-collapsed');
       var selected = getSelectedTaskKeys();
       var modified = false;
@@ -714,8 +705,9 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Delete'), click);
+    var predicate = or(matchingText('Delete'),
+      matchingAction('multi-select-toolbar-overflow-menu-delete'));
+    withUniqueClass(openMoreMenu(), 'menu_item', predicate, click);
     // }
   }
 
@@ -727,8 +719,9 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(openMoreMenu(), 'icon_menu_item__content', matchingText('Duplicate'), click);
+    var predicate = or(matchingText('Duplicate'),
+      matchingAction('multi-select-toolbar-overflow-menu-duplicate'));
+    withUniqueClass(openMoreMenu(), 'menu_item', predicate, click);
     // }
   }
 
@@ -737,8 +730,9 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('Labels'), click);
+    var predicate = or(matchingText('Labels'),
+      matchingAction('multi-select-toolbar-label-picker'));
+    withUniqueTag(document, 'button', predicate, click);
   }
 
   var TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
@@ -817,10 +811,10 @@
   function expandAll() { repeatedlyClickArrows('right'); }
 
   // Clears all selections.
-  function deselectAll() { ItemSelecter.deselectAll(); }
+  function deselectAllTasks() { ItemSelecter.deselectAll(); }
 
   // Selects all tasks, even those hidden by collapsing.
-  function selectAll() {
+  function selectAllTasks() {
     var allTasks = getTasks('include-collapsed');
     for (var i = 0; i < allTasks.length; i++) {
       selectTask(allTasks[i]);
@@ -845,17 +839,18 @@
   // Add a task above / below cursor. Unfortunately these options do not exist
   // in agenda mode, so in that case, instead it is added to the current
   // section.
-  function addAbove() { addAboveOrBelow('Add task above'); }
-  function addBelow() { addAboveOrBelow('Add task below'); }
+  function addAbove() { addAboveOrBelow('Add task above', 'task-overflow-menu-add-above'); }
+  function addBelow() { addAboveOrBelow('Add task below', 'task-overflow-menu-add-below'); }
 
   // Open comments sidepane
   function openComments() { withUniqueClass(requireCursor(), 'task_list_item__comments_button', all, click); }
 
   // Open reminders dialog
   function openReminders() {
-    // TODO(#137): English only
     withTaskMenu(requireCursor(), false, function(menu) {
-      withUniqueClass(menu, 'menu_item', matchingText('Reminders'), click);
+      var predicate = or(matchingText('Reminders'),
+        matchingAction('task-overflow-menu-reminders'));
+      withUniqueClass(menu, 'menu_item', predicate, click);
     });
   }
 
@@ -1138,24 +1133,31 @@
 
   function taskViewMoveToProject() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
-      withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Select a project'), click);
+      var predicate = or(matchingAttr('aria-label', 'Select a project'),
+        matchingAction('task-actions-move-to-project'));
+      withUniqueClass(sidePanel, 'item_action', predicate, click);
     });
   }
 
   function taskViewLabel() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
-      withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Add label(s)'), click);
+      var predicate = or(matchingAttr('aria-label', 'Add label(s)'),
+        matchingAction('task-actions-add-labels'));
+      withUniqueClass(sidePanel, 'item_action', predicate, click);
     });
   }
 
   function taskViewSetPriority(level) {
     return function() {
       withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
+        var actualLevel = invertPriorityLevel(level);
         if (!getUniqueClass(document, 'priority_picker')) {
-          withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Set the priority'), click);
+          withUnique(sidePanel,
+            '[aria-label="Set the priority"] > span, [data-action-hint="task-actions-priority-picker"]',
+            click);
         }
         withUniqueClass(document, 'priority_picker', all, function(picker) {
-          withUniqueTag(picker, 'li', matchingAttr('aria-label', level), click);
+          withUnique(picker, '[aria-label="' + actualLevel + '"], [data-action-hint="task-actions-priority-' + actualLevel + '"]', click);
         });
       });
     };
@@ -1163,19 +1165,17 @@
 
   function taskViewOpenReminders() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
-      withUniqueClass(sidePanel, 'item_action', matchingAttr('aria-label', 'Add reminder(s)'), click);
-    });
-  }
-
-  function taskViewArchive() {
-    withTaskViewMoreMenu(function(menu) {
-      withUniqueTag(menu, 'li', matchingText('Archive task'), click);
+      var predicate = or(matchingAttr('aria-label', 'Add reminder(s)'),
+        matchingAction('task-actions-reminders'));
+      withUniqueClass(sidePanel, 'item_action', predicate, click);
     });
   }
 
   function taskViewDelete() {
     withTaskViewMoreMenu(function(menu) {
-      withUniqueTag(menu, 'li', matchingText('Delete task'), click);
+      var predicate = or(matchingText('Delete task'),
+        matchingAction('task-actions-overflow-menu-delete'));
+      withUniqueTag(menu, 'li', predicate, click);
     });
   }
 
@@ -1187,10 +1187,12 @@
 
   function withTaskViewMoreMenu(f) {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
-      if (!getUniqueClass(document, 'ul', matchingAttr('aria-label', 'task edit menu'))) {
+      var predicate = or(matchingAttr('aria-label', 'task edit menu'),
+        matchingAction('task-actions-overflow-menu'));
+      if (!getUniqueClass(document, 'ul', predicate)) {
         withUniqueClass(sidePanel, 'item_actions_more', all, click);
       }
-      withUniqueTag(document, 'ul', matchingAttr('aria-label', 'task edit menu'), f);
+      withUniqueTag(document, 'ul', predicate, f);
     });
   }
 
@@ -1852,8 +1854,9 @@
   }
 
   function openMoreMenu() {
-    // TODO(#130): Don't use innerText to disambiguate.
-    withUniqueClass(document, 'multi_select_toolbar__btn_text', matchingText('More'), click);
+    var predicate = or(matchingText('More'),
+      matchingAction('multi-select-toolbar-overflow-menu-trigger'));
+    withUniqueTag(document, 'button', predicate, click);
     var result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
     if (!result) {
       throw new Error('Failed to find "More" menu');
@@ -2383,14 +2386,15 @@
   }
 
   // Common code implementing addAbove / addBelow.
-  function addAboveOrBelow(menuText) {
+  function addAboveOrBelow(menuText, action) {
     var cursor = getCursor();
     if (stripPrefix('agenda', viewMode) || cursor === null) {
       addToSectionContaining(cursor);
     } else if (viewMode === 'project') {
-      // TODO(#137): Remove hacks that only work in english localization
       withTaskMenu(cursor, true, function(menu) {
-        withUniqueClass(menu, 'menu_item', matchingText(menuText), click);
+        var predicate = or(matchingText(menuText),
+          matchingAction(action));
+        withUniqueClass(menu, 'menu_item', predicate, click);
       });
     } else {
       error('Unexpected viewMode:', viewMode);
@@ -2475,7 +2479,7 @@
   }
   */
 
-  // TODO(#130: Once resolved, don't select tasks to mutate them.
+  // TODO(#130): Once resolved, don't select tasks to mutate them.
   function selectCursorIfNoneSelected() {
     if (isEmptyMap(getSelectedTaskKeys())) {
       selectTask(requireCursor());
@@ -2680,6 +2684,22 @@
 
   function stripPriorityClass(cls) {
     return stripPrefix('priority_', cls);
+  }
+
+  // Yup, todoist has mixed up conventions for priority number...
+  function invertPriorityLevel(level) {
+    switch (level) {
+    case '4':
+      return '1';
+    case '3':
+      return '2';
+    case '2':
+      return '3';
+    case '1':
+      return '4';
+    default:
+      throw new Error('Unexpected level');
+    }
   }
 
   function withTaskByKey(key, f) {
@@ -3498,7 +3518,7 @@
     args.push(getStack());
     args.push('Please report this as an issue to http://github.com/mgsloan/todoist-shortcuts');
     // eslint-disable-next-line no-console
-    console.error.apply(null, arguments);
+    console.error.apply(null, args);
   }
 
   // https://stackoverflow.com/a/41586311/1164871
@@ -3539,6 +3559,43 @@
   // Alias for document.getElementById
   function getById(id) {
     return document.getElementById(id);
+  }
+
+  // Alias for querySelectorAll.
+  function selectAll(parent, query) {
+    if (!query) {
+      // eslint-disable-next-line no-param-reassign
+      query = parent;
+      // eslint-disable-next-line no-param-reassign
+      parent = document;
+    }
+    return parent.querySelectorAll(query);
+  }
+
+  // Uses querySelectorAll, but requires a unique result.
+  function selectUnique(parent, query) {
+    return findUnique(all, selectAll(parent, query));
+  }
+
+  // Users querySelectorAll, requires unique result, and applies the
+  // user's function to it.  Logs a warning if there isn't one.
+  function withUnique(parent, query, f) {
+    var result = selectUnique(parent, query);
+    if (result) {
+      return f(result);
+    } else {
+      warn('Couldn\'t find unique descendant matching query', query, ', instead got', result);
+      return null;
+    }
+  }
+
+  // Uses querySelectorAll, and applies the provided function to each result.
+  // eslint-disable-next-line no-unused-vars
+  function withQuery(parent, query, f) {
+    var els = selectAll(parent, query);
+    for (var i = 0; i < els.length; i++) {
+      f(els[i]);
+    }
   }
 
   // Invokes the function for the matching id, or logs a warning.
@@ -3781,6 +3838,15 @@
     return function(el) {
       return el.textContent === txt;
     };
+  }
+
+  // TODO: Switch to more efficient queries once these disambiguation
+  // attributes are available from todoist.com (and not just
+  // beta.todoist.com). See #137
+  //
+  // Also reinstate getCursorToMutate
+  function matchingAction(action) {
+    return matchingAttr('data-action-hint', action);
   }
 
   // Returns predicate which returns 'true' if the element has the specified class.
