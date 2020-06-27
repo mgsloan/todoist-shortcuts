@@ -11,6 +11,9 @@
 * Cursor movement now skips over collapsed tasks. See [comment on
   #137][].
 
+* Fixes a bug where `shift+enter` on a task with no link would open a
+  new Todoist tab.
+
 ### Enhancements ###
 
 * In navigate mode (`g`), backspace now deletes the last typed

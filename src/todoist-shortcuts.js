@@ -470,7 +470,7 @@
 
   // Follow the first link of the task under the cursor.
   function followLink() {
-    withUniqueClass(requireCursor(), ['content', 'task_list_item__body'], all, function(content) {
+    withUniqueClass(requireCursor(), ['content', 'task_content'], all, function(content) {
       var link = getFirstTag(content, 'a');
       if (link) {
         if (IS_CHROME) {
