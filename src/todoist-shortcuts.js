@@ -2564,6 +2564,11 @@
     return results;
   }
 
+  // Predicate, returns 'true' if the task has a 'hidden' attribute.
+  function hidden(el) {
+    return matchingAttr('hidden', '')(el);
+  }
+
   // This applies the function to every selected task.
   function withSelectedTasks(f) {
     var tasks = getTasks('include-collapsed');
@@ -3903,11 +3908,6 @@
         return false;
       }
     };
-  }
-
-  // Predicate, returns 'true' if the element is hidden with 'display: none'.
-  function hidden(el) {
-    return el.style.display === 'none';
   }
 
   // Inverts the result of a predicate.

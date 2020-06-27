@@ -8,12 +8,16 @@
   beta.todoist.com, but soon on todoist.com. This was made possible by
   changes made by helpful engineers at Doist! See [#137][].
 
+* Cursor movement now skips over collapsed tasks. See [comment on
+  #137][].
+
 ### Enhancements ###
 
 * In navigate mode (`g`), backspace now deletes the last typed
   character, instead of exiting navigate mode.
 
 [#137]: https://github.com/mgsloan/todoist-shortcuts/issues/137
+[comment on #137]: https://github.com/mgsloan/todoist-shortcuts/issues/137#issuecomment-641874431
 
 
 ## Version 89
