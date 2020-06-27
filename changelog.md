@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 90 (unreleased)
+## Version 90
 
 ### Bug fixes ###
 
