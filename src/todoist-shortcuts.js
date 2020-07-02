@@ -5,7 +5,7 @@
 /* global ItemSelecter, svgs */
 
 {
-  var TODOIST_SHORTCUTS_VERSION = 90;
+  var TODOIST_SHORTCUTS_VERSION = 91;
 
   // Set this to true to get more log output.
   var DEBUG = false;
