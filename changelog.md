@@ -7,7 +7,10 @@
 * Fixes task movement (mostly - there are still rough edges). See
   [#141][].
 
+* Fixes `y` / `@` label picker shortcut.  See [#143][]
+
 [#141]: https://github.com/mgsloan/todoist-shortcuts/issues/141
+[#143]: https://github.com/mgsloan/todoist-shortcuts/issues/143
 
 
 ## Version 90
