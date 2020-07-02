@@ -732,7 +732,9 @@
     }
     var predicate = or(matchingText('Labels'),
       matchingAction('multi-select-toolbar-label-picker'));
-    withUniqueTag(document, 'button', predicate, click);
+    withUniqueClass(document, 'multi_select_toolbar', all, function(toolbar) {
+      withUniqueTag(toolbar, 'button', predicate, click);
+    });
   }
 
   var TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
