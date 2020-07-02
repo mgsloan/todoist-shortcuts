@@ -1592,16 +1592,13 @@
     var section = getSection(task);
     var result = null;
     if (section) {
-      var header = getUniqueClass(section, 'section_header');
-      if (!header) {
-        header = getUniqueClass(section, 'subsection_header');
-      }
-      if (!header) {
-        header = getUniqueClass(section, 'view_header');
-      }
-      // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-      if (!header) {
-        header = getUniqueTag(section, 'header');
+      var outerHeader = getUniqueTag(section, 'header');
+      var header = null;
+      if (outerHeader) {
+        header = getUniqueTag(outerHeader, 'h1');
+        if (!header) {
+          header = getUniqueTag(outerHeader, 'h2');
+        }
       }
       if (header) {
         result = header.textContent;
@@ -1620,26 +1617,24 @@
   function getSection(task) {
     var predicate;
     if (stripPrefix('agenda', viewMode)) {
-      // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
       predicate = or(
-        matchingClass('section_overdue'),
-        matchingClass('section_day'),
-        matchingId('agenda_view'),
-        // View all filter looks like agenda view, but really has
-        // multiple project list editors.
-        matchingClass('list_editor'),
-        matchingClass('section'));
+        // overdue / today / upcoming / filters
+        matchingClass('section'),
+        // oddly enough, used for labels right now and nothing else.
+        matchingId('agenda_view')
+      );
     } else if (viewMode === 'project') {
-      predicate = matchingClass('list_editor');
+      predicate = or(matchingClass('list_editor'), matchingClass('filter_view'));
     } else {
       error('Unexpected viewMode:', viewMode);
       return null;
     }
     var section = findParent(task, predicate);
-    if (section && (viewMode === 'project')) {
+    debug('viewMode = ', viewMode);
+    if (section && (viewMode === 'project') && not(matchingClass('filter_view'))(section)) {
       section = section.parentElement;
-      if (!section.classList.contains('project_editor_instance')) {
-        error('Expected', section, 'to have class project_editor_instance');
+      if (not(or(matchingClass('project_editor_instance'), matchingClass('filter_view')))(section)) {
+        error('Expected', section, 'to have class project_editor_instance or filter_view');
         return null;
       }
     }
