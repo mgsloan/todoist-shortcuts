@@ -3929,7 +3929,7 @@
     return function(x) {
       var result = true;
       for (var i = 0; i < args.length; i++) {
-        result &= checkedPredicate('argument #' + i + ' of and', args[i])(x);
+        result = result && checkedPredicate('argument #' + i + ' of and', args[i])(x);
       }
       return result;
     };
@@ -3941,7 +3941,7 @@
     return function(x) {
       var result = false;
       for (var i = 0; i < args.length; i++) {
-        result |= checkedPredicate('argument #' + i + ' of or', args[i])(x);
+        result = result || checkedPredicate('argument #' + i + ' of or', args[i])(x);
       }
       return result;
     };
