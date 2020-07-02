@@ -3063,7 +3063,7 @@
     // assigning those.
     addViaKeyFunc('no-shortening', function(it) {
       var initials = it.initials;
-      if (initials.length >= MAX_NAVIGATE_PREFIX) {
+      if (initials && initials.length >= MAX_NAVIGATE_PREFIX) {
         return initials.slice(0, MAX_NAVIGATE_PREFIX);
       } else {
         return null;
