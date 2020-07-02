@@ -1621,14 +1621,14 @@
     var predicate;
     if (stripPrefix('agenda', viewMode)) {
       // TODO(#128): Simplify if Todoist DOM becomes more homogenous.
-      predicate = or(or(or(or(
+      predicate = or(
         matchingClass('section_overdue'),
-        matchingClass('section_day')),
-      matchingId('agenda_view')),
-      // View all filter looks like agenda view, but really has
-      // multiple project list editors.
-      matchingClass('list_editor')),
-      matchingClass('section'));
+        matchingClass('section_day'),
+        matchingId('agenda_view'),
+        // View all filter looks like agenda view, but really has
+        // multiple project list editors.
+        matchingClass('list_editor'),
+        matchingClass('section'));
     } else if (viewMode === 'project') {
       predicate = matchingClass('list_editor');
     } else {
@@ -3929,18 +3929,26 @@
 
   // Given two predicates, uses && to combine them.
   // eslint-disable-next-line no-unused-vars
-  function and(p1, p2) {
+  function and() {
+    var args = arguments;
     return function(x) {
-      return checkedPredicate('left side of and', p1)(x) &&
-             checkedPredicate('right side of and', p2)(x);
+      var result = true;
+      for (var i = 0; i < args.length; i++) {
+        result &= checkedPredicate('argument #' + i + ' of and', args[i])(x);
+      }
+      return result;
     };
   }
 
   // Given two predicates, uses || to combine them.
-  function or(p1, p2) {
+  function or() {
+    var args = arguments;
     return function(x) {
-      return checkedPredicate('left side of or', p1)(x) ||
-             checkedPredicate('right side of or', p2)(x);
+      var result = false;
+      for (var i = 0; i < args.length; i++) {
+        result |= checkedPredicate('argument #' + i + ' of or', args[i])(x);
+      }
+      return result;
     };
   }
 
