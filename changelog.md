@@ -7,10 +7,14 @@
 * Fixes task movement (mostly - there are still rough edges). See
   [#141][].
 
-* Fixes `y` / `@` label picker shortcut.  See [#143][]
+* Fixes `y` / `@` label picker shortcut. See [#143][]
+
+* Fixes section finding code, which fixes `shift+g` navigation from
+  label / filters to the agenda view of the task. See [#144][].
 
 [#141]: https://github.com/mgsloan/todoist-shortcuts/issues/141
 [#143]: https://github.com/mgsloan/todoist-shortcuts/issues/143
+[#144]: https://github.com/mgsloan/todoist-shortcuts/issues/144
 
 
 ## Version 90
