@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 92
+
+### Bug fixes ###
+
+* Fixes a typo that probably broke a lot of things. (this release is
+  coming minutes after version 91)
+
+
 ## Version 91
 
 ### Bug fixes ###
