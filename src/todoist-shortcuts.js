@@ -3522,7 +3522,7 @@
     var args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
     args.push(getStack());
-    args.push('Please report this as an issue to http://github.com/mgsloan/todoist-shortcuts');
+    args.push('Consider reporting this as an issue to http://github.com/mgsloan/todoist-shortcuts');
     // eslint-disable-next-line no-console
     console.error.apply(null, args);
   }
