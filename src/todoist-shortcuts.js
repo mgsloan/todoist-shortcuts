@@ -2024,10 +2024,10 @@
 
   // Indent task.
   function moveIn() {
-    if (viewMode === 'agenda_reorder') {
-      info('Indenting task does not work in agenda_reorder mode.');
-    } else if (viewMode === 'agenda_no_reorder') {
-      info('Indenting task does not work in agenda_no_reorder mode.');
+    if (viewMode === 'agenda') {
+      info('Indenting task does not work in agenda mode.');
+    } else if (viewMode === 'agenda') {
+      info('Indenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       var cursor = requireCursor();
       dragTaskOver(cursor, false, function() {
@@ -2044,10 +2044,10 @@
 
   // Dedent task.
   function moveOut() {
-    if (viewMode === 'agenda_reorder') {
-      info('Dedenting task does not work in agenda_reorder mode.');
-    } else if (viewMode === 'agenda_no_reorder') {
-      info('Dedenting task does not work in agenda_no_reorder mode.');
+    if (viewMode === 'agenda') {
+      info('Dedenting task does not work in agenda mode.');
+    } else if (viewMode === 'agenda') {
+      info('Dedenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       var cursor = requireCursor();
       if (getIndentClass(cursor) === 'indent_1') {
@@ -2072,9 +2072,9 @@
   function moveUp() {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
-    } else if (viewMode === 'agenda_no_reorder') {
+    } else if (viewMode === 'agenda') {
       info('Moving task up does not work in filter mode.');
-    } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
+    } else if (viewMode === 'project' || viewMode === 'agenda') {
       var cursor = requireCursor();
       if (getSectionName(cursor) === 'OverdueReschedule') {
         info('Can\'t move cursor up in overdue section');
@@ -2116,9 +2116,9 @@
   function moveDown() {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
-    } else if (viewMode === 'agenda_no_reorder') {
+    } else if (viewMode === 'agenda') {
       info('Moving task down does not work in filter mode.');
-    } else if (viewMode === 'project' || viewMode === 'agenda_reorder') {
+    } else if (viewMode === 'project' || viewMode === 'agenda') {
       var cursor = requireCursor();
       if (getSectionName(cursor) === 'OverdueReschedule') {
         info('Can\'t move cursor down in overdue section');
@@ -2405,7 +2405,7 @@
   // task.
   function addToSectionContaining(task) {
     var section = null;
-    if (viewMode === 'agenda_no_reorder') {
+    if (viewMode === 'agenda') {
       // TODO: This works well in labels, but may be a bit unexpected in filters
       // like "Priority 1", since quick add will not adjust the task such that
       // it ends up in the filter.
@@ -2422,7 +2422,7 @@
       error('Couldn\'t find section for task', task);
       return;
     }
-    if (viewMode === 'agenda_reorder') {
+    if (viewMode === 'agenda') {
       if (section.classList.contains('section_overdue')) {
         section = getFirstClass(document, 'section_day');
       }
@@ -2433,9 +2433,9 @@
   }
 
   function findParentSection(task) {
-    if (viewMode === 'agenda_reorder') {
+    if (viewMode === 'agenda') {
       return findParent(task, or(matchingClass('section_day'), matchingClass('section_overdue')));
-    } else if (viewMode === 'agenda_no_reorder') {
+    } else if (viewMode === 'agenda') {
       // Only one section in filter mode, and its header is directly under the
       // agenda_view div.
       return getById('agenda_view');
@@ -3453,22 +3453,7 @@
     if (agendaView === null) {
       return 'project';
     } else {
-      var reorderItem = getFirstClass(agendaView, 'reorder_item');
-      if (reorderItem) {
-        // Custom filters like "today & p1" result in an agenda view
-        // that looks like it might be reorderable. These cases seem
-        // to have the "is_filtered" class on the items list, so if
-        // this is present, don't use the drag handle for the
-        // cursor. See
-        // https://github.com/mgsloan/todoist-shortcuts/commit/4b563f76610a717a8659d5974ae00958fb1e1344#commitcomment-30618923
-        if (reorderItem.parentElement && matchingClass('is_filtered')(reorderItem.parentElement)) {
-          return 'agenda_no_reorder';
-        } else {
-          return 'agenda_reorder';
-        }
-      } else {
-        return 'agenda_no_reorder';
-      }
+      return 'agenda';
     }
   }
 
