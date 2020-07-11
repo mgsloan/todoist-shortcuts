@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 93
+
+### Bug fixes ###
+
+* Fix `c` shortcut for opening comments.  See [#146][].
+
+* Fixes task movement in today and upcoming views.  See [#145][].
+
+[#145]: https://github.com/mgsloan/todoist-shortcuts/issues/145
+[#146]: https://github.com/mgsloan/todoist-shortcuts/issues/146
+
+
 ## Version 92
 
 ### Bug fixes ###
