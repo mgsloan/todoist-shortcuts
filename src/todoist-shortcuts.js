@@ -2718,7 +2718,11 @@
 
   function getTaskByKey(key) {
     var arr = key.split(' ');
-    return getTaskById(arr[0], arr[1]);
+    if (viewMode === 'project') {
+      return getTaskById(arr[0], 'ignore-indent');
+    } else {
+      return getTaskById(arr[0], arr[1]);
+    }
   }
 
   // Given a task id, returns a task element. If an indent is also given and
