@@ -825,7 +825,7 @@
 
   // Selects all overdue tasks.
   function selectAllOverdue() {
-    if (stripPrefix('agenda', viewMode)) {
+    if (viewMode === 'agenda') {
       var allTasks = getTasks();
       for (var i = 0; i < allTasks.length; i++) {
         var sectionName = getSectionName(allTasks[i]);
@@ -1619,11 +1619,11 @@
 
   function getSection(task) {
     var predicate;
-    if (stripPrefix('agenda', viewMode)) {
+    if (viewMode === 'agenda') {
       predicate = or(
-        // overdue / today / upcoming / filters
+        // overdue / upcoming / filters
         matchingClass('section'),
-        // oddly enough, used for labels right now and nothing else.
+        // used for today / labels
         matchingId('agenda_view')
       );
     } else if (viewMode === 'project') {
@@ -1633,7 +1633,6 @@
       return null;
     }
     var section = findParent(task, predicate);
-    debug('viewMode = ', viewMode);
     if (section && (viewMode === 'project') && not(matchingClass('filter_view'))(section)) {
       section = section.parentElement;
       if (not(or(matchingClass('project_editor_instance'), matchingClass('filter_view')))(section)) {
@@ -2388,7 +2387,7 @@
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelow(menuText, action) {
     var cursor = getCursor();
-    if (stripPrefix('agenda', viewMode) || cursor === null) {
+    if (viewMode === 'agenda' || cursor === null) {
       addToSectionContaining(cursor);
     } else if (viewMode === 'project') {
       withTaskMenu(cursor, true, function(menu) {
@@ -2413,7 +2412,7 @@
       return;
     } else if (task) {
       section = findParentSection(task);
-    } else if (stripPrefix('agenda', viewMode)) {
+    } else if (viewMode === 'agenda') {
       section = getFirstClass(document, 'section_day');
     } else {
       section = getFirstClass(document, 'project_editor_instance');
@@ -2599,7 +2598,7 @@
 
   // Get key used for the cursor, in the getSelectedTaskKeys map.
   function getTaskKey(task) {
-    if (stripPrefix('agenda', viewMode)) {
+    if (viewMode === 'agenda') {
       return getTaskId(task) + ' ' + getIndentClass(task);
     } else if (viewMode === 'project') {
       return getTaskId(task);
@@ -2611,7 +2610,7 @@
 
   // eslint-disable-next-line no-unused-vars
   function makeTaskKey(id, indent) {
-    if (stripPrefix('agenda', viewMode)) {
+    if (viewMode === 'agenda') {
       return id + ' ' + indent;
     } else if (viewMode === 'project') {
       return id;

@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 94 (unreleased)
+
+### Bug fixes ###
+
+* Version 93 inadvertently broke some functionality in agenda mode.
+  Now fixed!
+
+
 ## Version 93
 
 ### Bug fixes ###
