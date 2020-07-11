@@ -845,7 +845,10 @@
   function addBelow() { addAboveOrBelow('Add task below', 'task-overflow-menu-add-below'); }
 
   // Open comments sidepane
-  function openComments() { withUniqueClass(requireCursor(), 'task_list_item__comments_button', all, click); }
+  function openComments() {
+    openTaskView();
+    taskViewComments();
+  }
 
   // Open reminders dialog
   function openReminders() {
