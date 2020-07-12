@@ -1,5 +1,22 @@
 # todoist-shortcuts changelog
 
+## Version 96
+
+### Enhancements ###
+
+* The previous workaround removal for [#137][] made rescheduling /
+  task movement clunky, because the task remained in inline edit mode
+  after selecting a date / project. This is now fixed by not opening
+  the inline editor, and instead using the original route for
+  scheduling / move-to-project.
+
+    - Sidenote: the reason this wasn't done before is that the buttons
+      on the task are now lazily added on mouse hover, presumably to
+      make initial render of large projects fater. I couldn't figure
+      out which event to use to trigger this, till today I realized
+      `mouseenter` does the trick.
+
+
 ## Version 95
 
 ### Enhancements ###
