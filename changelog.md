@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 95
+
+### Enhancements ###
+
+* Removes workaround introduced in version 85, which selected the task
+  under the cursor to perform operations on it. This was related to
+  the need for disambiguating attributes, tracked by [#137][].
+
+  - This is particularly beneficial for the `t` / `T` scheduling
+    shortcuts, as now the current scheduling information will appear.
+
+
 ## Version 94
 
 ### Bug fixes ###
