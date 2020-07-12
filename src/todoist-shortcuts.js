@@ -583,8 +583,7 @@
   function moveToProject() {
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskEdit(mutateCursor);
-      withUniqueClass(document, 'projectSectionPill', all, click);
+      clickTaskMenu(mutateCursor, 'task-overflow-menu-move-to-project', true);
       if (inBulkMoveMode) {
         bulkMoveCursorChanged();
       }
@@ -659,27 +658,21 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the cursor if
   // there is no selection.
   function deleteTasks() {
-    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, MI_DELETE_SEL);
+      clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
     } else {
-    */
-    selectCursorIfNoneSelected();
-    withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-delete"]', click);
-    // }
+      withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-delete"]', click);
+    }
   }
 
   function duplicateTasks() {
-    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, MI_DUPLICATE);
+      clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
     } else {
-    */
-    selectCursorIfNoneSelected();
-    withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]', click);
-    // }
+      withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]', click);
+    }
   }
 
   // Opens the label toggling menu.
@@ -1303,7 +1296,7 @@
     }
     setCursor(curBulkMoveTask, 'scroll');
     bulkMoveCursorChanged();
-    // clickTaskMenu(curBulkMoveTask, MI_MOVE, true);
+    clickTaskMenu(curBulkMoveTask, 'task-overflow-menu-move-to-project', true);
   }
 
   function bulkMoveCursorChanged() {
@@ -1874,12 +1867,6 @@
       return agendaTaskMenu;
     }
   }
-
-  function clickMenu(menu, cls) {
-    withUniqueClass(menu, cls, all, function(container) {
-      withUniqueClass(container, 'menu_label', all, click);
-    });
-  }
   */
 
   // Returns true if the task has children and is collapsed.
@@ -1913,13 +1900,11 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  /*
-  function clickTaskMenu(task, cls, shouldScroll) {
+  function clickTaskMenu(task, action, shouldScroll) {
     withTaskMenu(task, shouldScroll, function(menu) {
-      clickMenu(menu, cls);
+      withUnique(menu, '[data-action-hint="' + action + '"]', click);
     });
   }
-  */
 
   function withTaskMenu(task, shouldScroll, f) {
     if (shouldScroll) {
@@ -1930,9 +1915,11 @@
   }
 
   function withTaskMenuImpl(task, f) {
-    withUniqueTag(task, 'button', matchingClass('more_actions_button'), function(openMenu) {
-      click(openMenu);
-      withUniqueClass(document, 'ist_popover_content', all, f);
+    withTaskHovered(task, function() {
+      withUnique(task, 'button[data-action-hint="task-overflow-menu"]', function(openMenu) {
+        click(openMenu);
+        withUniqueClass(document, 'ist_popover_content', all, f);
+      });
     });
   }
 
@@ -2322,8 +2309,18 @@
   }
 
   function clickTaskSchedule(task) {
-    clickTaskEdit(task);
-    withUniqueClass(document, 'item_due_selector', all, click);
+    withTaskHovered(task, function() {
+      withUnique(task, '[data-action-hint="task-scheduler"]', click);
+    });
+  }
+
+  function withTaskHovered(task, f) {
+    task.dispatchEvent(new MouseEvent('mouseenter'));
+    try {
+      f();
+    } finally {
+      task.dispatchEvent(new MouseEvent('mouseout'));
+    }
   }
 
   function blurSchedulerInput() {
@@ -2438,13 +2435,6 @@
       }
     }
     return null;
-  }
-
-  // TODO(#130): Once resolved, don't select tasks to mutate them.
-  function selectCursorIfNoneSelected() {
-    if (isEmptyMap(getSelectedTaskKeys())) {
-      selectTask(requireCursor());
-    }
   }
 
   function clickPriorityMenu(menu, level) {
