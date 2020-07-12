@@ -323,7 +323,7 @@
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
-  // var WHAT_CURSOR_APPLIES_TO = 'all';
+  var WHAT_CURSOR_APPLIES_TO = 'all';
 
   // 'navigate' (g) attempts to assign keys to items based on their names. In
   // some case there might not be a concise labeling. This sets the limit on key
@@ -452,21 +452,7 @@
   }
 
   // Edit the task under the cursor.
-  function edit() {
-    withUniqueClass(requireCursor(), 'task_content', all, function(content) {
-      var options = {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        button: 0,
-        which: 1,
-        altKey: true
-      };
-      content.dispatchEvent(new MouseEvent( 'mousedown', options));
-      content.dispatchEvent(new MouseEvent( 'mouseup', options));
-      content.dispatchEvent(new MouseEvent( 'click', options));
-    });
-  }
+  function edit() { clickTaskEdit(requireCursor()); }
 
   // Follow the first link of the task under the cursor.
   function followLink() {
@@ -500,7 +486,6 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
   function schedule() {
-    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
@@ -509,32 +494,23 @@
         bulkScheduleCursorChanged();
       }
     } else {
-    */
-    selectCursorIfNoneSelected();
-    var predicate = or(matchingText('Schedule'),
-      matchingAction('multi-select-toolbar-scheduler'));
-    withUniqueTag(document, 'button', predicate, function(button) {
-      click(button);
-      blurSchedulerInput();
-    });
-    // }
+      withUnique(document, 'button[data-action-hint="multi-select-toolbar-scheduler"]', function(button) {
+        click(button);
+        blurSchedulerInput();
+      });
+    }
   }
 
   // Edits the task under the cursor and focuses the textual representation of
   // when the task is scheduled. Only works for the cursor, not for the
   // selection.
   function scheduleText() {
-    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-    */
-    selectCursorIfNoneSelected();
-    var predicate = or(matchingText('Schedule'),
-      matchingAction('multi-select-toolbar-scheduler'));
-    withUniqueTag(document, 'button', predicate, click);
-    // }
+      withUnique(document, 'button[data-action-hint="multi-select-toolbar-scheduler"]', click);
+    }
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
@@ -605,20 +581,16 @@
   // 'all' or 'most', then instead applies to the cursor if there is no
   // selection.
   function moveToProject() {
-    /*
     var mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, MI_MOVE, true);
+      clickTaskEdit(mutateCursor);
+      withUniqueClass(document, 'projectSectionPill', all, click);
       if (inBulkMoveMode) {
         bulkMoveCursorChanged();
       }
     } else {
-    */
-    selectCursorIfNoneSelected();
-    var predicate = or(matchingText('Move to project'),
-      matchingAction('multi-select-toolbar-project-picker'));
-    withUniqueTag(document, 'button', predicate, click);
-    // }
+      withUnique(document, 'button[data-action-hint="multi-select-toolbar-project-picker"]', click);
+    }
   }
 
   // Sets the priority of the selected tasks to the specified level. If
@@ -629,24 +601,21 @@
   // keybindings.
   function setPriority(level) {
     return function() {
-      /*
       var mutateCursor = getCursorToMutate();
       if (mutateCursor) {
-        withTaskMenu(mutateCursor, false, function(menu) {
+        clickTaskEdit(mutateCursor);
+        withUniqueClass(document, 'item_actions_priority', all, click);
+        withUniqueClass(document, 'popper', all, function(menu) {
           clickPriorityMenu(menu, level);
         });
+        // Click save button.
+        withUnique(document, '.task_editor__form_actions button[type="submit"]', click);
       } else {
-      */
-      selectCursorIfNoneSelected();
-      withUniqueClass(document, 'multi_select_toolbar', all, function(toolbar) {
-        withUniqueTag(toolbar, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_flag.svg'), function(selecterSvg) {
-          click(selecterSvg.parentElement);
+        withUnique(document, 'button[data-action-hint="multi-select-toolbar-priority-picker"]', click);
+        withUniqueClass(document, 'priority_picker', all, function(menu) {
+          clickPriorityMenu(menu, level);
         });
-      });
-      withUniqueClass(document, 'priority_picker', all, function(menu) {
-        clickPriorityMenu(menu, level);
-      });
-      // }
+      }
     };
   }
 
@@ -677,20 +646,12 @@
   // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then
   // instead applies to the cursor if there is no selection.
   function done() {
-    /*
     var mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
     } else {
-    */
-    selectCursorIfNoneSelected();
-    // For some reason, only one task can be marked once at a time. So, the
-    // timeout hack.  Means that the user will see intermediate UI updates,
-    // but hey, it works.
-    withSelectedTasks(function(task) {
-      setTimeout(function() { clickTaskDone(task); });
-    });
-    // }
+      withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-complete"]', click);
+    }
   }
 
   // Delete selected tasks. Todoist will prompt for deletion. Since todoist
@@ -705,9 +666,7 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    var predicate = or(matchingText('Delete'),
-      matchingAction('multi-select-toolbar-overflow-menu-delete'));
-    withUniqueClass(openMoreMenu(), 'menu_item', predicate, click);
+    withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-delete"]', click);
     // }
   }
 
@@ -719,9 +678,7 @@
     } else {
     */
     selectCursorIfNoneSelected();
-    var predicate = or(matchingText('Duplicate'),
-      matchingAction('multi-select-toolbar-overflow-menu-duplicate'));
-    withUniqueClass(openMoreMenu(), 'menu_item', predicate, click);
+    withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]', click);
     // }
   }
 
@@ -2348,18 +2305,25 @@
     };
   }
 
+  function clickTaskEdit(task) {
+    withUniqueClass(task, 'task_content', all, function(content) {
+      var options = {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        button: 0,
+        which: 1,
+        altKey: true
+      };
+      content.dispatchEvent(new MouseEvent( 'mousedown', options));
+      content.dispatchEvent(new MouseEvent( 'mouseup', options));
+      content.dispatchEvent(new MouseEvent( 'click', options));
+    });
+  }
+
   function clickTaskSchedule(task) {
-    var schedulerAction = getUniqueClass(task, 'scheduler_action');
-    if (schedulerAction) {
-      click(schedulerAction);
-    } else {
-      withUniqueClass(task, 'due_date_controls', all, function(dueDateControls) {
-        // For scheduled and unscheduled tasks, both of these elements
-        // exist, but only one will cause the scheduler to open.
-        withUniqueClass(dueDateControls, 'date', all, click);
-        withClass(dueDateControls, 'scheduler_action', click);
-      });
-    }
+    clickTaskEdit(task);
+    withUniqueClass(document, 'item_due_selector', all, click);
   }
 
   function blurSchedulerInput() {
@@ -2446,7 +2410,6 @@
     }
   }
 
-  /*
   var SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';
   var SHOULD_UNSAFE_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all';
 
@@ -2476,7 +2439,6 @@
     }
     return null;
   }
-  */
 
   // TODO(#130): Once resolved, don't select tasks to mutate them.
   function selectCursorIfNoneSelected() {
@@ -2486,7 +2448,10 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    withUniqueTag(menu, 'svg', matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'), function(svg) {
+    var predicate =
+        or(matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'),
+          matchingAttr('data-svgs-path', 'sm1/priority_' + level + '_hc.svg'));
+    withUniqueTag(menu, 'svg', predicate, function(svg) {
       // See https://github.com/mgsloan/todoist-shortcuts/issues/32
       // withRestoredSelections(function() { click(img); });
       click(svg.parentElement);
@@ -2566,17 +2531,6 @@
   // Predicate, returns 'true' if the task has a 'hidden' attribute.
   function hidden(el) {
     return matchingAttr('hidden', '')(el);
-  }
-
-  // This applies the function to every selected task.
-  function withSelectedTasks(f) {
-    var tasks = getTasks('include-collapsed');
-    for (var i = 0; i < tasks.length; i++) {
-      var task = tasks[i];
-      if (checkTaskIsSelected(task)) {
-        f(task);
-      }
-    }
   }
 
   // This returns the ids of all the selected tasks as a set-like object.
