@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 97
+
+### Bug fixes ##
+
+* Fix assign shortcut. See [#148][]
+
+[#148]: https://github.com/mgsloan/todoist-shortcuts/issues/148
+
+
 ## Version 96
 
 ### Enhancements ###
