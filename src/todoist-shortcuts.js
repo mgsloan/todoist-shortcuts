@@ -811,12 +811,15 @@
 
   // Open assign dialog
   function openAssign() {
-    var assignButton = getUniqueClass(requireCursor(), 'assign_user');
-    if (assignButton) {
-      click(assignButton);
-    } else {
-      info('Could not find assign button, perhaps this project is not shared?');
-    }
+    var cursor = requireCursor();
+    withTaskHovered(cursor, function() {
+      var assignButton = getUniqueClass(cursor, 'task_list_item__person_picker');
+      if (assignButton) {
+        click(assignButton);
+      } else {
+        info('Could not find assign button, perhaps this project is not shared?');
+      }
+    });
   }
 
   // Open the task view sidepane.
