@@ -1979,7 +1979,7 @@
       dragTaskOver(cursor, false, function() {
         return {
           destination: cursor,
-          horizontalOffset: 40,
+          horizontalOffset: 35,
           verticalOffset: 0
         };
       });
@@ -2003,7 +2003,7 @@
         dragTaskOver(cursor, false, function() {
           return {
             destination: cursor,
-            horizontalOffset: -40,
+            horizontalOffset: -35,
             verticalOffset: 0
           };
         });
@@ -2181,7 +2181,16 @@
     // Suppress subsequent drags for 50ms, otherwise glitches occur.
     setTimeout(function() { suppressDrag = false; }, 0);
     restoreScroll();
-    scrollTaskIntoView(getCursor());
+    ensureCursor(getById('content'));
+    var cursor = getCursor();
+    if (cursor) {
+      scrollTaskIntoView(cursor);
+    }
+    // Terrible but effective hack - the cursor sometimes disappears
+    // after drag for some reason.
+    setTimeout(function() {
+      ensureCursor(getById('content'));
+    }, 50);
     if (!task || task.classList.contains('on_drag')) {
       warn('didn\'t find spot to drop for drag and drop, so cancelling');
       closeContextMenus();

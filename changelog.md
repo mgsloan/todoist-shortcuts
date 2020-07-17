@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 98 (unreleased)
+
+### Bug fixes ##
+
+* Fixes horizontal task movement sometimes skipping nesting levels
+
+* Attempts to fix cursor disappearing after task movement.
+
+
 ## Version 97
 
 ### Bug fixes ##
