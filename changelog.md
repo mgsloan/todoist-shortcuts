@@ -2,7 +2,7 @@
 
 ## Version 98
 
-### Bug fixes ##
+### Bug fixes ###
 
 * Fixes horizontal task movement sometimes skipping nesting levels
 
@@ -11,7 +11,7 @@
 
 ## Version 97
 
-### Bug fixes ##
+### Bug fixes ###
 
 * Fix assign shortcut. See [#148][]
 
