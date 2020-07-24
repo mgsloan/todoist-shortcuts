@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 100
+
+### Bug fixes ###
+
+* Fixes functioning of `* o` shortcut for selecting all overdue tests.
+
+
 ## Version 99
 
 ### Bug fixes ###
