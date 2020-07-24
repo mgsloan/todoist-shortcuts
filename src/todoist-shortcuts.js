@@ -2327,11 +2327,17 @@
   }
 
   function withTaskHovered(task, f) {
-    task.dispatchEvent(new MouseEvent('mouseenter'));
+    var options = {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 0
+    };
+    task.dispatchEvent(new MouseEvent('mouseover', options));
     try {
       f();
     } finally {
-      task.dispatchEvent(new MouseEvent('mouseout'));
+      task.dispatchEvent(new MouseEvent('mouseout', options));
     }
   }
 
