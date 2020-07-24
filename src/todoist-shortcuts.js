@@ -779,7 +779,7 @@
       var allTasks = getTasks();
       for (var i = 0; i < allTasks.length; i++) {
         var sectionName = getSectionName(allTasks[i]);
-        if (sectionName === 'OverdueReschedule') {
+        if (sectionName === 'Overdue') {
           selectTask(allTasks[i]);
         }
       }
@@ -2022,7 +2022,7 @@
       info('Moving task up does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda') {
       var cursor = requireCursor();
-      if (getSectionName(cursor) === 'OverdueReschedule') {
+      if (getSectionName(cursor) === 'Overdue') {
         info('Can\'t move cursor up in overdue section');
         return;
       }
@@ -2066,7 +2066,7 @@
       info('Moving task down does not work in filter mode.');
     } else if (viewMode === 'project' || viewMode === 'agenda') {
       var cursor = requireCursor();
-      if (getSectionName(cursor) === 'OverdueReschedule') {
+      if (getSectionName(cursor) === 'Overdue') {
         info('Can\'t move cursor down in overdue section');
         return;
       }
