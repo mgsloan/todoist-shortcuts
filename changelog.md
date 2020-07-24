@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 99
+
+### Bug fixes ###
+
+* Most recent Todoist version changed the requirements for mouse
+  events causing task buttons to get created.  This caused many
+  operations on single tasks to no longer work.  It's now fixed by
+  fiddlying with the mouse events a bit!  See [#149][].
+
+[#149]: https://github.com/mgsloan/todoist-shortcuts/issues/149
+
+
 ## Version 98
 
 ### Bug fixes ###
