@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 101
+
+### Bug fixes ###
+
+* Fixes `u` shortcut for clicking undo - broken by changes in expected
+  page structure.
+
+
 ## Version 100
 
 ### Bug fixes ###
