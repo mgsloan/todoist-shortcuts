@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 102
+
+### Bug fixes ###
+
+* Prevents `* a` shortcut also triggering Todoist's native `a`
+  shortcut for adding a task. May also fix other fall-throughs.
+
+
 ## Version 101
 
 ### Bug fixes ###
