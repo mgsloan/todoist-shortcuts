@@ -948,7 +948,7 @@
     var undoToast = getUniqueClass(document, 'undo_toast');
     var undoLink = null;
     if (undoToast) {
-      undoLink = getUniqueTag(undoToast, 'button', not(matchingClass('hide_link')));
+      undoLink = getUniqueTag(undoToast, 'button', not(matchingClass('close_button')));
     }
     if (undoLink) {
       click(undoLink);
