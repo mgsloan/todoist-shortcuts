@@ -31,10 +31,6 @@
   // this list, or modify this script in general.
   var KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
 
-    // Add tasks
-    // (see originalHandler) ['q', quickAddTask],
-    // (see originalHandler) ['a', addTaskBottom],
-    // (see originalHandler) ['shift+a', addTaskTop],
 
     // Navigation
     ['g', navigate],
@@ -47,6 +43,8 @@
     ['shift+enter', followLink],
     ['shift+o', addAbove],
     ['o', addBelow],
+    ['a', addTaskBottom],
+    ['shift+a', addTaskTop],
     ['i', openTaskView],
     ['c', openComments],
     ['shift+r', openReminders],
@@ -788,11 +786,43 @@
     }
   }
 
+  function addTaskBottom() {
+    if (viewMode === 'agenda') {
+      withUniqueTag(document, 'button', matchingAttr('data-track', 'navigation|quick_add'), click);
+    } else {
+      clickInlineAddTask();
+    }
+  }
+
+  function addTaskTop() {
+    if (viewMode === 'agenda') {
+      withUniqueTag(document, 'button', matchingAttr('data-track', 'navigation|quick_add'), click);
+    } else {
+      var tasks = getTasks();
+      if (tasks.length > 0) {
+        addAboveTask(tasks[0]);
+      } else {
+        clickInlineAddTask();
+      }
+    }
+  }
+
+  function clickInlineAddTask() {
+    withUniqueClass(document, 'plus_add_button', all, click);
+    scrollTaskEditorIntoView();
+  }
+
+  function scrollTaskEditorIntoView() {
+    withUniqueClass(document, 'task_editor', all, function(editor) {
+      verticalScrollIntoView(editor, getTopHeight(), 0, true, 0.6);
+    });
+  }
+
   // Add a task above / below cursor. Unfortunately these options do not exist
   // in agenda mode, so in that case, instead it is added to the current
   // section.
-  function addAbove() { addAboveOrBelow('Add task above', 'task-overflow-menu-add-above'); }
-  function addBelow() { addAboveOrBelow('Add task below', 'task-overflow-menu-add-below'); }
+  function addAbove() { addAboveTask(getCursor()); }
+  function addBelow() { addBelowTask(getCursor()); }
 
   // Open comments sidepane
   function openComments() {
@@ -2363,17 +2393,25 @@
     withUniqueClass(task, 'item_checkbox', all, click);
   }
 
+  function addAboveTask(task) {
+    addAboveOrBelowTask(task, 'Add task above', 'task-overflow-menu-add-above');
+  }
+
+  function addBelowTask(task) {
+    addAboveOrBelowTask(task, 'Add task below', 'task-overflow-menu-add-below');
+  }
+
   // Common code implementing addAbove / addBelow.
-  function addAboveOrBelow(menuText, action) {
-    var cursor = getCursor();
-    if (viewMode === 'agenda' || cursor === null) {
-      addToSectionContaining(cursor);
+  function addAboveOrBelowTask(task, menuText, action) {
+    if (viewMode === 'agenda' || task === null) {
+      addToSectionContaining(task);
     } else if (viewMode === 'project') {
-      withTaskMenu(cursor, true, function(menu) {
+      withTaskMenu(task, true, function(menu) {
         var predicate = or(matchingText(menuText),
           matchingAction(action));
         withUniqueClass(menu, 'menu_item', predicate, click);
       });
+      scrollTaskEditorIntoView();
     } else {
       error('Unexpected viewMode:', viewMode);
     }
