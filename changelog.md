@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 103
+
+### Bug fixes ###
+
+* Fixes `a` and `A` shortcuts for inserting first and last tasks. See
+  [#150][].
+
+[#150]: https://github.com/mgsloan/todoist-shortcuts/issues/150
+
+
 ## Version 102
 
 ### Bug fixes ###
