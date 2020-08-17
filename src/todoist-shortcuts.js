@@ -1951,7 +1951,7 @@
     withTaskHovered(task, function() {
       withUnique(task, 'button[data-action-hint="task-overflow-menu"]', function(openMenu) {
         click(openMenu);
-        withUniqueClass(document, 'ist_popover_content', all, f);
+        withUniqueClass(document, 'popper', hasChild('[data-action-hint="task-overflow-menu-move-to-project"]'), f);
       });
     });
   }
@@ -3896,6 +3896,13 @@
       } else {
         return false;
       }
+    };
+  }
+
+  // Returns predicate which returns 'true' if the element has a child matching the query.
+  function hasChild(query) {
+    return function(el) {
+      return el.querySelector(query) !== null;
     };
   }
 
