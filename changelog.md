@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 104
+
+### Bug fixes ###
+
+* Fixes `v` shortcut for moving a single task to project. See [#151][].
+
+[#151]: https://github.com/mgsloan/todoist-shortcuts/issues/151
+
+
 ## Version 103
 
 ### Bug fixes ###
