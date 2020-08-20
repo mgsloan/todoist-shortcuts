@@ -991,7 +991,10 @@
 
   // Trigger sort by date by clicking a menu item.
   function sortByDate() {
-    withUniqueTag(document, 'td', matchingAttr('data-track', 'project|actions_sort_by_date'), click);
+    withUniqueTag(document, 'button', matchingClass('gear_icon'), click);
+    withUniqueClass(document, 'project_view_menu', all, function(menu) {
+      withUniqueClass(menu, 'icon_menu_item__content', matchingText('Sort by date'), click);
+    });
   }
 
   // Open help documentation.
