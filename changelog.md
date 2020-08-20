@@ -1,5 +1,18 @@
 # todoist-shortcuts changelog
 
+## Version 105
+
+### Bug fixes ###
+
+* Fixes `s` for sorting by date. For now fix will only work in English
+  version of Todoist. See [#142]
+
+* Fixes `o` + `shift+o` (add task below / above) functionality within
+  empty projects.
+
+[#142]: https://github.com/mgsloan/todoist-shortcuts/issues/142
+
+
 ## Version 104
 
 ### Bug fixes ###
