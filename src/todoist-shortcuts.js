@@ -2403,7 +2403,9 @@
 
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelowTask(task, menuText, action) {
-    if (viewMode === 'agenda' || task === null) {
+    if (task === null) {
+      clickInlineAddTask();
+    } else if (viewMode === 'agenda') {
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       withTaskMenu(task, true, function(menu) {
