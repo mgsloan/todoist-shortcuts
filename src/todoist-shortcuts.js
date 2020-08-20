@@ -2055,7 +2055,7 @@
             return {
               destination: task,
               horizontalOffset: 0,
-              verticalOffset: 0
+              verticalOffset: -10
             };
           } else if (indent < cursorIndent) {
             info('Refusing to dedent task to move it up.');
