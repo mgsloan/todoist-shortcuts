@@ -121,7 +121,6 @@
   // Scheduling keybindings (used when scheduler is open)
   var SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
     ['c', scheduleToday],
-    ['d', oldScheduleTodayBindingDeprecated],
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
@@ -1185,25 +1184,6 @@
       }
       withUniqueTag(document, 'ul', predicate, f);
     });
-  }
-
-  function oldScheduleTodayBindingDeprecated() {
-    var link = element('a', null, text('this GitHub discussion'));
-    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/52';
-    link.style.color = '';
-    notifyUser(
-      span(null,
-        text('The scheduler shortcut for selecting "Today" has been changed to '),
-        span('ts-note-key', text('c')),
-        text('.'),
-        element('br', null),
-        text('You pressed the old scheduler shortcut for this, '),
-        span('ts-note-key', text('d')),
-        text(', but it now just displays this message.'),
-        element('br', null),
-        text('See '),
-        link,
-        text(' for the reasoning behind this change.')));
   }
 
   /*****************************************************************************
