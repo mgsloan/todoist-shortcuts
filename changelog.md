@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 106
+
+### Bug fixes ###
+
+* Improves reliability of `shift+k` shortcut for moving task upwards.
+
+
 ## Version 105
 
 ### Bug fixes ###
