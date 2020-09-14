@@ -162,6 +162,7 @@
     // TODO(#94): proper bindings for o / O.
     [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
     ['t', taskViewSchedule],
+    ['shift+t', taskViewScheduleText],
     ['+', taskViewOpenAssign],
     ['v', taskViewMoveToProject],
     [['y', '@'], taskViewLabel],
@@ -1105,6 +1106,13 @@
   function taskViewSchedule() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_due_selector', all, click);
+      blurSchedulerInput();
+    });
+  }
+
+  function taskViewScheduleText() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
+      withUniqueClass(sidePanel, 'item_due_selector', all, click);
     });
   }
 
@@ -1767,14 +1775,14 @@
         } else {
           switchKeymap(POPUP_KEYMAP);
         }
-      } else if (checkTaskViewOpen()) {
-        switchKeymap(TASK_VIEW_KEYMAP);
       } else if (inBulkScheduleMode) {
         switchKeymap(BULK_SCHEDULE_KEYMAP);
       } else if (inBulkMoveMode) {
         switchKeymap(BULK_MOVE_KEYMAP);
       } else if (checkSchedulerOpen()) {
         switchKeymap(SCHEDULE_KEYMAP);
+      } else if (checkTaskViewOpen()) {
+        switchKeymap(TASK_VIEW_KEYMAP);
       } else {
         switchKeymap(DEFAULT_KEYMAP);
       }
