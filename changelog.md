@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 107
+
+### Bug fixes ###
+
+* Fixes scheduler shortcuts in task view mode. See [#152].
+
+[#152]: https://github.com/mgsloan/todoist-shortcuts/issues/152
+
+
 ## Version 106
 
 ### Bug fixes ###
