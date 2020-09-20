@@ -1569,7 +1569,11 @@
     var section = getSection(task);
     var result = null;
     if (section) {
-      var outerHeader = getUniqueTag(section, 'header');
+      var outerHeaders = section.querySelectorAll('header');
+      if (outerHeaders.length === 0) {
+        error('Failed to find header for section');
+      }
+      var outerHeader = outerHeaders[outerHeaders.length - 1];
       var header = null;
       if (outerHeader) {
         header = getUniqueTag(outerHeader, 'h1');
