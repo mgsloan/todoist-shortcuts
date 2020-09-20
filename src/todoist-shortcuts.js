@@ -1693,6 +1693,7 @@
       // TODO: remove this once unnecessary.
       if (!initializing) {
         overwriteKeyHandlers();
+        updateViewMode();
       }
       if (dragInProgress) {
         debug('ignoring mutations since drag is in progress:', mutations);
