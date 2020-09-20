@@ -6,7 +6,6 @@ repository, it is also available from the following places:
 
 * [ Extension for Google Chrome
     ![Chrome Users](https://img.shields.io/chrome-web-store/users/dehmghpdcahlffompjagejmgbcfahndp.svg)
-    ![Chrome Rating](https://img.shields.io/chrome-web-store/rating/dehmghpdcahlffompjagejmgbcfahndp.svg)
   ](https://chrome.google.com/webstore/detail/todoist-shortcuts/dehmghpdcahlffompjagejmgbcfahndp)
 
 * [ Extension for Mozilla Firefox
