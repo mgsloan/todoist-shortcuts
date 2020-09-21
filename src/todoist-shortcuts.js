@@ -807,8 +807,8 @@
     }
   }
 
-  function clickInlineAddTask() {
-    withUniqueClass(document, 'plus_add_button', all, click);
+  function clickInlineAddTask(section) {
+    withUniqueClass(section ? section : document, 'plus_add_button', all, click);
     scrollTaskEditorIntoView();
   }
 
@@ -2388,7 +2388,11 @@
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelowTask(task, menuText, action) {
     if (task === null) {
-      clickInlineAddTask();
+      if (getUniqueClass(document, 'plus_add_button')) {
+        clickInlineAddTask();
+      } else {
+        quickAddTask();
+      }
     } else if (viewMode === 'agenda') {
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
@@ -2397,7 +2401,13 @@
           matchingAction(action));
         withUniqueClass(menu, 'menu_item', predicate, click);
       });
-      scrollTaskEditorIntoView();
+      var editor = getUniqueClass(document, 'task_editor');
+      if (editor) {
+        scrollTaskEditorIntoView();
+      } else {
+        info('Clicking quick add task, as filter view has no task adding.');
+        quickAddTask();
+      }
     } else {
       error('Unexpected viewMode:', viewMode);
     }
@@ -2408,7 +2418,7 @@
   function addToSectionContaining(task) {
     var section = null;
     if (task) {
-      section = findParentSection(task);
+      section = getSection(task);
     } else if (viewMode === 'agenda') {
       section = getFirstClass(document, 'section_day');
     } else {
@@ -2422,28 +2432,10 @@
       quickAddTask();
       return;
     }
-    if (viewMode === 'agenda') {
-      if (section.classList.contains('section_overdue')) {
-        section = getFirstClass(document, 'section_day');
-      }
-      withUniqueClass(section, 'agenda_add_task', all, click);
-    } else {
-      withUniqueClass(section, 'action_add_item', all, click);
+    if (viewMode === 'agenda' && section.classList.contains('section_overdue')) {
+      section = getFirstClass(document, 'section_day');
     }
-  }
-
-  function findParentSection(task) {
-    if (viewMode === 'agenda') {
-      return findParent(task,
-        or(matchingClass('section_day'),
-          matchingClass('section_overdue'),
-          matchingId('agenda_view')));
-    } else if (viewMode === 'project') {
-      return findParent(task, matchingClass('project_editor_instance'));
-    } else {
-      error('Unexpected value of viewMode:', viewMode);
-      return null;
-    }
+    clickInlineAddTask(section);
   }
 
   var SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';

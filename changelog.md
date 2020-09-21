@@ -4,7 +4,11 @@
 
 ### Bug fixes ###
 
-* Fixes task movement shortcuts in today / upcoming views.  See [#153][]
+* Fixes task movement shortcuts in today / upcoming views.  See
+  [#153][]
+
+* Fixes `o` + `shift+o` (add task below / above) functionality in
+  upcoming / label / filter views.
 
 [#153]: https://github.com/mgsloan/todoist-shortcuts/issues/153
 
