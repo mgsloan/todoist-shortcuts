@@ -1998,8 +1998,6 @@
   function moveIn() {
     if (viewMode === 'agenda') {
       info('Indenting task does not work in agenda mode.');
-    } else if (viewMode === 'agenda') {
-      info('Indenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       var cursor = requireCursor();
       dragTaskOver(cursor, false, function() {
@@ -2017,8 +2015,6 @@
   // Dedent task.
   function moveOut() {
     if (viewMode === 'agenda') {
-      info('Dedenting task does not work in agenda mode.');
-    } else if (viewMode === 'agenda') {
       info('Dedenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       var cursor = requireCursor();
@@ -2411,13 +2407,7 @@
   // task.
   function addToSectionContaining(task) {
     var section = null;
-    if (viewMode === 'agenda') {
-      // TODO: This works well in labels, but may be a bit unexpected in filters
-      // like "Priority 1", since quick add will not adjust the task such that
-      // it ends up in the filter.
-      quickAddTask();
-      return;
-    } else if (task) {
+    if (task) {
       section = findParentSection(task);
     } else if (viewMode === 'agenda') {
       section = getFirstClass(document, 'section_day');
@@ -2425,7 +2415,11 @@
       section = getFirstClass(document, 'project_editor_instance');
     }
     if (!section) {
-      error('Couldn\'t find section for task', task);
+      warn('Couldn\'t find section for task', task, 'so instead using quick-add');
+      // TODO: This works well in labels, but may be a bit unexpected in filters
+      // like "Priority 1", since quick add will not adjust the task such that
+      // it ends up in the filter.
+      quickAddTask();
       return;
     }
     if (viewMode === 'agenda') {
@@ -2440,11 +2434,10 @@
 
   function findParentSection(task) {
     if (viewMode === 'agenda') {
-      return findParent(task, or(matchingClass('section_day'), matchingClass('section_overdue')));
-    } else if (viewMode === 'agenda') {
-      // Only one section in filter mode, and its header is directly under the
-      // agenda_view div.
-      return getById('agenda_view');
+      return findParent(task,
+        or(matchingClass('section_day'),
+          matchingClass('section_overdue'),
+          matchingId('agenda_view')));
     } else if (viewMode === 'project') {
       return findParent(task, matchingClass('project_editor_instance'));
     } else {
