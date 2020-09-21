@@ -8,7 +8,7 @@
   var TODOIST_SHORTCUTS_VERSION = 107;
 
   // Set this to true to get more log output.
-  var DEBUG = false;
+  var DEBUG = true;
 
   var IS_CHROME = /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
