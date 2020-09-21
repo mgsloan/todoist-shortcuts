@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 109
+
+### Bug fixes ###
+
+* Disables debug logging accidentally enabled in version 108.
+
+
 ## Version 108
 
 ### Bug fixes ###
@@ -11,6 +18,7 @@
   upcoming / label / filter views.
 
 [#153]: https://github.com/mgsloan/todoist-shortcuts/issues/153
+
 
 ## Version 107
 
