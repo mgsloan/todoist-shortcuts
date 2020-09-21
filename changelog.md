@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 108
+
+### Bug fixes ###
+
+* Fixes task movement shortcuts in today / upcoming views.  See [#153][]
+
+[#153]: https://github.com/mgsloan/todoist-shortcuts/issues/153
+
 ## Version 107
 
 ### Bug fixes ###

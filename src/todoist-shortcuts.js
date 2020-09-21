@@ -2044,9 +2044,7 @@
   function moveUp() {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
-    } else if (viewMode === 'agenda') {
-      info('Moving task up does not work in filter mode.');
-    } else if (viewMode === 'project' || viewMode === 'agenda') {
+    } else {
       var cursor = requireCursor();
       if (getSectionName(cursor) === 'Overdue') {
         info('Can\'t move cursor up in overdue section');
@@ -2078,8 +2076,6 @@
         info('Couldn\'t find task above cursor to move it above.');
         return null;
       });
-    } else {
-      error('Unexpected viewMode:', viewMode);
     }
   }
 
@@ -2088,9 +2084,7 @@
   function moveDown() {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
-    } else if (viewMode === 'agenda') {
-      info('Moving task down does not work in filter mode.');
-    } else if (viewMode === 'project' || viewMode === 'agenda') {
+    } else {
       var cursor = requireCursor();
       if (getSectionName(cursor) === 'Overdue') {
         info('Can\'t move cursor down in overdue section');
@@ -2139,8 +2133,6 @@
           return null;
         }
       });
-    } else {
-      error('Unexpected viewMode:', viewMode);
     }
   }
 
