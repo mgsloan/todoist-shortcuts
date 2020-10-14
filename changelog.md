@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 110
+
+### Bug fixes ###
+
+* Fixes 'd' shortcut for task completion. See [#154]
+
+[#154]: https://github.com/mgsloan/todoist-shortcuts/issues/154
+
+
 ## Version 109
 
 ### Bug fixes ###
