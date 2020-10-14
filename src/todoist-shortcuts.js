@@ -1061,7 +1061,7 @@
   function taskViewDone() {
     withUniqueClass(document, TASK_VIEW_CLS, all, function(sidePanel) {
       withUniqueClass(sidePanel, 'item_overview', all, function(overview) {
-        withUniqueClass(overview, 'item_checkbox', all, click);
+        withUniqueClass(overview, ['task_checkbox', 'item_checkbox'], all, click);
       });
     });
   }
@@ -2374,7 +2374,7 @@
   }
 
   function clickTaskDone(task) {
-    withUniqueClass(task, 'item_checkbox', all, click);
+    withUniqueClass(task, ['item_checkbox', 'task_checkbox'], all, click);
   }
 
   function addAboveTask(task) {
@@ -2642,9 +2642,9 @@
     if (priorityClass) {
       return stripPriorityClass(priorityClass);
     } else {
-      var itemCheckbox = getUniqueClass(task, 'item_checkbox');
-      if (itemCheckbox) {
-        priorityClass = findUnique(isPriorityClass, itemCheckbox.classList);
+      var taskCheckbox = getUniqueClass(task, ['task_checkbox', 'item_checkbox']);
+      if (taskCheckbox) {
+        priorityClass = findUnique(isPriorityClass, taskCheckbox.classList);
         if (priorityClass) {
           return stripPriorityClass(priorityClass);
         } else {
