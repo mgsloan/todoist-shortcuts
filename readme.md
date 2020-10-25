@@ -139,17 +139,15 @@ If none are selected, then these will apply to the cursor instead.
 | `3`        | set priority to 3                 |
 | `4` or `0` | set priority to 4                 |
 
-Archiving a task via `e` is fairly similar to marking it complete via `d`.  Here
-are the differences:
+Deleting a task via `e` or `#` is fairly similar to marking it
+complete via `d`.  Here are the differences:
 
-1. If the task is a child task, if you "Complete" it it will be checked and
-   greyed out (and will remain in the list under the uncompleted parent task
-   until the parent task is completed). If you "Archive" the child task it will
-   be checked and then removed from view.
+1. Deleting a child task (nested under another task), it will be
+   removed from the list. Completing a child task will mark it
+   complete, but it will stay in the list.
 
-2. If the task is a Recurring Task (e.g. every day) and you "Complete Task" it
-   will be scheduled for the next date of recurrence. If you "Archive Task" it
-   will be completed and not recur again.
+2. Deleting a Recurring Task (e.g. every day) will cause the task to
+   no longer be scheduled.
 
 ## Scheduling
 
