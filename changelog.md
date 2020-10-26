@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Unreleased
+## Version 111
 
 ### Bug fixes ###
 
