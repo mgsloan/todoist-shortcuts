@@ -1570,10 +1570,16 @@
     var result = null;
     if (section) {
       var outerHeaders = section.querySelectorAll('header');
+      var outerHeader;
       if (outerHeaders.length === 0) {
-        error('Failed to find header for section');
+        outerHeader = getUniqueClass(document, 'view_header');
+        if (!outerHeader) {
+          error('Failed to find header for section', section);
+          return null;
+        }
+      } else {
+        outerHeader = outerHeaders[outerHeaders.length - 1];
       }
-      var outerHeader = outerHeaders[outerHeaders.length - 1];
       var header = null;
       if (outerHeader) {
         header = getUniqueTag(outerHeader, 'h1');
