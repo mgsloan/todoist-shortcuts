@@ -3345,15 +3345,20 @@
     var upcomingHeader = getUniqueClass(document, 'upcoming_view__calendar');
     if (upcomingHeader) {
       return upcomingHeader.clientHeight;
-    } else {
-      var topBar = getById('top_bar');
-      if (topBar) {
-        return topBar.clientHeight;
-      } else {
-        error('No top bar to measure.');
-        return 0;
-      }
     }
+
+    var viewHeader = getUniqueClass(document, 'view_header');
+    if (viewHeader) {
+      return viewHeader.clientHeight;
+    }
+
+    var topBar = getById('top_bar');
+    if (topBar) {
+      return topBar.clientHeight;
+    }
+
+    error('No top bar to measure.');
+    return 0;
   }
 
   // Exception thrown by requireCursor.

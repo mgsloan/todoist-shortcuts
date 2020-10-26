@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Unreleased
+
+### Bug fixes ###
+
+* Fixes scrolling behavior when moving cursor up - adjusts for new
+  header height.
+
+
 ## Version 110
 
 ### Bug fixes ###
