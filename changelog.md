@@ -1,5 +1,22 @@
 # todoist-shortcuts changelog
 
+## Version 112
+
+### Bug fixes ###
+
+* Workaround `ItemSelector` interface disappearing. See [#156][]
+
+  - `x` now behaves the same as shift-click (so, bizarrely), and
+    displays a message explaining the behavior change.
+
+  - Selecting by priority is disabled (hopefully temporarily).
+
+  - These changes are non-ideal and will hopefully be fixed in the
+    future.
+
+[#156]: https://github.com/mgsloan/todoist-shortcuts/issues/154
+
+
 ## Version 111
 
 ### Bug fixes ###
