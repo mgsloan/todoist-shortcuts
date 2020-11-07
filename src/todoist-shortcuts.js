@@ -3,7 +3,7 @@
 /* global svgs */
 
 {
-  var TODOIST_SHORTCUTS_VERSION = 111;
+  var TODOIST_SHORTCUTS_VERSION = 112;
 
   // Set this to true to get more log output.
   var DEBUG = false;
