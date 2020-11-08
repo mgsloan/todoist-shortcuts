@@ -2673,7 +2673,7 @@
   }
 
   function checkTaskIsSelected(task) {
-    return task.classList.contains('selected');
+    return task.classList.contains('selected') || task.ariaSelected === 'true';
   }
 
   function getTaskId(task) {
