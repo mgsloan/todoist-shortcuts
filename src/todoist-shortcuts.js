@@ -2867,7 +2867,7 @@
             });
           });
         } else {
-          withUniqueClass(li, 'name', all, function(nameElement) {
+          withUniqueClass(li, ['name', 'SidebarListItem__content'], all, function(nameElement) {
             withUniqueChild(nameElement, matchingTag('span'), function(nameSpan) {
               txt = preprocessItemText(nameSpan.textContent);
               initials = getItemInitials(nameSpan.textContent);
