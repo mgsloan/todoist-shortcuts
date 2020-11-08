@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Unreleased
+
+### Bug fixes ###
+
+* Fixes actions on multiple selections. See [#156][].
+
+
 ## Version 112
 
 ### Bug fixes ###
