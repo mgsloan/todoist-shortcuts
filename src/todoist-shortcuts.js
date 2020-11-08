@@ -1682,13 +1682,16 @@
         matchingId('agenda_view')
       );
     } else if (viewMode === 'project') {
-      predicate = or(matchingClass('list_editor'), matchingClass('filter_view'));
+      predicate = or(
+        matchingClass('list_editor'),
+        matchingClass('filter_view'),
+        matchingClass('project_editor_instance'));
     } else {
       error('Unexpected viewMode:', viewMode);
       return null;
     }
     var section = findParent(task, predicate);
-    if (section && (viewMode === 'project') && not(matchingClass('filter_view'))(section)) {
+    if (section && viewMode === 'project' && not(or(matchingClass('filter_view'), matchingClass('project_editor_instance')))(section)) {
       section = section.parentElement;
       if (not(or(matchingClass('project_editor_instance'), matchingClass('filter_view')))(section)) {
         error('Expected', section, 'to have class project_editor_instance or filter_view');
