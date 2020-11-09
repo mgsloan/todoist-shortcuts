@@ -6,6 +6,10 @@
 
 * Fixes actions on multiple selections. See [#156][].
 
+* Fixes navigation keys for labels / filters. See [#157][].
+
+[#157]: https://github.com/mgsloan/todoist-shortcuts/issues/157
+
 
 ## Version 112
 
