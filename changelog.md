@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 114
+
+### Bug fixes ###
+
+* A truly proper workaround for `ItemSelector` interface
+  disappearing. It turns out control-click toggles task selection! I
+  did not realize this until pointed out by a helpful Todoist
+  developer. See [#156][].
+
+
+
 ## Version 113
 
 ### Bug fixes ###
