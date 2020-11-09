@@ -10,7 +10,6 @@
   developer. See [#156][].
 
 
-
 ## Version 113
 
 ### Bug fixes ###
