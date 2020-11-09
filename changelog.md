@@ -4,6 +4,10 @@
 
 ### Bug fixes ###
 
+* Proper workaround for `ItemSelector` interface disappearing. For
+  every selection change, it now orchestrates a series of shift-clicks
+  to construct the desired selection state. See [#156][].
+
 * Fixes actions on multiple selections. See [#156][].
 
 * Fixes navigation keys for labels / filters. See [#157][].
