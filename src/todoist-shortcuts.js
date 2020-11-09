@@ -621,6 +621,22 @@
   // keybindings.
   function selectPriority(level) {
     return function() {
+      debug('Ignoring request to select priority level', level);
+      var link = element('a', null, text('todoist-shortcuts issue #156'));
+      link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/156';
+      link.style.color = '';
+      notifyUser(
+        span(null,
+          text('Selecting by priority is disabled, hopefully temporarily. ' +
+                  'This is because Todoist removed an internal interface, and ' +
+                  'the shift+click behavior is too bizarre to use for this. ' +
+                  'I have contacted ' +
+                  'Todoist developers, so hopefully this will be fixed soon. ' +
+                  'See '),
+          link,
+          text(' for details.')
+        ));
+      /* TODO(#156)
       var actualLevel = invertPriorityLevel(level);
       var allTasks = getTasks('include-collapsed');
       var selected = getSelectedTaskKeys();
@@ -635,6 +651,7 @@
       if (modified) {
         setSelections(selected);
       }
+      */
     };
   }
 
@@ -769,6 +786,12 @@
       shiftClickTask(allTasks[0]);
       shiftClickTask(allTasks[allTasks.length - 1]);
     }
+    /* TODO(#156)
+    var allTasks = getTasks('include-collapsed');
+    for (var i = 0; i < allTasks.length; i++) {
+      selectTask(allTasks[i]);
+    }
+    */
   }
 
   // Selects all overdue tasks.
@@ -791,6 +814,15 @@
         shiftClickTask(firstOverdueTask);
         shiftClickTask(lastOverdueTask);
       }
+      /* TODO(#156)
+      var allTasks = getTasks();
+      for (var i = 0; i < allTasks.length; i++) {
+        var sectionName = getSectionName(allTasks[i]);
+        if (sectionName === 'Overdue') {
+          selectTask(allTasks[i]);
+        }
+      }
+      */
     } else {
       info('Can only select all overdue in agenda mode');
     }
@@ -1351,11 +1383,9 @@
    * Utilities for manipulating the UI
    */
 
-  // Given a task element, shift-clicks it. Unfortunately, Todoist has
-  // bizarre shift-click behavior: After the initial shift-click,
-  // shift-click will invert the selection state of all the tasks
-  // between the clicked task (included) and the last shift-clicked
-  // task (excluded).
+  // Given a task element, shift-clicks it. Unfortunately, Todoist has bizarre
+  // shift-click behavior. I have not been able to figure out how to get it to
+  // toggle the selection state of a single task.
   function shiftClickTask(task) {
     var e = new MouseEvent('click', { bubbles: true, shiftKey: true });
     withUniqueClass(task, 'task_content', all, function(content) {
@@ -1365,53 +1395,52 @@
   }
 
   function toggleSelectTask(task) {
-    var selections = getSelectedTaskKeys();
-    var taskKey = getTaskKey(task);
-    selections[taskKey] = !selections[taskKey];
-    setSelections(selections);
+    shiftClickTask(task);
+
+    var link = element('a', null, text('todoist-shortcuts issue #156'));
+    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/156';
+    link.style.color = '';
+    notifyUser(
+      span(null,
+        text('The "x" selection toggling shortcut currently behaves the ' +
+                'same as shift+click, because Todoist removed an internal ' +
+                'interface. The behavior of shift+click is too bizarre to ' +
+                'toggle selection for individual tasks. I have contacted ' +
+                'Todoist developers, so hopefully this will be fixed soon. ' +
+                ' See '),
+        link,
+        text(' for details.')
+      ));
   }
 
   function selectTask(task) {
     if (!checkTaskIsSelected(task)) {
-      toggleSelectTask(task);
+      shiftClickTask(task);
     }
   }
 
   function deselectTask(task) {
     if (checkTaskIsSelected(task)) {
-      toggleSelectTask(task);
+      shiftClickTask(task);
     }
   }
 
   // Ensures that the specified task ids are selected (specified by a set-like
   // object).
+  //
+  // TODO(#156)
+  // eslint-disable-next-line no-unused-vars
   function setSelections(selections) {
-    // TODO(#156): Simplify once there is a better way.
-    deselectAllTasks();
-    var tasks = getTasks('include-collapsed');
-    var counter = 0;
-    while (tasks.length > 0) {
-      var upperTask = tasks.shift();
-      while (upperTask && !!selections[getTaskKey(upperTask)] === checkTaskIsSelected(upperTask)) {
-        upperTask = tasks.shift();
+    var allTasks = getTasks('include-collapsed');
+    for (var i = 0; i < allTasks.length; i++) {
+      var task = allTasks[i];
+      var key = getTaskKey(task);
+      if (selections[key]) {
+        selectTask(task);
+      } else {
+        deselectTask(task);
       }
-      if (!upperTask) {
-        break;
-      }
-      shiftClickTask(upperTask);
-      counter++;
-
-      var lowerTask = tasks.pop();
-      while (lowerTask && !!selections[getTaskKey(lowerTask)] === checkTaskIsSelected(lowerTask)) {
-        lowerTask = tasks.pop();
-      }
-      if (!lowerTask) {
-        break;
-      }
-      shiftClickTask(lowerTask);
-      counter++;
     }
-    info('Reconstructed the desired selections using only ', counter, ' shift-clicks.');
   }
 
   // All MUTABLE. Only mutated by 'storeCursorContext'.
@@ -2688,6 +2717,8 @@
     return stripPrefix('indent_', cls);
   }
 
+  // TODO(#156)
+  // eslint-disable-next-line no-unused-vars
   function getTaskPriority(task) {
     var priorityClass = findUnique(isPriorityClass, task.classList);
     if (priorityClass) {
