@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 115
+
+### Bug fixes ###
+
+* Attempts to fix task selection on MacOS. See [#158][].
+
+[#158]: https://github.com/mgsloan/todoist-shortcuts/issues/157
+
+
 ## Version 114
 
 ### Bug fixes ###
