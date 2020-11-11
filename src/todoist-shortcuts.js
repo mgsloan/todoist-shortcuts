@@ -1341,7 +1341,10 @@
 
   function toggleSelectTask(task) {
     // Control click toggles selection state.
-    var e = new MouseEvent('click', { bubbles: true, ctrlKey: true });
+    var isMacOS = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    var e = isMacOS
+      ? new MouseEvent('click', { bubbles: true, metaKey: true })
+      : new MouseEvent('click', { bubbles: true, ctrlKey: true });
     withUniqueClass(task, 'task_content', all, function(content) {
       content.dispatchEvent(e);
     });
