@@ -4363,6 +4363,11 @@
 
   function keydownHandler(ev) {
     debug('keydownHandler', ev);
+    // In debug mode f12 enters debugger.
+    if (DEBUG && ev.keyCode === 123) {
+      // eslint-disable-next-line no-debugger
+      debugger;
+    }
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     if (todoistModalIsOpen()) {
