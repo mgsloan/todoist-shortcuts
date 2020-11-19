@@ -3239,7 +3239,10 @@
                   keepGoing = true;
                 }
               }
-              click(el);
+              // The li itself is not responsive to clicks.
+              var elToClick = getUniqueTag(el, 'a', all);
+              elToClick = elToClick || el;
+              click(elToClick);
               // Scroll the task into view, if needed. The delay is
               // to give time to the uncollapsing.
               setTimeout(function() { el.scrollIntoViewIfNeeded(); }, 300);
