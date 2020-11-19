@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 116
+
+### Bug fixes ###
+
+* Fixed keyboard navigation for search box. See [#159][].
+
+* Fix keyboard navigation to inbox and upcoming. See [#160][].
+
+[#159]: https://github.com/mgsloan/todoist-shortcuts/issues/159
+[#160]: https://github.com/mgsloan/todoist-shortcuts/issues/160
+
+
 ## Version 115
 
 ### Bug fixes ###
