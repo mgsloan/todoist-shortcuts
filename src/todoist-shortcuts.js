@@ -4306,12 +4306,17 @@
 
   function todoistModalIsOpen() {
     var modal = document.getElementsByClassName('reactist_modal_box').item(0);
-    if (!modal || matchingClass('detail_modal')(modal)) {
-      sawEscapeDown = false;
-      return false;
-    } else {
+    if (modal && !matchingClass('detail_modal')(modal)) {
       return true;
     }
+
+    var findSelector = selectAll(document, 'div[role="listbox"][data-dialog="true"]');
+    if (findSelector.length && findSelector[0].style.display !== 'none') {
+      return true;
+    }
+
+    sawEscapeDown = false;
+    return false;
   }
 
   function genericKeyHandler(ev) {
