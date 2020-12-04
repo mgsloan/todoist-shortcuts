@@ -4,8 +4,12 @@
 
 ### Bug fixes ###
 
+* Fixes navigation to starred items with newest Todoist verison. See
+  [#162][].
+
 * Fixes scrolling with newest Todoist version. See [#163][].
 
+[#162]: https://github.com/mgsloan/todoist-shortcuts/issues/163
 [#163]: https://github.com/mgsloan/todoist-shortcuts/issues/163
 
 
