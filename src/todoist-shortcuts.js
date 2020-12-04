@@ -1602,7 +1602,9 @@
         debug('Section name is', result);
       }
     } else {
-      error('Failed to find section div for', task);
+      error(
+        'Failed to find section div for', task,
+        'viewMode =', viewMode);
     }
     return result;
   }
@@ -1627,9 +1629,11 @@
     }
     var section = findParent(task, predicate);
     if (section && viewMode === 'project' && not(or(matchingClass('filter_view'), matchingClass('project_editor_instance')))(section)) {
-      section = section.parentElement;
-      if (not(or(matchingClass('project_editor_instance'), matchingClass('filter_view')))(section)) {
-        error('Expected', section, 'to have class project_editor_instance or filter_view');
+      var result = findParent(section, or(matchingClass('project_editor_instance'), matchingClass('filter_view')));
+      if (result) {
+        return result;
+      } else {
+        error('Expected', section, 'to have parent with class project_editor_instance or filter_view');
         return null;
       }
     }
