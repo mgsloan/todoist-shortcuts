@@ -1660,6 +1660,10 @@
     updateViewMode();
     var currentHash = document.location.hash;
     var isTaskViewHash = currentHash.startsWith('#task');
+    if (currentHash === '') {
+      currentHash = document.location.pathname;
+      isTaskViewHash = currentHash.startsWith('/app/task/');
+    }
     if (lastHash !== currentHash && !isTaskViewHash) {
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
