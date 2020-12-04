@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 118
+
+* Fixes some console errors that resulted from incomplete fix to
+  [#162][].
+
+
 ## Version 117
 
 ### Bug fixes ###
