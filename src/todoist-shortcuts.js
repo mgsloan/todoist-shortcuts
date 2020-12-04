@@ -2789,7 +2789,16 @@
     debug('Creating navigation shortcut tips');
     try {
       var navigateItems = [];
-      withTag(listHolder, 'li', function(li) {
+      withQuery(listHolder, 'li, a', function(li) {
+        // Hack alert: for some reason todoist started directly
+        // nesting <a> elements under <ul> for starred filters - see
+        // #162.
+        //
+        // TODO: remove when feasible (along with the special case CSS
+        // for it)
+        if (li.parentElement.tagName === 'LI') {
+          return;
+        }
         var mustBeKeys = null;
         var txt = null;
         var initials = null;
@@ -4069,6 +4078,10 @@
     '#top_filters .' + TODOIST_SHORTCUTS_TIP + ' {',
     '  margin-top: -4px;',
     '  margin-left: -20px;',
+    '}',
+    '',
+    '#top_filters a > .' + TODOIST_SHORTCUTS_TIP + ' {',
+    '  margin-top: 5px;',
     '}',
     '',
     '.expansion_panel__toggle .' + TODOIST_SHORTCUTS_TIP + ' {',
