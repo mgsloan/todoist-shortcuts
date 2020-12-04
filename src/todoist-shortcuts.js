@@ -2799,6 +2799,11 @@
         if (li.parentElement.tagName === 'LI') {
           return;
         }
+        // Due to this hack, it now visits some links that should be
+        // ignored.
+        if (li.tagName === 'A' && !li.classList.contains('SidebarListItem')) {
+          return;
+        }
         var mustBeKeys = null;
         var txt = null;
         var initials = null;
