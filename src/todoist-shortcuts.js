@@ -3374,12 +3374,7 @@
       return viewHeader.clientHeight;
     }
 
-    var topBar = getById('top_bar');
-    if (topBar) {
-      return topBar.clientHeight;
-    }
-
-    error('No top bar to measure.');
+    warn('No top bar to measure.');
     return 0;
   }
 
@@ -3542,14 +3537,16 @@
   // view. Does not work well for elements that are larger than half a screen
   // full.
   function verticalScrollIntoView(el, marginTop, marginBottom, skipCheck, t) {
-    var oy = offset(el).y;
-    var cy = oy - window.scrollY;
-    var h = el.offsetHeight;
-    if (skipCheck || cy < marginTop || cy + h > window.innerHeight - marginBottom) {
-      // TODO: for very large tasks, this could end up with the whole task not
-      // being in view.
-      window.scrollTo(0, oy - lerp(0, window.innerHeight, t));
-    }
+    withId('content', function(content) {
+      var oy = offset(el).y - offset(content).y;
+      var cy = oy - content.scrollTop;
+      var h = el.offsetHeight;
+      if (skipCheck || cy < marginTop || cy + h > content.offsetHeight - marginBottom) {
+        // TODO: for very large tasks, this could end up with the whole task not
+        // being in view.
+        content.scrollTo(0, oy - lerp(0, content.offsetHeight, t));
+      }
+    });
   }
 
   // Alias for document.getElementById
