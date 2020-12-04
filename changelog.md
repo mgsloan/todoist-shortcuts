@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 117
+
+### Bug fixes ###
+
+* Fixes scrolling with newest Todoist version. See [#163][].
+
+[#163]: https://github.com/mgsloan/todoist-shortcuts/issues/163
+
+
 ## Version 116
 
 ### Bug fixes ###
