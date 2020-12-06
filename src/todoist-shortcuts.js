@@ -1,18 +1,18 @@
 /* global svgs */
 
 {
-  var TODOIST_SHORTCUTS_VERSION = 118;
+  const TODOIST_SHORTCUTS_VERSION = 118;
 
   // Set this to true to get more log output.
-  var DEBUG = false;
+  const DEBUG = false;
 
-  var IS_CHROME = /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  const IS_CHROME = /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
   // Cursor navigation.
   //
   // Note that modifying these will not affect the cursor motion bindings in
   // 'handleBulkMoveKey'.
-  var CURSOR_BINDINGS = [
+  const CURSOR_BINDINGS = [
     [['j', 'down'], cursorDown],
     [['k', 'up'], cursorUp],
     [['h', 'left'], cursorLeft],
@@ -25,7 +25,7 @@
 
   // Here's where the keybindings get specified. Of course, feel free to modify
   // this list, or modify this script in general.
-  var KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
+  const KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
 
 
     // Navigation
@@ -102,12 +102,12 @@
 
     ['fallback', originalHandler]
   ]);
-  var DEFAULT_KEYMAP = 'default';
+  const DEFAULT_KEYMAP = 'default';
 
   // Build cursor movement bindings that can be used in schedule mode
-  var SCHEDULE_CURSOR_BINDINGS = [];
-  for (var cix = 0; cix < CURSOR_BINDINGS.length; cix++) {
-    var binding = CURSOR_BINDINGS[cix];
+  const SCHEDULE_CURSOR_BINDINGS = [];
+  for (let cix = 0; cix < CURSOR_BINDINGS.length; cix++) {
+    const binding = CURSOR_BINDINGS[cix];
     SCHEDULE_CURSOR_BINDINGS.push([
       binding[0],
       sequence([closeContextMenus, binding[1], schedule])
@@ -115,7 +115,7 @@
   }
 
   // Scheduling keybindings (used when scheduler is open)
-  var SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
+  const SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
     ['c', scheduleToday],
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
@@ -125,30 +125,30 @@
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback]
   ]);
-  var SCHEDULE_KEYMAP = 'schedule';
+  const SCHEDULE_KEYMAP = 'schedule';
 
   // Bulk schedule mode keybindings
-  var BULK_SCHEDULE_BINDINGS = [].concat(SCHEDULE_BINDINGS, [
+  const BULK_SCHEDULE_BINDINGS = [].concat(SCHEDULE_BINDINGS, [
     [['v', 'alt+v'], sequence([exitBulkSchedule, bulkMove])],
     ['escape', exitBulkSchedule],
     ['fallback', originalHandler]
   ]);
-  var BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
+  const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
   // Bulk move keybindings
   //
   // These can't be handled by mousetrap, because they need to be triggered
   // while an input is focused. See 'handleBulkMoveKey' below.
-  var BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
-  var BULK_MOVE_KEYMAP = 'bulk_move';
+  const BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
+  const BULK_MOVE_KEYMAP = 'bulk_move';
 
-  var SMART_SCHEDULER_BINDINGS = [
+  const SMART_SCHEDULER_BINDINGS = [
     ['enter', smartSchedulerUpdate],
     ['fallback', originalHandler]
   ];
-  var SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
+  const SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
-  var TASK_VIEW_BINDINGS = [
+  const TASK_VIEW_BINDINGS = [
     ['d', taskViewDone],
     [['i', 'escape'], taskViewClose],
     ['s', taskViewSubtasks],
@@ -170,17 +170,17 @@
     [['e', '#'], taskViewDelete],
     ['shift+c', taskViewToggleTimer]
   ];
-  var TASK_VIEW_KEYMAP = 'task_view';
+  const TASK_VIEW_KEYMAP = 'task_view';
 
   // Keycode constants
-  var LEFT_ARROW_KEYCODE = 37;
-  var UP_ARROW_KEYCODE = 38;
-  var RIGHT_ARROW_KEYCODE = 39;
-  var DOWN_ARROW_KEYCODE = 40;
-  var BACKSPACE_KEYCODE = 8;
-  var DELETE_KEYCODE = 46;
-  var ENTER_KEYCODE = 13;
-  var ESCAPE_KEYCODE = 27;
+  const LEFT_ARROW_KEYCODE = 37;
+  const UP_ARROW_KEYCODE = 38;
+  const RIGHT_ARROW_KEYCODE = 39;
+  const DOWN_ARROW_KEYCODE = 40;
+  const BACKSPACE_KEYCODE = 8;
+  const DELETE_KEYCODE = 46;
+  const ENTER_KEYCODE = 13;
+  const ESCAPE_KEYCODE = 27;
 
   function smartSchedulerUpdate() {
     withUniqueClass(document, 'SmartSchedule', all, smartScheduler => {
@@ -238,16 +238,16 @@
   }
 
   // Navigation mode uses its own key handler.
-  var NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
-  var NAVIGATE_KEYMAP = 'navigate';
+  const NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
+  const NAVIGATE_KEYMAP = 'navigate';
 
   // Keymap used when there is a floating window.
-  var POPUP_BINDINGS = [['fallback', originalHandler]];
-  var POPUP_KEYMAP = 'popup';
+  const POPUP_BINDINGS = [['fallback', originalHandler]];
+  const POPUP_KEYMAP = 'popup';
 
   // In some cases it looks like Todoist ends up invoking this
   // function. This variable prevents direct re-entry.
-  var originalHandlerReentered = false;
+  let originalHandlerReentered = false;
 
   function originalHandler(ev) {
     // Todoist is handling the 'h' key's keydown to switch to the
@@ -257,7 +257,7 @@
       return false;
     }
     // debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
-    var result = true;
+    let result = true;
     if (originalHandlerReentered) {
       warn('Ignored re-entry of key handler. Weird!');
       return result;
@@ -281,7 +281,7 @@
   }
 
   function schedulerFallback(ev) {
-    var scheduler = findScheduler();
+    const scheduler = findScheduler();
     if (scheduler) {
       // The idea here is that backspace or delete will clear and
       // focus the date entry box. Enter will just focus it.
@@ -317,29 +317,29 @@
   //
   // * "all" (default) - apply to all selection-oriented commands
   //
-  var WHAT_CURSOR_APPLIES_TO = 'all';
+  const WHAT_CURSOR_APPLIES_TO = 'all';
 
   // 'navigate' (g) attempts to assign keys to items based on their names. In
   // some case there might not be a concise labeling. This sets the limit on key
   // sequence length for things based on prefixes.
-  var MAX_NAVIGATE_PREFIX = 2;
+  const MAX_NAVIGATE_PREFIX = 2;
 
-  var TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
-  var TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
-  var TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
-  var TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
-  var TODOIST_SHORTCUTS_HELP = 'todoist_shortcuts_help';
-  var TODOIST_SHORTCUTS_HELP_CONTAINER = 'todoist_shortcuts_help_container';
+  const TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
+  const TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
+  const TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
+  const TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
+  const TODOIST_SHORTCUTS_HELP = 'todoist_shortcuts_help';
+  const TODOIST_SHORTCUTS_HELP_CONTAINER = 'todoist_shortcuts_help_container';
 
-  var TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
+  const TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
 
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
-  var todoistRootDiv = document.getElementById('todoist_app');
+  const todoistRootDiv = document.getElementById('todoist_app');
   if (!todoistRootDiv) throw new Error('no div with id "todoist_app"');
 
   // Set on initialization to mousetrap instance.
-  var mousetrap = null;
+  let mousetrap = null;
 
   /*****************************************************************************
    * Action combiners
@@ -350,7 +350,7 @@
   // eslint-disable-next-line no-unused-vars
   function sequence(actions) {
     return () => {
-      for (var i = 0; i < actions.length; i++) {
+      for (let i = 0; i < actions.length; i++) {
         actions[i]();
       }
     };
@@ -374,13 +374,13 @@
 
   // Move the cursor up and down.
   function cursorDown() {
-    var cursorChanged = modifyCursorIndex(ix => ix + 1);
+    const cursorChanged = modifyCursorIndex(ix => ix + 1);
     if (!cursorChanged && isUpcomingView()) {
       scrollTaskToTop(getCursor());
     }
   }
   function cursorUp() {
-    var cursorChanged = modifyCursorIndex(ix => ix - 1);
+    const cursorChanged = modifyCursorIndex(ix => ix - 1);
     if (!cursorChanged && isUpcomingView()) {
       info('scrolling task to bottom');
       scrollTaskToBottom(getCursor());
@@ -401,9 +401,9 @@
 
   function cursorUpSection() {
     disabledWithLazyLoading('Moving cursor up a section', () => {
-      var cursor = requireCursor();
-      var section = getSection(cursor);
-      var firstTask = getFirstTaskInSection(section);
+      const cursor = requireCursor();
+      let section = getSection(cursor);
+      let firstTask = getFirstTaskInSection(section);
       if (firstTask && !sameElement(cursor)(firstTask)) {
         // Not on first task, so move the cursor.
         setCursor(firstTask, 'scroll');
@@ -424,12 +424,12 @@
 
   function cursorDownSection() {
     disabledWithLazyLoading('Moving cursor down a section', () => {
-      var cursor = requireCursor();
-      var curSection = getSection(cursor);
-      var section = curSection;
+      const cursor = requireCursor();
+      const curSection = getSection(cursor);
+      let section = curSection;
       section = section.nextSibling;
       for (; section; section = section.nextSibling) {
-        var firstTask = getFirstTaskInSection(section);
+        const firstTask = getFirstTaskInSection(section);
         if (firstTask) {
           setCursor(firstTask, 'scroll');
           return;
@@ -437,7 +437,7 @@
       }
       // If execution has reached this point, then we must already be on the last
       // section.
-      var lastTask = getLastTaskInSection(curSection);
+      const lastTask = getLastTaskInSection(curSection);
       warn(lastTask);
       if (lastTask) {
         setCursor(lastTask, 'scroll');
@@ -451,10 +451,10 @@
   // Follow the first link of the task under the cursor.
   function followLink() {
     withUniqueClass(requireCursor(), ['content', 'task_content'], all, content => {
-      var link = getFirstTag(content, 'a');
+      const link = getFirstTag(content, 'a');
       if (link) {
         if (IS_CHROME) {
-          var middleClick = new MouseEvent( 'click', { 'button': 1, 'which': 2 });
+          const middleClick = new MouseEvent( 'click', { 'button': 1, 'which': 2 });
           link.dispatchEvent(middleClick);
         } else {
           click(link);
@@ -480,7 +480,7 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
   function schedule() {
-    var mutateCursor = getCursorToMutate();
+    const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
       blurSchedulerInput();
@@ -499,7 +499,7 @@
   // when the task is scheduled. Only works for the cursor, not for the
   // selection.
   function scheduleText() {
-    var mutateCursor = getCursorToMutate();
+    const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
@@ -548,11 +548,11 @@
     withScheduler(
       'scheduleSuggested',
       scheduler => {
-        var suggested = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'));
+        const suggested = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'));
         if (suggested) {
           click(suggested);
         } else {
-          var smartScheduler = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'));
+          const smartScheduler = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'));
           if (smartScheduler) {
             click(smartScheduler);
           } else {
@@ -575,7 +575,7 @@
   // 'all' or 'most', then instead applies to the cursor if there is no
   // selection.
   function moveToProject() {
-    var mutateCursor = getCursorToMutate();
+    const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-move-to-project', true);
       if (inBulkMoveMode) {
@@ -594,7 +594,7 @@
   // keybindings.
   function setPriority(level) {
     return () => {
-      var mutateCursor = getCursorToMutate();
+      const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
         withUniqueClass(document, 'item_actions_priority', all, click);
@@ -619,12 +619,12 @@
   // keybindings.
   function selectPriority(level) {
     return () => {
-      var actualLevel = invertPriorityLevel(level);
-      var allTasks = getTasks('include-collapsed');
-      var selected = getSelectedTaskKeys();
-      var modified = false;
-      for (var i = 0; i < allTasks.length; i++) {
-        var task = allTasks[i];
+      const actualLevel = invertPriorityLevel(level);
+      const allTasks = getTasks('include-collapsed');
+      const selected = getSelectedTaskKeys();
+      let modified = false;
+      for (let i = 0; i < allTasks.length; i++) {
+        const task = allTasks[i];
         if (getTaskPriority(task) === actualLevel) {
           selected[getTaskKey(task)] = true;
           modified = true;
@@ -639,7 +639,7 @@
   // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then
   // instead applies to the cursor if there is no selection.
   function done() {
-    var mutateCursor = getCursorToMutate('dangerous');
+    const mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
     } else {
@@ -652,7 +652,7 @@
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the cursor if
   // there is no selection.
   function deleteTasks() {
-    var mutateCursor = getCursorToMutate();
+    const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
     } else {
@@ -661,7 +661,7 @@
   }
 
   function duplicateTasks() {
-    var mutateCursor = getCursorToMutate();
+    const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
     } else {
@@ -674,14 +674,14 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    var predicate = or(matchingText('Labels'),
+    const predicate = or(matchingText('Labels'),
       matchingAction('multi-select-toolbar-label-picker'));
     withUniqueClass(document, 'multi_select_toolbar', all, toolbar => {
       withUniqueTag(toolbar, 'button', predicate, click);
     });
   }
 
-  var TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
+  const TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
 
   // If toggl-button or clockify extension is in use, clicks the
   // button element in the task.
@@ -715,14 +715,14 @@
   // nothing if it's already in the desired state.
 
   function collapse(task0) {
-    var task = task0 ? task0 : requireCursor();
+    const task = task0 ? task0 : requireCursor();
     if (checkTaskExpanded(task)) {
       toggleCollapse(task);
     }
   }
   // eslint-disable-next-line no-unused-vars
   function expand(task0) {
-    var task = task0 ? task0 : requireCursor();
+    const task = task0 ? task0 : requireCursor();
     if (checkTaskCollapsed(task)) {
       toggleCollapse(task);
     }
@@ -730,12 +730,12 @@
 
   // Move selection to parent project.
   function selectAndCollapseParent() {
-    var cursor = requireCursor();
-    var tasks = getTasks();
-    for (var i = 0; i < tasks.length; i++) {
-      var task = tasks[i];
+    const cursor = requireCursor();
+    const tasks = getTasks();
+    for (let i = 0; i < tasks.length; i++) {
+      let task = tasks[i];
       if (task === cursor) {
-        for (var j = i; j >= 0; j--) {
+        for (let j = i; j >= 0; j--) {
           task = tasks[j];
           if (getUniqueClass(task, 'down')) {
             setCursor(task, 'scroll');
@@ -761,8 +761,8 @@
 
   // Selects all tasks, even those hidden by collapsing.
   function selectAllTasks() {
-    var allTasks = getTasks('include-collapsed');
-    for (var i = 0; i < allTasks.length; i++) {
+    const allTasks = getTasks('include-collapsed');
+    for (let i = 0; i < allTasks.length; i++) {
       selectTask(allTasks[i]);
     }
   }
@@ -770,9 +770,9 @@
   // Selects all overdue tasks.
   function selectAllOverdue() {
     if (viewMode === 'agenda') {
-      var allTasks = getTasks();
-      for (var i = 0; i < allTasks.length; i++) {
-        var sectionName = getSectionName(allTasks[i]);
+      const allTasks = getTasks();
+      for (let i = 0; i < allTasks.length; i++) {
+        const sectionName = getSectionName(allTasks[i]);
         if (sectionName === 'Overdue') {
           selectTask(allTasks[i]);
         }
@@ -794,7 +794,7 @@
     if (viewMode === 'agenda') {
       withUniqueTag(document, 'button', matchingAttr('data-track', 'navigation|quick_add'), click);
     } else {
-      var tasks = getTasks();
+      const tasks = getTasks();
       if (tasks.length > 0) {
         addAboveTask(tasks[0]);
       } else {
@@ -829,7 +829,7 @@
   // Open reminders dialog
   function openReminders() {
     withTaskMenu(requireCursor(), false, menu => {
-      var predicate = or(matchingText('Reminders'),
+      const predicate = or(matchingText('Reminders'),
         matchingAction('task-overflow-menu-reminders'));
       withUniqueClass(menu, 'menu_item', predicate, click);
     });
@@ -837,9 +837,9 @@
 
   // Open assign dialog
   function openAssign() {
-    var cursor = requireCursor();
+    const cursor = requireCursor();
     withTaskHovered(cursor, () => {
-      var assignButton = getUniqueClass(cursor, 'task_list_item__person_picker');
+      const assignButton = getUniqueClass(cursor, 'task_list_item__person_picker');
       if (assignButton) {
         click(assignButton);
       } else {
@@ -858,7 +858,7 @@
   function closeContextMenus() {
     click(document.body);
     withClass(document, 'manager', manager => {
-      var cancelBtn = getUniqueClass(manager, 'cancel');
+      const cancelBtn = getUniqueClass(manager, 'cancel');
       click(cancelBtn);
     });
     // Close windows with close buttons, particularly move-to-project
@@ -879,7 +879,7 @@
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
       oldNavigateOptions = [];
-      var unregisterListener = registerMutationObserver(listHolder, () => {
+      const unregisterListener = registerMutationObserver(listHolder, () => {
         setupNavigate(listHolder);
       }, { childList: true, subtree: true });
       finishNavigate = () => {
@@ -899,9 +899,9 @@
   // it that is within the next 7 days, then it jumps to "next 7 days" and
   // reselects the task.
   function navigateToTask() {
-    var cursor = requireCursor();
+    const cursor = requireCursor();
     if (viewMode === 'project') {
-      var dateSpan = getUniqueClass(cursor, 'date');
+      const dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
         withId('top_filters', topFilters => {
           withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|upcoming'), upcoming => {
@@ -915,8 +915,8 @@
         info('Not switching to "Upcoming", because this task is not scheduled.');
       }
     } else {
-      var projectEl = null;
-      var projectSpanEl = getUniqueClass(cursor, 'task_list_item__project');
+      let projectEl = null;
+      const projectSpanEl = getUniqueClass(cursor, 'task_list_item__project');
       if (projectSpanEl) {
         projectEl = getUniqueTag(projectSpanEl, 'span');
       }
@@ -971,8 +971,8 @@
     //
     // I believe this approach was superior because it worked even
     // after the todo link disappeared.
-    var undoToast = getUniqueClass(document, 'undo_toast');
-    var undoLink = null;
+    const undoToast = getUniqueClass(document, 'undo_toast');
+    let undoLink = null;
     if (undoToast) {
       undoLink = getUniqueTag(undoToast, 'button', not(matchingClass('close_button')));
     }
@@ -995,7 +995,7 @@
 
   // Open help documentation.
   function openHelpModal() {
-    var modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
+    let modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
     if (modal === null) {
       createHelpModal();
       modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
@@ -1008,19 +1008,19 @@
     // Remove old help modals, if any.
     withClass(document, TODOIST_SHORTCUTS_HELP, x => { x.parentElement.removeChild(x); });
     // Create new help modal.
-    var header = element('h1', '', text('Keyboard shortcuts'));
-    var docsLink = element('a', '', text('Full todoist-shortcuts documentation'));
+    const header = element('h1', '', text('Keyboard shortcuts'));
+    const docsLink = element('a', '', text('Full todoist-shortcuts documentation'));
     docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/v' + TODOIST_SHORTCUTS_VERSION + '/readme.md');
-    var originalLink = element('a', '', text('Original Todoist keyboard shortcuts documentation'));
+    const originalLink = element('a', '', text('Original Todoist keyboard shortcuts documentation'));
     originalLink.setAttribute('href', 'https://get.todoist.help/hc/en-us/articles/205063212');
-    var sheetsLink = element('a', '', text('Printable shortcuts guide (displayed below)'));
+    const sheetsLink = element('a', '', text('Printable shortcuts guide (displayed below)'));
     sheetsLink.setAttribute('href', 'https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk');
-    var linksList = element('ul', '', element('li', '', docsLink), element('li', '', originalLink), element('li', '', sheetsLink));
-    var iframe = element('iframe');
+    const linksList = element('ul', '', element('li', '', docsLink), element('li', '', originalLink), element('li', '', sheetsLink));
+    const iframe = element('iframe');
     iframe.setAttribute('src', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5jkiI07g9XoeORQrOQUlAwY4uqJkBDkm-zMUK4WuaFvca0BJ0wPKEM5dw6RgKtcSN33PsZPKiN4G4/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false');
     iframe.setAttribute('scrolling', 'no');
-    var container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, iframe);
-    var modal = createModal(div('', header, container));
+    const container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, iframe);
+    const modal = createModal(div('', header, container));
     modal.classList.add(TODOIST_SHORTCUTS_HELP);
     modal.style.display = 'none';
   }
@@ -1031,7 +1031,7 @@
     withClass(document, 'menu_item', tr => {
       withUniqueTag(tr, 'td', matchingAttr('data-track', 'project|actions_import_from_template'), foundItem => {
         click(foundItem);
-        var foundInput = null;
+        let foundInput = null;
         withClass(document, 'file_input_container', container => {
           withTag(container, 'input', input => {
             foundInput = input;
@@ -1052,7 +1052,7 @@
 
   // TODO: Remove once side_panel is gone (currently it's needed for
   // todoist.com but not beta.todoist.com).
-  var TASK_VIEW_CLS = ['side_panel', 'detail_modal'];
+  const TASK_VIEW_CLS = ['side_panel', 'detail_modal'];
 
   function taskViewDone() {
     withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
@@ -1115,7 +1115,7 @@
   function taskViewOpenAssign() {
     withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
       withUniqueClass(sidePanel, 'item_overview_sub', all, itemOverview => {
-        var assignButton = getUniqueTag(itemOverview, 'button', matchingClass('person_picker__toggle'));
+        const assignButton = getUniqueTag(itemOverview, 'button', matchingClass('person_picker__toggle'));
         if (assignButton) {
           click(assignButton);
         } else {
@@ -1127,7 +1127,7 @@
 
   function taskViewMoveToProject() {
     withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
-      var predicate = or(matchingAttr('aria-label', 'Select a project'),
+      const predicate = or(matchingAttr('aria-label', 'Select a project'),
         matchingAction('task-actions-move-to-project'));
       withUniqueClass(sidePanel, 'item_action', predicate, click);
     });
@@ -1135,7 +1135,7 @@
 
   function taskViewLabel() {
     withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
-      var predicate = or(matchingAttr('aria-label', 'Add label(s)'),
+      const predicate = or(matchingAttr('aria-label', 'Add label(s)'),
         matchingAction('task-actions-add-labels'));
       withUniqueClass(sidePanel, 'item_action', predicate, click);
     });
@@ -1144,7 +1144,7 @@
   function taskViewSetPriority(level) {
     return () => {
       withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
-        var actualLevel = invertPriorityLevel(level);
+        const actualLevel = invertPriorityLevel(level);
         if (!getUniqueClass(document, 'priority_picker')) {
           withUnique(sidePanel,
             '[aria-label="Set the priority"] > span, [data-action-hint="task-actions-priority-picker"]',
@@ -1159,7 +1159,7 @@
 
   function taskViewOpenReminders() {
     withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
-      var predicate = or(matchingAttr('aria-label', 'Add reminder(s)'),
+      const predicate = or(matchingAttr('aria-label', 'Add reminder(s)'),
         matchingAction('task-actions-reminders'));
       withUniqueClass(sidePanel, 'item_action', predicate, click);
     });
@@ -1167,7 +1167,7 @@
 
   function taskViewDelete() {
     withTaskViewMoreMenu(menu => {
-      var predicate = or(matchingText('Delete task'),
+      const predicate = or(matchingText('Delete task'),
         matchingAction('task-actions-overflow-menu-delete'));
       withUniqueTag(menu, 'li', predicate, click);
     });
@@ -1181,7 +1181,7 @@
 
   function withTaskViewMoreMenu(f) {
     withUniqueClass(document, TASK_VIEW_CLS, all, sidePanel => {
-      var predicate = or(matchingAttr('aria-label', 'task edit menu'),
+      const predicate = or(matchingAttr('aria-label', 'task edit menu'),
         matchingAction('task-actions-overflow-menu'));
       if (!getUniqueClass(document, 'ul', predicate)) {
         withUniqueClass(sidePanel, 'item_actions_more', all, click);
@@ -1196,7 +1196,7 @@
 
   // MUTABLE. Is 'true' if we're in bulk schedule mode.
   var inBulkScheduleMode = false;
-  var nextBulkScheduleKey = null;
+  let nextBulkScheduleKey = null;
 
   function bulkSchedule() {
     bulkOperationsDisabled();
@@ -1212,7 +1212,7 @@
 
   // FIXME(#137)
   function bulkOperationsDisabled() {
-    var link = element('a', null, text('#137'));
+    const link = element('a', null, text('#137'));
     link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/137';
     link.style.color = '';
     notifyUser(
@@ -1239,7 +1239,7 @@
       exitBulkSchedule();
       return;
     }
-    var curBulkScheduleTask = getTaskByKey(nextBulkScheduleKey);
+    const curBulkScheduleTask = getTaskByKey(nextBulkScheduleKey);
     if (!curBulkScheduleTask) {
       warn('Exiting bulk schedule mode because it couldn\'t find', nextBulkScheduleKey);
       exitBulkSchedule();
@@ -1252,10 +1252,10 @@
   }
 
   function bulkScheduleCursorChanged() {
-    var cursor = getCursor();
+    const cursor = getCursor();
     if (cursor) {
-      var tasks = getTasks();
-      var nextBulkScheduleTask =
+      const tasks = getTasks();
+      const nextBulkScheduleTask =
           getNextCursorableTask(tasks, getTaskKey(cursor));
       if (nextBulkScheduleTask) {
         nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
@@ -1271,7 +1271,7 @@
 
   // MUTABLE. Is 'true' if we're in bulk move mode.
   var inBulkMoveMode = false;
-  var nextBulkMoveKey = null;
+  let nextBulkMoveKey = null;
 
   function bulkMove() {
     bulkOperationsDisabled();
@@ -1308,7 +1308,7 @@
       exitBulkMove();
       return;
     }
-    var curBulkMoveTask = getTaskByKey(nextBulkMoveKey);
+    const curBulkMoveTask = getTaskByKey(nextBulkMoveKey);
     if (!curBulkMoveTask) {
       warn('Exiting bulk move mode because it couldn\'t find', nextBulkMoveKey);
       exitBulkMove();
@@ -1320,10 +1320,10 @@
   }
 
   function bulkMoveCursorChanged() {
-    var cursor = getCursor();
+    const cursor = getCursor();
     if (cursor) {
-      var tasks = getTasks();
-      var nextBulkMoveTask =
+      const tasks = getTasks();
+      const nextBulkMoveTask =
           getNextCursorableTask(tasks, getTaskKey(cursor));
       if (nextBulkMoveTask) {
         nextBulkMoveKey = getTaskKey(nextBulkMoveTask);
@@ -1339,8 +1339,8 @@
 
   function toggleSelectTask(task) {
     // Control click toggles selection state.
-    var isMacOS = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    var e = isMacOS
+    const isMacOS = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const e = isMacOS
       ? new MouseEvent('click', { bubbles: true, metaKey: true })
       : new MouseEvent('click', { bubbles: true, ctrlKey: true });
     withUniqueClass(task, 'task_content', all, content => {
@@ -1364,10 +1364,10 @@
   // Ensures that the specified task ids are selected (specified by a set-like
   // object).
   function setSelections(selections) {
-    var allTasks = getTasks('include-collapsed');
-    for (var i = 0; i < allTasks.length; i++) {
-      var task = allTasks[i];
-      var key = getTaskKey(task);
+    const allTasks = getTasks('include-collapsed');
+    for (let i = 0; i < allTasks.length; i++) {
+      const task = allTasks[i];
+      const key = getTaskKey(task);
       if (selections[key]) {
         selectTask(task);
       } else {
@@ -1377,13 +1377,13 @@
   }
 
   // All MUTABLE. Only mutated by 'storeCursorContext'.
-  var lastCursorTasks = [];
-  var lastCursorIndex = -1;
-  var lastCursorId = null;
-  var lastCursorIndent = null;
-  var lastCursorSection = null;
-  var mouseGotMoved = false;
-  var wasEditing = false;
+  let lastCursorTasks = [];
+  let lastCursorIndex = -1;
+  let lastCursorId = null;
+  let lastCursorIndent = null;
+  let lastCursorSection = null;
+  let mouseGotMoved = false;
+  let wasEditing = false;
 
   function storeCursorContext(cursor, tasks, index, editing) {
     lastCursorTasks = tasks;
@@ -1402,8 +1402,8 @@
   }
 
   function storeNormalContext(cursor) {
-    var tasks = getTasks();
-    var index = tasks.indexOf(cursor);
+    const tasks = getTasks();
+    const index = tasks.indexOf(cursor);
     if (index < 0) {
       error('Invariant violation - couldn\'t find ', cursor, 'in', tasks);
     }
@@ -1427,8 +1427,8 @@
   function handleMouseOver(ev) {
     if (ev.isTrusted) {
       try {
-        var predicate = matchingClass('task_list_item');
-        var hoveredTask = findParent(ev.target, predicate);
+        const predicate = matchingClass('task_list_item');
+        const hoveredTask = findParent(ev.target, predicate);
         if (mouseGotMoved && hoveredTask) {
           debug('Due to mouse hover, setting cursor');
           setCursor(hoveredTask, 'no-scroll');
@@ -1449,10 +1449,10 @@
   function ensureCursor(content) {
     // If there's an editor open to add a task, then set the cursor to the item
     // above.
-    var manager = getUniqueClass(content, 'manager');
+    const manager = getUniqueClass(content, 'manager');
     if (manager) {
-      var tasks = getTasks('include-collapsed', 'include-editors');
-      var managerIndex = tasks.findIndex(task => task.classList.contains('manager'));
+      const tasks = getTasks('include-collapsed', 'include-editors');
+      const managerIndex = tasks.findIndex(task => task.classList.contains('manager'));
       debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
         storeEditingContext(tasks[managerIndex - 1], true);
@@ -1462,15 +1462,15 @@
       return;
     }
     debug('Checking if cursor still exists:', lastCursorId, lastCursorIndent);
-    var cursor = getCursor();
+    const cursor = getCursor();
     // Detect if the cursor has changed section. This can happen when the user
     // re-schedules it or moves it to a different project. I find it nicer if
     // the cursor doesn't follow the task for these moves, hence this logic.
-    var changedSection = false;
-    var currentSection = null;
+    let changedSection = false;
+    let currentSection = null;
     if (cursor && !wasEditing) {
-      var cursorId = getTaskId(cursor);
-      var cursorIndent = getIndentClass(cursor);
+      const cursorId = getTaskId(cursor);
+      const cursorIndent = getIndentClass(cursor);
       if (lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
         currentSection = getSectionName(cursor);
         debug(
@@ -1505,8 +1505,8 @@
   }
 
   function restoreLastCursor() {
-    var found = false;
-    var tasks = null;
+    let found = false;
+    let tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
         var task = getTaskById(lastCursorId, 'ignore-indent');
@@ -1518,13 +1518,13 @@
           warn('expected to find task that was being edited.');
         }
       } else {
-        for (var i = lastCursorIndex; i < lastCursorTasks.length; i++) {
-          var oldTask = lastCursorTasks[i];
+        for (let i = lastCursorIndex; i < lastCursorTasks.length; i++) {
+          const oldTask = lastCursorTasks[i];
           if (oldTask) {
-            var oldTaskId = getTaskId(oldTask);
+            const oldTaskId = getTaskId(oldTask);
             task = getTaskById(oldTaskId, 'ignore-indent');
             if (task) {
-              var taskSection = getSectionName(task);
+              const taskSection = getSectionName(task);
               // Don't jump back to the same task if it moved changed section.
               if (i !== lastCursorIndex || taskSection === lastCursorSection) {
                 debug(
@@ -1568,11 +1568,11 @@
 
   // Gets the name of the section that a task is in.
   function getSectionName(task) {
-    var section = getSection(task);
-    var result = null;
+    const section = getSection(task);
+    let result = null;
     if (section) {
-      var outerHeaders = section.querySelectorAll('header');
-      var outerHeader;
+      const outerHeaders = section.querySelectorAll('header');
+      let outerHeader;
       if (outerHeaders.length === 0) {
         outerHeader = getUniqueClass(document, 'view_header');
         if (!outerHeader) {
@@ -1582,7 +1582,7 @@
       } else {
         outerHeader = outerHeaders[outerHeaders.length - 1];
       }
-      var header = null;
+      let header = null;
       if (outerHeader) {
         header = getUniqueTag(outerHeader, 'h1');
         if (!header) {
@@ -1606,7 +1606,7 @@
   }
 
   function getSection(task) {
-    var predicate;
+    let predicate;
     if (viewMode === 'agenda') {
       predicate = or(
         // overdue / upcoming / filters
@@ -1623,9 +1623,9 @@
       error('Unexpected viewMode:', viewMode);
       return null;
     }
-    var section = findParent(task, predicate);
+    const section = findParent(task, predicate);
     if (section && viewMode === 'project' && not(or(matchingClass('filter_view'), matchingClass('project_editor_instance')))(section)) {
-      var result = findParent(section, or(matchingClass('project_editor_instance'), matchingClass('filter_view')));
+      const result = findParent(section, or(matchingClass('project_editor_instance'), matchingClass('filter_view')));
       if (result) {
         return result;
       } else {
@@ -1645,7 +1645,7 @@
   }
 
   // MUTABLE. Stores the last page hash, to detect page changes.
-  var lastHash = null;
+  let lastHash = null;
 
   // MUTABLE. If set, then the specified task ID will be selected after
   // navigation.
@@ -1654,8 +1654,8 @@
   function handlePageChange() {
     updateKeymap();
     updateViewMode();
-    var currentHash = document.location.hash;
-    var isTaskViewHash = currentHash.startsWith('#task');
+    let currentHash = document.location.hash;
+    let isTaskViewHash = currentHash.startsWith('#task');
     if (currentHash === '') {
       currentHash = document.location.pathname;
       isTaskViewHash = currentHash.startsWith('/app/task/');
@@ -1664,11 +1664,11 @@
       lastHash = currentHash;
       debug('Setting cursor to first task after navigation');
       if (selectAfterNavigate) {
-        var newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
+        const newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
         if (newEl) {
           setCursor(newEl, 'scroll');
         } else if (isUpcomingView()) {
-          var taskId = selectAfterNavigate;
+          const taskId = selectAfterNavigate;
           setTimeout(() => {
             persistentlySelectAfterNavigate(taskId, 100);
           }, 10);
@@ -1689,7 +1689,7 @@
   }
 
   function persistentlySelectAfterNavigate(taskId, retriesLeft) {
-    var taskEl = getTaskById(taskId, 'ignore-indent');
+    const taskEl = getTaskById(taskId, 'ignore-indent');
     if (taskEl) {
       setCursor(taskEl, 'scroll');
     } else if (retriesLeft > 1) {
@@ -1719,7 +1719,7 @@
         return;
       }
       // Ignore mutations from toggl-button extension
-      var filtered = mutations.filter(mutation => {
+      const filtered = mutations.filter(mutation => {
         if (mutation.target.classList.contains('toggl-button')) {
           return false;
         }
@@ -1746,7 +1746,7 @@
   }
 
   function handleBodyChange() {
-    var nextTask;
+    let nextTask;
     updateKeymap();
     if (inBulkScheduleMode) {
       if (!checkSchedulerOpen()) {
@@ -1791,9 +1791,9 @@
       if (currentKeymap === NAVIGATE_KEYMAP) {
         return;
       }
-      var popupWindow = getUniqueClass(document, 'GB_window');
+      const popupWindow = getUniqueClass(document, 'GB_window');
       if (popupWindow) {
-        var smartScheduler = getUniqueClass(popupWindow, 'SmartSchedule');
+        const smartScheduler = getUniqueClass(popupWindow, 'SmartSchedule');
         if (smartScheduler) {
           switchKeymap(SMART_SCHEDULER_KEYMAP);
         } else {
@@ -1831,8 +1831,8 @@
   // Registers a mutation observer that just observes modifications to its
   // child list.
   function registerMutationObserver(el, f, optionalOpts) {
-    var opts = optionalOpts ? optionalOpts : { childList: true };
-    var observer = new MutationObserver(f);
+    const opts = optionalOpts ? optionalOpts : { childList: true };
+    const observer = new MutationObserver(f);
     observer.observe(el, opts);
     return onDisable(() => { observer.disconnect(); });
   }
@@ -1842,7 +1842,7 @@
   //
   // eslint-disable-next-line no-unused-vars
   function withRestoredSelections(f) {
-    var oldSelections = getSelectedTaskKeys();
+    const oldSelections = getSelectedTaskKeys();
     try {
       f();
     } finally {
@@ -1851,10 +1851,10 @@
   }
 
   function openMoreMenu() {
-    var predicate = or(matchingText('More'),
+    const predicate = or(matchingText('More'),
       matchingAction('multi-select-toolbar-overflow-menu-trigger'));
     withUniqueTag(document, 'button', predicate, click);
-    var result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
+    const result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
     if (!result) {
       throw new Error('Failed to find "More" menu');
     }
@@ -1932,12 +1932,12 @@
   // collapse / expand all items.
   function repeatedlyClickArrows(cls) {
     withId('content', content => {
-      var clickedSomething = false;
-      var doClick = el => {
+      let clickedSomething = false;
+      const doClick = el => {
         click(el);
         clickedSomething = true;
       };
-      for (var i = 0; i < 100; i++) {
+      for (let i = 0; i < 100; i++) {
         withClass(content, cls, doClick);
         if (!clickedSomething) break;
         if (i === 99) {
@@ -1984,7 +1984,7 @@
   }
 
   function withScheduler(name, f) {
-    var scheduler = findScheduler();
+    const scheduler = findScheduler();
     if (scheduler) {
       f(scheduler);
     } else {
@@ -1995,8 +1995,8 @@
   // Simulate a key press with todoist's global handlers.
   // eslint-disable-next-line no-unused-vars
   function todoistShortcut(options0) {
-    var options = typeof options0 === 'string' ? { key: options0 } : options0;
-    var ev = new Event('keydown');
+    const options = typeof options0 === 'string' ? { key: options0 } : options0;
+    let ev = new Event('keydown');
     for (var o in options) { ev[o] = options[o]; }
     if (window.originalTodoistKeydown) {
       window.originalTodoistKeydown.apply(document, [ev]);
@@ -2018,7 +2018,7 @@
     if (viewMode === 'agenda') {
       info('Indenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
-      var cursor = requireCursor();
+      const cursor = requireCursor();
       dragTaskOver(cursor, false, () => ({
         destination: cursor,
         horizontalOffset: 35,
@@ -2034,7 +2034,7 @@
     if (viewMode === 'agenda') {
       info('Dedenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
-      var cursor = requireCursor();
+      const cursor = requireCursor();
       if (getIndentClass(cursor) === 'indent_1') {
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
@@ -2056,7 +2056,7 @@
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
-      var cursor = requireCursor();
+      const cursor = requireCursor();
       if (getSectionName(cursor) === 'Overdue') {
         info('Can\'t move cursor up in overdue section');
         return;
@@ -2065,12 +2065,12 @@
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
       dragTaskOver(cursor, false, () => {
-        var tasks = getTasks();
-        var cursorIndex = tasks.indexOf(cursor);
-        var cursorIndent = getIndentClass(cursor);
-        for (var i = cursorIndex - 1; i >= 0; i--) {
-          var task = tasks[i];
-          var indent = getIndentClass(task);
+        const tasks = getTasks();
+        const cursorIndex = tasks.indexOf(cursor);
+        const cursorIndent = getIndentClass(cursor);
+        for (let i = cursorIndex - 1; i >= 0; i--) {
+          const task = tasks[i];
+          const indent = getIndentClass(task);
           if (indent === cursorIndent) {
             // Less glitchy if destination is collapsed
             collapse(task);
@@ -2096,7 +2096,7 @@
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
-      var cursor = requireCursor();
+      const cursor = requireCursor();
       if (getSectionName(cursor) === 'Overdue') {
         info('Can\'t move cursor down in overdue section');
         return;
@@ -2105,13 +2105,13 @@
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
       dragTaskOver(cursor, true, () => {
-        var tasks = getTasks();
-        var cursorIndex = tasks.indexOf(cursor);
-        var cursorIndent = getIndentClass(cursor);
-        var lastQualifyingTask = null;
-        for (var i = cursorIndex + 1; i < tasks.length; i++) {
-          var task = tasks[i];
-          var indent = getIndentClass(task);
+        const tasks = getTasks();
+        const cursorIndex = tasks.indexOf(cursor);
+        const cursorIndent = getIndentClass(cursor);
+        let lastQualifyingTask = null;
+        for (let i = cursorIndex + 1; i < tasks.length; i++) {
+          const task = tasks[i];
+          const indent = getIndentClass(task);
           // Logic here is a bit tricky.  The first time we encounter a task
           // at the same indent level, this is the subtree we want to move
           // past.  So, set lastQualifyingTask to non-null and keep track of
@@ -2147,15 +2147,15 @@
     }
   }
 
-  var timeToRestoreScroll = null;
-  var scrollTimeoutCount = 0;
+  let timeToRestoreScroll = null;
+  let scrollTimeoutCount = 0;
 
   function withScrollIgnoredFor(millis, f) {
     try {
       ignoreScroll();
       f();
     } finally {
-      var restoreTime = new Date((new Date()).getTime() + millis);
+      const restoreTime = new Date((new Date()).getTime() + millis);
       if (timeToRestoreScroll === null || restoreTime > timeToRestoreScroll) {
         timeToRestoreScroll = restoreTime;
       }
@@ -2166,7 +2166,7 @@
 
   function scrollTimeoutHandler() {
     scrollTimeoutCount -= 1;
-    var now = new Date();
+    const now = new Date();
     if (timeToRestoreScroll === null || now > timeToRestoreScroll) {
       restoreScroll();
     } else if (scrollTimeoutCount === 0) {
@@ -2211,7 +2211,7 @@
     setTimeout(() => { suppressDrag = false; }, 0);
     restoreScroll();
     ensureCursor(getById('content'));
-    var cursor = getCursor();
+    const cursor = getCursor();
     if (cursor) {
       scrollTaskIntoView(cursor);
     }
@@ -2227,17 +2227,17 @@
   }
 
   function dragTaskOver(sourceTask, isBelow, findDestination) {
-    var sourceY = offset(sourceTask).y;
+    const sourceY = offset(sourceTask).y;
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
       try {
         dragStart();
-        var result = findDestination();
+        const result = findDestination();
         withDragHandle(sourceTask, (el, x, y) => {
           if (result) {
-            var deltaX = result.horizontalOffset;
-            var deltaY = offset(result.destination).y - sourceY + result.verticalOffset;
+            const deltaX = result.horizontalOffset;
+            let deltaY = offset(result.destination).y - sourceY + result.verticalOffset;
             if (isBelow) {
               deltaY += result.destination.clientHeight;
             }
@@ -2255,14 +2255,14 @@
   }
 
   function withDragHandle(task, f, finished) {
-    var key = getTaskKey(task);
+    const key = getTaskKey(task);
     task.dispatchEvent(new Event('mouseover'));
     try {
-      var handler = getUniqueClass(task, 'item_dnd_handle');
+      const handler = getUniqueClass(task, 'item_dnd_handle');
       if (handler) {
-        var handlerOffset = offset(handler);
-        var x = handlerOffset.x + handler.offsetWidth / 2 - window.scrollX - 3;
-        var y = handlerOffset.y + handler.offsetHeight / 2 - window.scrollY - 4;
+        const handlerOffset = offset(handler);
+        const x = handlerOffset.x + handler.offsetWidth / 2 - window.scrollX - 3;
+        const y = handlerOffset.y + handler.offsetHeight / 2 - window.scrollY - 4;
         f(handler, x, y);
       } else {
         // FIXME: Sometimes this triggers, particularly when move up / move
@@ -2279,15 +2279,15 @@
   }
 
   function animateDrag(el, sx, sy, tx, ty, finished) {
-    var startParams = mkMouseParams(sx, sy);
+    const startParams = mkMouseParams(sx, sy);
     el.dispatchEvent(new MouseEvent('mousedown', startParams));
-    var duration = 50;
-    var frameCount = 10;
-    var currentFrame = 0;
+    const duration = 50;
+    const frameCount = 10;
+    let currentFrame = 0;
     // NOTE: Animating this may seem overkill, but doing a direct move didn't
     // work reliably.  This also makes it clearer what's happening.
-    var dragLoop = () => {
-      var alpha = currentFrame / frameCount;
+    const dragLoop = () => {
+      const alpha = currentFrame / frameCount;
       currentFrame++;
       if (alpha >= 1) {
         var params = mkMouseParams(tx, ty);
@@ -2315,7 +2315,7 @@
   }
 
   function overshootCoslerp(s, e, t, mt, f) {
-    var m = lerp(s, e, f);
+    const m = lerp(s, e, f);
     if (t < mt) {
       return coslerp(s, m, t / mt);
     } else {
@@ -2335,7 +2335,7 @@
 
   function clickTaskEdit(task) {
     withUniqueClass(task, 'task_content', all, content => {
-      var options = {
+      const options = {
         bubbles: true,
         cancelable: true,
         view: window,
@@ -2356,7 +2356,7 @@
   }
 
   function withTaskHovered(task, f) {
-    var options = {
+    const options = {
       bubbles: true,
       cancelable: true,
       view: window,
@@ -2374,7 +2374,7 @@
     enterDeferLastBinding();
     setTimeout(() => {
       try {
-        var scheduler = findScheduler();
+        const scheduler = findScheduler();
         if (scheduler) {
           withTag(scheduler, 'input', el => {
             el.blur();
@@ -2412,11 +2412,11 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       withTaskMenu(task, true, menu => {
-        var predicate = or(matchingText(menuText),
+        const predicate = or(matchingText(menuText),
           matchingAction(action));
         withUniqueClass(menu, 'menu_item', predicate, click);
       });
-      var editor = getUniqueClass(document, 'task_editor');
+      const editor = getUniqueClass(document, 'task_editor');
       if (editor) {
         scrollTaskEditorIntoView();
       } else {
@@ -2431,7 +2431,7 @@
   // Clicks the "Add Task" button within the section that contains the specified
   // task.
   function addToSectionContaining(task) {
-    var section = null;
+    let section = null;
     if (task) {
       section = getSection(task);
     } else if (viewMode === 'agenda') {
@@ -2453,8 +2453,8 @@
     clickInlineAddTask(section);
   }
 
-  var SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';
-  var SHOULD_UNSAFE_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all';
+  const SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';
+  const SHOULD_UNSAFE_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all';
 
   // This function is used by commands that can be applied to both selections
   // and the cursor. It returns the cursor task under the following conditions:
@@ -2466,7 +2466,7 @@
     // TODO: Something more efficient than finding all selections if we just
     // want to know if there are any.
     if (isEmptyMap(getSelectedTaskKeys())) {
-      var cursor = requireCursor();
+      const cursor = requireCursor();
       // eslint-disable-next-line no-undefined
       if (danger === undefined) {
         if (SHOULD_MUTATE_CURSOR) {
@@ -2484,7 +2484,7 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    var predicate =
+    const predicate =
         or(matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'),
           matchingAttr('data-svgs-path', 'sm1/priority_' + level + '_hc.svg'));
     withUniqueTag(menu, 'svg', predicate, svg => {
@@ -2496,9 +2496,9 @@
 
   function notifyUser(msg) {
     withId('app_holder', appHolder => {
-      var close = div('ts-note-close');
+      const close = div('ts-note-close');
       close.innerHTML = svgs['sm1/close_small.svg'];
-      var note =
+      const note =
           div('ts-note',
             div('ts-note-content',
               span('ts-note-prefix', text('Message from todoist-shortcuts: ')),
@@ -2506,18 +2506,18 @@
               typeof msg === 'string' ? text(msg) : msg),
             close);
       appHolder.appendChild(note);
-      var closeFunc = () => { appHolder.removeChild(note); };
+      const closeFunc = () => { appHolder.removeChild(note); };
       close.onclick = closeFunc;
       setTimeout(closeFunc, 10000);
     });
   }
 
   function createModal(msg) {
-    var modal;
+    let modal;
     withId('app_holder', appHolder => {
-      var close = div('ts-modal-close');
+      const close = div('ts-modal-close');
       close.innerHTML = svgs['sm1/close_small.svg'];
-      var content = div('ts-modal-content', typeof msg === 'string' ? text(msg) : msg);
+      const content = div('ts-modal-content', typeof msg === 'string' ? text(msg) : msg);
       modal = div('ts-modal', content, close);
       appHolder.appendChild(modal);
       close.onclick = () => { modal.style.display = 'none'; };
@@ -2531,31 +2531,31 @@
 
   // Get the <li> elements for all the tasks visible in the current view.
   function getTasks(includeCollapsed, includeEditors) {
-    var shouldIncludeCollapsed = false;
+    let shouldIncludeCollapsed = false;
     if (includeCollapsed === 'include-collapsed') {
       shouldIncludeCollapsed = true;
     } else if (includeCollapsed && includeCollapsed !== 'no-collapsed') {
       error('Unexpected value for includeCollapsed:', includeCollapsed);
       return [];
     }
-    var shouldIncludeEditors = false;
+    let shouldIncludeEditors = false;
     if (includeEditors === 'include-editors') {
       shouldIncludeEditors = true;
     } else if (includeEditors && includeEditors !== 'no-editors') {
       error('Unexpected value for includeEditors:', includeEditors);
       return [];
     }
-    var results = [];
+    const results = [];
     withId('content', content => {
       withTag(content, 'li', item => {
         // Skip elements which don't correspond to tasks
-        var classMatches =
+        const classMatches =
           !item.classList.contains('reorder_item') &&
           (  item.classList.contains('task_list_item')
           || (item.classList.contains('manager') && shouldIncludeEditors)
           );
         // Skip nested tasks that are not visible (if includeCollapsed is not set).
-        var visible = shouldIncludeCollapsed || !hidden(item);
+        const visible = shouldIncludeCollapsed || !hidden(item);
         if (classMatches && visible) {
           results.push(item);
         }
@@ -2574,12 +2574,12 @@
   // When in agenda mode, also includes the indent level in the key. See
   // 'getTaskById' for why.
   function getSelectedTaskKeys() {
-    var results = {};
-    var tasks = getTasks('include-collapsed');
-    for (var i = 0; i < tasks.length; i++) {
-      var task = tasks[i];
+    const results = {};
+    const tasks = getTasks('include-collapsed');
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
       if (checkTaskIsSelected(task)) {
-        var key = getTaskKey(task);
+        const key = getTaskKey(task);
         results[key] = true;
       }
     }
@@ -2615,7 +2615,7 @@
   }
 
   function getTaskId(task) {
-    var idViaAttr = task.attributes['data-item-id'];
+    const idViaAttr = task.attributes['data-item-id'];
     if (idViaAttr) {
       return idViaAttr.value;
     } else {
@@ -2631,11 +2631,11 @@
   */
 
   function getIndentClass(task) {
-    var indentClass = findUnique(isIndentClass, task.classList);
+    const indentClass = findUnique(isIndentClass, task.classList);
     if (indentClass) {
       return indentClass;
     } else {
-      var indentAttribute = task.attributes['data-item-indent'];
+      const indentAttribute = task.attributes['data-item-indent'];
       if (indentAttribute) {
         return 'indent_' + indentAttribute.value;
       } else {
@@ -2653,11 +2653,11 @@
   }
 
   function getTaskPriority(task) {
-    var priorityClass = findUnique(isPriorityClass, task.classList);
+    let priorityClass = findUnique(isPriorityClass, task.classList);
     if (priorityClass) {
       return stripPriorityClass(priorityClass);
     } else {
-      var taskCheckbox = getUniqueClass(task, ['task_checkbox', 'item_checkbox']);
+      const taskCheckbox = getUniqueClass(task, ['task_checkbox', 'item_checkbox']);
       if (taskCheckbox) {
         priorityClass = findUnique(isPriorityClass, taskCheckbox.classList);
         if (priorityClass) {
@@ -2697,7 +2697,7 @@
   }
 
   function withTaskByKey(key, f) {
-    var task = getTaskByKey(key, f);
+    const task = getTaskByKey(key, f);
     if (task) {
       f(task);
     } else {
@@ -2706,7 +2706,7 @@
   }
 
   function getTaskByKey(key) {
-    var arr = key.split(' ');
+    const arr = key.split(' ');
     if (viewMode === 'project') {
       return getTaskById(arr[0], 'ignore-indent');
     } else {
@@ -2724,10 +2724,10 @@
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
   function getTaskById(id, indent) {
-    var els;
-    var i;
-    var el;
-    var indentNumber = indent ? stripIndentClass(indent) : null;
+    let els;
+    let i;
+    let el;
+    const indentNumber = indent ? stripIndentClass(indent) : null;
     els = document.getElementsByClassName('task_list_item');
     for (i = 0; i < els.length; i++) {
       el = els[i];
@@ -2749,10 +2749,10 @@
 
   // Gets the next task the cursor can be moved to, after the specified task.
   function getNextCursorableTask(tasks, currentKey) {
-    for (var i = 0; i < tasks.length; i++) {
+    for (let i = 0; i < tasks.length; i++) {
       if (getTaskKey(tasks[i]) === currentKey) {
-        for (var j = i + 1; j < tasks.length; j++) {
-          var task = tasks[j];
+        for (let j = i + 1; j < tasks.length; j++) {
+          const task = tasks[j];
           return task;
         }
       }
@@ -2765,14 +2765,14 @@
   var finishNavigate = null;
 
   // MUTABLE. Current set of navigate options.
-  var navigateOptions = {};
+  let navigateOptions = {};
 
   // MUTABLE. Used to avoid infinite recursion of 'setupNavigate' due to it
   // being called on mutation of DOM that it mutates.
   var oldNavigateOptions = {};
 
   // MUTABLE. Keys the user has pressed so far.
-  var navigateKeysPressed = '';
+  let navigateKeysPressed = '';
 
   // Assigns key bindings to sections like inbox / today / various projects.
   // These keybindings get displayed along the options.  This function should
@@ -2784,7 +2784,7 @@
     document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
-      var navigateItems = [];
+      const navigateItems = [];
       withQuery(listHolder, 'li, a', li => {
         // Hack alert: for some reason todoist started directly
         // nesting <a> elements under <ul> for starred filters - see
@@ -2800,9 +2800,9 @@
         if (li.tagName === 'A' && !li.classList.contains('SidebarListItem')) {
           return;
         }
-        var mustBeKeys = null;
-        var txt = null;
-        var initials = null;
+        let mustBeKeys = null;
+        let txt = null;
+        let initials = null;
         if (matchingAttr('data-track', 'navigation|inbox')(li)) {
           mustBeKeys = 'i';
         } else if (matchingAttr('data-track', 'navigation|today')(li)) {
@@ -2851,10 +2851,10 @@
         }
       });
       withClass(listHolder, 'expansion_panel__toggle', summary => {
-        var mustBeKeys = null;
-        var dataTrackAttr = summary.attributes['data-track'];
+        let mustBeKeys = null;
+        const dataTrackAttr = summary.attributes['data-track'];
         if (dataTrackAttr) {
-          var dataTrack = dataTrackAttr.value;
+          const dataTrack = dataTrackAttr.value;
           if (dataTrack === 'navigation|projects_panel') {
             mustBeKeys = 'tp';
           } else if (dataTrack === 'navigation|labels_panel') {
@@ -2874,9 +2874,9 @@
         }
       });
       navigateOptions = assignKeysToItems(navigateItems);
-      var different = false;
-      for (var key in navigateOptions) {
-        var oldOption = oldNavigateOptions[key];
+      let different = false;
+      for (const key in navigateOptions) {
+        const oldOption = oldNavigateOptions[key];
         if (!oldOption) {
           different = true;
           break;
@@ -2908,17 +2908,17 @@
   // Add in tips to tell the user what key to press.
   function rerenderTips() {
     removeOldTips();
-    var renderedAny = false;
-    for (var key in navigateOptions) {
-      var prefix = key.slice(0, navigateKeysPressed.length);
-      var rest = key.slice(navigateKeysPressed.length);
+    let renderedAny = false;
+    for (const key in navigateOptions) {
+      const prefix = key.slice(0, navigateKeysPressed.length);
+      const rest = key.slice(navigateKeysPressed.length);
       if (prefix === navigateKeysPressed) {
-        var option = navigateOptions[key];
-        var el = option.element;
+        const option = navigateOptions[key];
+        const el = option.element;
         if (!el) {
           error('Missing element for tip', key);
         } else {
-          var tip = div(TODOIST_SHORTCUTS_TIP, text(rest));
+          const tip = div(TODOIST_SHORTCUTS_TIP, text(rest));
           if (prefix.length > 0) {
             tip.prepend(span(TODOIST_SHORTCUTS_TIP_TYPED, text(prefix)));
           }
@@ -2932,10 +2932,10 @@
 
   // Lowercase and take only alphanumeric.
   function preprocessItemText(txt) {
-    var result = '';
-    for (var i = 0; i < txt.length; i++) {
-      var char = txt[i];
-      var lowerChar = char.toLowerCase();
+    let result = '';
+    for (let i = 0; i < txt.length; i++) {
+      const char = txt[i];
+      const lowerChar = char.toLowerCase();
       if (lowercaseCharIsAlphanum(lowerChar)) {
         result += lowerChar;
       }
@@ -2945,10 +2945,10 @@
 
   // Lowercase and get initials.
   function getItemInitials(txt) {
-    var result = '';
-    for (var i = 0; i < txt.length; i++) {
-      var char = txt[i];
-      var lowerChar = char.toLowerCase();
+    let result = '';
+    for (let i = 0; i < txt.length; i++) {
+      const char = txt[i];
+      const lowerChar = char.toLowerCase();
       if (lowercaseCharIsAlphanum(lowerChar) &&
         (i === 0 || txt[i - 1] === ' ' || lowerChar !== char)) {
         result += lowerChar;
@@ -2958,31 +2958,31 @@
   }
 
   function lowercaseCharIsAlphanum(char) {
-    var code = char.charCodeAt(0);
+    const code = char.charCodeAt(0);
     return (
       (code > 47 && code < 58) || // (0-9)
       (code > 96 && code < 123));  // (a-z)
   }
 
-  var JUMP_KEYS = 'asdfghjklqwertyuiopzxcvbnm1234567890';
+  const JUMP_KEYS = 'asdfghjklqwertyuiopzxcvbnm1234567890';
 
   // Assign keys to items based on their text.
   function assignKeysToItems(items) {
-    var result = {};
-    var item;
-    var keys;
-    var prefix;
-    var prefixesUsed = {};
+    const result = {};
+    let item;
+    let keys;
+    let prefix;
+    const prefixesUsed = {};
     // Ensure none of the results are prefixes or equal to this keysequence.
-    var prefixNotAliased = ks => {
-      for (var i = 1; i <= ks.length; i++) {
+    const prefixNotAliased = ks => {
+      for (let i = 1; i <= ks.length; i++) {
         if (result[ks.slice(0, i)]) {
           return false;
         }
       }
       return true;
     };
-    var noAliasing = ks => {
+    const noAliasing = ks => {
       if (!prefixNotAliased(ks)) {
         return false;
       }
@@ -2992,22 +2992,22 @@
       }
       return true;
     };
-    var addResult = (ks, x) => {
-      var noAlias = noAliasing(ks);
+    const addResult = (ks, x) => {
+      const noAlias = noAliasing(ks);
       if (noAlias) {
         result[ks] = x;
-        for (var i = 1; i <= ks.length; i++) {
+        for (let i = 1; i <= ks.length; i++) {
           prefixesUsed[ks.slice(0, i)] = true;
         }
       }
       return noAlias;
     };
-    var addViaKeyFunc = (mode, f) => {
-      var groups = {};
-      for (var j = 0; j < items.length; j++) {
+    const addViaKeyFunc = (mode, f) => {
+      const groups = {};
+      for (let j = 0; j < items.length; j++) {
         keys = f(items[j]);
         if (keys) {
-          var group = groups[keys];
+          let group = groups[keys];
           if (!group) {
             group = [];
             groups[keys] = group;
@@ -3015,20 +3015,20 @@
           group.push(j);
         }
       }
-      var qualifying = [];
+      const qualifying = [];
       for (keys in groups) {
         if (noAliasing(keys)) {
-          var groupItems = groups[keys];
-          var qualifies = false;
+          const groupItems = groups[keys];
+          let qualifies = false;
           if (mode === 'no-shortening') {
             qualifies = true;
           } else if (mode === 'try-shortening') {
             // Prefer shortened key sequences if they are unambiguous.
-            for (var sl = MAX_NAVIGATE_PREFIX - 1; sl > 0; sl--) {
-              var shortened = keys.slice(0, sl);
+            for (let sl = MAX_NAVIGATE_PREFIX - 1; sl > 0; sl--) {
+              const shortened = keys.slice(0, sl);
               if (noAliasing(shortened)) {
-                var found = true;
-                for (var otherKeys in groups) {
+                let found = true;
+                for (const otherKeys in groups) {
                   if (otherKeys !== keys && otherKeys.slice(0, sl) !== shortened) {
                     found = false;
                     break;
@@ -3055,9 +3055,9 @@
       }
       // sort backwards so that deletion works.
       qualifying.sort((a, b) => b[1] - a[1]);
-      for (var k = 0; k < qualifying.length; k++) {
+      for (let k = 0; k < qualifying.length; k++) {
         keys = qualifying[k][0];
-        var ix = qualifying[k][1];
+        const ix = qualifying[k][1];
         item = items[ix];
         if (addResult(keys, item)) {
           items.splice(ix, 1);
@@ -3069,7 +3069,7 @@
     // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
     // assigning those.
     addViaKeyFunc('no-shortening', it => {
-      var initials = it.initials;
+      const initials = it.initials;
       if (initials && initials.length >= MAX_NAVIGATE_PREFIX) {
         return initials.slice(0, MAX_NAVIGATE_PREFIX);
       } else {
@@ -3080,12 +3080,12 @@
     addViaKeyFunc('try-shortening', it => it.text.slice(0, MAX_NAVIGATE_PREFIX));
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
-    for (var p = MAX_NAVIGATE_PREFIX - 1; p >= 0; p--) {
-      for (var m = 0; m < items.length; m++) {
+    for (let p = MAX_NAVIGATE_PREFIX - 1; p >= 0; p--) {
+      for (let m = 0; m < items.length; m++) {
         item = items[m];
         prefix = item.text.slice(0, MAX_NAVIGATE_PREFIX - 1);
         if (prefixNotAliased(prefix)) {
-          for (var n = -1; n < JUMP_KEYS.length; n++) {
+          for (let n = -1; n < JUMP_KEYS.length; n++) {
             if (n === -1) {
               if (prefix.length > 0) {
                 // First, try doubling the last key, easiest to type.
@@ -3106,11 +3106,11 @@
       }
     }
     // Finally, fallback on choosing arbitrary combinations of characters.
-    for (var q = 0; q < items.length; q++) {
+    for (let q = 0; q < items.length; q++) {
       item = items[q];
-      var success = false;
+      let success = false;
       // TODO: Don't hardcode choosing one or two, instead follow MAX_NAVIGATE_PREFIX
-      for (var r = 0; r < JUMP_KEYS.length; r++) {
+      for (let r = 0; r < JUMP_KEYS.length; r++) {
         if (addResult(JUMP_KEYS[r], item)) {
           items.splice(q, 1);
           q--;
@@ -3121,10 +3121,10 @@
       if (success) {
         continue;
       }
-      for (var s = 0; s < JUMP_KEYS.length; s++) {
-        for (var t = -1; t < JUMP_KEYS.length; t++) {
+      for (let s = 0; s < JUMP_KEYS.length; s++) {
+        for (let t = -1; t < JUMP_KEYS.length; t++) {
           // Prefer doubling keys.
-          var secondKey = t === -1 ? JUMP_KEYS[s] : JUMP_KEYS[t];
+          const secondKey = t === -1 ? JUMP_KEYS[s] : JUMP_KEYS[t];
           if (addResult(JUMP_KEYS[s] + secondKey, item)) {
             items.splice(q, 1);
             q--;
@@ -3150,7 +3150,7 @@
       return;
     }
     if (ev.type === 'keydown') {
-      var keepGoing = false;
+      let keepGoing = false;
       try {
         // Space to scroll down.  Shift+space to scroll up.
         if (ev.key === ' ') {
@@ -3179,19 +3179,19 @@
           navigateKeysPressed = navigateKeysPressed.slice(0, -1);
           keepGoing = rerenderTips();
         } else {
-          var char = ev.key.toLowerCase();
+          const char = ev.key.toLowerCase();
           if (char.length === 1 && lowercaseCharIsAlphanum(char)) {
             navigateKeysPressed += char;
-            var option = navigateOptions[navigateKeysPressed];
+            const option = navigateOptions[navigateKeysPressed];
             if (option) {
-              var el = option.element;
+              const el = option.element;
               keepGoing = option.keepGoing;
               // If the user is selecting a section like projects / labels /
               // filters, then close the other sections.
               if (el.classList.contains('expansion_panel__toggle')) {
                 withId('list_holder', listHolder => {
                   withClass(listHolder, 'expansion_panel__toggle', ps => {
-                    var isExpanded = ps.attributes['aria-expanded'].value === 'true';
+                    const isExpanded = ps.attributes['aria-expanded'].value === 'true';
                     if (!sameElement(el)(ps) && isExpanded) {
                       ps.click();
                     }
@@ -3200,9 +3200,9 @@
               }
               // Ensure that the item is visible - first, uncollapsing
               // the outer section.
-              var collapseParent = findParent(el, matchingClass('collapse'));
+              const collapseParent = findParent(el, matchingClass('collapse'));
               if (collapseParent && !matchingClass('collapse--entered')(collapseParent)) {
-                var collapseHeader = collapseParent.previousSibling;
+                const collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
                   withUniqueClass(collapseHeader, 'expansion_panel__toggle', all, click);
                 } else {
@@ -3210,16 +3210,16 @@
                 }
               }
               // Second, uncollapse all of the project's parents.
-              var priorIndent = getIndentClass(el);
-              var arrowsToClick = [];
-              for ( var elAbove = el.previousSibling
+              let priorIndent = getIndentClass(el);
+              const arrowsToClick = [];
+              for ( let elAbove = el.previousSibling
                 ; elAbove
                 ; elAbove = elAbove.previousSibling
               ) {
-                var curIndent = getIndentClass(elAbove);
+                const curIndent = getIndentClass(elAbove);
                 if (curIndent < priorIndent) {
                   priorIndent = curIndent;
-                  var arr = getUniqueClass(elAbove, 'arrow');
+                  const arr = getUniqueClass(elAbove, 'arrow');
                   if (arr && arr.classList.contains('right')) {
                     arrowsToClick.unshift(arr);
                   } else if (elAbove.style.display === 'none') {
@@ -3231,16 +3231,16 @@
                   break;
                 }
               }
-              for (var i = 0; i < arrowsToClick.length; i++) {
+              for (let i = 0; i < arrowsToClick.length; i++) {
                 click(arrowsToClick[i]);
               }
               // Uncollapse the target project, if necessary.
-              var arrow = getUniqueClass(el, 'arrow');
+              const arrow = getUniqueClass(el, 'arrow');
               if (arrow) {
                 // If the user re-selects the same project they are already on,
                 // toggle folding.
                 if (el.classList.contains('current')) {
-                  var prev = el.previousSibling;
+                  const prev = el.previousSibling;
                   if (!prev || !prev.classList.contains('current')) {
                     click(arrow);
                     keepGoing = true;
@@ -3252,7 +3252,7 @@
                 }
               }
               // The li itself is not responsive to clicks.
-              var elToClick = getUniqueTag(el, 'a', all);
+              let elToClick = getUniqueTag(el, 'a', all);
               elToClick = elToClick || el;
               click(elToClick);
               // Scroll the task into view, if needed. The delay is
@@ -3296,10 +3296,10 @@
     // FIXME: I can't quite explain this, but for some reason, querying the
     // list that matches the class name doesn't quite work.  So instead find
     // and remove until they are all gone.
-    var toDelete = [];
+    let toDelete = [];
     do {
-      for (var i = 0; i < toDelete.length; i++) {
-        var el = toDelete[i];
+      for (let i = 0; i < toDelete.length; i++) {
+        const el = toDelete[i];
         el.parentElement.removeChild(el);
       }
       toDelete = document.getElementsByClassName(TODOIST_SHORTCUTS_TIP);
@@ -3310,9 +3310,9 @@
   // currently selected one, if any.
   function withTopFilters(f) {
     withId('top_filters', topFilters => {
-      var topItems = topFilters.getElementsByTagName('li');
-      var current = -1;
-      for (var i = 0; i < topItems.length; i++) {
+      const topItems = topFilters.getElementsByTagName('li');
+      let current = -1;
+      for (let i = 0; i < topItems.length; i++) {
         if (matchingClass('current')(topItems[i])) {
           current = i;
           break;
@@ -3328,7 +3328,7 @@
 
   // Sets the cursor to the first task, if any exists.
   function setCursorToFirstTask(shouldScroll) {
-    var tasks = getTasks();
+    const tasks = getTasks();
     if (tasks.length > 0) {
       setCursor(tasks[0], shouldScroll);
     }
@@ -3336,7 +3336,7 @@
 
   // Sets the cursor to the last task, if any exists.
   function setCursorToLastTask(shouldScroll) {
-    var tasks = getTasks();
+    const tasks = getTasks();
     if (tasks.length > 0) {
       setCursor(tasks[tasks.length - 1], shouldScroll);
     }
@@ -3372,12 +3372,12 @@
   }
 
   function getTopHeight() {
-    var upcomingHeader = getUniqueClass(document, 'upcoming_view__calendar');
+    const upcomingHeader = getUniqueClass(document, 'upcoming_view__calendar');
     if (upcomingHeader) {
       return upcomingHeader.clientHeight;
     }
 
-    var viewHeader = getUniqueClass(document, 'view_header');
+    const viewHeader = getUniqueClass(document, 'view_header');
     if (viewHeader) {
       return viewHeader.clientHeight;
     }
@@ -3394,7 +3394,7 @@
   // Returns the <li> element of the current cursor.  If there is
   // none, throws an exception.
   function requireCursor() {
-    var cursor = getCursor();
+    const cursor = getCursor();
     if (cursor) {
       return cursor;
     } else {
@@ -3409,20 +3409,20 @@
 
   // A functional-ish idiom to reduce boilerplate.
   function modifyCursorIndex(f) {
-    var tasks = getTasks();
-    var cursor = getCursor();
+    const tasks = getTasks();
+    let cursor = getCursor();
     if (!cursor) {
       debug('modifyCursorIndex couldn\'t find cursor, so running restoreLastCursor');
       restoreLastCursor();
       cursor = getCursor();
     }
-    var cursorChanged = false;
+    let cursorChanged = false;
     if (!cursor) {
       info('Couldn\'t find cursor, so cursoring first task.');
       setCursorToFirstTask('scroll');
       cursorChanged = true;
     } else {
-      var cursorIndex = tasks.indexOf(cursor);
+      const cursorIndex = tasks.indexOf(cursor);
       if (cursorIndex < 0) {
         error(
           'Invariant violation: couldn\'t find', cursor, 'in', tasks,
@@ -3430,7 +3430,7 @@
         cursorFirst();
         return false;
       }
-      var newIndex = f(cursorIndex, tasks);
+      let newIndex = f(cursorIndex, tasks);
       if (newIndex < 0) {
         info('Can\'t move cursor before first task');
         newIndex = 0;
@@ -3441,7 +3441,7 @@
       }
       cursorChanged = newIndex !== cursorIndex;
       if (cursorChanged) {
-        var newCursor = tasks[newIndex];
+        const newCursor = tasks[newIndex];
         if (newCursor) {
           setCursor(newCursor, 'scroll');
         }
@@ -3453,7 +3453,7 @@
   // This function detects which mode Todoist's view is in, since each behaves a
   // bit differently.
   function getViewMode() {
-    var agendaView = getById('agenda_view') || getUniqueClass(document, 'upcoming_view');
+    const agendaView = getById('agenda_view') || getUniqueClass(document, 'upcoming_view');
     if (agendaView === null) {
       return 'project';
     } else {
@@ -3476,7 +3476,7 @@
 
   function debug() {
     if (DEBUG) {
-      var args = [].slice.call(arguments);
+      const args = [].slice.call(arguments);
       args.unshift('todoist-shortcuts:');
       // eslint-disable-next-line no-console
       console.log.apply(null, args);
@@ -3485,7 +3485,7 @@
 
   function debugWithStack() {
     if (DEBUG) {
-      var args = [].slice.call(arguments);
+      const args = [].slice.call(arguments);
       args.unshift('todoist-shortcuts:');
       args.push('\n' + getStack());
       // eslint-disable-next-line no-console
@@ -3496,7 +3496,7 @@
   // Used to notify about an issue that's expected to sometimes occur during
   // normal operation.
   function info() {
-    var args = [].slice.call(arguments);
+    const args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
     args.push('(this is fine)');
     // eslint-disable-next-line no-console
@@ -3504,7 +3504,7 @@
   }
 
   function warn() {
-    var args = [].slice.call(arguments);
+    const args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
     args.push('\n' + getStack());
     // eslint-disable-next-line no-console
@@ -3512,7 +3512,7 @@
   }
 
   function error() {
-    var args = [].slice.call(arguments);
+    const args = [].slice.call(arguments);
     args.unshift('todoist-shortcuts:');
     args.push(getStack());
     args.push('Consider reporting this as an issue to http://github.com/mgsloan/todoist-shortcuts');
@@ -3531,7 +3531,7 @@
 
   // https://github.com/greasemonkey/greasemonkey/issues/2724#issuecomment-354005162
   function addCss(css) {
-    var style = document.createElement('style');
+    const style = document.createElement('style');
     style.textContent = css;
     document.documentElement.appendChild(style);
     onDisable(() => {
@@ -3546,9 +3546,9 @@
   // full.
   function verticalScrollIntoView(el, marginTop, marginBottom, skipCheck, t) {
     withId('content', content => {
-      var oy = offset(el).y - offset(content).y;
-      var cy = oy - content.scrollTop;
-      var h = el.offsetHeight;
+      const oy = offset(el).y - offset(content).y;
+      const cy = oy - content.scrollTop;
+      const h = el.offsetHeight;
       if (skipCheck || cy < marginTop || cy + h > content.offsetHeight - marginBottom) {
         // TODO: for very large tasks, this could end up with the whole task not
         // being in view.
@@ -3581,7 +3581,7 @@
   // Users querySelectorAll, requires unique result, and applies the
   // user's function to it.  Logs a warning if there isn't one.
   function withUnique(parent, query, f) {
-    var result = selectUnique(parent, query);
+    const result = selectUnique(parent, query);
     if (result) {
       return f(result);
     } else {
@@ -3593,8 +3593,8 @@
   // Uses querySelectorAll, and applies the provided function to each result.
   // eslint-disable-next-line no-unused-vars
   function withQuery(parent, query, f) {
-    var els = selectAll(parent, query);
-    for (var i = 0; i < els.length; i++) {
+    const els = selectAll(parent, query);
+    for (let i = 0; i < els.length; i++) {
       f(els[i]);
     }
   }
@@ -3604,7 +3604,7 @@
     if (arguments.length > 2) {
       error('Too many arguments passed to withId', arguments);
     }
-    var el = getById(id);
+    const el = getById(id);
     if (el) {
       return f(el);
     } else {
@@ -3619,8 +3619,8 @@
     if (arguments.length > 3) {
       error('Too many arguments passed to withClass', arguments);
     }
-    var els = parent.getElementsByClassName(cls);
-    for (var i = 0; i < els.length; i++) {
+    const els = parent.getElementsByClassName(cls);
+    for (let i = 0; i < els.length; i++) {
       f(els[i]);
     }
   }
@@ -3631,8 +3631,8 @@
     if (arguments.length > 3) {
       error('Too many arguments passed to withTag', arguments);
     }
-    var els = parent.getElementsByTagName(tag);
-    for (var i = 0; i < els.length; i++) {
+    const els = parent.getElementsByTagName(tag);
+    for (let i = 0; i < els.length; i++) {
       f(els[i]);
     }
   }
@@ -3641,7 +3641,7 @@
   // predicate. Returns null if element is null.
   function findParent(el0, predicate) {
     if (!el0) return null;
-    var el = el0.parentElement;
+    let el = el0.parentElement;
     if (!el) return null;
     do {
       if (predicate(el)) {
@@ -3667,9 +3667,9 @@
   // Checks that there is only one descendant element that matches the class name and
   // predicate, and returns it. Returns null if it is not found or not unique.
   function getUniqueClass(parent, cls, predicate) {
-    var foundElements = [];
+    let foundElements = [];
     if (cls.constructor === Array) {
-      for (var i = 0; i < cls.length; i++) {
+      for (let i = 0; i < cls.length; i++) {
         foundElements = foundElements.concat(Array.from(parent.getElementsByClassName(cls[i])));
       }
     } else {
@@ -3682,7 +3682,7 @@
   // class name, and invokes the function on it. Logs a warning if
   // there isn't exactly one.
   function withUniqueClass(parent, cls, predicate, f) {
-    var result = getUniqueClass(parent, cls, predicate);
+    const result = getUniqueClass(parent, cls, predicate);
     if (result) {
       return f(result);
     } else {
@@ -3708,7 +3708,7 @@
   // tag, and invokes the function on it. Logs a warning if there
   // isn't exactly one.
   function withUniqueTag(parent, tag, predicate, f) {
-    var result = getUniqueTag(parent, tag, predicate);
+    const result = getUniqueTag(parent, tag, predicate);
     if (result) {
       return f(result);
     } else {
@@ -3727,7 +3727,7 @@
   // predicate, and invokes the function on it. Logs a warning if
   // there isn't exactly one.
   function withUniqueChild(parent, predicate, f) {
-    var result = getUniqueChild(parent, predicate);
+    const result = getUniqueChild(parent, predicate);
     if (result) {
       return f(result);
     } else {
@@ -3738,7 +3738,7 @@
 
   // Returns true if the map-like / set-like object is empty.
   function isEmptyMap(obj) {
-    for (var key in obj) {
+    for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         return false;
       }
@@ -3749,9 +3749,9 @@
   // Given a predicate, returns the first element that matches. If predicate is
   // null, then it is treated like 'all'.
   function findFirst(predicate, array) {
-    var pred = checkedPredicate('findFirst', predicate ? predicate : all);
-    for (var i = 0; i < array.length; i++) {
-      var el = array[i];
+    const pred = checkedPredicate('findFirst', predicate ? predicate : all);
+    for (let i = 0; i < array.length; i++) {
+      const el = array[i];
       if (pred(el)) {
         return el;
       }
@@ -3762,9 +3762,9 @@
   // Given a predicate, returns the last element that matches. If predicate is
   // null, then it is treated like 'all'.
   function findLast(predicate, array) {
-    var pred = checkedPredicate('findLast', predicate ? predicate : all);
-    for (var i = array.length - 1; i >= 0; i--) {
-      var el = array[i];
+    const pred = checkedPredicate('findLast', predicate ? predicate : all);
+    for (let i = array.length - 1; i >= 0; i--) {
+      const el = array[i];
       if (pred(el)) {
         return el;
       }
@@ -3776,10 +3776,10 @@
   // match, or multiple elements match, then nothing gets returned. If predicate
   // is null, then it is treated like 'all'.
   function findUnique(predicate, array) {
-    var pred = checkedPredicate('findUnique', predicate ? predicate : all);
-    var result = null;
-    for (var i = 0; i < array.length; i++) {
-      var el = array[i];
+    const pred = checkedPredicate('findUnique', predicate ? predicate : all);
+    let result = null;
+    for (let i = 0; i < array.length; i++) {
+      const el = array[i];
       if (pred(el)) {
         if (result === null) {
           result = el;
@@ -3796,7 +3796,7 @@
   // Returns string with prefix removed.  Returns null if prefix doesn't
   // match.
   function stripPrefix(prefix, string) {
-    var found = string.slice(0, prefix.length);
+    const found = string.slice(0, prefix.length);
     if (found === prefix) {
       return string.slice(prefix.length);
     } else {
@@ -3806,7 +3806,7 @@
 
   // Simulate a mouse click.
   function click(el) {
-    var options = { bubbles: true, cancelable: true, view: window };
+    const options = { bubbles: true, cancelable: true, view: window };
     el.dispatchEvent(new MouseEvent('mousedown', options));
     el.dispatchEvent(new MouseEvent('mouseup', options));
     el.dispatchEvent(new MouseEvent('click', options));
@@ -3814,9 +3814,9 @@
 
   // Sum offsetTop / offsetLeft of all offsetParent to compute x / y.
   function offset(el) {
-    var x = 0;
-    var y = 0;
-    var cur = el;
+    let x = 0;
+    let y = 0;
+    let cur = el;
     while (cur) {
       x += cur.offsetLeft;
       y += cur.offsetTop;
@@ -3858,8 +3858,8 @@
   // eslint-disable-next-line no-unused-vars
   function matchingClassSuffix(suffix) {
     return el => {
-      for (var i = 0; i < el.classList.length; i++) {
-        var cl = el.classList.item(i);
+      for (let i = 0; i < el.classList.length; i++) {
+        const cl = el.classList.item(i);
         if (cl.endsWith(suffix)) {
           return true;
         }
@@ -3887,7 +3887,7 @@
   // Returns predicate which returns 'true' if the element has the specified attribute.
   function matchingAttr(k, v) {
     return el => {
-      var attr = el.attributes[k];
+      const attr = el.attributes[k];
       if (attr) {
         return attr.value === v;
       } else {
@@ -3914,10 +3914,10 @@
   // Given two predicates, uses && to combine them.
   // eslint-disable-next-line no-unused-vars
   function and() {
-    var args = arguments;
+    const args = arguments;
     return x => {
-      var result = true;
-      for (var i = 0; i < args.length; i++) {
+      let result = true;
+      for (let i = 0; i < args.length; i++) {
         result = result && checkedPredicate('argument #' + i + ' of and', args[i])(x);
       }
       return result;
@@ -3926,10 +3926,10 @@
 
   // Given two predicates, uses || to combine them.
   function or() {
-    var args = arguments;
+    const args = arguments;
     return x => {
-      var result = false;
-      for (var i = 0; i < args.length; i++) {
+      let result = false;
+      for (let i = 0; i < args.length; i++) {
         result = result || checkedPredicate('argument #' + i + ' of or', args[i])(x);
       }
       return result;
@@ -3938,7 +3938,7 @@
 
   function checkedPredicate(context, predicate) {
     return x => {
-      var bool = predicate(x);
+      const bool = predicate(x);
       if (typeof bool !== 'boolean') {
         throw new Error('In ' + context + ', expected boolean result from predicate. Instead got', bool);
       }
@@ -3955,23 +3955,23 @@
   }
 
   function span() {
-    var args = [].slice.call(arguments);
+    const args = [].slice.call(arguments);
     args.unshift('span');
     return element(...args);
   }
 
   function div() {
-    var args = [].slice.call(arguments);
+    const args = [].slice.call(arguments);
     args.unshift('div');
     return element(...args);
   }
 
   function element(t, cls) {
-    var el = document.createElement(t);
+    const el = document.createElement(t);
     if (cls) {
       el.classList.add(cls);
     }
-    for (var i = 2; i < arguments.length; i++) {
+    for (let i = 2; i < arguments.length; i++) {
       el.appendChild(arguments[i]);
     }
     return el;
@@ -3983,8 +3983,8 @@
 
   (() => {
     if (window.oldTodoistShortcutsDisableActions) {
-      var arr = window.oldTodoistShortcutsDisableActions;
-      for (var i = 0; i < arr.length; i++) {
+      const arr = window.oldTodoistShortcutsDisableActions;
+      for (let i = 0; i < arr.length; i++) {
         if (arr[i] !== null) {
           arr[i]();
         }
@@ -4000,7 +4000,7 @@
   // TODO: slight inefficiency in the usage here.  Would be good to not have
   // the list always grow.
   function onDisable(f) {
-    var ix = window.oldTodoistShortcutsDisableActions.length;
+    const ix = window.oldTodoistShortcutsDisableActions.length;
     window.oldTodoistShortcutsDisableActions.push(f);
     return () => {
       window.oldTodoistShortcutsDisableActions[ix] = null;
@@ -4015,7 +4015,7 @@
   function updateBackgroundColor() {
     withId('page_background', background => {
       try {
-        var todoistBackgroundColor =
+        const todoistBackgroundColor =
           background.computedStyleMap().get('background-color').toString();
         debug('Background color is', todoistBackgroundColor);
         addCss([
@@ -4171,13 +4171,13 @@
   ].join('\n'));
 
   // A CSS style element, dynamically updated by updateCursorStyle. MUTABLE.
-  var cursorStyle = addCss('');
+  const cursorStyle = addCss('');
 
   // This is unusual. Usually you would not dynamically generate CSS that uses
   // different IDs. However, this is a nice hack in this case, because todoist
   // frequently re-creates elements.
   function updateCursorStyle() {
-    var selecter = getKeySelecter(lastCursorId, lastCursorIndent);
+    const selecter = getKeySelecter(lastCursorId, lastCursorIndent);
     cursorStyle.textContent = [
       selecter + ' {',
       '  border-left: 2px solid #4073d6;',
@@ -4229,7 +4229,48 @@
    * Minified via "uglifyjs --compress --mangle -- mousetrap.js | xclip"
    */
   /* eslint-disable */
-!function(e,a){if(e){for(var r,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},l={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},t=1;t<20;++t)i[111+t]="f"+t;for(t=0;t<=9;++t)i[t+96]=t.toString();o.prototype.handleKeyEvent=function(e){return this._handleKeyEvent(e)},o.prototype.bind=function(e,t,n,a){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,a),this},o.prototype.unbind=function(e,t,n){return this.bind.call(this,e,function(){},t,n)},o.prototype.trigger=function(e,t,n){var a=n||"default";return this._directMap[a][e+":"+t]&&this._directMap[a][e+":"+t]({},e),this},o.prototype.reset=function(e){var t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},o.prototype.switchKeymap=function(e){e&&e!==this._currentKeymap&&(this._resetSequences(),this._currentKeymap=e)},o.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==a&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},o.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},o.addKeycodes=function(e){for(var t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);r=null},e.Mousetrap=o,"undefined"!=typeof module&&module.exports&&(module.exports=o),"function"==typeof define&&define.amd&&define(function(){return o})}function y(e){if("keypress"!=e.type)return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase();var t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}function b(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function s(e,t,n){return"keypress"==(n=n||(function(){if(!r)for(var e in r={},i)95<e&&e<112||i.hasOwnProperty(e)&&(r[i[e]]=e);return r}()[e]?"keydown":"keypress"))&&t.length&&(n="keydown"),n}function _(e,t){var n,a,r,i,o=[];for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),r=0;r<n.length;++r)a=n[r],l[a]&&(a=l[a]),t&&"keypress"!=t&&c[a]&&(a=c[a],o.push("shift")),b(a)&&o.push(a);return{key:a,modifiers:o,action:t=s(a,o,t)}}function o(e){var m=this;if(e=e||a,!(m instanceof o))return new o(e);m.target=e,m._callbacks={},m._directMap={},m._currentKeymap="default";var k={},s=!1,p=!1,f=!1;function h(e,t,n,a,r,i,o){var c,l,s,u,p=[],f=n.type,h=m._callbacks[a];if(!h)return[];if(!h[e])return[];for("keyup"==f&&b(e)&&(t=[e]),c=0;c<h[e].length;++c)if(l=h[e][c],(r||!l.seq||k[l.seq]==l.level)&&f==l.action&&("keypress"==f&&!n.metaKey&&!n.ctrlKey||(s=t,u=l.modifiers,s.sort().join(",")===u.sort().join(",")))){var d=!r&&l.combo==i,y=r&&l.seq==r&&l.level==o;(d||y)&&h[e].splice(c,1),p.push(l)}return p}function d(e,t,n,a){var r,i;m.stopCallback(t,t.target||t.srcElement,n,a)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(r=t).stopImmediatePropagation?r.stopImmediatePropagation():r.stopPropagation?r.stopPropagation():r.cancelBubble=!0)}function u(e,t,n,a,r,i){var o=a||"default";if(m._callbacks[o]=m._callbacks[o]||{},m._directMap[o]=m._directMap[o]||{},m._directMap[o][e+":"+n]=t,"fallback"!==e){var c,l=(e=e.replace(/\s+/g," ")).split(" ");1<l.length?function(t,e,n,a,r){function i(e){return function(){f=e,++k[t]}}function o(e){d(n,e,t),"keyup"!==a&&(s=y(e)),setTimeout(m._resetSequences,10)}for(var c=k[t]=0;c<e.length;++c){var l=c+1===e.length?o:i(a||_(e[c+1]).action);u(e[c],l,a,r,t,c)}}(e,l,t,n,a):(c=_(e,n),m._callbacks[o][c.key]=m._callbacks[o][c.key]||[],h(c.key,c.modifiers,{type:c.action},o,r,e,i),m._callbacks[o][c.key][r?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:r,level:i,combo:e}))}else m._callbacks[o].fallback=[{callback:t,modifiers:[],action:n,seq:r,level:i,combo:e}]}m._resetSequences=function(e){e=e||{};var t,n=!1;for(t in k)e[t]?n=!0:k[t]=0;n||(f=!1)},m._handleKey=function(e,t,n){var a,r=h(e,t,n,m._currentKeymap),i={},o=0,c=!1,l=m._callbacks[m._currentKeymap];if(0===r.length&&l){var s=l.fallback;s&&r.push(s[0])}for(a=0;a<r.length;++a)r[a].seq&&(o=Math.max(o,r[a].level));for(a=0;a<r.length;++a)if(r[a].seq){if(r[a].level!=o)continue;c=!0,i[r[a].seq]=1,d(r[a].callback,n,r[a].combo,r[a].seq)}else c||d(r[a].callback,n,r[a].combo);var u="keypress"==n.type&&p;n.type!=f||b(e)||u||m._resetSequences(i),p=c&&"keydown"==n.type},m._handleKeyEvent=function(e){"number"!=typeof e.which&&(e.which=e.keyCode);var t,n,a=y(e);a&&("keyup"!=e.type||s!==a?m.handleKey(a,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):s=!1)},m._bindMultiple=function(e,t,n,a){for(var r=0;r<e.length;++r)u(e[r],t,n,a)}}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
+!function(e,a){if(e){for(var r,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},l={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},t=1;t<20;++t)i[111+t]="f"+t;for(t=0;t<=9;++t)i[t+96]=t.toString();o.prototype.handleKeyEvent=function(e){return this._handleKeyEvent(e)},o.prototype.bind=function(e,t,n,a){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,a),this},o.prototype.unbind=function(e,t,n){return this.bind.call(this,e,function(){},t,n)},o.prototype.trigger=function(e,t,n){const a=n||"default";return this._directMap[a][e+":"+t]&&this._directMap[a][e+":"+t]({},e),this},o.prototype.reset=function(e){const t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},o.prototype.switchKeymap=function(e){e&&e!==this._currentKeymap&&(this._resetSequences(),this._currentKeymap=e)},o.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==a&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},o.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},o.addKeycodes=function(e){for(const t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);r=null},e.Mousetrap=o,"undefined"!=typeof module&&module.exports&&(module.exports=o),"function"==typeof define&&define.amd&&define(function(){return o})}function y(e){if("keypress"!=e.type)return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase();let t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}function b(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function s(e,t,n){return "keypress"==(n=n||(function(){if(!r)for(const e in (r={}, i))95<e&&e<112||i.hasOwnProperty(e)&&(r[i[e]]=e);return r}()[e]?"keydown":"keypress"))&&t.length&&(n="keydown"),n;}function _(e,t){
+  let n;
+  let a;
+  let r;
+  let i;
+  const o=[];
+  for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),r=0;r<n.length;++r)a=n[r],l[a]&&(a=l[a]),t&&"keypress"!=t&&c[a]&&(a=c[a],o.push("shift")),b(a)&&o.push(a);return{key:a,modifiers:o,action:t=s(a,o,t)}
+}function o(e){
+  const m=this;if(e=e||a,!(m instanceof o))return new o(e);m.target=e,m._callbacks={},m._directMap={},m._currentKeymap="default";
+  const k={};
+  let s=!1;
+  let p=!1;
+  let f=!1;
+  function h(e,t,n,a,r,i,o){
+    let c;
+    let l;
+    let s;
+    let u;
+    const p=[];
+    const f=n.type;
+    const h=m._callbacks[a];
+    if(!h)return[];if(!h[e])return[];for("keyup"==f&&b(e)&&(t=[e]),c=0;c<h[e].length;++c)if(l=h[e][c],(r||!l.seq||k[l.seq]==l.level)&&f==l.action&&("keypress"==f&&!n.metaKey&&!n.ctrlKey||(s=t,u=l.modifiers,s.sort().join(",")===u.sort().join(",")))){const d=!r&&l.combo==i, y=r&&l.seq==r&&l.level==o;(d||y)&&h[e].splice(c,1),p.push(l)}return p
+  }function d(e,t,n,a){let r, i;m.stopCallback(t,t.target||t.srcElement,n,a)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(r=t).stopImmediatePropagation?r.stopImmediatePropagation():r.stopPropagation?r.stopPropagation():r.cancelBubble=!0)}function u(e,t,n,a,r,i){const o=a||"default";if(m._callbacks[o]=m._callbacks[o]||{},m._directMap[o]=m._directMap[o]||{},m._directMap[o][e+":"+n]=t,"fallback"!==e){
+    let c;
+    const l=(e=e.replace(/\s+/g," ")).split(" ");
+    1<l.length?function(t,e,n,a,r){function i(e){return function(){f=e,++k[t]}}function o(e){d(n,e,t),"keyup"!==a&&(s=y(e)),setTimeout(m._resetSequences,10)}for(let c=k[t]=0;c<e.length;++c){const l=c+1===e.length?o:i(a||_(e[c+1]).action);u(e[c],l,a,r,t,c)}}(e,l,t,n,a):(c=_(e,n),m._callbacks[o][c.key]=m._callbacks[o][c.key]||[],h(c.key,c.modifiers,{type:c.action},o,r,e,i),m._callbacks[o][c.key][r?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:r,level:i,combo:e}))
+  }else m._callbacks[o].fallback=[{callback:t,modifiers:[],action:n,seq:r,level:i,combo:e}]}m._resetSequences=function(e){e=e||{};let t, n=!1;for(t in k)e[t]?n=!0:k[t]=0;n||(f=!1)},m._handleKey=function(e,t,n){
+    let a;
+    const r=h(e,t,n,m._currentKeymap);
+    const i={};
+    let o=0;
+    let c=!1;
+    const l=m._callbacks[m._currentKeymap];
+    if(0===r.length&&l){const s=l.fallback;s&&r.push(s[0])}for(a=0;a<r.length;++a)r[a].seq&&(o=Math.max(o,r[a].level));for(a=0;a<r.length;++a)if(r[a].seq){if(r[a].level!=o)continue;c=!0,i[r[a].seq]=1,d(r[a].callback,n,r[a].combo,r[a].seq)}else c||d(r[a].callback,n,r[a].combo);const u="keypress"==n.type&&p;n.type!=f||b(e)||u||m._resetSequences(i),p=c&&"keydown"==n.type
+  },m._handleKeyEvent=function(e){
+    "number"!=typeof e.which&&(e.which=e.keyCode);
+    let t;
+    let n;
+    const a=y(e);
+    a&&("keyup"!=e.type||s!==a?m.handleKey(a,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):s=!1)
+  },m._bindMultiple=function(e,t,n,a){for(let r=0;r<e.length;++r)u(e[r],t,n,a)}
+}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
   /* eslint-enable */
 
   // Tell eslint that "Mousetrap" is now a global.
@@ -4247,7 +4288,7 @@
       } else {
         try {
           // debug('Invoking action bound to', bind[0]);
-          var result = bind[1].apply(null, args);
+          const result = bind[1].apply(null, args);
           // Default to stopping propagation.
           return result === true;
         } catch (ex) {
@@ -4263,7 +4304,7 @@
   }
 
   function registerKeybindings(keymap, binds) {
-    for (var i = 0; i < binds.length; i++) {
+    for (let i = 0; i < binds.length; i++) {
       if (binds[i].length === 2) {
         // eslint-disable-next-line no-undefined
         mousetrap.bind(binds[i][0], callBinding(binds[i]), undefined, keymap);
@@ -4273,8 +4314,8 @@
     }
   }
 
-  var deferLastKeyDownEnabled = false;
-  var lastDeferredEvent = null;
+  let deferLastKeyDownEnabled = false;
+  let lastDeferredEvent = null;
 
   function enterDeferLastBinding() {
     deferLastKeyDownEnabled = true;
@@ -4291,7 +4332,7 @@
 
   // Not sure why this is needed, but otherwise exceptions get thrown.
   function copyKeyPressEvent(ev) {
-    var result = new Event('keypress');
+    const result = new Event('keypress');
     result.key = ev.key;
     result.keyCode = ev.keyCode;
     result.shiftKey = ev.shiftKey;
@@ -4302,12 +4343,12 @@
   }
 
   function todoistModalIsOpen() {
-    var modal = document.getElementsByClassName('reactist_modal_box').item(0);
+    const modal = document.getElementsByClassName('reactist_modal_box').item(0);
     if (modal && !matchingClass('detail_modal')(modal)) {
       return true;
     }
 
-    var findSelector = selectAll(document, 'div[role="listbox"][data-dialog="true"]');
+    const findSelector = selectAll(document, 'div[role="listbox"][data-dialog="true"]');
     if (findSelector.length && findSelector[0].style.display !== 'none') {
       return true;
     }
@@ -4327,13 +4368,13 @@
   var sawEscapeDown = false;
 
   function modalKeyHandler(ev) {
-    var uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(or(matchingClass('quick_add'), matchingClass('detail_modal'))));
+    const uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(or(matchingClass('quick_add'), matchingClass('detail_modal'))));
     if (uniqueModal) {
       // Special handling for the modal that appears when confirming
       // task discard (esc after q), and for the deletion confirmation
       // modal.
-      var cancelButton = null;
-      var acceptButton = null;
+      let cancelButton = null;
+      let acceptButton = null;
       withClass(uniqueModal, 'ist_button', el => {
         if (el.innerText === 'Cancel') {
           cancelButton = el;
@@ -4459,7 +4500,7 @@
   }
 
   function initializeWhenContentAppears() {
-    var content = getById('content');
+    const content = getById('content');
     if (content === null) {
       info('Waiting for #content appears before initializing todoist-shortcuts');
       setTimeout(initializeWhenContentAppears, 50);
