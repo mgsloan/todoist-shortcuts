@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Unreleased changes
+
+### Bug fixes ###
+
+* Fixes the width of the help modal being too narrow.
+
+
 ## Version 118
 
 * Fixes some console errors that resulted from incomplete fix to

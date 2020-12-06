@@ -4133,7 +4133,7 @@
     '  transition: opacity .25s ease-in;',
     '  -webkit-box-shadow: rgba(0,0,0,0.156863) 0 2px 3px 0, rgba(0,0,0,0.0588235) 0 1px 10px 0, rgba(0,0,0,0.0196078) 0 4px 6px 0;',
     '  box-shadow: rgba(0,0,0,0.156863) 0 2px 3px 0, rgba(0,0,0,0.0588235) 0 1px 10px 0, rgba(0,0,0,0.0196078) 0 4px 6px 0;',
-    '  max-width: 30em;',
+    '  max-width: 105em;',
     '}',
     '',
     '.ts-modal {',
