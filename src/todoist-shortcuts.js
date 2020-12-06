@@ -2180,14 +2180,14 @@
 
   function ignoreScroll() {
     debug('ignoring scroll');
-    window.scroll = function() {
-      debug('Ignored Todoist scroll:', arguments);
+    window.scroll = (...args) => {
+      debug('Ignored Todoist scroll:', args);
     };
-    window.scrollBy = function() {
-      debug('Ignored Todoist scrollBy:', arguments);
+    window.scrollBy = (...args) => {
+      debug('Ignored Todoist scrollBy:', args);
     };
-    window.scrollTo = function() {
-      debug('Ignored Todoist scrollTo:', arguments);
+    window.scrollTo = (...args) => {
+      debug('Ignored Todoist scrollTo:', args);
     };
   }
 
@@ -4242,14 +4242,14 @@
    */
 
   function callBinding(bind) {
-    return function() {
+    return (...args) => {
       // Don't handle keybindings when modal is open.
       if (todoistModalIsOpen()) {
         return false;
       } else {
         try {
           // debug('Invoking action bound to', bind[0]);
-          var result = bind[1].apply(null, arguments);
+          var result = bind[1].apply(null, args);
           // Default to stopping propagation.
           return result === true;
         } catch (ex) {
