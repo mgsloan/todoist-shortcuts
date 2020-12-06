@@ -35,7 +35,7 @@ propose a new feature!
 First, install eslint:
 
 ```
-npm install eslint eslint-config-es5
+npm install --dev eslint eslint-config-google
 ```
 
 Then, run `eslint.sh` to use it to do checking.
