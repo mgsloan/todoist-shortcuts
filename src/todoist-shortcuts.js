@@ -3959,13 +3959,13 @@
   function span() {
     var args = [].slice.call(arguments);
     args.unshift('span');
-    return element.apply(null, args);
+    return element(...args);
   }
 
   function div() {
     var args = [].slice.call(arguments);
     args.unshift('div');
-    return element.apply(null, args);
+    return element(...args);
   }
 
   function element(t, cls) {
