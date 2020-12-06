@@ -6,7 +6,8 @@
   // Set this to true to get more log output.
   const DEBUG = false;
 
-  const IS_CHROME = /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  const IS_CHROME =
+    /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
   // Cursor navigation.
   //
@@ -4274,7 +4275,8 @@
 
   function disabledWithLazyLoading(actionName, f) {
     if (isUpcomingView()) {
-      warn(actionName, ' disabled in upcoming view is disabled as it doesn\'t work properly due to lazy loading.');
+      warn(actionName, ' disabled in upcoming view, ',
+          'as it doesn\'t work properly due to lazy loading.');
       return;
     } else {
       f();
@@ -4353,7 +4355,8 @@
           return result === true;
         } catch (ex) {
           if (ex instanceof CursorRequired) {
-            warn('Shortcut for keys ' + bind[0] + ' requires a cursored task, but none found.');
+            warn('Shortcut for keys ' + bind[0] +
+                 ' requires a cursored task, but none found.');
             return false;
           } else {
             throw ex;
@@ -4403,12 +4406,14 @@
   }
 
   function todoistModalIsOpen() {
-    const modal = document.getElementsByClassName('reactist_modal_box').item(0);
+    const modal =
+          document.getElementsByClassName('reactist_modal_box').item(0);
     if (modal && !matchingClass('detail_modal')(modal)) {
       return true;
     }
 
-    const findSelector = selectAll(document, 'div[role="listbox"][data-dialog="true"]');
+    const findSelector =
+          selectAll(document, 'div[role="listbox"][data-dialog="true"]');
     if (findSelector.length && findSelector[0].style.display !== 'none') {
       return true;
     }
@@ -4428,7 +4433,10 @@
   let sawEscapeDown = false;
 
   function modalKeyHandler(ev) {
-    const uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(or(matchingClass('quick_add'), matchingClass('detail_modal'))));
+    const modalPredicate =
+          not(or(matchingClass('quick_add'), matchingClass('detail_modal')));
+    const uniqueModal =
+          getUniqueClass(document, 'reactist_modal_box', modalPredicate);
     if (uniqueModal) {
       // Special handling for the modal that appears when confirming
       // task discard (esc after q), and for the deletion confirmation
@@ -4438,7 +4446,8 @@
       withClass(uniqueModal, 'ist_button', (el) => {
         if (el.innerText === 'Cancel') {
           cancelButton = el;
-        } else if (el.innerText === 'Discard task' || el.innerText === 'Delete') {
+        } else if (el.innerText === 'Discard task' ||
+                   el.innerText === 'Delete') {
           acceptButton = el;
         }
       });
@@ -4546,7 +4555,8 @@
     registerKeybindings(SMART_SCHEDULER_KEYMAP, SMART_SCHEDULER_BINDINGS);
     registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
 
-    // Update the keymap.  Necessary now that the side panel can start out visible.
+    // Update the keymap.  Necessary now that the side panel can start
+    // out visible.
     updateKeymap();
 
     // Reset mousetrap on disable.
@@ -4570,7 +4580,7 @@
   function initializeWhenContentAppears() {
     const content = getById('content');
     if (content === null) {
-      info('Waiting for #content appears before initializing todoist-shortcuts');
+      info('Waiting for #content div before initializing todoist-shortcuts');
       setTimeout(initializeWhenContentAppears, 50);
     } else {
       info('Found #content div - initializing todoist-shortcuts!');
