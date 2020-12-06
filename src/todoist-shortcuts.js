@@ -2763,13 +2763,10 @@
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
   function getTaskById(id, indent) {
-    let els;
-    let i;
-    let el;
     const indentNumber = indent ? stripIndentClass(indent) : null;
-    els = document.getElementsByClassName('task_list_item');
-    for (i = 0; i < els.length; i++) {
-      el = els[i];
+    const els = document.getElementsByClassName('task_list_item');
+    for (let i = 0; i < els.length; i++) {
+      const el = els[i];
       if (el.attributes['data-item-id'].value === id) {
         if (indent === 'ignore-indent') {
           return el;
@@ -3535,18 +3532,18 @@
    * Utilities
    */
 
-  function debug() {
+  function debug(...rest) {
     if (DEBUG) {
-      const args = [].slice.call(arguments);
+      const args = [].slice.call(rest);
       args.unshift('todoist-shortcuts:');
       // eslint-disable-next-line no-console
       console.log.apply(null, args);
     }
   }
 
-  function debugWithStack() {
+  function debugWithStack(...rest) {
     if (DEBUG) {
-      const args = [].slice.call(arguments);
+      const args = [].slice.call(rest);
       args.unshift('todoist-shortcuts:');
       args.push('\n' + getStack());
       // eslint-disable-next-line no-console
@@ -3556,24 +3553,24 @@
 
   // Used to notify about an issue that's expected to sometimes occur during
   // normal operation.
-  function info() {
-    const args = [].slice.call(arguments);
+  function info(...rest) {
+    const args = [].slice.call(rest);
     args.unshift('todoist-shortcuts:');
     args.push('(this is fine)');
     // eslint-disable-next-line no-console
     console.log.apply(null, args);
   }
 
-  function warn() {
-    const args = [].slice.call(arguments);
+  function warn(...rest) {
+    const args = [].slice.call(rest);
     args.unshift('todoist-shortcuts:');
     args.push('\n' + getStack());
     // eslint-disable-next-line no-console
     console.warn.apply(null, args);
   }
 
-  function error() {
-    const args = [].slice.call(arguments);
+  function error(...rest) {
+    const args = [].slice.call(rest);
     args.unshift('todoist-shortcuts:');
     args.push(getStack());
     args.push('Consider reporting this as an issue to http://github.com/mgsloan/todoist-shortcuts');
@@ -3661,9 +3658,9 @@
   }
 
   // Invokes the function for the matching id, or logs a warning.
-  function withId(id, f) {
-    if (arguments.length > 2) {
-      error('Too many arguments passed to withId', arguments);
+  function withId(id, f, ...rest) {
+    if (rest.length > 0) {
+      error('Too many arguments passed to withId', rest);
     }
     const el = getById(id);
     if (el) {
@@ -3676,9 +3673,9 @@
 
   // Invokes the function for every descendant element that matches
   // the class name.
-  function withClass(parent, cls, f) {
-    if (arguments.length > 3) {
-      error('Too many arguments passed to withClass', arguments);
+  function withClass(parent, cls, f, ...rest) {
+    if (rest.length > 0) {
+      error('Too many arguments passed to withClass', rest);
     }
     const els = parent.getElementsByClassName(cls);
     for (let i = 0; i < els.length; i++) {
@@ -3688,9 +3685,9 @@
 
   // Invokes the function for every descendant element that matches a
   // tag name.
-  function withTag(parent, tag, f) {
-    if (arguments.length > 3) {
-      error('Too many arguments passed to withTag', arguments);
+  function withTag(parent, tag, f, ...rest) {
+    if (rest.length > 0) {
+      error('Too many arguments passed to withTag', rest);
     }
     const els = parent.getElementsByTagName(tag);
     for (let i = 0; i < els.length; i++) {
@@ -3974,24 +3971,22 @@
 
   // Given two predicates, uses && to combine them.
   // eslint-disable-next-line no-unused-vars
-  function and() {
-    const args = arguments;
+  function and(...predicates) {
     return (x) => {
       let result = true;
-      for (let i = 0; i < args.length; i++) {
-        result = result && checkedPredicate('argument #' + i + ' of and', args[i])(x);
+      for (const predicate of predicates) {
+        result = result && checkedPredicate('argument of and', predicate)(x);
       }
       return result;
     };
   }
 
-  // Given two predicates, uses || to combine them.
-  function or() {
-    const args = arguments;
+  // Given multiple predicates, uses || to combine them.
+  function or(...predicates) {
     return (x) => {
       let result = false;
-      for (let i = 0; i < args.length; i++) {
-        result = result || checkedPredicate('argument #' + i + ' of or', args[i])(x);
+      for (const predicate of predicates) {
+        result = result || checkedPredicate('argument of or', predicate)(x);
       }
       return result;
     };
@@ -4015,25 +4010,21 @@
     return document.createTextNode(x);
   }
 
-  function span() {
-    const args = [].slice.call(arguments);
-    args.unshift('span');
-    return element(...args);
+  function span(...rest) {
+    return element('span', ...rest);
   }
 
-  function div() {
-    const args = [].slice.call(arguments);
-    args.unshift('div');
-    return element(...args);
+  function div(...rest) {
+    return element('div', ...rest);
   }
 
-  function element(t, cls) {
+  function element(t, cls, ...children) {
     const el = document.createElement(t);
     if (cls) {
       el.classList.add(cls);
     }
-    for (let i = 2; i < arguments.length; i++) {
-      el.appendChild(arguments[i]);
+    for (const child of children) {
+      el.appendChild(child);
     }
     return el;
   }
