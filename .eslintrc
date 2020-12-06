@@ -1,11 +1,10 @@
 {
-  "extends": "eslint-config-es5",
-  "rules": {
-    "func-names": "off",
-    "no-use-before-define": "off",
-    "spaced-comment": "off",
-    "guard-for-in": "off",
-    "no-else-return": "off",
-    "no-lone-blocks": "off",
-  }
+    "parserOptions": {
+        "ecmaVersion": 2017,
+    },
+    "extends": "google",
+    "rules": {
+      "require-jsdoc": "off",
+      "spaced-comment": "off",
+    }
 }
