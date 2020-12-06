@@ -1195,14 +1195,14 @@
   */
 
   // MUTABLE. Is 'true' if we're in bulk schedule mode.
-  var inBulkScheduleMode = false;
+  let inBulkScheduleMode = false;
   let nextBulkScheduleKey = null;
 
   function bulkSchedule() {
     bulkOperationsDisabled();
     /*
     deselectAll();
-    var cursor = requireCursor();
+    const cursor = requireCursor();
     inBulkScheduleMode = true;
     nextBulkScheduleKey = getTaskKey(cursor);
     updateKeymap();
@@ -1270,14 +1270,14 @@
   */
 
   // MUTABLE. Is 'true' if we're in bulk move mode.
-  var inBulkMoveMode = false;
+  let inBulkMoveMode = false;
   let nextBulkMoveKey = null;
 
   function bulkMove() {
     bulkOperationsDisabled();
     /*
     deselectAll();
-    var cursor = requireCursor();
+    const cursor = requireCursor();
     inBulkMoveMode = true;
     nextBulkMoveKey = getTaskKey(cursor);
     updateKeymap();
@@ -1509,7 +1509,7 @@
     let tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
-        var task = getTaskById(lastCursorId, 'ignore-indent');
+        let task = getTaskById(lastCursorId, 'ignore-indent');
         if (task) {
           debug('found task that is probably the one that was previously being edited');
           found = true;
@@ -1649,7 +1649,7 @@
 
   // MUTABLE. If set, then the specified task ID will be selected after
   // navigation.
-  var selectAfterNavigate = null;
+  let selectAfterNavigate = null;
 
   function handlePageChange() {
     updateKeymap();
@@ -1814,7 +1814,7 @@
   }
 
   // MUTABLE. Currently set mousetrap keymap.
-  var currentKeymap = DEFAULT_KEYMAP;
+  let currentKeymap = DEFAULT_KEYMAP;
 
   function switchKeymap(keymap) {
     if (currentKeymap !== keymap) {
@@ -1865,13 +1865,13 @@
   // need to do it by looking at text content of the options.
   /*
   function findMenu(name, expectedItems, predicate0, expectedCount0) {
-    var predicate = predicate0 ? predicate0 : all;
-    var expectedCount = expectedCount0 ? expectedCount0 : 1;
-    var results = [];
+    const predicate = predicate0 ? predicate0 : all;
+    const expectedCount = expectedCount0 ? expectedCount0 : 1;
+    const results = [];
     withClass(document, 'ist_menu', function(menu) {
       if (predicate(menu)) {
-        var matches = true;
-        for (var i = 0; i < expectedItems.length; i++) {
+        let matches = true;
+        for (let i = 0; i < expectedItems.length; i++) {
           if (!getUniqueClass(menu, expectedItems[i])) {
             matches = false;
             break;
@@ -1894,8 +1894,8 @@
   // These are menus that are always in the DOM, but need to be located by text
   // matching their options.
   /*
-  var taskMenu;
-  var agendaTaskMenu;
+  let taskMenu;
+  let agendaTaskMenu;
 
   function getTaskMenu() {
     if (taskMenu) {
@@ -1997,7 +1997,7 @@
   function todoistShortcut(options0) {
     const options = typeof options0 === 'string' ? { key: options0 } : options0;
     let ev = new Event('keydown');
-    for (var o in options) { ev[o] = options[o]; }
+    for (let o in options) { ev[o] = options[o]; }
     if (window.originalTodoistKeydown) {
       window.originalTodoistKeydown.apply(document, [ev]);
     }
@@ -2196,8 +2196,8 @@
     window.scrollTo = window.originalTodoistScrollTo;
   }
 
-  var dragInProgress = false;
-  var suppressDrag = false;
+  let dragInProgress = false;
+  let suppressDrag = false;
 
   function dragStart() {
     dragInProgress = true;
@@ -2290,7 +2290,7 @@
       const alpha = currentFrame / frameCount;
       currentFrame++;
       if (alpha >= 1) {
-        var params = mkMouseParams(tx, ty);
+        const params = mkMouseParams(tx, ty);
         el.dispatchEvent(new MouseEvent('mousemove', params));
         el.dispatchEvent(new MouseEvent('mouseup', params));
         finished();
@@ -2762,14 +2762,14 @@
 
   // MUTABLE. When set, this function should be called when navigate mode
   // finished.
-  var finishNavigate = null;
+  let finishNavigate = null;
 
   // MUTABLE. Current set of navigate options.
   let navigateOptions = {};
 
   // MUTABLE. Used to avoid infinite recursion of 'setupNavigate' due to it
   // being called on mutation of DOM that it mutates.
-  var oldNavigateOptions = {};
+  let oldNavigateOptions = {};
 
   // MUTABLE. Keys the user has pressed so far.
   let navigateKeysPressed = '';
@@ -3463,7 +3463,7 @@
 
   // MUTABLE. Should always correspond to getViewMode result, as it is updated
   // on load and on some dom mutation.
-  var viewMode = null;
+  let viewMode = null;
 
   function updateViewMode() {
     viewMode = getViewMode();
@@ -4365,7 +4365,7 @@
     }
   }
 
-  var sawEscapeDown = false;
+  let sawEscapeDown = false;
 
   function modalKeyHandler(ev) {
     const uniqueModal = getUniqueClass(document, 'reactist_modal_box', not(or(matchingClass('quick_add'), matchingClass('detail_modal'))));
@@ -4455,7 +4455,7 @@
    */
 
   // MUTABLE
-  var initializing = true;
+  let initializing = true;
 
   function initialize() {
     handlePageChange();
