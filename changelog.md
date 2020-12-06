@@ -6,6 +6,12 @@
 
 * Fixes the width of the help modal being too narrow.
 
+### Enhancements ###
+
+* Code switched over to using ES6, mostly by using the [lebab tool][].
+
+[lebab tool]: https://github.com/lebab/lebab
+
 
 ## Version 118
 
