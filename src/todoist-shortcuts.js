@@ -2838,15 +2838,15 @@
         if (mustBeKeys) {
           navigateItems.push({
             element: li,
-            mustBeKeys: mustBeKeys,
+            mustBeKeys,
             text: txt,
-            initials: initials
+            initials
           });
         } else if (txt) {
           navigateItems.push({
             element: li,
             text: txt,
-            initials: initials
+            initials
           });
         } else {
           error('Couldn\'t figure out text for', li);
@@ -2870,7 +2870,7 @@
         if (mustBeKeys) {
           navigateItems.push({
             element: summary,
-            mustBeKeys: mustBeKeys,
+            mustBeKeys,
             keepGoing: true
           });
         }
@@ -3824,7 +3824,7 @@
       y += cur.offsetTop;
       cur = cur.offsetParent;
     }
-    return {x: x, y: y};
+    return {x, y};
   }
 
   /*****************************************************************************
