@@ -107,8 +107,7 @@
 
   // Build cursor movement bindings that can be used in schedule mode
   const SCHEDULE_CURSOR_BINDINGS = [];
-  for (let cix = 0; cix < CURSOR_BINDINGS.length; cix++) {
-    const binding = CURSOR_BINDINGS[cix];
+  for (const binding of CURSOR_BINDINGS) {
     SCHEDULE_CURSOR_BINDINGS.push([
       binding[0],
       sequence([closeContextMenus, binding[1], schedule]),
@@ -632,8 +631,7 @@
       const allTasks = getTasks('include-collapsed');
       const selected = getSelectedTaskKeys();
       let modified = false;
-      for (let i = 0; i < allTasks.length; i++) {
-        const task = allTasks[i];
+      for (const task of allTasks) {
         if (getTaskPriority(task) === actualLevel) {
           selected[getTaskKey(task)] = true;
           modified = true;
@@ -1386,8 +1384,7 @@
   // object).
   function setSelections(selections) {
     const allTasks = getTasks('include-collapsed');
-    for (let i = 0; i < allTasks.length; i++) {
-      const task = allTasks[i];
+    for (const task of allTasks) {
       const key = getTaskKey(task);
       if (selections[key]) {
         selectTask(task);
@@ -2615,8 +2612,7 @@
   function getSelectedTaskKeys() {
     const results = {};
     const tasks = getTasks('include-collapsed');
-    for (let i = 0; i < tasks.length; i++) {
-      const task = tasks[i];
+    for (const task of tasks) {
       if (checkTaskIsSelected(task)) {
         const key = getTaskKey(task);
         results[key] = true;
@@ -2765,8 +2761,7 @@
   function getTaskById(id, indent) {
     const indentNumber = indent ? stripIndentClass(indent) : null;
     const els = document.getElementsByClassName('task_list_item');
-    for (let i = 0; i < els.length; i++) {
-      const el = els[i];
+    for (const el of els) {
       if (el.attributes['data-item-id'].value === id) {
         if (indent === 'ignore-indent') {
           return el;
@@ -2987,8 +2982,7 @@
   // Lowercase and take only alphanumeric.
   function preprocessItemText(txt) {
     let result = '';
-    for (let i = 0; i < txt.length; i++) {
-      const char = txt[i];
+    for (const char of txt) {
       const lowerChar = char.toLowerCase();
       if (lowercaseCharIsAlphanum(lowerChar)) {
         result += lowerChar;
@@ -3356,8 +3350,7 @@
     // and remove until they are all gone.
     let toDelete = [];
     do {
-      for (let i = 0; i < toDelete.length; i++) {
-        const el = toDelete[i];
+      for (const el of toDelete) {
         el.parentElement.removeChild(el);
       }
       toDelete = document.getElementsByClassName(TODOIST_SHORTCUTS_TIP);
@@ -3808,8 +3801,7 @@
   // null, then it is treated like 'all'.
   function findFirst(predicate, array) {
     const pred = checkedPredicate('findFirst', predicate ? predicate : all);
-    for (let i = 0; i < array.length; i++) {
-      const el = array[i];
+    for (const el of array) {
       if (pred(el)) {
         return el;
       }
@@ -3836,8 +3828,7 @@
   function findUnique(predicate, array) {
     const pred = checkedPredicate('findUnique', predicate ? predicate : all);
     let result = null;
-    for (let i = 0; i < array.length; i++) {
-      const el = array[i];
+    for (const el of array) {
       if (pred(el)) {
         if (result === null) {
           result = el;
