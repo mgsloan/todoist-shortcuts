@@ -376,13 +376,13 @@
 
   // Move the cursor up and down.
   function cursorDown() {
-    var cursorChanged = modifyCursorIndex(ix => { return ix + 1; });
+    var cursorChanged = modifyCursorIndex(ix => ix + 1);
     if (!cursorChanged && isUpcomingView()) {
       scrollTaskToTop(getCursor());
     }
   }
   function cursorUp() {
-    var cursorChanged = modifyCursorIndex(ix => { return ix - 1; });
+    var cursorChanged = modifyCursorIndex(ix => ix - 1);
     if (!cursorChanged && isUpcomingView()) {
       info('scrolling task to bottom');
       scrollTaskToBottom(getCursor());
@@ -1454,9 +1454,7 @@
     var manager = getUniqueClass(content, 'manager');
     if (manager) {
       var tasks = getTasks('include-collapsed', 'include-editors');
-      var managerIndex = tasks.findIndex(task => {
-        return task.classList.contains('manager');
-      });
+      var managerIndex = tasks.findIndex(task => task.classList.contains('manager'));
       debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
         storeEditingContext(tasks[managerIndex - 1], true);
@@ -2023,13 +2021,11 @@
       info('Indenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       var cursor = requireCursor();
-      dragTaskOver(cursor, false, () => {
-        return {
-          destination: cursor,
-          horizontalOffset: 35,
-          verticalOffset: 0
-        };
-      });
+      dragTaskOver(cursor, false, () => ({
+        destination: cursor,
+        horizontalOffset: 35,
+        verticalOffset: 0
+      }));
     } else {
       error('Unexpected viewMode:', viewMode);
     }
@@ -2045,13 +2041,11 @@
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
       } else {
-        dragTaskOver(cursor, false, () => {
-          return {
-            destination: cursor,
-            horizontalOffset: -35,
-            verticalOffset: 0
-          };
-        });
+        dragTaskOver(cursor, false, () => ({
+          destination: cursor,
+          horizontalOffset: -35,
+          verticalOffset: 0
+        }));
       }
     } else {
       error('Unexpected viewMode:', viewMode);
@@ -3062,7 +3056,7 @@
         }
       }
       // sort backwards so that deletion works.
-      qualifying.sort((a, b) => { return b[1] - a[1]; });
+      qualifying.sort((a, b) => b[1] - a[1]);
       for (var k = 0; k < qualifying.length; k++) {
         keys = qualifying[k][0];
         var ix = qualifying[k][1];
@@ -3073,7 +3067,7 @@
       }
     };
     // Handle items with 'mustBeKeys' set.
-    addViaKeyFunc('no-shortening', it => { return it.mustBeKeys; });
+    addViaKeyFunc('no-shortening', it => it.mustBeKeys);
     // When initials are at least MAX_NAVIGATE_PREFIX in length, prefer
     // assigning those.
     addViaKeyFunc('no-shortening', it => {
@@ -3085,9 +3079,7 @@
       }
     });
     // Attempt to use prefix as the key sequence.
-    addViaKeyFunc('try-shortening', it => {
-      return it.text.slice(0, MAX_NAVIGATE_PREFIX);
-    });
+    addViaKeyFunc('try-shortening', it => it.text.slice(0, MAX_NAVIGATE_PREFIX));
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
     for (var p = MAX_NAVIGATE_PREFIX - 1; p >= 0; p--) {
@@ -3846,9 +3838,7 @@
 
   // Returns predicate which returns 'true' if text content matches wanted text.
   function matchingText(txt) {
-    return el => {
-      return el.textContent === txt;
-    };
+    return el => el.textContent === txt;
   }
 
   // TODO: Switch to more efficient queries once these disambiguation
@@ -3862,9 +3852,7 @@
 
   // Returns predicate which returns 'true' if the element has the specified class.
   function matchingClass(cls) {
-    return el => {
-      return el.classList.contains(cls);
-    };
+    return el => el.classList.contains(cls);
   }
 
   // Returns predicate which returns 'true' if the element has the specified class suffix.
@@ -3884,24 +3872,18 @@
 
   // Returns predicate which returns 'true' if the element has the specified id suffix.
   function matchingIdSuffix(suffix) {
-    return el => {
-      return el.id.endsWith(suffix);
-    };
+    return el => el.id.endsWith(suffix);
   }
 
 
   // Returns predicate which returns 'true' if the element has the specified tag.
   function matchingTag(tag) {
-    return el => {
-      return el.tagName.toLowerCase() === tag;
-    };
+    return el => el.tagName.toLowerCase() === tag;
   }
 
   // Returns predicate which returns 'true' if the element has the specified id.
   function matchingId(id) {
-    return el => {
-      return el.id === id;
-    };
+    return el => el.id === id;
   }
 
   // Returns predicate which returns 'true' if the element has the specified attribute.
@@ -3918,23 +3900,17 @@
 
   // Returns predicate which returns 'true' if the element has a child matching the query.
   function hasChild(query) {
-    return el => {
-      return el.querySelector(query) !== null;
-    };
+    return el => el.querySelector(query) !== null;
   }
 
   // Inverts the result of a predicate.
   function not(p) {
-    return x => {
-      return !p(x);
-    };
+    return x => !p(x);
   }
 
   function sameElement(el1) {
-    return el2 => {
-      // eslint-disable-next-line eqeqeq
-      return el1 == el2;
-    };
+    return el2 => // eslint-disable-next-line eqeqeq
+    el1 == el2;
   }
 
   // Given two predicates, uses && to combine them.
