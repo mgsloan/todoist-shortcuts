@@ -1,8 +1,6 @@
 /* global svgs */
 
 {
-  const TODOIST_SHORTCUTS_VERSION = 119;
-
   // Set this to true to get more log output.
   const DEBUG = false;
 
@@ -1029,7 +1027,7 @@
     // Create new help modal.
     const header = element('h1', '', text('Keyboard shortcuts'));
     const docsLink = element('a', '', text('Full todoist-shortcuts documentation'));
-    docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/v' + TODOIST_SHORTCUTS_VERSION + '/readme.md');
+    docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
     const originalLink = element('a', '', text('Original Todoist keyboard shortcuts documentation'));
     originalLink.setAttribute('href', 'https://get.todoist.help/hc/en-us/articles/205063212');
     const sheetsLink = element('a', '', text('Printable shortcuts guide (displayed below)'));
