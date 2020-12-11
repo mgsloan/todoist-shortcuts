@@ -2816,21 +2816,7 @@
     debug('Creating navigation shortcut tips');
     try {
       const navigateItems = [];
-      withQuery(listHolder, 'li, a', (li) => {
-        // Hack alert: for some reason todoist started directly
-        // nesting <a> elements under <ul> for starred filters - see
-        // #162.
-        //
-        // TODO: remove when feasible (along with the special case CSS
-        // for it)
-        if (li.parentElement.tagName === 'LI') {
-          return;
-        }
-        // Due to this hack, it now visits some links that should be
-        // ignored.
-        if (li.tagName === 'A' && !li.classList.contains('SidebarListItem')) {
-          return;
-        }
+      withTag(listHolder, 'li', (li) => {
         let mustBeKeys = null;
         let txt = null;
         let initials = null;
@@ -2840,20 +2826,18 @@
           mustBeKeys = 'g';
         } else if (matchingAttr('data-track', 'navigation|upcoming')(li)) {
           mustBeKeys = 'n';
-        } else if (li.classList.contains('favorite_item')) {
-          withUniqueClass(li, 'item_content', all, (content) => {
-            withUniqueChild(content, matchingTag('span'), (nameSpan) => {
-              txt = preprocessItemText(nameSpan.textContent);
-              initials = getItemInitials(nameSpan.textContent);
-            });
-          });
         } else {
-          withUniqueClass(li, ['name', 'SidebarListItem__content'], all, (nameElement) => {
-            withUniqueChild(nameElement, matchingTag('span'), (nameSpan) => {
-              txt = preprocessItemText(nameSpan.textContent);
-              initials = getItemInitials(nameSpan.textContent);
-            });
-          });
+          nameSpan = getUniqueClass(li, 'simple_content');
+          if (!nameSpan) {
+            nameSpan = getUniqueClass(li, 'name');
+            if (nameSpan) {
+              nameSpan = getUniqueChild(nameSpan, matchingTag('span'));
+            }
+          }
+          if (nameSpan) {
+            txt = preprocessItemText(nameSpan.textContent);
+            initials = getItemInitials(nameSpan.textContent);
+          }
         }
         // Add some stable sequences for common text
         if (txt === 'priority1') {
@@ -3777,6 +3761,8 @@
   // Checks that there is only one child element that matches the
   // predicate, and invokes the function on it. Logs a warning if
   // there isn't exactly one.
+  //
+  // eslint-disable-next-line no-unused-vars
   function withUniqueChild(parent, predicate, f) {
     const result = getUniqueChild(parent, predicate);
     if (result) {
@@ -4102,12 +4088,8 @@
     '}',
     '',
     '#top_filters .' + TODOIST_SHORTCUTS_TIP + ' {',
-    '  margin-top: -4px;',
+    '  margin-top: 0;',
     '  margin-left: -20px;',
-    '}',
-    '',
-    '#top_filters a > .' + TODOIST_SHORTCUTS_TIP + ' {',
-    '  margin-top: 5px;',
     '}',
     '',
     '.expansion_panel__toggle .' + TODOIST_SHORTCUTS_TIP + ' {',
