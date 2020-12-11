@@ -1676,7 +1676,7 @@
     let isTaskViewHash = currentHash.startsWith('#task');
     if (currentHash === '') {
       currentHash = document.location.pathname;
-      isTaskViewHash = currentHash.startsWith('/app/task/');
+      isTaskViewHash = currentHash.includes('/task/');
     }
     if (lastHash !== currentHash && !isTaskViewHash) {
       lastHash = currentHash;
