@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 120
+
+### Bug fixes ###
+
+* Fixes navigation to favorite items with newest Todoist verison
+  (again!). See [#162][]
+
+
 ## Version 119
 
 ### Bug fixes ###
@@ -23,7 +31,7 @@
 
 ### Bug fixes ###
 
-* Fixes navigation to starred items with newest Todoist verison. See
+* Fixes navigation to favorite items with newest Todoist verison. See
   [#162][].
 
 * Fixes scrolling with newest Todoist version. See [#163][].
