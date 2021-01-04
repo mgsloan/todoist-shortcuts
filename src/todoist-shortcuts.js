@@ -2105,19 +2105,21 @@
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
       dragTaskOver(cursor, false, () => {
-        const tasks = getTasks();
+        const tasks = getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
         const cursorIndent = getIndentClass(cursor);
         for (let i = cursorIndex - 1; i >= 0; i--) {
           const task = tasks[i];
           const indent = getIndentClass(task);
-          if (indent === cursorIndent) {
+          if (indent === cursorIndent ||
+              (isSectionLi(task) && i != cursorIndex - 1)) {
+            debug('moveUp target is', task);
             // Less glitchy if destination is collapsed
             collapse(task);
             return {
               destination: task,
               horizontalOffset: 0,
-              verticalOffset: -10,
+              verticalOffset: isSectionLi(task) ? 30 : -10,
             };
           } else if (indent < cursorIndent) {
             info('Refusing to dedent task to move it up.');
@@ -2145,7 +2147,7 @@
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
       dragTaskOver(cursor, true, () => {
-        const tasks = getTasks();
+        const tasks = getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
         const cursorIndent = getIndentClass(cursor);
         let lastQualifyingTask = null;
@@ -2159,7 +2161,10 @@
           // lesser or equal indent to cursorIndent, we want to place it after
           // the last one.
           if (!lastQualifyingTask) {
-            if (indent === cursorIndent) {
+            if (isSectionLi(task)) {
+              lastQualifyingTask = task;
+              break;
+            } else if (indent === cursorIndent) {
               lastQualifyingTask = task;
             } else if (indent < cursorIndent) {
               info('Refusing to dedent task to move it down.');
@@ -2171,13 +2176,14 @@
             lastQualifyingTask = task;
           }
         }
+        debug('moveDown target is', lastQualifyingTask);
         if (lastQualifyingTask) {
           // Less glitchy if destination is collapsed
           collapse(lastQualifyingTask);
           return {
             destination: lastQualifyingTask,
             horizontalOffset: 0,
-            verticalOffset: -cursor.clientHeight,
+            verticalOffset: isSectionLi(lastQualifyingTask) ? -100 : -cursor.clientHeight,
           };
         } else {
           info('Couldn\'t find task below cursor to move it below.');
@@ -2339,7 +2345,7 @@
         el.dispatchEvent(new MouseEvent('mouseup', params));
         finished();
       } else {
-        params = mkMouseParams(overshootCoslerp(sx, tx, alpha, 0.3, 1.5), overshootCoslerp(sy, ty, alpha, 0.3, 1.5));
+        params = mkMouseParams(overshootCoslerp(sx, tx, alpha, 0.3, 1.2), overshootCoslerp(sy, ty, alpha, 0.3, 1.2));
         el.dispatchEvent(new MouseEvent('mousemove', params));
         setTimeout(dragLoop, duration / frameCount);
       }
@@ -2578,7 +2584,7 @@
    */
 
   // Get the <li> elements for all the tasks visible in the current view.
-  function getTasks(includeCollapsed, includeEditors) {
+  function getTasks(includeCollapsed, includeEditors, includeSections) {
     let shouldIncludeCollapsed = false;
     if (includeCollapsed === 'include-collapsed') {
       shouldIncludeCollapsed = true;
@@ -2593,23 +2599,35 @@
       error('Unexpected value for includeEditors:', includeEditors);
       return [];
     }
+    let shouldIncludeSections = false;
+    if (includeSections === 'include-sections') {
+      shouldIncludeSections = true;
+    } else if (includeSections && includeSections !== 'no-sections') {
+      error('Unexpected value for includeSections:', includeSections);
+      return [];
+    }
     const results = [];
     withId('content', (content) => {
       withTag(content, 'li', (item) => {
-        // Skip elements which don't correspond to tasks
-        const classMatches =
+        // Skip elements which don't correspond to tasks or sections
+        const matches =
           !item.classList.contains('reorder_item') &&
           ( item.classList.contains('task_list_item') ||
-          (item.classList.contains('manager') && shouldIncludeEditors)
+          (item.classList.contains('manager') && shouldIncludeEditors) ||
+          (isSectionLi(item) && shouldIncludeSections)
           );
         // Skip nested tasks that are not visible (if includeCollapsed is not set).
         const visible = shouldIncludeCollapsed || !hidden(item);
-        if (classMatches && visible) {
+        if (matches && visible) {
           results.push(item);
         }
       });
     });
     return results;
+  }
+
+  function isSectionLi(task) {
+    return matchingClass('section_list')(task.parentElement);
   }
 
   // Predicate, returns 'true' if the task has a 'hidden' attribute.
