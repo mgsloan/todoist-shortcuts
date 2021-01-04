@@ -2059,10 +2059,11 @@
       info('Indenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       const cursor = requireCursor();
-      dragTaskOver(cursor, false, () => ({
+      dragTaskOver(cursor, () => ({
         destination: cursor,
         horizontalOffset: 35,
         verticalOffset: 0,
+        isBelow: false,
       }));
     } else {
       error('Unexpected viewMode:', viewMode);
@@ -2079,10 +2080,11 @@
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
       } else {
-        dragTaskOver(cursor, false, () => ({
+        dragTaskOver(cursor, () => ({
           destination: cursor,
           horizontalOffset: -35,
           verticalOffset: 0,
+          isBelow: false,
         }));
       }
     } else {
@@ -2104,7 +2106,7 @@
       // Collapse nested tasks before moving it - see
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
-      dragTaskOver(cursor, false, () => {
+      dragTaskOver(cursor, () => {
         const tasks = getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
         const cursorIndent = getIndentClass(cursor);
@@ -2119,7 +2121,8 @@
             return {
               destination: task,
               horizontalOffset: 0,
-              verticalOffset: isSectionLi(task) ? 30 : -10,
+              verticalOffset: isSectionLi(task) ? 0 : -10,
+              isBelow: isSectionLi(task) ? true : false,
             };
           } else if (indent < cursorIndent) {
             info('Refusing to dedent task to move it up.');
@@ -2146,7 +2149,7 @@
       // Collapse nested tasks before moving it - see
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
-      dragTaskOver(cursor, true, () => {
+      dragTaskOver(cursor, () => {
         const tasks = getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
         const cursorIndent = getIndentClass(cursor);
@@ -2160,11 +2163,13 @@
           // the last one.  After that, when we encounter something at a
           // lesser or equal indent to cursorIndent, we want to place it after
           // the last one.
-          if (!lastQualifyingTask) {
-            if (isSectionLi(task)) {
+          if (isSectionLi(task)) {
+            if (!lastQualifyingTask) {
               lastQualifyingTask = task;
-              break;
-            } else if (indent === cursorIndent) {
+            }
+            break;
+          } else if (!lastQualifyingTask) {
+            if (indent === cursorIndent) {
               lastQualifyingTask = task;
             } else if (indent < cursorIndent) {
               info('Refusing to dedent task to move it down.');
@@ -2183,7 +2188,8 @@
           return {
             destination: lastQualifyingTask,
             horizontalOffset: 0,
-            verticalOffset: isSectionLi(lastQualifyingTask) ? -100 : -cursor.clientHeight,
+            verticalOffset: -cursor.clientHeight + (isSectionLi(lastQualifyingTask) ? 40 : 0),
+            isBelow: isSectionLi(lastQualifyingTask) ? false : true,
           };
         } else {
           info('Couldn\'t find task below cursor to move it below.');
@@ -2274,7 +2280,7 @@
     }
   }
 
-  function dragTaskOver(sourceTask, isBelow, findDestination) {
+  function dragTaskOver(sourceTask, findDestination) {
     const sourceY = offset(sourceTask).y;
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
@@ -2286,7 +2292,7 @@
           if (result) {
             const deltaX = result.horizontalOffset;
             let deltaY = offset(result.destination).y - sourceY + result.verticalOffset;
-            if (isBelow) {
+            if (result.isBelow) {
               deltaY += result.destination.clientHeight;
             }
             animateDrag(el, x, y, x + deltaX, y + deltaY,
@@ -2345,7 +2351,7 @@
         el.dispatchEvent(new MouseEvent('mouseup', params));
         finished();
       } else {
-        params = mkMouseParams(overshootCoslerp(sx, tx, alpha, 0.3, 1.2), overshootCoslerp(sy, ty, alpha, 0.3, 1.2));
+        params = mkMouseParams(overshootCoslerp(sx, tx, alpha, 0.3, 1.5), overshootCoslerp(sy, ty, alpha, 0.3, 1.5));
         el.dispatchEvent(new MouseEvent('mousemove', params));
         setTimeout(dragLoop, duration / frameCount);
       }
