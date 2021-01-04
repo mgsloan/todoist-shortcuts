@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 122
+
+### Bug fixes ###
+
+* More adjustments to task dragging between sections. See [#166][]
+
+[#166]: https://github.com/mgsloan/todoist-shortcuts/issues/166
+
+
 ## Version 121
 
 ### Bug fixes ###
