@@ -1421,13 +1421,22 @@
     const tasks = getTasks();
     const index = tasks.indexOf(cursor);
     if (index < 0) {
-      error('Invariant violation - couldn\'t find ', cursor, 'in', tasks);
+      clearEditingContext(tasks);
     }
     storeCursorContext(cursor, tasks, index, false);
   }
 
   function storeEditingContext(cursor, index) {
     storeCursorContext(cursor, getTasks(), index, true);
+  }
+
+  function clearEditingContext(tasks) {
+    lastCursorTasks = tasks;
+    lastCursorIndex = -1;
+    lastCursorId = null;
+    lastCursorIndent = null;
+    lastCursorSection = null;
+    wasEditing = false;
   }
 
   function handleMouseMove(ev) {
@@ -2765,7 +2774,8 @@
     const indentNumber = indent ? stripIndentClass(indent) : null;
     const els = document.getElementsByClassName('task_list_item');
     for (const el of els) {
-      if (el.attributes['data-item-id'].value === id) {
+      const itemIdAttr = el.attributes['data-item-id'];
+      if (itemIdAttr && itemIdAttr.value === id) {
         if (indent === 'ignore-indent') {
           return el;
         } else if (!indent) {
