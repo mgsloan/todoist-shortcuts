@@ -36,7 +36,7 @@
 
 * Fixes scrolling with newest Todoist version. See [#163][].
 
-[#162]: https://github.com/mgsloan/todoist-shortcuts/issues/163
+[#162]: https://github.com/mgsloan/todoist-shortcuts/issues/162
 [#163]: https://github.com/mgsloan/todoist-shortcuts/issues/163
 
 
