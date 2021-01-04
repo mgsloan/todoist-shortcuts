@@ -1584,6 +1584,11 @@
 
   // Gets the name of the section that a task is in.
   function getSectionName(task) {
+    // Only really relevant in agenda mode, since nested project tasks
+    // no longer appear in parent projects.
+    if (viewMode !== 'agenda') {
+      return '';
+    }
     const section = getSection(task);
     let result = null;
     if (section) {
