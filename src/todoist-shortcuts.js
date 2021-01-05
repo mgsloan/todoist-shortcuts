@@ -26,7 +26,6 @@
   // this list, or modify this script in general.
   const KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
 
-
     // Navigation
     ['g', navigate],
     ['G', navigateToTask],
