@@ -58,8 +58,8 @@
     ['* 2', selectPriority('2')],
     ['* 3', selectPriority('3')],
     [['* 4', '* 0'], selectPriority('4')],
-    ['* h', collapseAll],
-    ['* l', expandAll],
+    [['* h', '* left'], collapseAll],
+    [['* l', '* right'], expandAll],
 
     // Manipulation of selected tasks
     ['t', schedule],
