@@ -1964,18 +1964,27 @@
   // collapse / expand all items.
   function repeatedlyClickArrows(cls) {
     withId('content', (content) => {
+      let i = 0;
       let clickedSomething = false;
       const doClick = (el) => {
         click(el);
         clickedSomething = true;
       };
-      for (let i = 0; i < 100; i++) {
+      let clickAll = null;
+      clickAll = () => {
+        clickedSomething = false;
         withClass(content, cls, doClick);
-        if (!clickedSomething) break;
-        if (i === 99) {
-          warn('iteratively clicked arrows 100 times but they didn\'t all toggle');
+        if (!clickedSomething) {
+          return;
         }
-      }
+        if (i < 5) {
+          i++;
+          setTimeout(clickAll);
+        } else {
+          warn('iteratively clicked arrows 5 times but they didn\'t all toggle');
+        }
+      };
+      clickAll();
     });
   }
 
