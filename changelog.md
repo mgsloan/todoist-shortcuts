@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 123
+
+### Enhancements ###
+
+* `* left` and `* right` can now be used to collapse or expand all
+  tasks.
+
+
 ## Version 122
 
 ### Bug fixes ###
