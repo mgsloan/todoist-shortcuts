@@ -934,7 +934,7 @@
       let projectEl = null;
       const projectSpanEl = getUniqueClass(cursor, 'task_list_item__project');
       if (projectSpanEl) {
-        projectEl = getUniqueTag(projectSpanEl, 'span');
+        projectEl = getUniqueTag(projectSpanEl, 'a');
       }
       if (projectEl) {
         // Set a variable that will be read by 'handlePageChange', which will
