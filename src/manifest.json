@@ -26,5 +26,6 @@
       "128": "icon128.png"
     }
   },
+  "content_security_policy": "default-src 'self'",
   "manifest_version": 2
 }
