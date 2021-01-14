@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 124
+
+### Enhancements ###
+
+* No user-facing changes. Sets `content_security_policy` in extension
+  manifest.
+
+
 ## Version 123
 
 ### Enhancements ###
