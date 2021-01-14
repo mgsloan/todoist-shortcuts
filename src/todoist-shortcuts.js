@@ -1698,13 +1698,11 @@
         const newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
         if (newEl) {
           setCursor(newEl, 'scroll');
-        } else if (isUpcomingView()) {
+        } else {
           const taskId = selectAfterNavigate;
           setTimeout(() => {
             persistentlySelectAfterNavigate(taskId, 100);
           }, 10);
-        } else {
-          warn('Couldn\'t find cursored task after switching to its project');
         }
         selectAfterNavigate = null;
       } else {
