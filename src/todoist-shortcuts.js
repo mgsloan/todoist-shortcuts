@@ -918,11 +918,13 @@
       const dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
         withId('top_filters', (topFilters) => {
-          withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|upcoming'), (upcoming) => {
-            // Set a variable that will be read by 'handlePageChange',
-            // which will tell it to select this task.
-            selectAfterNavigate = getTaskId(cursor);
-            click(upcoming);
+          withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|upcoming'), (upcomingLi) => {
+            withUniqueTag(upcomingLi, 'a', all, (upcomingLink) => {
+              // Set a variable that will be read by 'handlePageChange',
+              // which will tell it to select this task.
+              selectAfterNavigate = getTaskId(cursor);
+              click(upcomingLink);
+            });
           });
         });
       } else {
