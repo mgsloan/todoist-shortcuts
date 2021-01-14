@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 125
+
+### Bug fixes ###
+
+* Fixes a few breakages of `shift-g` shortcut (navigate to task's
+  project, or to agenda mode). See [#169][], [#170][], and [#171][].
+
+[#169]: https://github.com/mgsloan/todoist-shortcuts/issues/169
+[#170]: https://github.com/mgsloan/todoist-shortcuts/issues/170
+[#171]: https://github.com/mgsloan/todoist-shortcuts/issues/171
+
+
 ## Version 124
 
 ### Enhancements ###
