@@ -914,7 +914,8 @@
   // reselects the task.
   function navigateToTask() {
     const cursor = requireCursor();
-    if (viewMode === 'project') {
+    const isFilterView = getIsFilterView();
+    if (viewMode === 'project' && !isFilterView) {
       const dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
         withId('top_filters', (topFilters) => {
@@ -3538,6 +3539,16 @@
       return 'project';
     } else {
       return 'agenda';
+    }
+  }
+
+  function getIsFilterView() {
+    let currentHash = document.location.hash;
+    if (currentHash === '') {
+      currentHash = document.location.pathname;
+      return currentHash.includes('/filter/');
+    } else {
+      return currentHash.startsWith('#/filter/');
     }
   }
 
