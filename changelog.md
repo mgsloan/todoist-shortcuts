@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 126
+
+### Enhancements ###
+
+* `shift-g` in filter view now navigates to the task's project rather
+  than bringing up the "upcoming" view.
+
+
 ## Version 125
 
 ### Bug fixes ###
