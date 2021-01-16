@@ -63,7 +63,7 @@
     // Manipulation of selected tasks
     ['t', schedule],
     ['shift+t', scheduleText],
-    ['d', done],
+    ['alt+d', done],
     [['e', '#'], deleteTasks],
     ['&', duplicateTasks],
     ['v', moveToProject],
@@ -75,7 +75,7 @@
     ['shift+c', toggleTimer],
 
     // Sorting
-    ['s', sortByDate],
+    // ['s', sortByDate],
     // (see originalHandler) ['p', sortByPriority],
     // (see originalHandler) ['n', sortByName],
     // (see originalHandler) ['r', sortByAssignee],
@@ -146,7 +146,7 @@
   const SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
   const TASK_VIEW_BINDINGS = [
-    ['d', taskViewDone],
+    ['alt+d', taskViewDone],
     [['i', 'escape'], taskViewClose],
     ['s', taskViewSubtasks],
     ['c', taskViewComments],
