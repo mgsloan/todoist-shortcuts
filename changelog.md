@@ -6,7 +6,7 @@
 
 * Fixes navigation to favorites. See [#173][].
 
-[#173]: ttps://github.com/mgsloan/todoist-shortcuts/issues/173
+[#173]: https://github.com/mgsloan/todoist-shortcuts/issues/173
 
 
 ## Version 126
