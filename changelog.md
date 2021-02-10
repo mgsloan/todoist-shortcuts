@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 127
+
+### Fixes ###
+
+* Fixes navigation to favorites. See [#173][].
+
+[#173]: ttps://github.com/mgsloan/todoist-shortcuts/issues/173
+
+
 ## Version 126
 
 ### Enhancements ###
