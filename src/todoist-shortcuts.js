@@ -2880,6 +2880,10 @@
               nameSpan = getUniqueChild(nameSpan, matchingTag('span'));
             }
           }
+          if (!nameSpan) {
+            // Handle new favorites DOM.
+            nameSpan = getUniqueTag(li, 'a');
+          }
           if (nameSpan) {
             txt = preprocessItemText(nameSpan.textContent);
             initials = getItemInitials(nameSpan.textContent);
@@ -2938,6 +2942,8 @@
             mustBeKeys = 'tl';
           } else if (dataTrack === 'navigation|filters_panel') {
             mustBeKeys = 'tf';
+          } else if (dataTrack === 'navigation|favorites_panel') {
+            mustBeKeys = 'tt';
           } else {
             error('Unexpected dataTrack value:', dataTrack);
           }
@@ -3266,11 +3272,11 @@
               keepGoing = option.keepGoing;
               // If the user is selecting a section like projects / labels /
               // filters, then close the other sections.
-              if (el.classList.contains('expansion_panel__toggle')) {
+              if (el.classList.contains('expansion_panel__toggle') && !isFavoritesSection(el)) {
                 withId('list_holder', (listHolder) => {
                   withClass(listHolder, 'expansion_panel__toggle', (ps) => {
                     const isExpanded = ps.attributes['aria-expanded'].value === 'true';
-                    if (!sameElement(el)(ps) && isExpanded) {
+                    if (!sameElement(el)(ps) && isExpanded && !isFavoritesSection(ps)) {
                       ps.click();
                     }
                   });
@@ -3364,6 +3370,11 @@
         }
       }
     }
+  }
+
+  function isFavoritesSection(el) {
+    const dataTrackAttr = el.attributes['data-track'];
+    return dataTrackAttr && dataTrackAttr.value === 'navigation|favorites_panel';
   }
 
   function keyIsModifier(ev) {
@@ -4143,13 +4154,18 @@
     '  color: #aaa;',
     '}',
     '',
-    '#top_filters .' + TODOIST_SHORTCUTS_TIP + ' {',
+    '#top_filters > li > .' + TODOIST_SHORTCUTS_TIP + ' {',
     '  margin-top: 0;',
     '  margin-left: -20px;',
     '}',
     '',
+    '#top_filters .collapse__wrapper .' + TODOIST_SHORTCUTS_TIP + ' {',
+    '  margin-top: 5px;',
+    '  margin-left: -22px;',
+    '}',
+    '',
     '.expansion_panel__toggle .' + TODOIST_SHORTCUTS_TIP + ' {',
-    '  margin-top: -1px;',
+    '  margin-top: -3px;',
     '}',
     '',
     '#page_background {',
