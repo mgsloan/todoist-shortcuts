@@ -3930,11 +3930,6 @@
     return true;
   }
 
-  // Returns predicate which returns 'true' if text content matches wanted text.
-  function matchingText(txt) {
-    return (el) => el.textContent === txt;
-  }
-
   function matchingAction(action) {
     return matchingAttr('data-action-hint', action);
   }
