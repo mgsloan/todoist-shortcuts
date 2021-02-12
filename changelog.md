@@ -4,6 +4,9 @@
 
 ### Fixes ###
 
+* Reinstates the bulk move / bulk reschedule features which were
+  disabled as part of [#137][].
+
 * Fixes a bug where the number of tasks associated with a favorited
   section affected the choice of keys in navigation mode.
 
