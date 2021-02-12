@@ -10,6 +10,8 @@
 * Fixes a bug where the number of tasks associated with a favorited
   section affected the choice of keys in navigation mode.
 
+* Fixes `s` for sorting by date. See [#137][] / [#142][].
+
 
 ## Version 127
 
