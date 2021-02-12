@@ -1011,10 +1011,14 @@
 
   // Trigger sort by date by clicking a menu item.
   function sortByDate() {
-    withUniqueTag(document, 'button', matchingClass('gear_icon'), click);
-    withUniqueClass(document, 'project_view_menu', all, (menu) => {
-      withUniqueClass(menu, 'icon_menu_item__content', matchingText('Sort by date'), click);
+    withUniqueClass(document, 'view_header__actions', all, (actions) => {
+      // Ooof, such terrible hacks.
+      const svgs = actions.querySelectorAll('svg[viewBox="0 0 24 24"]');
+      if (svgs.length > 1) {
+        click(svgs[svgs.length - 1].parentElement);
+      }
     });
+    withUnique(document, '[data-track="items|sort_by_date"]', click)
   }
 
   // Open help documentation.
