@@ -870,6 +870,17 @@
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
   function closeContextMenus() {
+    for (let i = 0; i < 100; i++) {
+      const popperOverlay = getLastClass(document, 'popper__overlay');
+      if (popperOverlay) {
+        popperOverlay.click();
+      } else {
+        break;
+      }
+      if (i == 99) {
+        warn('Tried a lot to close poppers.');
+      }
+    }
     click(document.body);
     withClass(document, 'manager', (manager) => {
       const cancelBtn = getUniqueClass(manager, 'cancel');
