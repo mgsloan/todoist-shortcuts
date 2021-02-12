@@ -1229,28 +1229,12 @@
   let nextBulkScheduleKey = null;
 
   function bulkSchedule() {
-    bulkOperationsDisabled();
-    /*
-    deselectAll();
+    deselectAllTasks();
     const cursor = requireCursor();
     inBulkScheduleMode = true;
     nextBulkScheduleKey = getTaskKey(cursor);
     updateKeymap();
     oneBulkSchedule(cursor);
-    */
-  }
-
-  // FIXME(#137)
-  function bulkOperationsDisabled() {
-    const link = element('a', null, text('#137'));
-    link.href = 'https://github.com/mgsloan/todoist-shortcuts/issues/137';
-    link.style.color = '';
-    notifyUser(
-        span(null,
-            text('todoist-shortcuts bulk operations are disabled (hopefully temporarily). '),
-            text('For more info, see issue '),
-            link,
-            text('.')));
   }
 
   // TODO(new-scheduler): Exiting doesn't work immediately - visits an
@@ -1285,8 +1269,7 @@
     const cursor = getCursor();
     if (cursor) {
       const tasks = getTasks();
-      const nextBulkScheduleTask =
-          getNextCursorableTask(tasks, getTaskKey(cursor));
+      const nextBulkScheduleTask = getNextCursorableTask(tasks, getTaskKey(cursor));
       if (nextBulkScheduleTask) {
         nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
         return;
@@ -1304,15 +1287,12 @@
   let nextBulkMoveKey = null;
 
   function bulkMove() {
-    bulkOperationsDisabled();
-    /*
-    deselectAll();
+    deselectAllTasks();
     const cursor = requireCursor();
     inBulkMoveMode = true;
     nextBulkMoveKey = getTaskKey(cursor);
     updateKeymap();
     oneBulkMove();
-    */
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -1353,8 +1333,7 @@
     const cursor = getCursor();
     if (cursor) {
       const tasks = getTasks();
-      const nextBulkMoveTask =
-          getNextCursorableTask(tasks, getTaskKey(cursor));
+      const nextBulkMoveTask = getNextCursorableTask(tasks, getTaskKey(cursor));
       if (nextBulkMoveTask) {
         nextBulkMoveKey = getTaskKey(nextBulkMoveTask);
         return;
@@ -2026,7 +2005,7 @@
   }
 
   function checkMoveToProjectOpen() {
-    return getById('GB_window') !== null;
+    return getFirstClass(document, 'project_picker') !== null;
   }
 
   function checkSchedulerOpen() {
@@ -2570,6 +2549,7 @@
     });
   }
 
+  // eslint-disable-next-line no-unused-vars
   function notifyUser(msg) {
     withId('app_holder', (appHolder) => {
       const close = div('ts-note-close');
@@ -2839,10 +2819,15 @@
   function getNextCursorableTask(tasks, currentKey) {
     for (let i = 0; i < tasks.length; i++) {
       if (getTaskKey(tasks[i]) === currentKey) {
+        if (i + 1 < tasks.length) {
+          return tasks[i + 1];
+        }
+        /*
         for (let j = i + 1; j < tasks.length; j++) {
           const task = tasks[j];
           return task;
         }
+        */
       }
     }
     return null;
