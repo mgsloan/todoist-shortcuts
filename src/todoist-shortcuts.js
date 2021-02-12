@@ -249,11 +249,12 @@
   function originalHandler(ev) {
     // Todoist is handling the 'h' key's keydown to switch to the
     // upcoming view, so this workaround skips it - see #134.
-    if (ev.key === 'h' && ev.target === document.body && ev.type === 'keydown') {
+    if (ev.key === 'h' &&
+        ev.target === document.body &&
+        ev.type === 'keydown') {
       debug('skipping todoist handler for "h" to workaround #134.', ev);
       return false;
     }
-    // debug('invoking todoist handler for', ev.type, ev.key, 'full event:', ev);
     let result = true;
     if (originalHandlerReentered) {
       warn('Ignored re-entry of key handler. Weird!');
@@ -405,8 +406,8 @@
         // Not on first task, so move the cursor.
         setCursor(firstTask, 'scroll');
       } else {
-        // If already on the first task of this section, then select first task of
-        // prior populated section, if any exists.
+        // If already on the first task of this section, then select
+        // first task of prior populated section, if any exists.
         section = section.previousSibling;
         for (; section; section = section.previousSibling) {
           firstTask = getFirstTaskInSection(section);
@@ -432,8 +433,8 @@
           return;
         }
       }
-      // If execution has reached this point, then we must already be on the last
-      // section.
+      // If execution has reached this point, then we must already be
+      // on the last section.
       const lastTask = getLastTaskInSection(curSection);
       warn(lastTask);
       if (lastTask) {
@@ -449,11 +450,13 @@
 
   // Follow the first link of the task under the cursor.
   function followLink() {
-    withUniqueClass(requireCursor(), ['content', 'task_content'], all, (content) => {
+    const classes = ['content', 'task_content'];
+    withUniqueClass(requireCursor(), classes, all, (content) => {
       const link = getFirstTag(content, 'a');
       if (link) {
         if (IS_CHROME) {
-          const middleClick = new MouseEvent( 'click', {'button': 1, 'which': 2});
+          const middleClick =
+                new MouseEvent( 'click', {'button': 1, 'which': 2});
           link.dispatchEvent(middleClick);
         } else {
           click(link);
@@ -493,7 +496,8 @@
         bulkScheduleCursorChanged();
       }
     } else {
-      withUnique(document, 'button[data-action-hint="multi-select-toolbar-scheduler"]', (button) => {
+      const query = 'button[data-action-hint="multi-select-toolbar-scheduler"]';
+      withUnique(document, query, (button) => {
         click(button);
         blurSchedulerInput();
       });
@@ -508,7 +512,11 @@
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-      withUnique(document, 'button[data-action-hint="multi-select-toolbar-scheduler"]', click);
+      withUnique(
+          document,
+          'button[data-action-hint="multi-select-toolbar-scheduler"]',
+          click,
+      );
     }
   }
 
@@ -517,7 +525,12 @@
     withScheduler(
         'scheduleToday',
         (scheduler) => {
-          withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_today'), click);
+          withUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_today'),
+              click,
+          );
         });
   }
 
@@ -526,7 +539,12 @@
     withScheduler(
         'scheduleTomorrow',
         (scheduler) => {
-          withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_tomorrow'), click);
+          withUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_tomorrow'),
+              click,
+          );
         });
   }
 
@@ -535,7 +553,12 @@
     withScheduler(
         'scheduleNextWeek',
         (scheduler) => {
-          withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'), click);
+          withUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'),
+              click,
+          );
         });
   }
 
@@ -544,7 +567,7 @@
     withScheduler(
         'scheduleNextMonth',
         () => {
-          error('schedule next month no longer supported with new Todoist scheduler.');
+          error('schedule next month no longer supported.');
         });
   }
 
@@ -553,15 +576,30 @@
     withScheduler(
         'scheduleSuggested',
         (scheduler) => {
-          const suggested = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_suggested'));
+          const suggested = getUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_suggested'),
+          );
           if (suggested) {
             click(suggested);
           } else {
-            const smartScheduler = getUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_smartscheduler'));
+            const smartScheduler = getUniqueTag(
+                scheduler,
+                'button',
+                matchingAttr('data-track',
+                    'scheduler|date_shortcut_smartscheduler'),
+            );
             if (smartScheduler) {
               click(smartScheduler);
             } else {
-              withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_postpone'), click);
+              withUniqueTag(
+                  scheduler,
+                  'button',
+                  matchingAttr('data-track',
+                      'scheduler|date_shortcut_postpone'),
+                  click,
+              );
             }
           }
         });
@@ -572,7 +610,12 @@
     withScheduler(
         'unschedule',
         (scheduler) => {
-          withUniqueTag(scheduler, 'button', matchingAttr('data-track', 'scheduler|date_shortcut_nodate'), click);
+          withUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_nodate'),
+              click,
+          );
         });
   }
 
@@ -587,7 +630,11 @@
         bulkMoveCursorChanged();
       }
     } else {
-      withUnique(document, 'button[data-action-hint="multi-select-toolbar-project-picker"]', click);
+      withUnique(
+          document,
+          'button[data-action-hint="multi-select-toolbar-project-picker"]',
+          click,
+      );
     }
   }
 
@@ -607,9 +654,17 @@
           clickPriorityMenu(menu, level);
         });
         // Click save button.
-        withUnique(document, '.task_editor__form_actions button[type="submit"]', click);
+        withUnique(
+            document,
+            '.task_editor__form_actions button[type="submit"]',
+            click,
+        );
       } else {
-        withUnique(document, 'button[data-action-hint="multi-select-toolbar-priority-picker"]', click);
+        withUnique(
+            document,
+            'button[data-action-hint="multi-select-toolbar-priority-picker"]',
+            click,
+        );
         withUniqueClass(document, 'priority_picker', all, (menu) => {
           clickPriorityMenu(menu, level);
         });
@@ -647,20 +702,28 @@
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
     } else {
-      withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-complete"]', click);
+      withUnique(
+          openMoreMenu(),
+          'li[data-action-hint="multi-select-toolbar-overflow-menu-complete"]',
+          click,
+      );
     }
   }
 
-  // Delete selected tasks. Todoist will prompt for deletion. Since todoist
-  // prompts, this is not treated as a 'dangerous' action.  As such, if
-  // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the cursor if
-  // there is no selection.
+  // Delete selected tasks. Todoist will prompt for deletion. Since
+  // todoist prompts, this is not treated as a 'dangerous' action.  As
+  // such, if WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead
+  // applies to the cursor if there is no selection.
   function deleteTasks() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
     } else {
-      withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-delete"]', click);
+      withUnique(
+          openMoreMenu(),
+          'li[data-action-hint="multi-select-toolbar-overflow-menu-delete"]',
+          click,
+      );
     }
   }
 
@@ -669,7 +732,11 @@
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
     } else {
-      withUnique(openMoreMenu(), 'li[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]', click);
+      withUnique(
+          openMoreMenu(),
+          'li[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]',
+          click,
+      );
     }
   }
 
@@ -679,11 +746,20 @@
       select();
     }
     withUniqueClass(document, 'multi_select_toolbar', all, (toolbar) => {
-      withUniqueTag(toolbar, 'button', matchingAction('multi-select-toolbar-label-picker'), click);
+      withUniqueTag(
+          toolbar,
+          'button',
+          matchingAction('multi-select-toolbar-label-picker'),
+          click,
+      );
     });
   }
 
-  const TIMER_CLASSES = ['toggl-button', 'clockify-button-inactive', 'clockify-button-active'];
+  const TIMER_CLASSES = [
+    'toggl-button',
+    'clockify-button-inactive',
+    'clockify-button-active',
+  ];
 
   // If toggl-button or clockify extension is in use, clicks the
   // button element in the task.
@@ -792,7 +868,12 @@
 
   function addTaskBottom() {
     if (viewMode === 'agenda') {
-      withUniqueTag(document, 'button', matchingAttr('data-track', 'navigation|quick_add'), click);
+      withUniqueTag(
+          document,
+          'button',
+          matchingAttr('data-track', 'navigation|quick_add'),
+          click,
+      );
     } else {
       clickInlineAddTask();
     }
@@ -800,7 +881,12 @@
 
   function addTaskTop() {
     if (viewMode === 'agenda') {
-      withUniqueTag(document, 'button', matchingAttr('data-track', 'navigation|quick_add'), click);
+      withUniqueTag(
+          document,
+          'button',
+          matchingAttr('data-track', 'navigation|quick_add'),
+          click,
+      );
     } else {
       const tasks = getTasks();
       if (tasks.length > 0) {
@@ -812,7 +898,12 @@
   }
 
   function clickInlineAddTask(section) {
-    withUniqueClass(section ? section : document, 'plus_add_button', all, click);
+    withUniqueClass(
+      section ? section : document,
+      'plus_add_button',
+      all,
+      click,
+    );
     scrollTaskEditorIntoView();
   }
 
@@ -841,7 +932,12 @@
   // Open reminders dialog
   function openReminders() {
     withTaskMenu(requireCursor(), false, (menu) => {
-      withUniqueClass(menu, 'menu_item', matchingAction('task-overflow-menu-reminders'), click);
+      withUniqueClass(
+          menu,
+          'menu_item',
+          matchingAction('task-overflow-menu-reminders'),
+          click,
+      );
     });
   }
 
@@ -849,18 +945,24 @@
   function openAssign() {
     const cursor = requireCursor();
     withTaskHovered(cursor, () => {
-      const assignButton = getUniqueClass(cursor, 'task_list_item__person_picker');
+      const assignButton =
+            getUniqueClass(cursor, 'task_list_item__person_picker');
       if (assignButton) {
         click(assignButton);
       } else {
-        info('Could not find assign button, perhaps this project is not shared?');
+        info('Could not find assign button, maybe project not shared?');
       }
     });
   }
 
   // Open the task view sidepane.
   function openTaskView() {
-    withUniqueClass(requireCursor(), ['content', 'task_list_item__body'], all, click);
+    withUniqueClass(
+        requireCursor(),
+        ['content', 'task_list_item__body'],
+        all,
+        click,
+    );
   }
 
   // Click somewhere on the page that shouldn't do anything in particular except
@@ -926,7 +1028,8 @@
       const dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
         withId('top_filters', (topFilters) => {
-          withUniqueTag(topFilters, 'li', matchingAttr('data-track', 'navigation|upcoming'), (upcomingLi) => {
+          const predicate = matchingAttr('data-track', 'navigation|upcoming');
+          withUniqueTag(topFilters, 'li', predicate, (upcomingLi) => {
             withUniqueTag(upcomingLi, 'a', all, (upcomingLink) => {
               // Set a variable that will be read by 'handlePageChange',
               // which will tell it to select this task.
@@ -936,7 +1039,7 @@
           });
         });
       } else {
-        info('Not switching to "Upcoming", because this task is not scheduled.');
+        info('Not switching to "Upcoming", because task is not scheduled.');
       }
     } else {
       let projectEl = null;
@@ -998,7 +1101,8 @@
     const undoToast = getUniqueClass(document, 'undo_toast');
     let undoLink = null;
     if (undoToast) {
-      undoLink = getUniqueTag(undoToast, 'button', not(matchingClass('close_button')));
+      undoLink = getUniqueTag(
+          undoToast, 'button', not(matchingClass('close_button')));
     }
     if (undoLink) {
       click(undoLink);
@@ -1018,7 +1122,7 @@
         click(svgs[svgs.length - 1].parentElement);
       }
     });
-    withUnique(document, '[data-track="items|sort_by_date"]', click)
+    withUnique(document, '[data-track="items|sort_by_date"]', click);
   }
 
   // Open help documentation.
@@ -1038,14 +1142,32 @@
       x.parentElement.removeChild(x);
     });
     // Create new help modal.
-    const header = element('h1', '', text('Keyboard shortcuts'));
-    const docsLink = element('a', '', text('Full todoist-shortcuts documentation'));
-    docsLink.setAttribute('href', TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
-    const originalLink = element('a', '', text('Original Todoist keyboard shortcuts documentation'));
+    const header = element(
+        'h1', '',
+        text('Keyboard shortcuts'),
+    );
+    const docsLink = element(
+        'a', '',
+        text('Full todoist-shortcuts documentation'),
+    );
+    docsLink.setAttribute(
+        'href', TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
+    const originalLink = element(
+        'a', '',
+        text('Original Todoist keyboard shortcuts documentation'),
+    );
     originalLink.setAttribute('href', 'https://get.todoist.help/hc/en-us/articles/205063212');
-    const sheetsLink = element('a', '', text('Printable shortcuts guide (displayed below)'));
+    const sheetsLink = element(
+        'a', '',
+        text('Printable shortcuts guide (displayed below)'),
+    );
     sheetsLink.setAttribute('href', 'https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk');
-    const linksList = element('ul', '', element('li', '', docsLink), element('li', '', originalLink), element('li', '', sheetsLink));
+    const linksList = element(
+        'ul', '',
+        element('li', '', docsLink),
+        element('li', '', originalLink),
+        element('li', '', sheetsLink),
+    );
     const iframe = element('iframe');
     iframe.setAttribute('src', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5jkiI07g9XoeORQrOQUlAwY4uqJkBDkm-zMUK4WuaFvca0BJ0wPKEM5dw6RgKtcSN33PsZPKiN4G4/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false');
     iframe.setAttribute('scrolling', 'no');
@@ -1059,7 +1181,9 @@
   // eslint-disable-next-line no-unused-vars
   function importFromTemplate() {
     withClass(document, 'menu_item', (tr) => {
-      withUniqueTag(tr, 'td', matchingAttr('data-track', 'project|actions_import_from_template'), (foundItem) => {
+      const predicate =
+            matchingAttr('data-track', 'project|actions_import_from_template');
+      withUniqueTag(tr, 'td', predicate, (foundItem) => {
         click(foundItem);
         let foundInput = null;
         withClass(document, 'file_input_container', (container) => {
@@ -1077,7 +1201,12 @@
   }
 
   function sync() {
-    withUniqueTag(document, 'td', matchingAttr('data-track', 'navigation|gear_sync'), click);
+    withUniqueTag(
+        document,
+        'td',
+        matchingAttr('data-track', 'navigation|gear_sync'),
+        click,
+    );
   }
 
   // TODO: Remove once side_panel is gone (currently it's needed for
@@ -1087,7 +1216,12 @@
   function taskViewDone() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
       withUniqueClass(sidePanel, 'item_overview', all, (overview) => {
-        withUniqueClass(overview, ['task_checkbox', 'item_checkbox'], all, click);
+        withUniqueClass(
+            overview,
+            ['task_checkbox', 'item_checkbox'],
+            all,
+            click,
+        );
       });
     });
   }
@@ -1100,19 +1234,34 @@
 
   function taskViewSubtasks() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-subtasks'), click);
+      withUniqueTag(
+          sidePanel,
+          'button',
+          matchingIdSuffix('-tab-subtasks'),
+          click,
+      );
     });
   }
 
   function taskViewComments() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-comments'), click);
+      withUniqueTag(
+          sidePanel,
+          'button',
+          matchingIdSuffix('-tab-comments'),
+          click,
+      );
     });
   }
 
   function taskViewActivity() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueTag(sidePanel, 'button', matchingIdSuffix('-tab-activity'), click);
+      withUniqueTag(
+          sidePanel,
+          'button',
+          matchingIdSuffix('-tab-activity'),
+          click,
+      );
     });
   }
 
@@ -1145,11 +1294,12 @@
   function taskViewOpenAssign() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
       withUniqueClass(sidePanel, 'item_overview_sub', all, (itemOverview) => {
-        const assignButton = getUniqueTag(itemOverview, 'button', matchingClass('person_picker__toggle'));
+        const assignButton = getUniqueTag(
+            itemOverview, 'button', matchingClass('person_picker__toggle'));
         if (assignButton) {
           click(assignButton);
         } else {
-          info('Could not find assign button, perhaps this project is not shared?');
+          info('Could not find assign button, maybe project not shared?');
         }
       });
     });
@@ -1157,13 +1307,23 @@
 
   function taskViewMoveToProject() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_action', matchingAction('task-actions-move-to-project'), click);
+      withUniqueClass(
+          sidePanel,
+          'item_action',
+          matchingAction('task-actions-move-to-project'),
+          click,
+      );
     });
   }
 
   function taskViewLabel() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_action', matchingAction('task-actions-add-labels'), click);
+      withUniqueClass(
+          sidePanel,
+          'item_action',
+          matchingAction('task-actions-add-labels'),
+          click,
+      );
     });
   }
 
@@ -1177,7 +1337,11 @@
               click);
         }
         withUniqueClass(document, 'priority_picker', all, (picker) => {
-          withUnique(picker, '[data-action-hint="task-actions-priority-' + actualLevel + '"]', click);
+          withUnique(
+              picker,
+              '[data-action-hint="task-actions-priority-' + actualLevel + '"]',
+              click,
+          );
         });
       });
     };
@@ -1185,13 +1349,23 @@
 
   function taskViewOpenReminders() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_action', matchingAction('task-actions-reminders'), click);
+      withUniqueClass(
+          sidePanel,
+          'item_action',
+          matchingAction('task-actions-reminders'),
+          click,
+      );
     });
   }
 
   function taskViewDelete() {
     withTaskViewMoreMenu((menu) => {
-      withUniqueTag(menu, 'li', matchingAction('task-actions-overflow-menu-delete'), click);
+      withUniqueTag(
+          menu,
+          'li',
+          matchingAction('task-actions-overflow-menu-delete'),
+          click,
+      );
     });
   }
 
@@ -1203,7 +1377,9 @@
 
   function withTaskViewMoreMenu(f) {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      if (!getUniqueClass(document, 'ul', matchingAction('task-actions-overflow-menu'))) {
+      const overflowMenu = getUniqueClass(
+          document, 'ul', matchingAction('task-actions-overflow-menu'));
+      if (!overflowMenu) {
         withUniqueClass(sidePanel, 'item_actions_more', all, click);
       }
       withUniqueTag(document, 'ul', predicate, f);
@@ -1239,13 +1415,16 @@
   // NOTE: This is called internally, not intended for use as keybinding action.
   function oneBulkSchedule() {
     if (!nextBulkScheduleKey) {
-      debug('Exiting bulk schedule mode because there is nothing left to schedule.');
+      debug('Exiting bulk schedule mode - nothing left to schedule.');
       exitBulkSchedule();
       return;
     }
     const curBulkScheduleTask = getTaskByKey(nextBulkScheduleKey);
     if (!curBulkScheduleTask) {
-      warn('Exiting bulk schedule mode because it couldn\'t find', nextBulkScheduleKey);
+      warn(
+          'Exiting bulk schedule mode because it couldn\'t find',
+          nextBulkScheduleKey,
+      );
       exitBulkSchedule();
       return;
     }
@@ -1259,7 +1438,8 @@
     const cursor = getCursor();
     if (cursor) {
       const tasks = getTasks();
-      const nextBulkScheduleTask = getNextCursorableTask(tasks, getTaskKey(cursor));
+      const nextBulkScheduleTask =
+            getNextCursorableTask(tasks, getTaskKey(cursor));
       if (nextBulkScheduleTask) {
         nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
         return;
@@ -1459,7 +1639,8 @@
     const manager = getUniqueClass(content, 'manager');
     if (manager) {
       const tasks = getTasks('include-collapsed', 'include-editors');
-      const managerIndex = tasks.findIndex((task) => task.classList.contains('manager'));
+      const managerIndex =
+            tasks.findIndex((task) => task.classList.contains('manager'));
       debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
         storeEditingContext(tasks[managerIndex - 1], true);
@@ -1495,7 +1676,9 @@
         // a task, moving the task list. The task under the mouse then gets
         // hovered, even if the mouse wasn't moved, which erroneously changes
         // the cursor.
-        debug('Was just editing, and mouse didn\'t move, so restoring the cursor to last position');
+        debug(
+            'Was just editing, and mouse didn\'t move,',
+            'so restoring the cursor to last position.');
         restoreLastCursor();
       } else {
         debug('Found normal cursor, so storing its context');
@@ -1518,7 +1701,7 @@
       if (wasEditing) {
         const task = getTaskById(lastCursorId, 'ignore-indent');
         if (task) {
-          debug('found task that is probably the one that was previously being edited');
+          debug('found task that was being edited.');
           found = true;
           setCursor(task, 'no-scroll');
         } else {
@@ -1544,7 +1727,7 @@
                 setCursor(task, 'no-scroll');
                 break;
               } else {
-                debug('disappeared due to changing section, finding new location');
+                debug('cursor changed section, finding new location');
               }
             }
           }
@@ -1636,12 +1819,21 @@
       return null;
     }
     const section = findParent(task, predicate);
-    if (section && viewMode === 'project' && not(or(matchingClass('filter_view'), matchingClass('project_editor_instance')))(section)) {
-      const result = findParent(section, or(matchingClass('project_editor_instance'), matchingClass('filter_view')));
+    if (section &&
+        viewMode === 'project' &&
+        not(or(matchingClass('filter_view'),
+            matchingClass('project_editor_instance')))(section)) {
+      const result = findParent(
+          section,
+          or(matchingClass('project_editor_instance'),
+              matchingClass('filter_view')),
+      );
       if (result) {
         return result;
       } else {
-        error('Expected', section, 'to have parent with class project_editor_instance or filter_view');
+        error(
+            'Expected', section,
+            'to have parent with class project_editor_instance or filter_view');
         return null;
       }
     }
@@ -1649,11 +1841,19 @@
   }
 
   function getFirstTaskInSection(section) {
-    return getFirstClass(section, 'task_item', not(matchingClass('reorder_item')));
+    return getFirstClass(
+        section,
+        'task_item',
+        not(matchingClass('reorder_item')),
+    );
   }
 
   function getLastTaskInSection(section) {
-    return getLastClass(section, 'task_item', not(matchingClass('reorder_item')));
+    return getLastClass(
+        section,
+        'task_item',
+        not(matchingClass('reorder_item')),
+    );
   }
 
   // MUTABLE. Stores the last page hash, to detect page changes.
@@ -1763,7 +1963,7 @@
         if (nextBulkScheduleKey) {
           nextTask = getTaskByKey(nextBulkScheduleKey);
           if (nextTask) {
-            debug('Calendar is closed in bulk schedule mode, so scheduling next task.');
+            debug('Bulk schedule dialog is closed, so scheduling next task.');
             oneBulkSchedule();
           } else {
             error('Could not find next task for bulk schedule.');
@@ -1780,7 +1980,7 @@
         if (nextBulkMoveKey) {
           nextTask = getTaskByKey(nextBulkMoveKey);
           if (nextTask) {
-            debug('Move-to-project is closed in bulk move mode, so scheduling next task.');
+            debug('Bulk move dialog is closed, so scheduling next task.');
             setCursor(nextTask, 'no-scroll');
             oneBulkMove();
           } else {
@@ -1863,7 +2063,12 @@
   }
 
   function openMoreMenu() {
-    withUniqueTag(document, 'button', matchingAction('multi-select-toolbar-overflow-menu-trigger'), click);
+    withUniqueTag(
+        document,
+        'button',
+        matchingAction('multi-select-toolbar-overflow-menu-trigger'),
+        click,
+    );
     const result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
     if (!result) {
       throw new Error('Failed to find "More" menu');
@@ -1959,7 +2164,7 @@
           i++;
           setTimeout(clickAll);
         } else {
-          warn('iteratively clicked arrows 5 times but they didn\'t all toggle');
+          warn('Iteratively clicked arrows but they didn\'t all toggle');
         }
       };
       clickAll();
@@ -1985,9 +2190,15 @@
 
   function withTaskMenuImpl(task, f) {
     withTaskHovered(task, () => {
-      withUnique(task, 'button[data-action-hint="task-overflow-menu"]', (openMenu) => {
+      const query = 'button[data-action-hint="task-overflow-menu"]';
+      withUnique(task, query, (openMenu) => {
         click(openMenu);
-        withUniqueClass(document, 'popper', hasChild('[data-action-hint="task-overflow-menu-move-to-project"]'), f);
+        withUniqueClass(
+            document,
+            'popper',
+            hasChild('[data-action-hint="task-overflow-menu-move-to-project"]'),
+            f,
+        );
       });
     });
   }
@@ -2094,7 +2305,8 @@
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
       dragTaskOver(cursor, () => {
-        const tasks = getTasks('no-collapsed', 'no-editors', 'include-sections');
+        const tasks =
+              getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
         const cursorIndent = getIndentClass(cursor);
         for (let i = cursorIndex - 1; i >= 0; i--) {
@@ -2137,7 +2349,8 @@
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
       dragTaskOver(cursor, () => {
-        const tasks = getTasks('no-collapsed', 'no-editors', 'include-sections');
+        const tasks =
+              getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
         const cursorIndent = getIndentClass(cursor);
         let lastQualifyingTask = null;
@@ -2175,7 +2388,8 @@
           return {
             destination: lastQualifyingTask,
             horizontalOffset: 0,
-            verticalOffset: -cursor.clientHeight + (isSectionLi(lastQualifyingTask) ? 40 : 0),
+            verticalOffset: -cursor.clientHeight +
+              (isSectionLi(lastQualifyingTask) ? 40 : 0),
             isBelow: isSectionLi(lastQualifyingTask) ? false : true,
           };
         } else {
@@ -2278,7 +2492,8 @@
         withDragHandle(sourceTask, (el, x, y) => {
           if (result) {
             const deltaX = result.horizontalOffset;
-            let deltaY = offset(result.destination).y - sourceY + result.verticalOffset;
+            let deltaY =
+                offset(result.destination).y - sourceY + result.verticalOffset;
             if (result.isBelow) {
               deltaY += result.destination.clientHeight;
             }
@@ -2304,8 +2519,8 @@
       const handler = getUniqueClass(task, 'item_dnd_handle');
       if (handler) {
         const handlerOffset = offset(handler);
-        const x = handlerOffset.x + handler.offsetWidth / 2 - window.scrollX - 3;
-        const y = handlerOffset.y + handler.offsetHeight / 2 - window.scrollY - 4;
+        const x = handlerOffset.x + handler.offsetWidth/2 - window.scrollX - 3;
+        const y = handlerOffset.y + handler.offsetHeight/2 - window.scrollY - 4;
         f(handler, x, y);
       } else {
         // FIXME: Sometimes this triggers, particularly when move up / move
@@ -2338,7 +2553,9 @@
         el.dispatchEvent(new MouseEvent('mouseup', params));
         finished();
       } else {
-        params = mkMouseParams(overshootCoslerp(sx, tx, alpha, 0.3, 1.5), overshootCoslerp(sy, ty, alpha, 0.3, 1.5));
+        const x = overshootCoslerp(sx, tx, alpha, 0.3, 1.5);
+        const y = overshootCoslerp(sy, ty, alpha, 0.3, 1.5);
+        params = mkMouseParams(x, y);
         el.dispatchEvent(new MouseEvent('mousemove', params));
         setTimeout(dragLoop, duration / frameCount);
       }
@@ -2481,20 +2698,27 @@
       section = getFirstClass(document, 'project_editor_instance');
     }
     if (!section) {
-      warn('Couldn\'t find section for task', task, 'so instead using quick-add');
+      warn(
+          'Couldn\'t find section for task',
+          task,
+          ', so instead using quick-add',
+      );
       // TODO: This works well in labels, but may be a bit unexpected in filters
       // like "Priority 1", since quick add will not adjust the task such that
       // it ends up in the filter.
       quickAddTask();
       return;
     }
-    if (viewMode === 'agenda' && section.classList.contains('section_overdue')) {
+    if (viewMode === 'agenda' &&
+        section.classList.contains('section_overdue')) {
       section = getFirstClass(document, 'section_day');
     }
     clickInlineAddTask(section);
   }
 
-  const SHOULD_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all' || WHAT_CURSOR_APPLIES_TO === 'most';
+  const SHOULD_MUTATE_CURSOR =
+        WHAT_CURSOR_APPLIES_TO === 'all' ||
+        WHAT_CURSOR_APPLIES_TO === 'most';
   const SHOULD_UNSAFE_MUTATE_CURSOR = WHAT_CURSOR_APPLIES_TO === 'all';
 
   // This function is used by commands that can be applied to both selections
@@ -2518,16 +2742,21 @@
           return cursor;
         }
       } else {
-        error('Unexpected 2nd argument to getCursorToMutate.  Expected undefined or "dangerous", but got:', danger);
+        error(
+            'Unexpected 2nd argument to getCursorToMutate.',
+            'Expected undefined or "dangerous", but got:',
+            danger,
+        );
       }
     }
     return null;
   }
 
   function clickPriorityMenu(menu, level) {
-    const predicate =
-        or(matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'),
-            matchingAttr('data-svgs-path', 'sm1/priority_' + level + '_hc.svg'));
+    const predicate = or(
+        matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'),
+        matchingAttr('data-svgs-path', 'sm1/priority_' + level + '_hc.svg'),
+    );
     withUniqueTag(menu, 'svg', predicate, (svg) => {
       // See https://github.com/mgsloan/todoist-shortcuts/issues/32
       // withRestoredSelections(function() { click(img); });
@@ -2543,7 +2772,8 @@
       const note =
           div('ts-note',
               div('ts-note-content',
-                  span('ts-note-prefix', text('Message from todoist-shortcuts: ')),
+                  span('ts-note-prefix',
+                      text('Message from todoist-shortcuts: ')),
                   element('br', null),
               typeof msg === 'string' ? text(msg) : msg),
               close);
@@ -2561,7 +2791,10 @@
     withId('app_holder', (appHolder) => {
       const close = div('ts-modal-close');
       close.innerHTML = svgs['sm1/close_small.svg'];
-      const content = div('ts-modal-content', typeof msg === 'string' ? text(msg) : msg);
+      const content = div(
+          'ts-modal-content',
+        typeof msg === 'string' ? text(msg) : msg,
+      );
       modal = div('ts-modal', content, close);
       appHolder.appendChild(modal);
       close.onclick = () => {
@@ -2608,7 +2841,8 @@
           (item.classList.contains('manager') && shouldIncludeEditors) ||
           (isSectionLi(item) && shouldIncludeSections)
           );
-        // Skip nested tasks that are not visible (if includeCollapsed is not set).
+        // Skip nested tasks that are not visible (if includeCollapsed
+        // is not set).
         const visible = shouldIncludeCollapsed || !hidden(item);
         if (matches && visible) {
           results.push(item);
@@ -2714,7 +2948,8 @@
     if (priorityClass) {
       return stripPriorityClass(priorityClass);
     } else {
-      const taskCheckbox = getUniqueClass(task, ['task_checkbox', 'item_checkbox']);
+      const taskCheckbox =
+            getUniqueClass(task, ['task_checkbox', 'item_checkbox']);
       if (taskCheckbox) {
         priorityClass = findUnique(isPriorityClass, taskCheckbox.classList);
         if (priorityClass) {
@@ -2967,7 +3202,7 @@
       if (different) {
         debug('Different set of navigation options, so re-setting them.');
       } else {
-        debug('Same set of navigation options, so avoiding infinite recursion.');
+        debug('Same set of navigation options, avoiding infinite recursion.');
         return;
       }
       navigateKeysPressed = '';
@@ -3107,7 +3342,8 @@
               if (noAliasing(shortened)) {
                 let found = true;
                 for (const otherKeys in groups) {
-                  if (otherKeys !== keys && otherKeys.slice(0, sl) !== shortened) {
+                  if (otherKeys !== keys &&
+                      otherKeys.slice(0, sl) !== shortened) {
                     found = false;
                     break;
                   }
@@ -3155,7 +3391,10 @@
       }
     });
     // Attempt to use prefix as the key sequence.
-    addViaKeyFunc('try-shortening', (it) => it.text.slice(0, MAX_NAVIGATE_PREFIX));
+    addViaKeyFunc(
+        'try-shortening',
+        (it) => it.text.slice(0, MAX_NAVIGATE_PREFIX),
+    );
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
     for (let p = MAX_NAVIGATE_PREFIX - 1; p >= 0; p--) {
@@ -3187,7 +3426,8 @@
     for (let q = 0; q < items.length; q++) {
       item = items[q];
       let success = false;
-      // TODO: Don't hardcode choosing one or two, instead follow MAX_NAVIGATE_PREFIX
+      // TODO: Don't hardcode choosing one or two, instead follow
+      // MAX_NAVIGATE_PREFIX
       for (let r = 0; r < JUMP_KEYS.length; r++) {
         if (addResult(JUMP_KEYS[r], item)) {
           items.splice(q, 1);
@@ -3218,7 +3458,11 @@
     // That should have assigned keys to everything, but if there are many
     // similar number of options this case can happen.
     if (items.length !== 0) {
-      info('There must be many similar sidebar options, couldn\'t find keysequences for', items);
+      info(
+          'There must be many similar sidebar options.',
+          'Couldn\'t find keysequences for',
+          items,
+      );
     }
     return result;
   }
@@ -3266,11 +3510,15 @@
               keepGoing = option.keepGoing;
               // If the user is selecting a section like projects / labels /
               // filters, then close the other sections.
-              if (el.classList.contains('expansion_panel__toggle') && !isFavoritesSection(el)) {
+              if (el.classList.contains('expansion_panel__toggle') &&
+                  !isFavoritesSection(el)) {
                 withId('list_holder', (listHolder) => {
                   withClass(listHolder, 'expansion_panel__toggle', (ps) => {
-                    const isExpanded = ps.attributes['aria-expanded'].value === 'true';
-                    if (!sameElement(el)(ps) && isExpanded && !isFavoritesSection(ps)) {
+                    const isExpanded =
+                          ps.attributes['aria-expanded'].value === 'true';
+                    if (!sameElement(el)(ps) &&
+                        isExpanded &&
+                        !isFavoritesSection(ps)) {
                       ps.click();
                     }
                   });
@@ -3279,10 +3527,12 @@
               // Ensure that the item is visible - first, uncollapsing
               // the outer section.
               const collapseParent = findParent(el, matchingClass('collapse'));
-              if (collapseParent && !matchingClass('collapse--entered')(collapseParent)) {
+              if (collapseParent &&
+                  !matchingClass('collapse--entered')(collapseParent)) {
                 const collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
-                  withUniqueClass(collapseHeader, 'expansion_panel__toggle', all, click);
+                  withUniqueClass(
+                      collapseHeader, 'expansion_panel__toggle', all, click);
                 } else {
                   warn('Expected to find section collapse header, but did\'nt');
                 }
@@ -3304,7 +3554,8 @@
                     warn('Expected to find collapsed task, but got', elAbove);
                   }
                 }
-                // If we've reached a visible list item, we're done uncollapsing.
+                // If we've reached a visible list item, we're done
+                // uncollapsing.
                 if (elAbove.style.display !== 'none') {
                   break;
                 }
@@ -3368,7 +3619,8 @@
 
   function isFavoritesSection(el) {
     const dataTrackAttr = el.attributes['data-track'];
-    return dataTrackAttr && dataTrackAttr.value === 'navigation|favorites_panel';
+    return dataTrackAttr &&
+      dataTrackAttr.value === 'navigation|favorites_panel';
   }
 
   function keyIsModifier(ev) {
@@ -3408,7 +3660,7 @@
     });
   }
 
-  /** ***************************************************************************
+  /*****************************************************************************
    * Task cursor
    */
 
@@ -3498,7 +3750,7 @@
     const tasks = getTasks();
     let cursor = getCursor();
     if (!cursor) {
-      debug('modifyCursorIndex couldn\'t find cursor, so running restoreLastCursor');
+      debug('modifyCursorIndex couldn\'t find cursor, so restoreLastCursor');
       restoreLastCursor();
       cursor = getCursor();
     }
@@ -3539,7 +3791,9 @@
   // This function detects which mode Todoist's view is in, since each behaves a
   // bit differently.
   function getViewMode() {
-    const agendaView = getById('agenda_view') || getUniqueClass(document, 'upcoming_view');
+    const agendaView =
+          getById('agenda_view') ||
+          getUniqueClass(document, 'upcoming_view');
     if (agendaView === null) {
       return 'project';
     } else {
@@ -3645,7 +3899,9 @@
       const oy = offset(el).y - offset(content).y;
       const cy = oy - content.scrollTop;
       const h = el.offsetHeight;
-      if (skipCheck || cy < marginTop || cy + h > content.offsetHeight - marginBottom) {
+      if (skipCheck ||
+          cy < marginTop ||
+          cy + h > content.offsetHeight - marginBottom) {
         // TODO: for very large tasks, this could end up with the whole task not
         // being in view.
         content.scrollTo(0, oy - lerp(0, content.offsetHeight, t));
@@ -3681,7 +3937,12 @@
     if (result) {
       return f(result);
     } else {
-      warn('Couldn\'t find unique descendant matching query', query, ', instead got', result);
+      warn(
+          'Couldn\'t find unique descendant matching query',
+          query,
+          ', instead got',
+          result,
+      );
       return null;
     }
   }
@@ -3760,13 +4021,16 @@
     return findLast(predicate, parent.getElementsByClassName(cls));
   }
 
-  // Checks that there is only one descendant element that matches the class name and
-  // predicate, and returns it. Returns null if it is not found or not unique.
+  // Checks that there is only one descendant element that matches the
+  // class name and predicate, and returns it. Returns null if it is
+  // not found or not unique.
   function getUniqueClass(parent, cls, predicate) {
     let foundElements = [];
     if (cls.constructor === Array) {
       for (let i = 0; i < cls.length; i++) {
-        foundElements = foundElements.concat(Array.from(parent.getElementsByClassName(cls[i])));
+        foundElements = foundElements.concat(
+            Array.from(parent.getElementsByClassName(cls[i])),
+        );
       }
     } else {
       foundElements = parent.getElementsByClassName(cls);
@@ -3782,7 +4046,12 @@
     if (result) {
       return f(result);
     } else {
-      warn('Couldn\'t find unique descendant with class', cls, 'and matching predicate, instead got', result);
+      warn(
+          'Couldn\'t find unique descendant with class',
+          cls,
+          'and matching predicate, instead got',
+          result,
+      );
       return null;
     }
   }
@@ -3808,7 +4077,11 @@
     if (result) {
       return f(result);
     } else {
-      warn('Couldn\'t find unique descendant with tag', tag, 'and passing predicate');
+      warn(
+          'Couldn\'t find unique descendant with tag',
+          tag,
+          'and passing predicate',
+      );
       return null;
     }
   }
@@ -3880,7 +4153,10 @@
         if (result === null) {
           result = el;
         } else {
-          debugWithStack('findUnique didn\'t find unique element because there are multiple results. Here are two:', result, el);
+          debugWithStack(
+              'findUnique didn\'t find unique element because there are ' +
+            'multiple results. Here are two:', result, el,
+          );
           // Not unique, so return null.
           return null;
         }
@@ -3934,12 +4210,14 @@
     return matchingAttr('data-action-hint', action);
   }
 
-  // Returns predicate which returns 'true' if the element has the specified class.
+  // Returns predicate which returns 'true' if the element has the
+  // specified class.
   function matchingClass(cls) {
     return (el) => el.classList.contains(cls);
   }
 
-  // Returns predicate which returns 'true' if the element has the specified class suffix.
+  // Returns predicate which returns 'true' if the element has the
+  // specified class suffix.
   //
   // eslint-disable-next-line no-unused-vars
   function matchingClassSuffix(suffix) {
@@ -3954,23 +4232,27 @@
     };
   }
 
-  // Returns predicate which returns 'true' if the element has the specified id suffix.
+  // Returns predicate which returns 'true' if the element has the
+  // specified id suffix.
   function matchingIdSuffix(suffix) {
     return (el) => el.id.endsWith(suffix);
   }
 
 
-  // Returns predicate which returns 'true' if the element has the specified tag.
+  // Returns predicate which returns 'true' if the element has the
+  // specified tag.
   function matchingTag(tag) {
     return (el) => el.tagName.toLowerCase() === tag;
   }
 
-  // Returns predicate which returns 'true' if the element has the specified id.
+  // Returns predicate which returns 'true' if the element has the
+  // specified id.
   function matchingId(id) {
     return (el) => el.id === id;
   }
 
-  // Returns predicate which returns 'true' if the element has the specified attribute.
+  // Returns predicate which returns 'true' if the element has the
+  // specified attribute.
   function matchingAttr(k, v) {
     return (el) => {
       const attr = el.attributes[k];
@@ -3982,7 +4264,8 @@
     };
   }
 
-  // Returns predicate which returns 'true' if the element has a child matching the query.
+  // Returns predicate which returns 'true' if the element has a child
+  // matching the query.
   function hasChild(query) {
     return (el) => el.querySelector(query) !== null;
   }
@@ -4024,7 +4307,9 @@
     return (x) => {
       const bool = predicate(x);
       if (typeof bool !== 'boolean') {
-        throw new Error('In ' + context + ', expected boolean result from predicate. Instead got', bool);
+        throw new Error(
+            'In ' + context + ', expected bool from predicate. Got', bool,
+        );
       }
       return bool;
     };
@@ -4186,8 +4471,14 @@
     '  z-index: 19000;',
     '  -webkit-transition: opacity .25s ease-in;',
     '  transition: opacity .25s ease-in;',
-    '  -webkit-box-shadow: rgba(0,0,0,0.156863) 0 2px 3px 0, rgba(0,0,0,0.0588235) 0 1px 10px 0, rgba(0,0,0,0.0196078) 0 4px 6px 0;',
-    '  box-shadow: rgba(0,0,0,0.156863) 0 2px 3px 0, rgba(0,0,0,0.0588235) 0 1px 10px 0, rgba(0,0,0,0.0196078) 0 4px 6px 0;',
+    '  -webkit-box-shadow: ' +
+      'rgba(0,0,0,0.156863) 0 2px 3px 0, ' +
+      'rgba(0,0,0,0.0588235) 0 1px 10px 0, ' +
+      'rgba(0,0,0,0.0196078) 0 4px 6px 0;',
+    '  box-shadow: ' +
+      'rgba(0,0,0,0.156863) 0 2px 3px 0, ' +
+      'rgba(0,0,0,0.0588235) 0 1px 10px 0, ' +
+      'rgba(0,0,0,0.0196078) 0 4px 6px 0;',
     '  max-width: 105em;',
     '}',
     '',

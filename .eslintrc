@@ -6,7 +6,6 @@
     "rules": {
       "require-jsdoc": "off",
       "spaced-comment": "off",
-      "max-len": "off",
       "guard-for-in": "off",
     }
 }
