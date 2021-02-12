@@ -2076,62 +2076,6 @@
     return result;
   }
 
-  // Finds a menu element. These do not have any unique class or ID, so instead
-  // need to do it by looking at text content of the options.
-  /*
-  function findMenu(name, expectedItems, predicate0, expectedCount0) {
-    const predicate = predicate0 ? predicate0 : all;
-    const expectedCount = expectedCount0 ? expectedCount0 : 1;
-    const results = [];
-    withClass(document, 'ist_menu', function(menu) {
-      if (predicate(menu)) {
-        let matches = true;
-        for (let i = 0; i < expectedItems.length; i++) {
-          if (!getUniqueClass(menu, expectedItems[i])) {
-            matches = false;
-            break;
-          }
-        }
-        if (matches) {
-          results.push(menu);
-        }
-      }
-    });
-    if (results.length === expectedCount) {
-      return results[0];
-    } else {
-      error('Couldn\'t find unique \'' + name + '\' menu element, found:', results);
-      return null;
-    }
-  }
-  */
-
-  // These are menus that are always in the DOM, but need to be located by text
-  // matching their options.
-  /*
-  let taskMenu;
-  let agendaTaskMenu;
-
-  function getTaskMenu() {
-    if (taskMenu) {
-      return taskMenu;
-    } else {
-      taskMenu = findMenu('task', TASKMENU_ITEMS, all, 2);
-      return taskMenu;
-    }
-  }
-
-  function getAgendaTaskMenu() {
-    if (agendaTaskMenu) {
-      return agendaTaskMenu;
-    } else {
-      getTaskMenu();
-      agendaTaskMenu = findMenu('agenda task', TASKMENU_ITEMS, function(el) { return el !== taskMenu; });
-      return agendaTaskMenu;
-    }
-  }
-  */
-
   // Returns true if the task has children and is collapsed.
   function checkTaskCollapsed(task) {
     return getUniqueClass(task, 'right');
