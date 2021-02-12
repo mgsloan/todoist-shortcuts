@@ -12,6 +12,8 @@
 
 * Fixes `s` for sorting by date. See [#137][] / [#142][].
 
+* Various code cleanups.
+
 
 ## Version 127
 
