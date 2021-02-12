@@ -2882,11 +2882,23 @@
           }
           if (!nameSpan) {
             // Handle new favorites DOM.
-            nameSpan = getUniqueTag(li, 'a');
+            const link = getUniqueTag(li, 'a');
+            if (link) {
+              const spanChildren = link.querySelectorAll(':scope > span');
+              if (spanChildren.length > 0) {
+                const lastSpan = spanChildren[spanChildren.length - 1];
+                const textNode = lastSpan.firstChild;
+                if (textNode && textNode.nodeType == Node.TEXT_NODE) {
+                  nameSpan = textNode;
+                }
+              }
+            }
           }
           if (nameSpan) {
             txt = preprocessItemText(nameSpan.textContent);
             initials = getItemInitials(nameSpan.textContent);
+          } else {
+            warn('failed to get nav link text for', li);
           }
         }
         // Add some stable sequences for common text
