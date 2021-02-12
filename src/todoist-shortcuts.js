@@ -678,10 +678,8 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    const predicate = or(matchingText('Labels'),
-        matchingAction('multi-select-toolbar-label-picker'));
     withUniqueClass(document, 'multi_select_toolbar', all, (toolbar) => {
-      withUniqueTag(toolbar, 'button', predicate, click);
+      withUniqueTag(toolbar, 'button', matchingAction('multi-select-toolbar-label-picker'), click);
     });
   }
 
@@ -843,9 +841,7 @@
   // Open reminders dialog
   function openReminders() {
     withTaskMenu(requireCursor(), false, (menu) => {
-      const predicate = or(matchingText('Reminders'),
-          matchingAction('task-overflow-menu-reminders'));
-      withUniqueClass(menu, 'menu_item', predicate, click);
+      withUniqueClass(menu, 'menu_item', matchingAction('task-overflow-menu-reminders'), click);
     });
   }
 
@@ -1157,17 +1153,13 @@
 
   function taskViewMoveToProject() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      const predicate = or(matchingAttr('aria-label', 'Select a project'),
-          matchingAction('task-actions-move-to-project'));
-      withUniqueClass(sidePanel, 'item_action', predicate, click);
+      withUniqueClass(sidePanel, 'item_action', matchingAction('task-actions-move-to-project'), click);
     });
   }
 
   function taskViewLabel() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      const predicate = or(matchingAttr('aria-label', 'Add label(s)'),
-          matchingAction('task-actions-add-labels'));
-      withUniqueClass(sidePanel, 'item_action', predicate, click);
+      withUniqueClass(sidePanel, 'item_action', matchingAction('task-actions-add-labels'), click);
     });
   }
 
@@ -1177,11 +1169,11 @@
         const actualLevel = invertPriorityLevel(level);
         if (!getUniqueClass(document, 'priority_picker')) {
           withUnique(sidePanel,
-              '[aria-label="Set the priority"] > span, [data-action-hint="task-actions-priority-picker"]',
+              '[data-action-hint="task-actions-priority-picker"]',
               click);
         }
         withUniqueClass(document, 'priority_picker', all, (picker) => {
-          withUnique(picker, '[aria-label="' + actualLevel + '"], [data-action-hint="task-actions-priority-' + actualLevel + '"]', click);
+          withUnique(picker, '[data-action-hint="task-actions-priority-' + actualLevel + '"]', click);
         });
       });
     };
@@ -1189,17 +1181,13 @@
 
   function taskViewOpenReminders() {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      const predicate = or(matchingAttr('aria-label', 'Add reminder(s)'),
-          matchingAction('task-actions-reminders'));
-      withUniqueClass(sidePanel, 'item_action', predicate, click);
+      withUniqueClass(sidePanel, 'item_action', matchingAction('task-actions-reminders'), click);
     });
   }
 
   function taskViewDelete() {
     withTaskViewMoreMenu((menu) => {
-      const predicate = or(matchingText('Delete task'),
-          matchingAction('task-actions-overflow-menu-delete'));
-      withUniqueTag(menu, 'li', predicate, click);
+      withUniqueTag(menu, 'li', matchingAction('task-actions-overflow-menu-delete'), click);
     });
   }
 
@@ -1211,9 +1199,7 @@
 
   function withTaskViewMoreMenu(f) {
     withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      const predicate = or(matchingAttr('aria-label', 'task edit menu'),
-          matchingAction('task-actions-overflow-menu'));
-      if (!getUniqueClass(document, 'ul', predicate)) {
+      if (!getUniqueClass(document, 'ul', matchingAction('task-actions-overflow-menu'))) {
         withUniqueClass(sidePanel, 'item_actions_more', all, click);
       }
       withUniqueTag(document, 'ul', predicate, f);
@@ -1873,9 +1859,7 @@
   }
 
   function openMoreMenu() {
-    const predicate = or(matchingText('More'),
-        matchingAction('multi-select-toolbar-overflow-menu-trigger'));
-    withUniqueTag(document, 'button', predicate, click);
+    withUniqueTag(document, 'button', matchingAction('multi-select-toolbar-overflow-menu-trigger'), click);
     const result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
     if (!result) {
       throw new Error('Failed to find "More" menu');
@@ -2467,9 +2451,7 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       withTaskMenu(task, true, (menu) => {
-        const predicate = or(matchingText(menuText),
-            matchingAction(action));
-        withUniqueClass(menu, 'menu_item', predicate, click);
+        withUniqueClass(menu, 'menu_item', matchingAction(action), click);
       });
       const editor = getUniqueClass(document, 'task_editor');
       if (editor) {
@@ -3949,11 +3931,6 @@
     return (el) => el.textContent === txt;
   }
 
-  // TODO: Switch to more efficient queries once these disambiguation
-  // attributes are available from todoist.com (and not just
-  // beta.todoist.com). See #137
-  //
-  // Also reinstate getCursorToMutate
   function matchingAction(action) {
     return matchingAttr('data-action-hint', action);
   }
