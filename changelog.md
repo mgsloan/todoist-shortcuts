@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 128
+
+### Fixes ###
+
+* Fixes a bug where the number of tasks associated with a favorited
+  section affected the choice of keys in navigation mode.
+
+
 ## Version 127
 
 ### Fixes ###
