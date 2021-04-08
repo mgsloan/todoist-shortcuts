@@ -109,17 +109,20 @@ Note that there are some known bugs related to task motion - see
 
 ## Selection
 
-| keys              | action                                |
-| ---               | ---                                   |
-| `x`               | add task at cursor to selection       |
-| `* a`             | select all tasks                      |
-| `* n` or `escape` | clear selection                       |
-| `* 1`             | add all priority 1 tasks to selection |
-| `* 2`             | add all priority 2 tasks to selection |
-| `* 3`             | add all priority 3 tasks to selection |
-| `* 4` or `* 0`    | add all priority 4 tasks to selection |
-| `* h`             | collapses all tasks                   |
-| `* l`             | expands all tasks                     |
+| keys                     | action                                |
+| ---                      | ---                                   |
+| `x`                      | add task at cursor to selection       |
+| `* a`                    | select all tasks                      |
+| `* n` or `escape`        | clear selection                       |
+| `* 1`                    | add all priority 1 tasks to selection |
+| `* 2`                    | add all priority 2 tasks to selection |
+| `* 3`                    | add all priority 3 tasks to selection |
+| `* 4` or `* 0`           | add all priority 4 tasks to selection |
+| `* left-arrow`           | collapses all tasks                   |
+| `* l` or `* right-arrow` | expands all tasks                     |
+
+`* h` ought to collapse all tasks, but there is a [bug][#167]
+preventing it from working, for some relatively tricky reason.
 
 ## Manipulation of selected items
 
