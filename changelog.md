@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 129
+
+### Fixes ###
+
+* Fixes backtick and `~` shortcuts for cycling through inbox / today /
+  upcoming / favorites. Probably broken for a long time.
+
 ## Version 128
 
 ### Fixes ###
