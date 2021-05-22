@@ -3592,15 +3592,26 @@
   // currently selected one, if any.
   function withTopFilters(f) {
     withId('top_filters', (topFilters) => {
-      const topItems = topFilters.getElementsByTagName('li');
+      const topLinks = [];
       let current = -1;
-      for (let i = 0; i < topItems.length; i++) {
-        if (matchingClass('current')(topItems[i])) {
-          current = i;
-          break;
+      const addResults = (items, isFavorites) => {
+        for (let i = 0; i < items.length; i++) {
+          topLinks.push(getFirstClass(items[i], 'item_content') ||
+                        getFirstTag(items[i], 'a'));
+          // Terrible hack around obfuscated class names.
+          if (matchingClass('current')(items[i]) ||
+              (isFavorites &&
+               items[i].firstElementChild.classList.length > 2)) {
+            current = topLinks.length - 1;
+          }
         }
-      }
-      f(topItems, current);
+      };
+      const favoritesPanel = withId('left_menu', (leftMenu) =>
+        getFirstClass(leftMenu, 'expansion_panel'));
+      debug('favoritesPanel = ', favoritesPanel);
+      addResults(topFilters.getElementsByTagName('li'), false);
+      addResults(favoritesPanel.getElementsByTagName('li'), true);
+      f(topLinks, current);
     });
   }
 
