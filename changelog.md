@@ -2,10 +2,17 @@
 
 ## Version 129
 
+### Enhancements ###
+
+* Adds `!` keybinding to open notifications. See [#177][].
+
 ### Fixes ###
 
 * Fixes backtick and `~` shortcuts for cycling through inbox / today /
   upcoming / favorites. Probably broken for a long time.
+
+[#177]: https://github.com/mgsloan/todoist-shortcuts/issues/177
+
 
 ## Version 128
 

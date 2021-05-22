@@ -92,6 +92,7 @@
     [['u', 'z', 'ctrl+z'], undo],
 
     // (see originalHandler) [['f', '/'], focusSearch],
+    ['!', openNotifications],
     ['?', openHelpModal],
     ['ctrl+s', sync],
 
@@ -1123,6 +1124,10 @@
       }
     });
     withUnique(document, '[data-track="items|sort_by_date"]', click);
+  }
+
+  function openNotifications() {
+    withUnique(document, '.top_bar_btn.notifications_btn', click);
   }
 
   // Open help documentation.

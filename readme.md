@@ -255,6 +255,7 @@ though this is a planned future addition.  See [#94][]
 | `shift+enter`          | clicks first link in the task the cursor is on         |
 | `ctrl+s`               | manually synchronize state with server                 |
 | `?`                    | display [keyboard shortcuts guide sheet](google-sheet) |
+| `!`                    | open notifications                                     |
 
 Note that undo only works when the "UNDO" button is visible at the bottom of the
 screen. Some actions are not undo-able, such as [deletion or archiving multiple
