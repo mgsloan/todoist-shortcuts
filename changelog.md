@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 131
+
+### Fixes ###
+
+* Fixes `ctrl+s` shortcut for sync. See [#178][].
+
+[#178]: https://github.com/mgsloan/todoist-shortcuts/issues/178
+
+
 ## Version 130
 
 ### Enhancements ###
