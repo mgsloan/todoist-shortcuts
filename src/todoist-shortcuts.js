@@ -1175,12 +1175,18 @@
   }
 
   function sync() {
-    withUniqueTag(
-        document,
-        'td',
-        matchingAttr('data-track', 'navigation|gear_sync'),
-        click,
-    );
+    let lastSynced = getById('last_synced');
+    if (!lastSynced) {
+      withId('help_btn', click);
+      lastSynced = getById('last_synced');
+    }
+    const priorElement = lastSynced.previousElementSibling;
+    const tag = priorElement.tagName.toLowerCase();
+    if (tag !== 'button') {
+      error('Expected element to be sync button, but instead it is ' + tag);
+      return;
+    }
+    click(priorElement);
   }
 
   // TODO: Remove once side_panel is gone (currently it's needed for
