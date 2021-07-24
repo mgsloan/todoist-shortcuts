@@ -118,7 +118,7 @@
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
     ['m', scheduleNextMonth],
-    [['s', 'p'], scheduleSuggested],
+    [['s', 'p'], schedulePostpone],
     ['r', unschedule],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback],
@@ -139,12 +139,6 @@
   // while an input is focused. See 'handleBulkMoveKey' below.
   const BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
   const BULK_MOVE_KEYMAP = 'bulk_move';
-
-  const SMART_SCHEDULER_BINDINGS = [
-    ['enter', smartSchedulerUpdate],
-    ['fallback', originalHandler],
-  ];
-  const SMART_SCHEDULER_KEYMAP = 'smart_scheduler';
 
   const TASK_VIEW_BINDINGS = [
     ['d', taskViewDone],
@@ -179,12 +173,6 @@
   const DELETE_KEYCODE = 46;
   const ENTER_KEYCODE = 13;
   const ESCAPE_KEYCODE = 27;
-
-  function smartSchedulerUpdate() {
-    withUniqueClass(document, 'SmartSchedule', all, (smartScheduler) => {
-      withUniqueClass(smartScheduler, 'submit_btn', all, click);
-    });
-  }
 
   function handleBulkMoveKey(ev) {
     if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
@@ -572,37 +560,18 @@
         });
   }
 
-  // Click 'suggested' in schedule. Only does anything if schedule is open.
-  function scheduleSuggested() {
+  // Clicks 'postpone' in scheduler.
+  function schedulePostpone() {
     withScheduler(
-        'scheduleSuggested',
+        'schedulePostpone',
         (scheduler) => {
-          const suggested = getUniqueTag(
+          withUniqueTag(
               scheduler,
               'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_suggested'),
+              matchingAttr('data-track',
+                  'scheduler|date_shortcut_postpone'),
+              click,
           );
-          if (suggested) {
-            click(suggested);
-          } else {
-            const smartScheduler = getUniqueTag(
-                scheduler,
-                'button',
-                matchingAttr('data-track',
-                    'scheduler|date_shortcut_smartscheduler'),
-            );
-            if (smartScheduler) {
-              click(smartScheduler);
-            } else {
-              withUniqueTag(
-                  scheduler,
-                  'button',
-                  matchingAttr('data-track',
-                      'scheduler|date_shortcut_postpone'),
-                  click,
-              );
-            }
-          }
         });
   }
 
@@ -2008,12 +1977,7 @@
       }
       const popupWindow = getUniqueClass(document, 'GB_window');
       if (popupWindow) {
-        const smartScheduler = getUniqueClass(popupWindow, 'SmartSchedule');
-        if (smartScheduler) {
-          switchKeymap(SMART_SCHEDULER_KEYMAP);
-        } else {
-          switchKeymap(POPUP_KEYMAP);
-        }
+        switchKeymap(POPUP_KEYMAP);
       } else if (inBulkScheduleMode) {
         switchKeymap(BULK_SCHEDULE_KEYMAP);
       } else if (inBulkMoveMode) {
@@ -4823,7 +4787,6 @@
     registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
-    registerKeybindings(SMART_SCHEDULER_KEYMAP, SMART_SCHEDULER_BINDINGS);
     registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
 
     // Update the keymap.  Necessary now that the side panel can start
