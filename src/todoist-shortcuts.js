@@ -1,6 +1,6 @@
 /* global svgs */
 
-{
+(function() {
   // Set this to true to get more log output.
   const DEBUG = false;
 
@@ -4824,4 +4824,4 @@
   }
 
   initializeWhenContentAppears();
-}
+})();
