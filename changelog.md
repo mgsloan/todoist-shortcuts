@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 130
+
+### Enhancements ###
+
+* Removes support for smart scheduler, which was removed from Todoist. See [#179][]
+
+[#179]: https://github.com/mgsloan/todoist-shortcuts/issues/179
+
+
 ## Version 129
 
 ### Enhancements ###
