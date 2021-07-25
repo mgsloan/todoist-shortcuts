@@ -4310,8 +4310,18 @@
   function updateBackgroundColor() {
     withId('page_background', (background) => {
       try {
+        const currentStyle =
+          background.computedStyleMap ?
+          background.computedStyleMap() :
+          background.currentStyle;
+        if (!currentStyle) {
+          // Issue is that we can't even enumerate the stylesheet rules as the
+          // theme CSS is from a different domain.  Could possibly be resolved
+          // by loading the CSS file directly, but that seems way too inovlved.
+          log('Figuring out background color not supported in some browsers');
+        }
         const todoistBackgroundColor =
-          background.computedStyleMap().get('background-color').toString();
+          currentStyle.get('background-color').toString();
         debug('Background color is', todoistBackgroundColor);
         addCss([
           '.' + TODOIST_SHORTCUTS_TIP + ' {',
@@ -4319,9 +4329,9 @@
           // background.
           '  background-color: ' + todoistBackgroundColor + ';',
           '}',
-        ]);
+        ].join('\n'));
       } catch (e) {
-        error('Failed to figure out background color:', e);
+        warn('Failed to figure out background color:', e);
       }
     });
   }
