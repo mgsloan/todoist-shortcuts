@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 132
+
+### Fixes ###
+
+* Fixes setting background color of navigation tips in Chrome and
+  probably Opera too.
+
+
 ## Version 131
 
 ### Fixes ###
