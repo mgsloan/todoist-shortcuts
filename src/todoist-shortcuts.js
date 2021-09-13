@@ -117,6 +117,7 @@
     ['c', scheduleToday],
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
+    ['e', scheduleNextWeekend],
     ['m', scheduleNextMonth],
     [['s', 'p'], schedulePostpone],
     ['r', unschedule],
@@ -546,6 +547,20 @@
               scheduler,
               'button',
               matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'),
+              click,
+          );
+        });
+  }
+
+  // Click 'next weekend' in schedule. Only does anything if schedule is open.
+  function scheduleNextWeekend() {
+    withScheduler(
+        'scheduleNextWeekend',
+        (scheduler) => {
+          withUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_nextweekend'),
               click,
           );
         });
