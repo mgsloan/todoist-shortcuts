@@ -1,5 +1,23 @@
 # todoist-shortcuts changelog
 
+## Version 133
+
+### Enhancements ###
+
+* Scheduler now will respond to the number keys, and schedule for `N`
+  days after today, where `N` is the number pressed. This addition
+  contributed by [Adam Rich][] in [#181][].
+
+[Adam Rich]: https://github.com/adamleerich
+[#181]: https://github.com/mgsloan/todoist-shortcuts/pull/181
+
+### Fixes ###
+
+* Inspired by the change in [#181][], the `w` scheduler keybinding for
+  "schedule next week" (monday) now works again, despite Todoist no
+  longer having a "schedule next week" option.
+
+
 ## Version 132
 
 ### Fixes ###
