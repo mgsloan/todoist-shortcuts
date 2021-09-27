@@ -121,15 +121,16 @@
     ['m', scheduleNextMonth],
     [['s', 'p'], schedulePostpone],
     ['r', unschedule],
-    ['1', schedulePlus1],
-    ['2', schedulePlus2],
-    ['3', schedulePlus3],
-    ['4', schedulePlus4],
-    ['5', schedulePlus5],
-    ['6', schedulePlus6],
-    ['7', schedulePlus7],
-    ['8', schedulePlus8],
-    ['9', schedulePlus9],
+    ['0', scheduleToday],
+    ['1', schedulePlusN(1)],
+    ['2', schedulePlusN(2)],
+    ['3', schedulePlusN(3)],
+    ['4', schedulePlusN(4)],
+    ['5', schedulePlusN(5)],
+    ['6', schedulePlusN(6)],
+    ['7', schedulePlusN(7)],
+    ['8', schedulePlusN(8)],
+    ['9', schedulePlusN(9)],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback],
   ]);
@@ -600,49 +601,23 @@
   }
 
   // Clicks date on scheduler 1-9 days in the future
-  function schedulePlus1() {
-    schedulePlusN(1);
-  }
-  function schedulePlus2() {
-    schedulePlusN(2);
-  }
-  function schedulePlus3() {
-    schedulePlusN(3);
-  }
-  function schedulePlus4() {
-    schedulePlusN(4);
-  }
-  function schedulePlus5() {
-    schedulePlusN(5);
-  }
-  function schedulePlus6() {
-    schedulePlusN(6);
-  }
-  function schedulePlus7() {
-    schedulePlusN(7);
-  }
-  function schedulePlus8() {
-    schedulePlusN(8);
-  }
-  function schedulePlus9() {
-    schedulePlusN(9);
-  }
-
   function schedulePlusN(n) {
-    const date = new Date();
-    date.setDate(date.getDate() + n);
-    buttonAriaLabel = dateToIsoFormatUsingCurrentTimezone(date);
+    return () => {
+      const date = new Date();
+      date.setDate(date.getDate() + n);
+      buttonAriaLabel = dateToIsoFormatUsingCurrentTimezone(date);
 
-    withScheduler(
-        'schedulePlusN',
-        (scheduler) => {
-          withUniqueTag(
-              scheduler,
-              'button',
-              matchingAttr('aria-label', buttonAriaLabel),
-              click,
-          );
-        });
+      withScheduler(
+          'schedulePlusN',
+          (scheduler) => {
+            withUniqueTag(
+                scheduler,
+                'button',
+                matchingAttr('aria-label', buttonAriaLabel),
+                click,
+            );
+          });
+    };
   }
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
