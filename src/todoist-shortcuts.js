@@ -117,7 +117,7 @@
     ['c', scheduleToday],
     ['t', scheduleTomorrow],
     ['w', scheduleNextWeek],
-    ['e', scheduleNextWeekend],
+    ['n', scheduleNextWeekend],
     ['m', scheduleNextMonth],
     [['s', 'p'], schedulePostpone],
     ['r', unschedule],
