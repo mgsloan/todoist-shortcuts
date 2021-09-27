@@ -629,9 +629,9 @@
   }
 
   function schedulePlusN(n) {
-    const dt = new Date();
-    dt.setDate(dt.getDate() + n);
-    buttonAriaLabel = dt.toISOString().substr(0, 10);
+    const date = new Date();
+    date.setDate(date.getDate() + n);
+    buttonAriaLabel = dateToIsoFormatUsingCurrentTimezone(date);
 
     withScheduler(
         'schedulePlusN',
@@ -4195,6 +4195,12 @@
       cur = cur.offsetParent;
     }
     return {x, y};
+  }
+
+  function dateToIsoFormatUsingCurrentTimezone(date) {
+    return (date.getYear() + 1900) + '-' +
+      (String(date.getMonth() + 1).padStart(2, '0')) + '-' +
+      (String(date.getDate()).padStart(2, '0'));
   }
 
   /*****************************************************************************
