@@ -550,16 +550,13 @@
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
   function scheduleNextWeek() {
-    withScheduler(
-        'scheduleNextWeek',
-        (scheduler) => {
-          withUniqueTag(
-              scheduler,
-              'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_nextweek'),
-              click,
-          );
-        });
+    const date = new Date();
+    const day = date.getDay();
+    if (day === 0) {
+      schedulePlusN(1)();
+    } else if (day > 0) {
+      schedulePlusN(8 - day)();
+    }
   }
 
   // Click 'next weekend' in schedule. Only does anything if schedule is open.
