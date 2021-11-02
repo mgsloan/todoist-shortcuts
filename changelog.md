@@ -1,5 +1,18 @@
 # todoist-shortcuts changelog
 
+## Version 134
+
+### Fixes ###
+
+* No longer calls Todoist's keyhandlers as a fallback. This started
+  causing total non-functionality with update to Todoist version 1447.
+  I no longer recall why the fallback was in place, so I imagine this
+  might break some shortcuts that relied on fallback. See [#184][].
+
+[#184]: https://github.com/mgsloan/todoist-shortcuts/issues/184
+
+
+
 ## Version 133
 
 ### Enhancements ###
