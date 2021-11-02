@@ -242,11 +242,20 @@
   const POPUP_BINDINGS = [['fallback', originalHandler]];
   const POPUP_KEYMAP = 'popup';
 
+  /*
   // In some cases it looks like Todoist ends up invoking this
   // function. This variable prevents direct re-entry.
   let originalHandlerReentered = false;
+  */
 
   function originalHandler(ev) {
+    if (ev.type != 'keyup' && ev.type != 'keydown') {
+      warn(
+          'Skipping invoking todoists keyhandler for', ev,
+          '\n(see https://github.com/mgsloan/todoist-shortcuts/issues/184)');
+    }
+    return true;
+    /*
     // Todoist is handling the 'h' key's keydown to switch to the
     // upcoming view, so this workaround skips it - see #134.
     if (ev.key === 'h' &&
@@ -276,6 +285,7 @@
     }
     originalHandlerReentered = false;
     return result;
+    */
   }
 
   function schedulerFallback(ev) {
