@@ -100,8 +100,6 @@
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
-
-    ['fallback', originalHandler],
   ]);
   const DEFAULT_KEYMAP = 'default';
 
@@ -142,7 +140,6 @@
   const BULK_SCHEDULE_BINDINGS = [].concat(SCHEDULE_BINDINGS, [
     [['v', 'alt+v'], sequence([exitBulkSchedule, bulkMove])],
     ['escape', exitBulkSchedule],
-    ['fallback', originalHandler],
   ]);
   const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
@@ -150,7 +147,7 @@
   //
   // These can't be handled by mousetrap, because they need to be triggered
   // while an input is focused. See 'handleBulkMoveKey' below.
-  const BULK_MOVE_BINDINGS = [['fallback', originalHandler]];
+  const BULK_MOVE_BINDINGS = [];
   const BULK_MOVE_KEYMAP = 'bulk_move';
 
   const TASK_VIEW_BINDINGS = [
@@ -241,54 +238,8 @@
   const NAVIGATE_KEYMAP = 'navigate';
 
   // Keymap used when there is a floating window.
-  const POPUP_BINDINGS = [['fallback', originalHandler]];
+  const POPUP_BINDINGS = [];
   const POPUP_KEYMAP = 'popup';
-
-  /*
-  // In some cases it looks like Todoist ends up invoking this
-  // function. This variable prevents direct re-entry.
-  let originalHandlerReentered = false;
-  */
-
-  function originalHandler(ev) {
-    if (ev.type != 'keyup' && ev.type != 'keydown') {
-      warn(
-          'Skipping invoking todoists keyhandler for', ev,
-          '\n(see https://github.com/mgsloan/todoist-shortcuts/issues/184)');
-    }
-    return true;
-    /*
-    // Todoist is handling the 'h' key's keydown to switch to the
-    // upcoming view, so this workaround skips it - see #134.
-    if (ev.key === 'h' &&
-        ev.target === document.body &&
-        ev.type === 'keydown') {
-      debug('skipping todoist handler for "h" to workaround #134.', ev);
-      return false;
-    }
-    let result = true;
-    if (originalHandlerReentered) {
-      warn('Ignored re-entry of key handler. Weird!');
-      return result;
-    }
-    originalHandlerReentered = true;
-    if (ev.type === 'keydown') {
-      if (window.originalTodoistKeydown) {
-        result = window.originalTodoistKeydown.apply(document, [ev]);
-      }
-    } else if (ev.type === 'keyup') {
-      if (window.originalTodoistKeyup) {
-        result = window.originalTodoistKeyup.apply(document, [ev]);
-      }
-    } else if (ev.type === 'keypress') {
-      if (window.originalTodoistKeypress) {
-        result = window.originalTodoistKeypress.apply(document, [ev]);
-      }
-    }
-    originalHandlerReentered = false;
-    return result;
-    */
-  }
 
   function schedulerFallback(ev) {
     const scheduler = findScheduler();
@@ -309,11 +260,11 @@
         });
         return false;
       } else {
-        return originalHandler(ev);
+        return true;
       }
     } else {
       warn('Expected to find scheduler, but it wasn\'t found.');
-      return originalHandler(ev);
+      return true;
     }
   }
 
@@ -2236,8 +2187,8 @@
     }
   }
 
+  /*
   // Simulate a key press with todoist's global handlers.
-  // eslint-disable-next-line no-unused-vars
   function todoistShortcut(options0) {
     const options = typeof options0 === 'string' ? {key: options0} : options0;
     let ev = new Event('keydown');
@@ -2262,6 +2213,7 @@
       window.originalTodoistKeypress.apply(document, [ev]);
     }
   }
+  */
 
   // Indent task.
   function moveIn() {
@@ -4820,7 +4772,7 @@
     } else {
       sawEscapeDown = false;
     }
-    return originalHandler(ev);
+    return true;
   }
 
   function keydownHandler(ev) {
@@ -4852,21 +4804,16 @@
   function overwriteKeyHandlers() {
     if (document.onkeydown !== null) {
       debug('overwrote onkeydown');
-      window.originalTodoistKeydown = document.onkeydown;
       document.onkeydown = null;
       document.addEventListener('keydown', keydownHandler, {capture: true});
     }
-    // Clear the other key handlers. Instead fallthrough to Todoist is handled
-    // by 'originalHandler'.
     if (document.onkeypress !== null) {
       debug('overwrote onkeypress');
-      window.originalTodoistKeypress = document.onkeypress;
       document.onkeypress = null;
       document.addEventListener('keypress', genericKeyHandler, {capture: true});
     }
     if (document.onkeyup !== null) {
       debug('overwrote onkeyup');
-      window.originalTodoistKeyup = document.onkeyup;
       document.onkeyup = null;
       document.addEventListener('keyup', genericKeyHandler, {capture: true});
     }
