@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 135
+
+### Fixes ###
+
+* The hasty fix for [#184][] did indeed break some shortcuts that
+  relied on fallthrough to Todoist native shortcuts. Specifically,
+  this fixes `q` (quick add), `m` (toggle left nav), `p` (sort by
+  priority), `n` (sort by name), `r` (sort by assignee), and `f` / `/`
+  (focus search) by directly implementing these via simulating
+  mouseclicks (like the rest of todoist-shortcuts).
+
+
 ## Version 134
 
 ### Fixes ###
