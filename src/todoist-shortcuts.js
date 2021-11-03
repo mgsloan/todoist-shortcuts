@@ -4809,22 +4809,25 @@
   }
 
   function overwriteKeyHandlers() {
-    if (document.onkeydown !== keydownHandler) {
+    if (document.onkeydown !== null) {
       debug('overwrote onkeydown');
       window.originalTodoistKeydown = document.onkeydown;
-      document.onkeydown = keydownHandler;
+      document.onkeydown = null;
+      document.addEventListener('keydown', keydownHandler, {capture: true});
     }
     // Clear the other key handlers. Instead fallthrough to Todoist is handled
     // by 'originalHandler'.
-    if (document.onkeypress !== genericKeyHandler) {
+    if (document.onkeypress !== null) {
       debug('overwrote onkeypress');
       window.originalTodoistKeypress = document.onkeypress;
-      document.onkeypress = genericKeyHandler;
+      document.onkeypress = null;
+      document.addEventListener('keypress', genericKeyHandler, {capture: true});
     }
-    if (document.onkeyup !== genericKeyHandler) {
+    if (document.onkeyup !== null) {
       debug('overwrote onkeyup');
       window.originalTodoistKeyup = document.onkeyup;
-      document.onkeyup = genericKeyHandler;
+      document.onkeyup = null;
+      document.addEventListener('keyup', genericKeyHandler, {capture: true});
     }
   }
 
