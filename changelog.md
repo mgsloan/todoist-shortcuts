@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 136
+
+### Fixes ###
+
+* Fixes `p` (sort by priority) to sort in descending order.
+
+
 ## Version 135
 
 ### Fixes ###
