@@ -76,9 +76,9 @@
 
     // Sorting
     ['s', sortByDate],
-    // (see originalHandler) ['p', sortByPriority],
-    // (see originalHandler) ['n', sortByName],
-    // (see originalHandler) ['r', sortByAssignee],
+    ['p', sortByPriority],
+    ['n', sortByName],
+    ['r', sortByAssignee],
 
     // Bulk reschedule / move mode
     ['* t', bulkSchedule],
@@ -91,7 +91,9 @@
     // overridden here.
     [['u', 'z', 'ctrl+z'], undo],
 
-    // (see originalHandler) [['f', '/'], focusSearch],
+    ['q', quickAdd],
+    ['m', toggleLeftNav],
+    [['f', '/'], focusSearch],
     ['!', openNotifications],
     ['?', openHelpModal],
     ['ctrl+s', sync],
@@ -1135,20 +1137,59 @@
     }
   }
 
-  // Trigger sort by date by clicking a menu item.
   function sortByDate() {
+    openSortMenu();
+    withUnique(document, 'li[aria-label="DUE_DATE"]', click);
+    closeContextMenus();
+  }
+
+  function sortByPriority() {
+    openSortMenu();
+    withUnique(document, 'li[aria-label="PRIORITY"]', click);
+    closeContextMenus();
+  }
+
+  function sortByName() {
+    openSortMenu();
+    withUnique(document, 'li[aria-label="ALPHABETICALLY"]', click);
+    closeContextMenus();
+  }
+
+  function sortByAssignee() {
+    openSortMenu();
+    withUnique(document, 'li[aria-label="ASSIGNEE"]', click);
+    closeContextMenus();
+  }
+
+  function openSortMenu() {
     withUniqueClass(document, 'view_header__actions', all, (actions) => {
       // Ooof, such terrible hacks.
-      const svgs = actions.querySelectorAll('svg[viewBox="0 0 24 24"]');
-      if (svgs.length > 1) {
-        click(svgs[svgs.length - 1].parentElement);
-      }
+      // eslint-disable-next-line max-len
+      withUniqueTag(actions, 'path', matchingAttr('d', 'M15 14.5a2 2 0 011.936 1.498L19.5 16a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 17a.5.5 0 010-1l8.564-.002A2 2 0 0115 14.5zm-.982 1.81l.005-.025-.005.026-.003.014-.004.025-.007.061A.897.897 0 0014 16.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0016 16.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026a.998.998 0 00-1.843.043l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047zM9 9.5a2 2 0 011.936 1.498L19.5 11a.5.5 0 010 1l-8.563.001a2.001 2.001 0 01-3.874 0L4.5 12a.5.5 0 010-1l2.564-.002A2 2 0 019 9.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C8 11.441 8 11.471 8 11.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0010 11.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 009 10.5zm6-6a2 2 0 011.936 1.498L19.5 6a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 7a.5.5 0 010-1l8.564-.002A2 2 0 0115 4.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C14 6.441 14 6.471 14 6.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06C16 6.557 16 6.528 16 6.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 0015 5.5z'), (svgPath) => {
+        click(svgPath.parentElement);
+      });
     });
-    withUnique(document, '[data-track="items|sort_by_date"]', click);
+    withUniqueClass(
+        document,
+        'menu_item',
+        matchingAttr('aria-labelledby', 'view_menu__sort_by'),
+        click);
   }
 
   function openNotifications() {
     withUnique(document, '.top_bar_btn.notifications_btn', click);
+  }
+
+  function quickAdd() {
+    withId('quick_add_task_holder', click);
+  }
+
+  function toggleLeftNav() {
+    withUnique(document, '.top_bar_btn.left_menu_toggle ', click);
+  }
+
+  function focusSearch() {
+    withUniqueClass(document, 'quick_find__input', all, (el) => el.focus());
   }
 
   // Open help documentation.
