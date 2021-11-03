@@ -1097,6 +1097,12 @@
   function sortByPriority() {
     openSortMenu();
     withUnique(document, 'li[aria-label="PRIORITY"]', click);
+    withUniqueClass(
+        document,
+        'menu_item',
+        matchingAttr('aria-labelledby', 'view_menu__order'),
+        click);
+    withUnique(document, 'li[aria-label="DESC"]', click);
     closeContextMenus();
   }
 
