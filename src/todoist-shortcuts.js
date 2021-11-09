@@ -2642,7 +2642,15 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       withTaskMenu(task, true, (menu) => {
-        withUniqueClass(menu, 'menu_item', matchingAction(action), click);
+        const btn = getUniqueClass(menu, 'menu_item', matchingAction(action));
+        if (btn) {
+          click(btn);
+        } else {
+          // If there is no matching menu item (such as when sorting
+          // project by priority), then the task menu needs to be
+          // explicitly closed.
+          closeContextMenus();
+        }
       });
       const editor = getUniqueClass(document, 'task_editor');
       if (editor) {
