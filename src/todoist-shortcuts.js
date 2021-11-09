@@ -1089,12 +1089,14 @@
   }
 
   function sortByDate() {
+    if (resetIfSortTypeAlready('date')) return;
     openSortMenu();
     withUnique(document, 'li[aria-label="DUE_DATE"]', click);
     closeContextMenus();
   }
 
   function sortByPriority() {
+    if (resetIfSortTypeAlready('priority')) return;
     openSortMenu();
     withUnique(document, 'li[aria-label="PRIORITY"]', click);
     withUniqueClass(
@@ -1107,15 +1109,33 @@
   }
 
   function sortByName() {
+    if (resetIfSortTypeAlready('alphabetically')) return;
     openSortMenu();
     withUnique(document, 'li[aria-label="ALPHABETICALLY"]', click);
     closeContextMenus();
   }
 
   function sortByAssignee() {
+    if (resetIfSortTypeAlready('assignee')) return;
     openSortMenu();
     withUnique(document, 'li[aria-label="ASSIGNEE"]', click);
     closeContextMenus();
+  }
+
+  function resetIfSortTypeAlready(type) {
+    const changeSortButton = selectUnique(
+        document, 'button[aria-label="Change sorting options"]');
+    if (changeSortButton) {
+      if (changeSortButton.innerText.includes(type)) {
+        const resetSortButton = selectUnique(
+            document, 'button[aria-label="Reset sorting options"]');
+        if (resetSortButton) {
+          click(resetSortButton);
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   function openSortMenu() {
