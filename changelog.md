@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 137
+
+### Fixes ###
+
+* Fixes behavior of `o` / `O` in sorted projects. Also makes sorting
+  keybindings toggle sort enablement. See [llinfeng][]'s [comment on
+  #183][].
+
+[llinfeng]: https://github.com/llinfeng
+[comment on #183]: https://github.com/mgsloan/todoist-shortcuts/issues/183#issuecomment-959861962
+
+
 ## Version 136
 
 ### Fixes ###
