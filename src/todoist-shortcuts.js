@@ -4571,6 +4571,12 @@
     '  font-size: 150%;',
     '  line-height: 150%;',
     '}',
+    '',
+    // Fix background of active item obscuring cursor
+    '',
+    '.task_list_item--keyboard_shortcuts_active .task_list_item__body {',
+    '  background: transparent !important;',
+    '}',
   ].join('\n'));
 
   // A CSS style element, dynamically updated by updateCursorStyle. MUTABLE.
