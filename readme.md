@@ -38,7 +38,7 @@ Todoist by pressing `?`.
 ## Add tasks
 
 | keys | action                                 |
-| ---  | ---                                    |
+|------|----------------------------------------|
 | `q`  | Add task                               |
 | `a`  | Add new task at the bottom of the list |
 | `A`  | Add new task at the top of the list    |
@@ -52,7 +52,7 @@ described in this document.
 ## Navigation
 
 | keys           | action                                                                |
-| ---            | ---                                                                   |
+|----------------|-----------------------------------------------------------------------|
 | `j` or `down`  | move cursor down                                                      |
 | `k` or `up`    | move cursor up                                                        |
 | `h` or `left`  | collapse nested at cursor                                             |
@@ -81,7 +81,7 @@ navigation mode to select the same project again.
 ## Manipulation of tasks at cursor
 
 | keys                       | action                                                   |
-| ---                        | ---                                                      |
+|----------------------------|----------------------------------------------------------|
 | `enter`                    | edit task at cursor                                      |
 | `o`                        | add task after cursor                                    |
 | `shift+o`                  | add task before cursor                                   |
@@ -110,7 +110,7 @@ Note that there are some known bugs related to task motion - see
 ## Selection
 
 | keys                     | action                                |
-| ---                      | ---                                   |
+|--------------------------|---------------------------------------|
 | `x`                      | add task at cursor to selection       |
 | `* a`                    | select all tasks                      |
 | `* n` or `escape`        | clear selection                       |
@@ -126,7 +126,7 @@ Note that there are some known bugs related to task motion - see
 If none are selected, then these will apply to the cursor instead.
 
 | keys       | action                            |
-| ---        | ---                               |
+|------------|-----------------------------------|
 | `t`        | schedule                          |
 | `T`        | schedule by editing text          |
 | `d`        | done: mark task as complete       |
@@ -154,7 +154,7 @@ complete via `d`.  Here are the differences:
 When scheduling is opened via `t`, the following keybindings will apply:
 
 | keys                    | date                                      |
-| ---                     | ---                                       |
+|-------------------------|-------------------------------------------|
 | `c`                     | today (mnemonic is "current day")         |
 | `t`                     | tomorrow                                  |
 | `w`                     | next week                                 |
@@ -174,7 +174,7 @@ When viewing the inbox or a project, the following keybindings can be used to
 sort the tasks:
 
 | keys | sorted by        |
-| ---  | ---              |
+|------|------------------|
 | `s`  | Sort by date     |
 | `p`  | Sort by priority |
 | `r`  | Sort by assignee |
@@ -183,7 +183,7 @@ sort the tasks:
 ## Bulk reschedule mode
 
 | keys           | action                               |
-| ---            | ---                                  |
+|----------------|--------------------------------------|
 | `* t`          | enter bulk reschedule mode           |
 | `v` or `alt+v` | switch to bulk move mode (see below) |
 | `escape`       | exit bulk reschedule mode            |
@@ -195,7 +195,7 @@ navigation keys can be used while in this mode.
 ## Bulk move mode
 
 | keys     | action                                     |
-| ---      | ---                                        |
+|----------|--------------------------------------------|
 | `* v`    | enter bulk move mode                       |
 | `alt+t`  | switch to bulk reschedule mode (see above) |
 | `escape` | exit bulk move mode                        |
@@ -211,7 +211,7 @@ pressing `i`. Once the side panel is visible, you can use the
 following shortcuts:
 
 | keys            | action                     |
-| ---             | ---                        |
+|-----------------|----------------------------|
 | `i` or `escape` | close the task side panel  |
 | `s`             | switch to subtasks section |
 | `c`             | switch to comments section |
@@ -222,7 +222,7 @@ The rest of the bindings match the shortcuts used in other
 contexts. Listed here for completeness:
 
 | keys              | action                                                                    |
-| ---               | ---                                                                       |
+|-------------------|---------------------------------------------------------------------------|
 | `d`               | done: mark task as complete                                               |
 | `q` or `a` or `A` | add a subtask                                                             |
 | `t`               | schedule                                                                  |
@@ -246,7 +246,7 @@ though this is a planned future addition.  See [#94][]
 ## Other
 
 | keys                   | action                                                 |
-| ---                    | ---                                                    |
+|------------------------|--------------------------------------------------------|
 | `u` or `z` or `ctrl+z` | undo                                                   |
 | `f` or `/`             | open search                                            |
 | `shift+enter`          | clicks first link in the task the cursor is on         |
