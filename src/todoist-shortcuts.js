@@ -960,11 +960,15 @@
       click(cancelBtn);
     });
     // Close windows with close buttons, particularly move-to-project
+    //
+    // (probably old)
     withClass(document, 'GB_window', (gbw) => {
       withClass(gbw, 'close', (close) => {
         withTag(close, 'div', click);
       });
     });
+    // Close windows with close buttons
+    withQuery(document, '[aria-label="Close modal"]', click);
     // Close todoist-shortcuts' modals
     withClass(document, 'ts-modal-close', click);
   }
@@ -2051,7 +2055,9 @@
       if (currentKeymap === NAVIGATE_KEYMAP) {
         return;
       }
-      const popupWindow = getUniqueClass(document, 'GB_window');
+      const popupWindow =
+            getUniqueClass(document, 'GB_window') ||
+            selectUnique(document, '[data-testid="modal-overlay"]');
       if (popupWindow) {
         switchKeymap(POPUP_KEYMAP);
       } else if (inBulkScheduleMode) {
