@@ -1,5 +1,23 @@
 # todoist-shortcuts changelog
 
+## Version 138
+
+### Enhancements ###
+
+* Adds support for `ctrl+k` to open Todoist's command pallete. See
+  [#186][].
+
+### Fixes ###
+
+* Fixes keyboard handling when modal dialogs are visible (broken by
+  changes to how the dialogs work).
+
+* Makes Todoist's "active item" style use a transparent background, so
+  that the todoist-shortcuts cursor is still visible.
+
+[#186]: https://github.com/mgsloan/todoist-shortcuts/issues/186
+
+
 ## Version 137
 
 ### Fixes ###
