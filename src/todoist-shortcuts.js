@@ -97,6 +97,7 @@
     ['!', openNotifications],
     ['?', openHelpModal],
     ['ctrl+s', sync],
+    ['ctrl+k', openCommandMenu],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
@@ -1261,6 +1262,19 @@
       return;
     }
     click(priorElement);
+  }
+
+  const COMMAND_MENU_SELECTOR =
+        'button[aria-labelledby="command-menu-description"]';
+
+  function openCommandMenu() {
+    const button = selectUnique(document, COMMAND_MENU_SELECTOR);
+    if (button) {
+      click(button);
+    } else {
+      withId('help_btn', click);
+      withUnique(document, COMMAND_MENU_SELECTOR, click);
+    }
   }
 
   // TODO: Remove once side_panel is gone (currently it's needed for
