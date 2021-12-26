@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Unreleased
+
+### Enhancements ###
+
+* Updates to extension manifest v3
+
+
 ## Version 190
 
 ### Fixes ###

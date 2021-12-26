@@ -16,15 +16,14 @@
     }
   ],
   "permissions": ["storage"],
-  "web_accessible_resources": [
-    "mousetrap.js",
-    "todoist-shortcuts.js",
-    "options-page.html"
-  ],
+  "web_accessible_resources": [{
+    "resources": ["mousetrap.js", "todoist-shortcuts.js", "options-page.html"],
+    "matches": ["<all_urls>"]
+  }],
   "icons": {
     "128": "icon128.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "128": "icon128.png"
     }
@@ -39,6 +38,8 @@
       "strict_min_version": "57.0"
     }
   },
-  "content_security_policy": "default-src 'self'",
-  "manifest_version": 2
+  "content_security_policy": {
+    "script-src": ["'self'"]
+  },
+  "manifest_version": 3
 }
