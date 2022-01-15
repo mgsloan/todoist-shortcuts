@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 139 (unreleased)
+
+### Fixes ###
+
+* Attempts to fix issue with blurring scheduler text input on
+  safari. See [#191][].
+
+[#191]: https://github.com/mgsloan/todoist-shortcuts/issues/191
+
+
 ## Version 138
 
 ### Enhancements ###
