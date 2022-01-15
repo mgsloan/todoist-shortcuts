@@ -2642,20 +2642,27 @@
 
   function blurSchedulerInput() {
     enterDeferLastBinding();
-    setTimeout(() => {
+    setTimeout(() => blurSchedulerInputImpl(20), 0);
+  }
+
+  function blurSchedulerInputImpl(fuel) {
+    if (fuel <= 0) {
+      exitDeferLastBinding();
+      error('Expected to find scheduler after opening it.');
+      return;
+    }
+    const scheduler = findScheduler();
+    if (scheduler) {
       try {
-        const scheduler = findScheduler();
-        if (scheduler) {
-          withTag(scheduler, 'input', (el) => {
-            el.blur();
-          });
-        } else {
-          error('Expected to find scheduler after opening it.');
-        }
+        withTag(scheduler, 'input', (el) => {
+          el.blur();
+        });
       } finally {
         exitDeferLastBinding();
       }
-    }, 0);
+    } else {
+      setTimeout(() => blurSchedulerInputImpl(n - 1), 10);
+    }
   }
 
   function clickTaskDone(task) {
