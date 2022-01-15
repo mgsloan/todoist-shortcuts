@@ -11,6 +11,9 @@
     * `ctrl+,` - copy task title
     * `ctrl+shift+,` - copy task url
 
+* Adds `ctrl+shift+/` shortcut for opening a random task. See
+  [#190][].
+
 * No longer includes minified mousetrap code, as Mozilla is now
   enforcing non minified code policies.
 
@@ -20,6 +23,7 @@
   safari. See [#191][].
 
 [#189]: https://github.com/mgsloan/todoist-shortcuts/issues/189
+[#190]: https://github.com/mgsloan/todoist-shortcuts/issues/190
 [#191]: https://github.com/mgsloan/todoist-shortcuts/issues/191
 
 
