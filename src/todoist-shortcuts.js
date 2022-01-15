@@ -98,6 +98,9 @@
     ['?', openHelpModal],
     ['ctrl+s', sync],
     ['ctrl+k', openCommandMenu],
+    ['ctrl+shift+,', copyCursorUrl],
+    ['ctrl+,', copyCursorTitle],
+    ['ctrl+c', copyCursorMarkdown],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
@@ -1454,6 +1457,34 @@
     });
   }
 
+  function copyCursorUrl() {
+    const cursor = requireCursor();
+    setClipboard('https://todoist.com/showTask?id=' + getTaskId(cursor));
+  }
+
+  function copyCursorTitle() {
+    const cursor = requireCursor();
+    setClipboard(getTaskTitle(cursor));
+  }
+
+  function copyCursorMarkdown() {
+    const cursor = requireCursor();
+    const title = getTaskTitle(cursor);
+    const url = 'https://todoist.com/showTask?id=' + getTaskId(cursor);
+    const escapedTitle = title
+        .replace(/\*/g, '\\*')
+        .replace(/#/g, '\\#')
+        .replace(/\//g, '\\/')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)')
+        .replace(/\[/g, '\\[')
+        .replace(/\]/g, '\\]')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/_/g, '\\_');
+    setClipboard('[' + escapedTitle + '](' + url + ')');
+  }
+
   /*****************************************************************************
   * Bulk schedule
   */
@@ -2789,9 +2820,11 @@
     });
   }
 
-  // eslint-disable-next-line no-unused-vars
   function notifyUser(msg) {
     withId('app_holder', (appHolder) => {
+      withClass(appHolder, 'ts-note', (oldNote) => {
+        appHolder.removeChild(oldNote);
+      });
       const close = div('ts-note-close');
       close.innerHTML = svgs['sm1/close_small.svg'];
       const note =
@@ -2827,6 +2860,14 @@
       };
     });
     return modal;
+  }
+
+  function setClipboard(text) {
+    const type = 'text/plain';
+    const blob = new Blob([text], {type});
+    const data = [new ClipboardItem({[type]: blob})];
+    navigator.clipboard.write(data);
+    notifyUser('Copied the following text to clipboard:\n\n' + text);
   }
 
   /*****************************************************************************
@@ -2938,6 +2979,10 @@
       error('Couldn\'t find id for task', task);
       return null;
     }
+  }
+
+  function getTaskTitle(task) {
+    return getUniqueClass(task, ['content', 'task_content']).textContent;
   }
 
   /*
@@ -4532,6 +4577,7 @@
       'rgba(0,0,0,0.0588235) 0 1px 10px 0, ' +
       'rgba(0,0,0,0.0196078) 0 4px 6px 0;',
     '  max-width: 105em;',
+    '  white-space: pre-wrap;',
     '}',
     '',
     '.ts-modal {',

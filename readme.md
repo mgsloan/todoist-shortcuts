@@ -94,6 +94,9 @@ navigation mode to select the same project again.
 | `shift+l` or `shift+left`  | dedent task at cursor                                    |
 | `shift+h` or `shift+right` | indent task at cursor                                    |
 | `shift+c`                  | clicks [toggl][] or [clockify][] time tracking button    |
+| `ctrl+c`                   | copy title and url of task in markdown format            |
+| `ctrl+,`                   | copy task title                                          |
+| `ctrl+shift+,`             | copy task url                                            |
 
 
 Note that there are some known bugs related to task motion - see
