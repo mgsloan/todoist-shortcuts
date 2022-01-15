@@ -1,4 +1,4 @@
-/* global svgs */
+/* global svgs, TodoistShortcutsMousetrap */
 
 (function() {
   // Set this to true to get more log output.
@@ -4653,61 +4653,6 @@
   }
 
   /*****************************************************************************
-   * mousetrap v1.6.1 craig.is/killing/mice
-   *
-   * Forked version at https://github.com/mgsloan/mousetrap (see submodule)
-   *
-   * Minified via "uglifyjs --compress --mangle -- mousetrap.js | xclip"
-   */
-  /* eslint-disable */
-!function(e,a){if(e){for(var r,i={8:"backspace",9:"tab",13:"enter",16:"shift",17:"ctrl",18:"alt",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"ins",46:"del",91:"meta",93:"meta",224:"meta"},n={106:"*",107:"+",109:"-",110:".",111:"/",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},c={"~":"`","!":"1","@":"2","#":"3",$:"4","%":"5","^":"6","&":"7","*":"8","(":"9",")":"0",_:"-","+":"=",":":";",'"':"'","<":",",">":".","?":"/","|":"\\"},l={option:"alt",command:"meta",return:"enter",escape:"esc",plus:"+",mod:/Mac|iPod|iPhone|iPad/.test(navigator.platform)?"meta":"ctrl"},t=1;t<20;++t)i[111+t]="f"+t;for(t=0;t<=9;++t)i[t+96]=t.toString();o.prototype.handleKeyEvent=function(e){return this._handleKeyEvent(e)},o.prototype.bind=function(e,t,n,a){return e=e instanceof Array?e:[e],this._bindMultiple.call(this,e,t,n,a),this},o.prototype.unbind=function(e,t,n){return this.bind.call(this,e,function(){},t,n)},o.prototype.trigger=function(e,t,n){const a=n||"default";return this._directMap[a][e+":"+t]&&this._directMap[a][e+":"+t]({},e),this},o.prototype.reset=function(e){const t=this;return e?(t._callbacks[e]={},t._directMap[e]={}):(t._callbacks={},t._directMap={}),t},o.prototype.switchKeymap=function(e){e&&e!==this._currentKeymap&&(this._resetSequences(),this._currentKeymap=e)},o.prototype.stopCallback=function(e,t){return!(-1<(" "+t.className+" ").indexOf(" mousetrap "))&&(!function e(t,n){return null!==t&&t!==a&&(t===n||e(t.parentNode,n))}(t,this.target)&&("INPUT"==t.tagName||"SELECT"==t.tagName||"TEXTAREA"==t.tagName||t.isContentEditable))},o.prototype.handleKey=function(){return this._handleKey.apply(this,arguments)},o.addKeycodes=function(e){for(const t in e)e.hasOwnProperty(t)&&(i[t]=e[t]);r=null},e.Mousetrap=o,"undefined"!=typeof module&&module.exports&&(module.exports=o),"function"==typeof define&&define.amd&&define(function(){return o})}function y(e){if("keypress"!=e.type)return i[e.which]?i[e.which]:n[e.which]?n[e.which]:String.fromCharCode(e.which).toLowerCase();let t=String.fromCharCode(e.which);return e.shiftKey||(t=t.toLowerCase()),t}function b(e){return"shift"==e||"ctrl"==e||"alt"==e||"meta"==e}function s(e,t,n){return "keypress"==(n=n||(function(){if(!r)for(const e in (r={}, i))95<e&&e<112||i.hasOwnProperty(e)&&(r[i[e]]=e);return r}()[e]?"keydown":"keypress"))&&t.length&&(n="keydown"),n;}function _(e,t){
-  let n;
-  let a;
-  let r;
-  let i;
-  const o=[];
-  for(n="+"===(i=e)?["+"]:(i=i.replace(/\+{2}/g,"+plus")).split("+"),r=0;r<n.length;++r)a=n[r],l[a]&&(a=l[a]),t&&"keypress"!=t&&c[a]&&(a=c[a],o.push("shift")),b(a)&&o.push(a);return{key:a,modifiers:o,action:t=s(a,o,t)}
-}function o(e){
-  const m=this;if(e=e||a,!(m instanceof o))return new o(e);m.target=e,m._callbacks={},m._directMap={},m._currentKeymap="default";
-  const k={};
-  let s=!1;
-  let p=!1;
-  let f=!1;
-  function h(e,t,n,a,r,i,o){
-    let c;
-    let l;
-    let s;
-    let u;
-    const p=[];
-    const f=n.type;
-    const h=m._callbacks[a];
-    if(!h)return[];if(!h[e])return[];for("keyup"==f&&b(e)&&(t=[e]),c=0;c<h[e].length;++c)if(l=h[e][c],(r||!l.seq||k[l.seq]==l.level)&&f==l.action&&("keypress"==f&&!n.metaKey&&!n.ctrlKey||(s=t,u=l.modifiers,s.sort().join(",")===u.sort().join(",")))){const d=!r&&l.combo==i, y=r&&l.seq==r&&l.level==o;(d||y)&&h[e].splice(c,1),p.push(l)}return p
-  }function d(e,t,n,a){let r, i;m.stopCallback(t,t.target||t.srcElement,n,a)||!1===e(t,n)&&((i=t).preventDefault?i.preventDefault():i.returnValue=!1,(r=t).stopImmediatePropagation?r.stopImmediatePropagation():r.stopPropagation?r.stopPropagation():r.cancelBubble=!0)}function u(e,t,n,a,r,i){const o=a||"default";if(m._callbacks[o]=m._callbacks[o]||{},m._directMap[o]=m._directMap[o]||{},m._directMap[o][e+":"+n]=t,"fallback"!==e){
-    let c;
-    const l=(e=e.replace(/\s+/g," ")).split(" ");
-    1<l.length?function(t,e,n,a,r){function i(e){return function(){f=e,++k[t]}}function o(e){d(n,e,t),"keyup"!==a&&(s=y(e)),setTimeout(m._resetSequences,10)}for(let c=k[t]=0;c<e.length;++c){const l=c+1===e.length?o:i(a||_(e[c+1]).action);u(e[c],l,a,r,t,c)}}(e,l,t,n,a):(c=_(e,n),m._callbacks[o][c.key]=m._callbacks[o][c.key]||[],h(c.key,c.modifiers,{type:c.action},o,r,e,i),m._callbacks[o][c.key][r?"unshift":"push"]({callback:t,modifiers:c.modifiers,action:c.action,seq:r,level:i,combo:e}))
-  }else m._callbacks[o].fallback=[{callback:t,modifiers:[],action:n,seq:r,level:i,combo:e}]}m._resetSequences=function(e){e=e||{};let t, n=!1;for(t in k)e[t]?n=!0:k[t]=0;n||(f=!1)},m._handleKey=function(e,t,n){
-    let a;
-    const r=h(e,t,n,m._currentKeymap);
-    const i={};
-    let o=0;
-    let c=!1;
-    const l=m._callbacks[m._currentKeymap];
-    if(0===r.length&&l){const s=l.fallback;s&&r.push(s[0])}for(a=0;a<r.length;++a)r[a].seq&&(o=Math.max(o,r[a].level));for(a=0;a<r.length;++a)if(r[a].seq){if(r[a].level!=o)continue;c=!0,i[r[a].seq]=1,d(r[a].callback,n,r[a].combo,r[a].seq)}else c||d(r[a].callback,n,r[a].combo);const u="keypress"==n.type&&p;n.type!=f||b(e)||u||m._resetSequences(i),p=c&&"keydown"==n.type
-  },m._handleKeyEvent=function(e){
-    "number"!=typeof e.which&&(e.which=e.keyCode);
-    let t;
-    let n;
-    const a=y(e);
-    a&&("keyup"!=e.type||s!==a?m.handleKey(a,(n=[],(t=e).shiftKey&&n.push("shift"),t.altKey&&n.push("alt"),t.ctrlKey&&n.push("ctrl"),t.metaKey&&n.push("meta"),n),e):s=!1)
-  },m._bindMultiple=function(e,t,n,a){for(let r=0;r<e.length;++r)u(e[r],t,n,a)}
-}}("undefined"!=typeof window?window:null,"undefined"!=typeof window?document:null);
-  /* eslint-enable */
-
-  // Tell eslint that "Mousetrap" is now a global.
-  /* global Mousetrap */
-
-  /*****************************************************************************
    * Mousetrap utilities
    */
 
@@ -4910,7 +4855,7 @@
     overwriteKeyHandlers();
 
     // Initialize mousetrap.
-    mousetrap = new Mousetrap(document);
+    mousetrap = new TodoistShortcutsMousetrap(document);
 
     // Register key bindings with mousetrap.
     registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
