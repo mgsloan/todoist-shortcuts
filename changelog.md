@@ -2,6 +2,11 @@
 
 ## Version 139 (unreleased)
 
+### Enhancements ###
+
+* No longer includes minified mousetrap code, as Mozilla is now
+  enforcing non minified code policies.
+
 ### Fixes ###
 
 * Attempts to fix issue with blurring scheduler text input on
