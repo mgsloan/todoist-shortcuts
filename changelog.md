@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 139 (unreleased)
+## Version 139
 
 ### Enhancements ###
 
