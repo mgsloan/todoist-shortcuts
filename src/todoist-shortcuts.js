@@ -101,6 +101,7 @@
     ['ctrl+shift+,', copyCursorUrl],
     ['ctrl+,', copyCursorTitle],
     ['ctrl+c', copyCursorMarkdown],
+    ['ctrl+shift+/', openRandomTask],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
@@ -175,6 +176,10 @@
     ['shift+r', taskViewOpenReminders],
     [['e', '#'], taskViewDelete],
     ['shift+c', taskViewToggleTimer],
+    ['ctrl+shift+/', () => {
+      taskViewClose();
+      openRandomTask();
+    }],
   ];
   const TASK_VIEW_KEYMAP = 'task_view';
 
@@ -1483,6 +1488,12 @@
         .replace(/>/g, '&gt;')
         .replace(/_/g, '\\_');
     setClipboard('[' + escapedTitle + '](' + url + ')');
+  }
+
+  function openRandomTask() {
+    const tasks = getTasks();
+    setCursor(tasks[Math.floor(Math.random()*tasks.length)], 'scroll');
+    openTaskView();
   }
 
   /*****************************************************************************

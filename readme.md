@@ -257,6 +257,7 @@ though this is a planned future addition.  See [#94][]
 | `?`                    | display [keyboard shortcuts guide sheet](google-sheet) |
 | `!`                    | open notifications                                     |
 | `ctrl+k`               | open Todoist command pallette                          |
+| `ctrl+shift+/`         | open random task from current view                     |
 
 Note that undo only works when the "UNDO" button is visible at the bottom of the
 screen. Some actions are not undo-able, such as [deletion or archiving multiple
