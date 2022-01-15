@@ -4,6 +4,13 @@
 
 ### Enhancements ###
 
+* Shortcuts for copying info about current task to clipboard. See
+  [#189][].
+
+    * `ctrl+c` - copy title and url of task in markdown format
+    * `ctrl+,` - copy task title
+    * `ctrl+shift+,` - copy task url
+
 * No longer includes minified mousetrap code, as Mozilla is now
   enforcing non minified code policies.
 
@@ -12,6 +19,7 @@
 * Attempts to fix issue with blurring scheduler text input on
   safari. See [#191][].
 
+[#189]: https://github.com/mgsloan/todoist-shortcuts/issues/189
 [#191]: https://github.com/mgsloan/todoist-shortcuts/issues/191
 
 
