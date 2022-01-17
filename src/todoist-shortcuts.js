@@ -3166,6 +3166,8 @@
         let initials = null;
         if (matchingAttr('data-track', 'navigation|inbox')(li)) {
           mustBeKeys = 'i';
+        } else if (matchingAttr('data-track', 'navigation|team_inbox')(li)) {
+          mustBeKeys = 't';
         } else if (matchingAttr('data-track', 'navigation|today')(li)) {
           mustBeKeys = 'g';
         } else if (matchingAttr('data-track', 'navigation|upcoming')(li)) {
@@ -3190,6 +3192,12 @@
                   nameSpan = textNode;
                 }
               }
+            }
+          }
+          if (!nameSpan) {
+            nameSpan = getUniqueClass(li, 'item_content');
+            if (nameSpan) {
+              warn('Fell back to using .item_content for ', li);
             }
           }
           if (nameSpan) {
