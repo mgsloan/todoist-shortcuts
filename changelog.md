@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 140
+
+### Fixes ###
+
+* Attempts to fix missing navigation keys for "Team Inbox". See
+  [#194][].
+
+[#194]: https://github.com/mgsloan/todoist-shortcuts/issues/194
+
+
 ## Version 139
 
 ### Enhancements ###
