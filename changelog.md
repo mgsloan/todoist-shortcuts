@@ -2,12 +2,17 @@
 
 ## Version 141
 
+### Enhancements ###
+
+* Adds `alt+t` keybinding for opening time prompt. See [#198][].
+
 ### Fixes ###
 
 * Attempts to fix bug with navigation mode reported in [a comment on
   #194][].
 
 [a comment on #194]: https://github.com/mgsloan/todoist-shortcuts/issues/194#issuecomment-1019452067
+[#198]: https://github.com/mgsloan/todoist-shortcuts/issues/198
 
 
 ## Version 140
