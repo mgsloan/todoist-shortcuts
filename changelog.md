@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 141
+
+### Fixes ###
+
+* Attempts to fix bug with navigation mode reported in [a comment on
+  #194][].
+
+[a comment on #194]: https://github.com/mgsloan/todoist-shortcuts/issues/194#issuecomment-1019452067
+
+
 ## Version 140
 
 ### Fixes ###
