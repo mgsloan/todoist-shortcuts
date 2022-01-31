@@ -1072,6 +1072,38 @@
     });
   }
 
+  // Cycles down through left navigation items.
+  // eslint-disable-next-line no-unused-vars
+  function nextNavItem() {
+    withId('list_holder', (listHolder) => {
+      withNavigationLinks([listHolder], (items, current) => {
+        // If on the last item, or no item, select the first item.
+        if (current >= items.length - 1 || current < 0) {
+          items[0].click();
+        // Otherwise, select the next item.
+        } else {
+          items[current + 1].click();
+        }
+      });
+    });
+  }
+
+  // Cycles up through right navigation items.
+  // eslint-disable-next-line no-unused-vars
+  function prevNavItem() {
+    withId('list_holder', (listHolder) => {
+      withNavigationLinks([listHolder], (items, current) => {
+        // If on the first item, or no item, select the last item.
+        if (current <= 0) {
+          items[items.length - 1].click();
+        // Otherwise, select the previous item.
+        } else {
+          items[current - 1].click();
+        }
+      });
+    });
+  }
+
   // Clicks quick add task button.  Would be better to use todoist's builtin
   // shortcut, but that logic is currently WIP and broken.
   function quickAddTask() {
@@ -2935,7 +2967,7 @@
 
   // Predicate, returns 'true' if the task has a 'hidden' attribute.
   function hidden(el) {
-    return matchingAttr('hidden', '')(el);
+    return matchingAttr('hidden', '')(el) || el.style.display === 'none';
   }
 
   // This returns the ids of all the selected tasks as a set-like object.
@@ -3737,27 +3769,46 @@
   // currently selected one, if any.
   function withTopFilters(f) {
     withId('top_filters', (topFilters) => {
-      const topLinks = [];
-      let current = -1;
-      const addResults = (items, isFavorites) => {
-        for (let i = 0; i < items.length; i++) {
-          topLinks.push(getFirstClass(items[i], 'item_content') ||
-                        getFirstTag(items[i], 'a'));
-          // Terrible hack around obfuscated class names.
-          if (matchingClass('current')(items[i]) ||
-              (isFavorites &&
-               items[i].firstElementChild.classList.length > 2)) {
-            current = topLinks.length - 1;
-          }
-        }
-      };
       const favoritesPanel = withId('left_menu', (leftMenu) =>
         getFirstClass(leftMenu, 'expansion_panel'));
       debug('favoritesPanel = ', favoritesPanel);
-      addResults(topFilters.getElementsByTagName('li'), false);
-      addResults(favoritesPanel.getElementsByTagName('li'), true);
-      f(topLinks, current);
+      withNavigationItems([topFilters, favoritesPanel], f);
     });
+  }
+
+  function withNavigationLinks(containers, f) {
+    const links = [];
+    let current = -1;
+    const allCurrents = [];
+    for (const container of containers) {
+      withTag(container, 'li', (item) => {
+        const link =
+              getFirstClass(item, 'item_content') ||
+              getFirstTag(item, 'a') ||
+              getFirstClass(item, 'name');
+        if (hidden(item)) {
+        } else if (!link) {
+          warn('Didn\'t find link in', item.innerHTML);
+        } else {
+          links.push(link);
+          const firstChild = item.firstElementChild;
+          // Terrible hack around obfuscated class names.
+          if (matchingClass('current')(item) ||
+              (firstChild.tagName === 'DIV' &&
+               !firstChild.classList.contains('arrow') &&
+               firstChild.classList.length > 1)) {
+            if (!allCurrents.length) {
+              current = links.length - 1;
+            }
+            allCurrents.push(item.innerHTML);
+          }
+        }
+      });
+    }
+    if (allCurrents.length > 1) {
+      warn('Multiple navigation items: ', allCurrents);
+    }
+    f(links, current);
   }
 
   /*****************************************************************************
