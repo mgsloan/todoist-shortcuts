@@ -63,6 +63,7 @@
     // Manipulation of selected tasks
     ['t', schedule],
     ['shift+t', scheduleText],
+    ['alt+t', scheduleTime],
     ['d', done],
     [['e', '#'], deleteTasks],
     ['&', duplicateTasks],
@@ -136,6 +137,7 @@
     ['7', schedulePlusN(7)],
     ['8', schedulePlusN(8)],
     ['9', schedulePlusN(9)],
+    ['alt+t', scheduleTime],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback],
   ]);
@@ -490,6 +492,24 @@
           click,
       );
     }
+  }
+
+  function scheduleTime() {
+    warn('scheduleTime');
+    if (!findScheduler()) {
+      scheduleText();
+    }
+    setTimeout(() => {
+      withScheduler('scheduleTime', (scheduler) => {
+        const addTime = getUniqueClass(scheduler, 'scheduler-actions-addtime');
+        if (addTime) {
+          click(addTime);
+        } else {
+          withUniqueClass(document, 'scheduler-actions-time-label', all, click);
+        }
+      });
+      focusTimeInput();
+    }, 50);
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
@@ -2735,7 +2755,32 @@
         exitDeferLastBinding();
       }
     } else {
-      setTimeout(() => blurSchedulerInputImpl(n - 1), 10);
+      setTimeout(() => blurSchedulerInputImpl(fuel - 1), 10);
+    }
+  }
+
+  function focusTimeInput() {
+    enterDeferLastBinding();
+    setTimeout(() => focusTimeInputImpl(20), 0);
+  }
+
+  // TODO: deduplicate this with other "persistent" retry code.
+  function focusTimeInputImpl(fuel) {
+    if (fuel <= 0) {
+      exitDeferLastBinding();
+      error('Expected to find time input after opening it.');
+      return;
+    }
+    const timepicker = getById('scheduler-timepicker-input-element');
+    if (timepicker) {
+      try {
+        warn('focusing ', timepicker);
+        timepicker.focus();
+      } finally {
+        exitDeferLastBinding();
+      }
+    } else {
+      setTimeout(() => focusTimeInputImpl(fuel - 1), 10);
     }
   }
 

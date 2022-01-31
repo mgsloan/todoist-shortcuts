@@ -132,6 +132,7 @@ If none are selected, then these will apply to the cursor instead.
 |------------|-----------------------------------|
 | `t`        | schedule                          |
 | `T`        | schedule by editing text          |
+| `alt+t`    | open time-of-day scheduler        |
 | `d`        | done: mark task as complete       |
 | `e` or `#` | delete                            |
 | `&`        | duplicate                         |
@@ -165,6 +166,7 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `r`                     | remove                                    |
 | `backspace` or `delete` | clear and focus text date entry           |
 | `enter`                 | focus text date entry without clearing it |
+| `alt+t`                 | open time of day scheduler                |
 | `escape`                | exit scheduling                           |
 
 The "Smart Scheduler" is opened by pressing `s` when scheduling
