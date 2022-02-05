@@ -3559,7 +3559,7 @@
     // Attempt to use prefix as the key sequence.
     addViaKeyFunc(
         'try-shortening',
-        (it) => it.text ? it.text.slice(0, MAX_NAVIGATE_PREFIX) : null,
+        (it) => it.text.slice(0, MAX_NAVIGATE_PREFIX),
     );
     // For the ones that didn't have unambiguous prefixes, try other character
     // suffixes.
