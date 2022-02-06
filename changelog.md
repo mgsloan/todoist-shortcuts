@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+### Fixes ###
+
+* Another attempt to fix bug with navigation mode reported in [a
+  comment on #194][].
+
+
 ## Version 141
 
 ### Enhancements ###
