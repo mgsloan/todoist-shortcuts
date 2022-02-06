@@ -3239,7 +3239,7 @@
       const navigateItems = [];
       withTag(listHolder, 'li', (li) => {
         let mustBeKeys = null;
-        let txt = null;
+        let txt = '';
         let initials = null;
         if (matchingAttr('data-track', 'navigation|inbox')(li)) {
           mustBeKeys = 'i';
