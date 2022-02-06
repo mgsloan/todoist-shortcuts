@@ -2586,7 +2586,7 @@
   }
 
   function dragTaskOver(sourceTask, findDestination) {
-    const sourceY = offset(sourceTask).y;
+    const sourceY = clientOffset(sourceTask).y;
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
@@ -2597,7 +2597,8 @@
           if (result) {
             const deltaX = result.horizontalOffset;
             let deltaY =
-                offset(result.destination).y - sourceY + result.verticalOffset;
+                clientOffset(result.destination).y - sourceY +
+                result.verticalOffset;
             if (result.isBelow) {
               deltaY += result.destination.clientHeight;
             }
@@ -2622,7 +2623,7 @@
     try {
       const handler = getUniqueClass(task, 'item_dnd_handle');
       if (handler) {
-        const handlerOffset = offset(handler);
+        const handlerOffset = clientOffset(handler);
         const x = handlerOffset.x + handler.offsetWidth/2 - window.scrollX - 3;
         const y = handlerOffset.y + handler.offsetHeight/2 - window.scrollY - 4;
         f(handler, x, y);
@@ -4092,7 +4093,7 @@
   // full.
   function verticalScrollIntoView(el, marginTop, marginBottom, skipCheck, t) {
     withId('content', (content) => {
-      const oy = offset(el).y - offset(content).y;
+      const oy = pageOffset(el).y - pageOffset(content).y;
       const cy = oy - content.scrollTop;
       const h = el.offsetHeight;
       if (skipCheck ||
@@ -4381,7 +4382,7 @@
   }
 
   // Sum offsetTop / offsetLeft of all offsetParent to compute x / y.
-  function offset(el) {
+  function pageOffset(el) {
     let x = 0;
     let y = 0;
     let cur = el;
@@ -4391,6 +4392,11 @@
       cur = cur.offsetParent;
     }
     return {x, y};
+  }
+
+  function clientOffset(el) {
+    const bounds = el.getBoundingClientRect();
+    return {x: bounds.x, y: bounds.y};
   }
 
   function dateToIsoFormatUsingCurrentTimezone(date) {
