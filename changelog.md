@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 142 (unreleased)
+## Version 142
 
 ### Fixes ###
 
