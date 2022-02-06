@@ -1,9 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 142 (unreleased)
+
 ### Fixes ###
 
 * Another attempt to fix bug with navigation mode reported in [a
   comment on #194][].
+
+* Fixes task movement on Firefox when page is scrolled, thanks to
+  [matejdro][] for identifying a fix. See [#176][].
+
+[#176]: https://github.com/mgsloan/todoist-shortcuts/issues/176
+[matejdro]: https://github.com/matejdro
 
 
 ## Version 141
