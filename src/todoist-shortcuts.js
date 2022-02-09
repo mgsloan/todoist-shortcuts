@@ -99,9 +99,9 @@
     ['?', openHelpModal],
     ['ctrl+s', sync],
     ['ctrl+k', openCommandMenu],
-    ['ctrl+shift+,', copyCursorUrl],
-    ['ctrl+,', copyCursorTitle],
-    ['ctrl+c', copyCursorMarkdown],
+    ['ctrl+shift+,', copyCursorOrSelectedUrls],
+    ['ctrl+,', copyCursorOrSelectedTitles],
+    ['ctrl+c', copyCursorOrSelectedAsMarkdown],
     ['ctrl+shift+/', openRandomTask],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
@@ -1514,32 +1514,16 @@
     });
   }
 
-  function copyCursorUrl() {
-    const cursor = requireCursor();
-    setClipboard('https://todoist.com/showTask?id=' + getTaskId(cursor));
+  function copyCursorOrSelectedUrls() {
+    setClipboard(selectedTasksOrCursorToText(getTaskUrl));
   }
 
-  function copyCursorTitle() {
-    const cursor = requireCursor();
-    setClipboard(getTaskTitle(cursor));
+  function copyCursorOrSelectedTitles() {
+    setClipboard(selectedTasksOrCursorToText(getTaskTitle));
   }
 
-  function copyCursorMarkdown() {
-    const cursor = requireCursor();
-    const title = getTaskTitle(cursor);
-    const url = 'https://todoist.com/showTask?id=' + getTaskId(cursor);
-    const escapedTitle = title
-        .replace(/\*/g, '\\*')
-        .replace(/#/g, '\\#')
-        .replace(/\//g, '\\/')
-        .replace(/\(/g, '\\(')
-        .replace(/\)/g, '\\)')
-        .replace(/\[/g, '\\[')
-        .replace(/\]/g, '\\]')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/_/g, '\\_');
-    setClipboard('[' + escapedTitle + '](' + url + ')');
+  function copyCursorOrSelectedAsMarkdown() {
+    setClipboard(selectedTasksOrCursorToText(getTaskMarkdown, '* '));
   }
 
   function openRandomTask() {
@@ -1714,6 +1698,15 @@
         deselectTask(task);
       }
     }
+  }
+
+  function getSelectedTasksOrCursor() {
+    const selectedTasks = getTasks().filter(checkTaskIsSelected);
+    if (!selectedTasks.length) {
+      const cursor = getCursor();
+      return [cursor];
+    }
+    return selectedTasks;
   }
 
   // All MUTABLE. Only mutated by 'storeCursorContext'.
@@ -2951,7 +2944,37 @@
     return modal;
   }
 
+  function selectedTasksOrCursorToText(f, multiPrefix) {
+    const tasks = getSelectedTasksOrCursor();
+    const minIndent = Math.min(...tasks.map(getIndentLevel));
+    const prefix = multiPrefix && tasks.length > 1 ? multiPrefix : '';
+    return tasks.map((task) =>
+      '    '.repeat(getIndentLevel(task) - minIndent) + prefix + f(task),
+    ).join('\n');
+  }
+
+  function getTaskMarkdown(task) {
+    const escapedTitle = escapeForMarkdown(getTaskTitle(task));
+    return '[' + escapedTitle + '](' + getTaskUrl(task) + ')';
+  }
+
+  function escapeForMarkdown(text) {
+    return text
+        .replace(/\*/g, '\\*')
+        .replace(/#/g, '\\#')
+        .replace(/\//g, '\\/')
+        .replace(/\(/g, '\\(')
+        .replace(/\)/g, '\\)')
+        .replace(/\[/g, '\\[')
+        .replace(/\]/g, '\\]')
+        .replace(/_/g, '\\_');
+  }
+
   function setClipboard(text) {
+    if (text == '') {
+      warn('Nothing to put in clipboard, so not doing anything');
+      return;
+    }
     const type = 'text/plain';
     const blob = new Blob([text], {type});
     const data = [new ClipboardItem({[type]: blob})];
@@ -3074,6 +3097,10 @@
     return getUniqueClass(task, ['content', 'task_content']).textContent;
   }
 
+  function getTaskUrl(task) {
+    return 'https://todoist.com/showTask?id=' + getTaskId(task);
+  }
+
   /*
   function isItemClass(cls) {
     return cls.startsWith('item_');
@@ -3081,6 +3108,8 @@
   */
 
   function getIndentClass(task) {
+    // TODO: can probably just use data-item-indent now, seems to
+    // always be available.
     const indentClass = findUnique(isIndentClass, task.classList);
     if (indentClass) {
       return indentClass;
@@ -3091,6 +3120,15 @@
       } else {
         return null;
       }
+    }
+  }
+
+  function getIndentLevel(task) {
+    const indentAttribute = task.attributes['data-item-indent'];
+    if (indentAttribute) {
+      return parseInt(indentAttribute.value);
+    } else {
+      return 1;
     }
   }
 
