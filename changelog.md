@@ -5,7 +5,7 @@
 ### Enhancements ###
 
 * Makes task copying shortcuts handle multiple selected tasks. See
-  [#201]
+  [#201][]
 
 [#201]: https://github.com/mgsloan/todoist-shortcuts/issues/201
 
