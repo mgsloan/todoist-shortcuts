@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 ./node_modules/eslint/bin/eslint.js src/todoist-shortcuts.js $@
 
