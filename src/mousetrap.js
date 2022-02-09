@@ -1,5 +1,9 @@
 /*global define:false */
 /**
+ * Mousetrap library, with modifications specifically for
+ * todoist-shortcuts.
+ */
+/**
  * Copyright 2012-2017 Craig Campbell
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +21,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.6.1
+ * @version 1.6.1 + mgsloan modifications
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
