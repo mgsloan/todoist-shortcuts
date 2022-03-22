@@ -1,11 +1,21 @@
 # todoist-shortcuts changelog
 
+## Version 144
+
+### Fixes ###
+
+* Fixes navigation mode links in the presence of leading emoji. See
+  [#206][].
+
+[#206]: https://github.com/mgsloan/todoist-shortcuts/issues/206
+
+
 ## Version 143
 
 ### Enhancements ###
 
 * Makes task copying shortcuts handle multiple selected tasks. See
-  [#201][]
+  [#201][].
 
 [#201]: https://github.com/mgsloan/todoist-shortcuts/issues/201
 
