@@ -3302,11 +3302,7 @@
             if (link) {
               const spanChildren = link.querySelectorAll(':scope > span');
               if (spanChildren.length > 0) {
-                const lastSpan = spanChildren[spanChildren.length - 1];
-                const textNode = lastSpan.firstChild;
-                if (textNode && textNode.nodeType == Node.TEXT_NODE) {
-                  nameSpan = textNode;
-                }
+                nameSpan = spanChildren[spanChildren.length - 1];
               }
             }
           }
