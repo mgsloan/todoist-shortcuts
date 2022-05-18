@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 145
+
+### Fixes ###
+
+* Fixes priority setting shortcuts (`1` / `2` / `3`/ `4`). See
+  [#207][].
+
+[#207]: https://github.com/mgsloan/todoist-shortcuts/issues/207
+
+
 ## Version 144
 
 ### Fixes ###
