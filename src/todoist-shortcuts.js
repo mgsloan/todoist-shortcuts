@@ -69,10 +69,10 @@
     ['&', duplicateTasks],
     ['v', moveToProject],
     [['y', '@'], openLabelMenu],
-    ['1', setPriority('1')],
-    ['2', setPriority('2')],
-    ['3', setPriority('3')],
-    [['4', '0'], setPriority('4')],
+    ['1', setPriority('4')],
+    ['2', setPriority('3')],
+    ['3', setPriority('2')],
+    [['4', '0'], setPriority('1')],
     ['shift+c', toggleTimer],
 
     // Sorting
@@ -2891,15 +2891,8 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    const predicate = or(
-        matchingAttr('data-svgs-path', 'sm1/priority_' + level + '.svg'),
-        matchingAttr('data-svgs-path', 'sm1/priority_' + level + '_hc.svg'),
-    );
-    withUniqueTag(menu, 'svg', predicate, (svg) => {
-      // See https://github.com/mgsloan/todoist-shortcuts/issues/32
-      // withRestoredSelections(function() { click(img); });
-      click(svg.parentElement);
-    });
+    withUniqueTag(
+        menu, 'li', matchingAction('task-actions-priority-' + level), click);
   }
 
   function notifyUser(msg) {
