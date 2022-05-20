@@ -879,7 +879,13 @@
           click,
       );
     } else {
-      clickInlineAddTask();
+      addToSectionContaining(getCursor());
+      const tasks = getTasks();
+      if (tasks.length > 0) {
+        addBelowTask(tasks[tasks.length - 1]);
+      } else {
+        quickAddTask();
+      }
     }
   }
 
@@ -896,7 +902,7 @@
       if (tasks.length > 0) {
         addAboveTask(tasks[0]);
       } else {
-        clickInlineAddTask();
+        quickAddTask();
       }
     }
   }
