@@ -1965,6 +1965,7 @@
       );
     } else if (viewMode === 'project') {
       predicate = or(
+          matchingClass('section'),
           matchingClass('list_editor'),
           matchingClass('filter_view'),
           matchingClass('project_editor_instance'));
