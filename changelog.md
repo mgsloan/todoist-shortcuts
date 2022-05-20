@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 147
+
+* Fixes `~` / `shift-~` shortcuts for rotating between top sections.
+
+* Fixes `c` shortcut for opening comments (broken by redesigned task
+  view)
+
+
 ## Version 146
 
 ### Fixes ###
