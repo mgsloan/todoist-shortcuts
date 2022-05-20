@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 146
+
+### Fixes ###
+
+* Fixes `a` / `shift-a` (add to bottom / add to top) in projects with
+  sections. See [recent comment on #93][].
+
+[recent comment on #93]: https://github.com/mgsloan/todoist-shortcuts/issues/93#issuecomment-1127833290
+
+
 ## Version 145
 
 ### Fixes ###
