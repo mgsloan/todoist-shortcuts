@@ -1789,6 +1789,9 @@
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
   function ensureCursor(content) {
+    if (!content) {
+      content = getById('content');
+    }
     // If there's an editor open to add a task, then set the cursor to the item
     // above.
     const manager = getUniqueClass(content, 'manager');
@@ -2562,7 +2565,7 @@
       suppressDrag = false;
     }, 0);
     restoreScroll();
-    ensureCursor(getById('content'));
+    ensureCursor();
     const cursor = getCursor();
     if (cursor) {
       scrollTaskIntoView(cursor);
@@ -2570,7 +2573,7 @@
     // Terrible but effective hack - the cursor sometimes disappears
     // after drag for some reason.
     setTimeout(() => {
-      ensureCursor(getById('content'));
+      ensureCursor();
     }, 50);
     if (!task || task.classList.contains('on_drag')) {
       warn('didn\'t find spot to drop for drag and drop, so cancelling');
