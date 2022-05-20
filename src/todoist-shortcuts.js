@@ -926,7 +926,8 @@
   // Open comments sidepane
   function openComments() {
     openTaskView();
-    taskViewComments();
+    withUnique(
+        document, 'button[data-testid="open-comment-editor-button"]', click);
   }
 
   // Open reminders dialog
