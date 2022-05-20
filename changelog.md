@@ -2,10 +2,16 @@
 
 ## Version 147
 
+* Fixes keyboard use when task view is open by instead using Todoist
+  native shortcuts. This also allows for deletion of some code! See
+  [#204][].
+
 * Fixes `~` / `shift-~` shortcuts for rotating between top sections.
 
 * Fixes `c` shortcut for opening comments (broken by redesigned task
   view)
+
+[#204]: https://github.com/mgsloan/todoist-shortcuts/issues/204
 
 
 ## Version 146
