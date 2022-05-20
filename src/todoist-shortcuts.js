@@ -901,16 +901,6 @@
     }
   }
 
-  function clickInlineAddTask(section) {
-    withUniqueClass(
-      section ? section : document,
-      'plus_add_button',
-      all,
-      click,
-    );
-    scrollTaskEditorIntoView();
-  }
-
   function scrollTaskEditorIntoView() {
     withUniqueClass(document, 'task_editor', all, (editor) => {
       verticalScrollIntoView(editor, getTopHeight(), 0, true, 0.6);
@@ -2855,6 +2845,16 @@
       section = getFirstClass(document, 'section_day');
     }
     clickInlineAddTask(section);
+  }
+
+  function clickInlineAddTask(section) {
+    withUniqueClass(
+      section ? section : document,
+      'plus_add_button',
+      all,
+      click,
+    );
+    scrollTaskEditorIntoView();
   }
 
   const SHOULD_MUTATE_CURSOR =
