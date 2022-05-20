@@ -3852,11 +3852,11 @@
   // Run a function on the array of top filters, along with the index of the
   // currently selected one, if any.
   function withTopFilters(f) {
-    withId('top_filters', (topFilters) => {
+    withId('top-menu', (topFilters) => {
       const favoritesPanel = withId('left_menu', (leftMenu) =>
         getFirstClass(leftMenu, 'expansion_panel'));
       debug('favoritesPanel = ', favoritesPanel);
-      withNavigationItems([topFilters, favoritesPanel], f);
+      withNavigationLinks([topFilters, favoritesPanel], f);
     });
   }
 
