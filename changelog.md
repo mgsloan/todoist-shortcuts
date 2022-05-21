@@ -1,6 +1,19 @@
 # todoist-shortcuts changelog
 
+## Version 148
+
+### Fixes ###
+
+* Reinstates keybindings for current task view (removed in version
+  147).  Uses Todoist native keybindings in new experimental task
+  view, because current DOM generated for it uses obfuscated IDs and
+  so it is challenging to reliably manipulate it. See
+  [#204][].
+
+
 ## Version 147
+
+### Fixes ###
 
 * Fixes keyboard use when task view is open by instead using Todoist
   native shortcuts. This also allows for deletion of some code! See
