@@ -157,6 +157,34 @@
   const BULK_MOVE_BINDINGS = [];
   const BULK_MOVE_KEYMAP = 'bulk_move';
 
+  const TASK_VIEW_BINDINGS = [
+    ['d', taskViewDone],
+    [['i', 'escape'], taskViewClose],
+    ['s', taskViewSubtasks],
+    ['c', taskViewComments],
+    ['h', taskViewParent],
+    ['shift+h', taskViewActivity],
+    // TODO(#94): proper bindings for o / O.
+    [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
+    ['t', taskViewSchedule],
+    ['shift+t', taskViewScheduleText],
+    ['+', taskViewOpenAssign],
+    ['v', taskViewMoveToProject],
+    [['y', '@'], taskViewLabel],
+    ['1', taskViewSetPriority('1')],
+    ['2', taskViewSetPriority('2')],
+    ['3', taskViewSetPriority('3')],
+    [['4', '0'], taskViewSetPriority('4')],
+    ['shift+r', taskViewOpenReminders],
+    [['e', '#'], taskViewDelete],
+    ['shift+c', taskViewToggleTimer],
+    ['ctrl+shift+/', () => {
+      taskViewClose();
+      openRandomTask();
+    }],
+  ];
+  const TASK_VIEW_KEYMAP = 'task_view';
+
   // Keycode constants
   const LEFT_ARROW_KEYCODE = 37;
   const UP_ARROW_KEYCODE = 38;
@@ -1306,6 +1334,183 @@
     }
   }
 
+  // TODO: Remove once side_panel is gone (currently it's needed for
+  // todoist.com but not beta.todoist.com).
+  const TASK_VIEW_CLS = ['side_panel', 'detail_modal'];
+
+  function taskViewDone() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, 'item_overview', all, (overview) => {
+        withUniqueClass(
+            overview,
+            ['task_checkbox', 'item_checkbox'],
+            all,
+            click,
+        );
+      });
+    });
+  }
+
+  function taskViewClose() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, 'item_detail_close', all, click);
+    });
+  }
+
+  function taskViewSubtasks() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueTag(
+          sidePanel,
+          'button',
+          matchingIdSuffix('-tab-subtasks'),
+          click,
+      );
+    });
+  }
+
+  function taskViewComments() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueTag(
+          sidePanel,
+          'button',
+          matchingIdSuffix('-tab-comments'),
+          click,
+      );
+    });
+  }
+
+  function taskViewActivity() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueTag(
+          sidePanel,
+          'button',
+          matchingIdSuffix('-tab-activity'),
+          click,
+      );
+    });
+  }
+
+  function taskViewParent() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, 'item_detail_parent_info', all, click);
+    });
+  }
+
+  function taskViewAddSubtask() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      taskViewSubtasks();
+      withUniqueClass(sidePanel, 'plus_add_button', all, click);
+    });
+  }
+
+  function taskViewSchedule() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, 'item_due_selector', all, click);
+      blurSchedulerInput();
+    });
+  }
+
+  function taskViewScheduleText() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, 'item_due_selector', all, click);
+    });
+  }
+
+  function taskViewOpenAssign() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, 'item_overview_sub', all, (itemOverview) => {
+        const assignButton = getUniqueTag(
+            itemOverview, 'button', matchingClass('person_picker__toggle'));
+        if (assignButton) {
+          click(assignButton);
+        } else {
+          info('Could not find assign button, maybe project not shared?');
+        }
+      });
+    });
+  }
+
+  function taskViewMoveToProject() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(
+          sidePanel,
+          'item_action',
+          matchingAction('task-actions-move-to-project'),
+          click,
+      );
+    });
+  }
+
+  function taskViewLabel() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(
+          sidePanel,
+          'item_action',
+          matchingAction('task-actions-add-labels'),
+          click,
+      );
+    });
+  }
+
+  function taskViewSetPriority(level) {
+    return () => {
+      withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+        const actualLevel = invertPriorityLevel(level);
+        if (!getUniqueClass(document, 'priority_picker')) {
+          withUnique(sidePanel,
+              '[data-action-hint="task-actions-priority-picker"]',
+              click);
+        }
+        withUniqueClass(document, 'priority_picker', all, (picker) => {
+          withUnique(
+              picker,
+              '[data-action-hint="task-actions-priority-' + actualLevel + '"]',
+              click,
+          );
+        });
+      });
+    };
+  }
+
+  function taskViewOpenReminders() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(
+          sidePanel,
+          'item_action',
+          matchingAction('task-actions-reminders'),
+          click,
+      );
+    });
+  }
+
+  function taskViewDelete() {
+    withTaskViewMoreMenu((menu) => {
+      withUniqueTag(
+          menu,
+          'li',
+          matchingAction('task-actions-overflow-menu-delete'),
+          click,
+      );
+    });
+  }
+
+  function taskViewToggleTimer() {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUniqueClass(sidePanel, TIMER_CLASSES, all, click);
+    });
+  }
+
+  function withTaskViewMoreMenu(f) {
+    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      const overflowMenu = getUniqueClass(
+          document, 'ul', matchingAction('task-actions-overflow-menu'));
+      if (!overflowMenu) {
+        withUniqueClass(sidePanel, 'item_actions_more', all, click);
+      }
+      withUniqueTag(document, 'ul', predicate, f);
+    });
+  }
+
   function copyCursorOrSelectedUrls() {
     setClipboard(selectedTasksOrCursorToText(getTaskUrl));
   }
@@ -1872,7 +2077,7 @@
       //
       // TODO: remove this once unnecessary.
       if (!initializing) {
-        // overwriteKeyHandlers();
+        overwriteKeyHandlers();
         updateViewMode();
       }
       if (dragInProgress) {
@@ -1963,6 +2168,8 @@
         switchKeymap(BULK_MOVE_KEYMAP);
       } else if (checkSchedulerOpen()) {
         switchKeymap(SCHEDULE_KEYMAP);
+      } else if (checkTaskViewOpen()) {
+        switchKeymap(TASK_VIEW_KEYMAP);
       } else {
         switchKeymap(DEFAULT_KEYMAP);
       }
@@ -1981,7 +2188,7 @@
   }
 
   function checkTaskViewOpen() {
-    return selectUnique(document, 'div[data-item-detail-root]') !== null;
+    return getUniqueClass(document, TASK_VIEW_CLS) !== null;
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -4272,6 +4479,13 @@
   }
 
   // Returns predicate which returns 'true' if the element has the
+  // specified id suffix.
+  function matchingIdSuffix(suffix) {
+    return (el) => el.id.endsWith(suffix);
+  }
+
+
+  // Returns predicate which returns 'true' if the element has the
   // specified tag.
   function matchingTag(tag) {
     return (el) => el.tagName.toLowerCase() === tag;
@@ -4728,24 +4942,10 @@
   }
 
   function genericKeyHandler(ev) {
-    if (checkTaskViewOpen()) {
-      return originalHandler(ev);
-    }
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
-    }
-    return mousetrap.handleKeyEvent(ev);
-  }
-
-  function originalHandler(ev) {
-    if (ev.type === 'keydown') {
-      return window.originalTodoistKeydown.apply(document, [ev]);
-    } else if (ev.type === 'keyup') {
-      return window.originalTodoistKeyup.apply(document, [ev]);
-    } else if (ev.type === 'keypress') {
-      return window.originalTodoistKeypress.apply(document, [ev]);
     } else {
-      error('Unexpected event type', ev.type);
+      return mousetrap.handleKeyEvent(ev);
     }
   }
 
@@ -4799,9 +4999,6 @@
       // eslint-disable-next-line no-debugger
       debugger;
     }
-    if (checkTaskViewOpen()) {
-      return originalHandler(ev);
-    }
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     if (todoistModalIsOpen()) {
@@ -4823,20 +5020,17 @@
 
   function overwriteKeyHandlers() {
     if (document.onkeydown !== null) {
-      debug('overwrote onkeydown.');
-      window.originalTodoistKeydown = document.onkeydown;
+      debug('overwrote onkeydown');
       document.onkeydown = null;
       document.addEventListener('keydown', keydownHandler, {capture: true});
     }
     if (document.onkeypress !== null) {
       debug('overwrote onkeypress');
-      window.originalTodoistKeypress = document.onkeypress;
       document.onkeypress = null;
       document.addEventListener('keypress', genericKeyHandler, {capture: true});
     }
     if (document.onkeyup !== null) {
       debug('overwrote onkeyup');
-      window.originalTodoistKeyup = document.onkeyup;
       document.onkeyup = null;
       document.addEventListener('keyup', genericKeyHandler, {capture: true});
     }
@@ -4875,6 +5069,7 @@
     registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
+    registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
 
     // Update the keymap.  Necessary now that the side panel can start
     // out visible.

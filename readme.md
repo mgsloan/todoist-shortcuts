@@ -209,19 +209,44 @@ Once bulk move mode is entered, it will repeatedly bring up the move-to-project
 dialog until there are no more tasks after the cursor. By holding down `alt`,
 you can use the normal cursor navigation keys in this mode.
 
-## Task view
+## Task side panel
 
-The task view dialog can be opened for the task under the cursor by
-pressing `i`. Interactions with the task view use Todoist's built-in
-shortcuts, many of which follow the conventions of the shortcuts
-defined by this extension.
+The task side panel can be opened for the task under the cursor by
+pressing `i`. Once the side panel is visible, you can use the
+following shortcuts:
 
-The task view was redesigned in 2022. First class support for the new
-task view was considered, but the HTML structure uses obfuscated
-identifiers which makes this challenging. See [issue #204][] for
-details.
+| keys            | action                     |
+|-----------------|----------------------------|
+| `i` or `escape` | close the task side panel  |
+| `s`             | switch to subtasks section |
+| `c`             | switch to comments section |
+| `shift+h`       | switch to activity section |
+| `h`             | navigate to parent task    |
 
-[issue #204]: https://github.com/mgsloan/todoist-shortcuts/issues/204
+The rest of the bindings match the shortcuts used in other
+contexts. Listed here for completeness:
+
+| keys              | action                                                                    |
+|-------------------|---------------------------------------------------------------------------|
+| `d`               | done: mark task as complete                                               |
+| `q` or `a` or `A` | add a subtask                                                             |
+| `t`               | schedule                                                                  |
+| `v`               | move to project via search prompt                                         |
+| `y` or `@`        | open label dialog                                                         |
+| `1`               | set priority to 1                                                         |
+| `2`               | set priority to 2                                                         |
+| `3`               | set priority to 3                                                         |
+| `4` or `0`        | set priority to 4                                                         |
+| `shift+r`         | open reminders                                                            |
+| `+`               | open assignee dialog                                                      |
+| `e`               | archive                                                                   |
+| `#`               | delete                                                                    |
+| `shift+c`         | clicks [toggl-button (time tracking integration extension)][toggl-button] |
+
+There are not yet shortcuts for subtask manipulation in the task view,
+though this is a planned future addition.  See [#94][]
+
+[#94]: https://github.com/mgsloan/todoist-shortcuts/issues/94
 
 ## Other
 
