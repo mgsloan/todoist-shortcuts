@@ -12,7 +12,8 @@ module.exports = function(grunt) {
         default: {
           publish: true,
           client_id: secrets ? secrets.chrome_client_id : null,
-          client_secret: secrets ? secrets.chrome_client_secret : null
+          client_secret: secrets ? secrets.chrome_client_secret : null,
+          refresh_token: secrets ? secrets.refresh_token : null
         }
       },
       extensions: {
