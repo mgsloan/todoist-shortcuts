@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 149
+
+### Fixes ###
+
+* Fixes cursor motion when a task is present in multiple sections.
+  For example, before this fix, if the cursor is on the second
+  instance of such a task then pressing down would instead move the
+  cursor to the task below the first instance.
+
+
 ## Version 148
 
 ### Fixes ###
