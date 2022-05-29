@@ -2072,7 +2072,12 @@
   function registerTopMutationObservers(content) {
     registerMutationObserver(content, handlePageChange);
     registerMutationObserver(content, (mutations) => {
+      // Not sure how to do this at intelligent times. Instead doing
+      // it all the time.
+      //
+      // TODO: remove this once unnecessary.
       if (!initializing) {
+        overwriteKeyHandlers();
         updateViewMode();
       }
       if (dragInProgress) {
@@ -2184,14 +2189,6 @@
 
   function checkTaskViewOpen() {
     return getUniqueClass(document, TASK_VIEW_CLS) !== null;
-  }
-
-  function shouldUseOriginalHandlerForNewTaskView() {
-    const taskViewDiv =
-        selectUnique(document, 'div[data-item-detail-root]');
-    const newTaskViewOpen =
-        taskViewDiv !== null && !matchingClass('item_detail')(taskViewDiv);
-    return newTaskViewOpen && !checkSchedulerOpen();
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -4957,13 +4954,11 @@
   }
 
   function genericKeyHandler(ev) {
-    if (shouldUseOriginalHandlerForNewTaskView()) {
-      return originalHandler(ev);
-    }
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
+    } else {
+      return mousetrap.handleKeyEvent(ev);
     }
-    return mousetrap.handleKeyEvent(ev);
   }
 
   let sawEscapeDown = false;
@@ -5016,9 +5011,6 @@
       // eslint-disable-next-line no-debugger
       debugger;
     }
-    if (shouldUseOriginalHandlerForNewTaskView()) {
-      return originalHandler(ev);
-    }
     // Focus is on an input box during bulk move code, and mousetrap doesn't
     // handle those events.  So this handling needs to be done manually.
     if (todoistModalIsOpen()) {
@@ -5041,33 +5033,18 @@
   function overwriteKeyHandlers() {
     if (document.onkeydown !== null) {
       debug('overwrote onkeydown');
-      window.originalTodoistKeydown = document.onkeydown;
       document.onkeydown = null;
       document.addEventListener('keydown', keydownHandler, {capture: true});
     }
     if (document.onkeypress !== null) {
       debug('overwrote onkeypress');
-      window.originalTodoistKeypress = document.onkeypress;
       document.onkeypress = null;
       document.addEventListener('keypress', genericKeyHandler, {capture: true});
     }
     if (document.onkeyup !== null) {
       debug('overwrote onkeyup');
-      window.originalTodoistKeyup = document.onkeyup;
       document.onkeyup = null;
       document.addEventListener('keyup', genericKeyHandler, {capture: true});
-    }
-  }
-
-  function originalHandler(ev) {
-    if (ev.type === 'keydown') {
-      return window.originalTodoistKeydown.apply(document, [ev]);
-    } else if (ev.type === 'keyup') {
-      return window.originalTodoistKeyup.apply(document, [ev]);
-    } else if (ev.type === 'keypress') {
-      return window.originalTodoistKeypress.apply(document, [ev]);
-    } else {
-      error('Unexpected event type', ev.type);
     }
   }
 
