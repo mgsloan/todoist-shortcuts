@@ -223,6 +223,8 @@ following shortcuts:
 |-----------------|----------------------------|
 | `i` or `escape` | close the task side panel  |
 | `h`             | navigate to parent task    |
+| `j`             | navigate to next task      |
+| `k`             | navigate to previous task  |
 
 The rest of the bindings match the shortcuts used in other contexts.
 Listed here for completeness:

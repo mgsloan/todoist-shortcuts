@@ -161,6 +161,8 @@
     ['d', taskViewDone],
     [['i', 'escape'], taskViewClose],
     ['h', taskViewParent],
+    ['j', taskViewNext],
+    ['k', taskViewPrevious],
     // TODO(#94): proper bindings for o / O.
     [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
     ['t', taskViewSchedule],
@@ -1347,6 +1349,18 @@
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(
           taskView, 'div[data-testid="task-detail-breadcrumbs"] > a', click);
+    });
+  }
+
+  function taskViewNext() {
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(taskView, '[aria-label="Next task"', click);
+    });
+  }
+
+  function taskViewPrevious() {
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(taskView, '[aria-label="Previous task"', click);
     });
   }
 
