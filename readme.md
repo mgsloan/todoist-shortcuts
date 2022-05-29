@@ -211,6 +211,10 @@ you can use the normal cursor navigation keys in this mode.
 
 ## Task side panel
 
+NOTE: Some shortcuts may only work in the english translation, as the
+DOM structure chosen by Todoist for this part of the UI has obfuscated
+IDs.
+
 The task side panel can be opened for the task under the cursor by
 pressing `i`. Once the side panel is visible, you can use the
 following shortcuts:
@@ -218,13 +222,10 @@ following shortcuts:
 | keys            | action                     |
 |-----------------|----------------------------|
 | `i` or `escape` | close the task side panel  |
-| `s`             | switch to subtasks section |
-| `c`             | switch to comments section |
-| `shift+h`       | switch to activity section |
 | `h`             | navigate to parent task    |
 
-The rest of the bindings match the shortcuts used in other
-contexts. Listed here for completeness:
+The rest of the bindings match the shortcuts used in other contexts.
+Listed here for completeness:
 
 | keys              | action                                                                    |
 |-------------------|---------------------------------------------------------------------------|
@@ -242,11 +243,6 @@ contexts. Listed here for completeness:
 | `e`               | archive                                                                   |
 | `#`               | delete                                                                    |
 | `shift+c`         | clicks [toggl-button (time tracking integration extension)][toggl-button] |
-
-There are not yet shortcuts for subtask manipulation in the task view,
-though this is a planned future addition.  See [#94][]
-
-[#94]: https://github.com/mgsloan/todoist-shortcuts/issues/94
 
 ## Other
 

@@ -160,10 +160,7 @@
   const TASK_VIEW_BINDINGS = [
     ['d', taskViewDone],
     [['i', 'escape'], taskViewClose],
-    ['s', taskViewSubtasks],
-    ['c', taskViewComments],
     ['h', taskViewParent],
-    ['shift+h', taskViewActivity],
     // TODO(#94): proper bindings for o / O.
     [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
     ['t', taskViewSchedule],
@@ -1202,11 +1199,11 @@
 
   function openSortMenu() {
     withUniqueClass(document, 'view_header__actions', all, (actions) => {
-      // Ooof, such terrible hacks.
-      // eslint-disable-next-line max-len
-      withUniqueTag(actions, 'path', matchingAttr('d', 'M15 14.5a2 2 0 011.936 1.498L19.5 16a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 17a.5.5 0 010-1l8.564-.002A2 2 0 0115 14.5zm-.982 1.81l.005-.025-.005.026-.003.014-.004.025-.007.061A.897.897 0 0014 16.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0016 16.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026a.998.998 0 00-1.843.043l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047zM9 9.5a2 2 0 011.936 1.498L19.5 11a.5.5 0 010 1l-8.563.001a2.001 2.001 0 01-3.874 0L4.5 12a.5.5 0 010-1l2.564-.002A2 2 0 019 9.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C8 11.441 8 11.471 8 11.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0010 11.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 009 10.5zm6-6a2 2 0 011.936 1.498L19.5 6a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 7a.5.5 0 010-1l8.564-.002A2 2 0 0115 4.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C14 6.441 14 6.471 14 6.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06C16 6.557 16 6.528 16 6.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 0015 5.5z'), (svgPath) => {
-        click(svgPath.parentElement);
-      });
+      // Ooof, such a terrible hack.
+      withUniqueTag(
+          actions, 'path', matchingAttr('d', SORT_SVG_PATH), (svgPath) => {
+            click(svgPath.parentElement);
+          });
     });
     withUniqueClass(
         document,
@@ -1334,131 +1331,74 @@
     }
   }
 
-  // TODO: Remove once side_panel is gone (currently it's needed for
-  // todoist.com but not beta.todoist.com).
-  const TASK_VIEW_CLS = ['side_panel', 'detail_modal'];
+  const TASK_VIEW_SELECTOR = 'div[data-testid="task-details-modal"]';
 
   function taskViewDone() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_overview', all, (overview) => {
-        withUniqueClass(
-            overview,
-            ['task_checkbox', 'item_checkbox'],
-            all,
-            click,
-        );
-      });
-    });
+    withUnique(document, '[data-action-hint=task-detail-view-complete]', click);
   }
 
   function taskViewClose() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_detail_close', all, click);
-    });
-  }
-
-  function taskViewSubtasks() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueTag(
-          sidePanel,
-          'button',
-          matchingIdSuffix('-tab-subtasks'),
-          click,
-      );
-    });
-  }
-
-  function taskViewComments() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueTag(
-          sidePanel,
-          'button',
-          matchingIdSuffix('-tab-comments'),
-          click,
-      );
-    });
-  }
-
-  function taskViewActivity() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueTag(
-          sidePanel,
-          'button',
-          matchingIdSuffix('-tab-activity'),
-          click,
-      );
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(taskView, 'button[aria-label="Close modal"]', click);
     });
   }
 
   function taskViewParent() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_detail_parent_info', all, click);
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(
+          taskView, 'div[data-testid="task-detail-breadcrumbs"] > a', click);
     });
   }
 
   function taskViewAddSubtask() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      taskViewSubtasks();
-      withUniqueClass(sidePanel, 'plus_add_button', all, click);
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      const firstMatch =
+          getFirstTag(taskView, 'path', matchingAttr('d', PLUS_SVG_PATH)) ||
+          getFirstTag(taskView, 'span', matchingText('Add sub-task'));
+      if (firstMatch) {
+        click(firstMatch);
+      }
     });
   }
 
   function taskViewSchedule() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_due_selector', all, click);
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUniqueTag(taskView, 'span', matchingText('Due date'), click);
       blurSchedulerInput();
     });
   }
 
   function taskViewScheduleText() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_due_selector', all, click);
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUniqueTag(taskView, 'span', matchingText('Due date'), click);
     });
   }
 
   function taskViewOpenAssign() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, 'item_overview_sub', all, (itemOverview) => {
-        const assignButton = getUniqueTag(
-            itemOverview, 'button', matchingClass('person_picker__toggle'));
-        if (assignButton) {
-          click(assignButton);
-        } else {
-          info('Could not find assign button, maybe project not shared?');
-        }
-      });
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUniqueTag(taskView, 'span', matchingText('Assignee'), click);
     });
   }
 
   function taskViewMoveToProject() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(
-          sidePanel,
-          'item_action',
-          matchingAction('task-actions-move-to-project'),
-          click,
-      );
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(taskView, 'button[aria-label="Select a project"]', click);
     });
   }
 
   function taskViewLabel() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(
-          sidePanel,
-          'item_action',
-          matchingAction('task-actions-add-labels'),
-          click,
-      );
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUniqueTag(taskView, 'span', matchingText('Labels'), click);
     });
   }
 
   function taskViewSetPriority(level) {
     return () => {
-      withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
+      withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
         const actualLevel = invertPriorityLevel(level);
         if (!getUniqueClass(document, 'priority_picker')) {
-          withUnique(sidePanel,
-              '[data-action-hint="task-actions-priority-picker"]',
+          withUnique(taskView,
+              'div[aria-label="Priority"] button',
               click);
         }
         withUniqueClass(document, 'priority_picker', all, (picker) => {
@@ -1473,42 +1413,41 @@
   }
 
   function taskViewOpenReminders() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(
-          sidePanel,
-          'item_action',
-          matchingAction('task-actions-reminders'),
-          click,
-      );
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUniqueTag(taskView, 'span', matchingText('Reminders'), click);
     });
   }
 
   function taskViewDelete() {
     withTaskViewMoreMenu((menu) => {
-      withUniqueTag(
-          menu,
-          'li',
-          matchingAction('task-actions-overflow-menu-delete'),
-          click,
-      );
+      withUniqueTag(menu, 'kbd', matchingText('Delete'), click);
     });
   }
 
   function taskViewToggleTimer() {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      withUniqueClass(sidePanel, TIMER_CLASSES, all, click);
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
+      withUniqueClass(taskView, TIMER_CLASSES, all, click);
     });
   }
 
   function withTaskViewMoreMenu(f) {
-    withUniqueClass(document, TASK_VIEW_CLS, all, (sidePanel) => {
-      const overflowMenu = getUniqueClass(
-          document, 'ul', matchingAction('task-actions-overflow-menu'));
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      let overflowMenu = getTaskViewMoreMenu();
       if (!overflowMenu) {
-        withUniqueClass(sidePanel, 'item_actions_more', all, click);
+        withUnique(taskView, 'button[aria-label="More actions"]', click);
+        overflowMenu = getTaskViewMoreMenu();
       }
-      withUniqueTag(document, 'ul', predicate, f);
+      if (overflowMenu) {
+        f(overflowMenu);
+      } else {
+        warn('Couldn\'t find overflow menu.');
+      }
     });
+  }
+
+  function getTaskViewMoreMenu() {
+    return selectUnique(
+        document, 'div.reactist_menulist[aria-label="More actions"]');
   }
 
   function copyCursorOrSelectedUrls() {
@@ -1854,7 +1793,8 @@
     let tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
-        const task = getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
+        const task =
+            getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
         if (task) {
           debug('found task that was being edited.');
           found = true;
@@ -1867,7 +1807,7 @@
           const oldTask = lastCursorTasks[i];
           if (oldTask) {
             const oldTaskId = getTaskId(oldTask);
-            task = getTaskById(oldTaskId, 'ignore-indent', );
+            task = getTaskById(oldTaskId, 'ignore-indent' );
             if (task) {
               const taskSection = getSectionName(task);
               // Don't jump back to the same task if it changed section.
@@ -2157,22 +2097,30 @@
       if (currentKeymap === NAVIGATE_KEYMAP) {
         return;
       }
+      if (inBulkScheduleMode) {
+        switchKeymap(BULK_SCHEDULE_KEYMAP);
+        return;
+      }
+      if (inBulkMoveMode) {
+        switchKeymap(BULK_MOVE_KEYMAP);
+        return;
+      }
+      if (checkSchedulerOpen()) {
+        switchKeymap(SCHEDULE_KEYMAP);
+        return;
+      }
+      if (checkTaskViewOpen()) {
+        switchKeymap(TASK_VIEW_KEYMAP);
+        return;
+      }
       const popupWindow =
             getUniqueClass(document, 'GB_window') ||
             selectUnique(document, '[data-testid="modal-overlay"]');
       if (popupWindow) {
         switchKeymap(POPUP_KEYMAP);
-      } else if (inBulkScheduleMode) {
-        switchKeymap(BULK_SCHEDULE_KEYMAP);
-      } else if (inBulkMoveMode) {
-        switchKeymap(BULK_MOVE_KEYMAP);
-      } else if (checkSchedulerOpen()) {
-        switchKeymap(SCHEDULE_KEYMAP);
-      } else if (checkTaskViewOpen()) {
-        switchKeymap(TASK_VIEW_KEYMAP);
-      } else {
-        switchKeymap(DEFAULT_KEYMAP);
+        return;
       }
+      switchKeymap(DEFAULT_KEYMAP);
     }
   }
 
@@ -2188,7 +2136,7 @@
   }
 
   function checkTaskViewOpen() {
-    return getUniqueClass(document, TASK_VIEW_CLS) !== null;
+    return selectUnique(document, 'div[data-item-detail-root]') !== null;
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -4068,6 +4016,16 @@
   }
 
   /*****************************************************************************
+   * SVG paths used for matching hacks
+   */
+
+  // eslint-disable-next-line max-len
+  const SORT_SVG_PATH = 'M15 14.5a2 2 0 011.936 1.498L19.5 16a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 17a.5.5 0 010-1l8.564-.002A2 2 0 0115 14.5zm-.982 1.81l.005-.025-.005.026-.003.014-.004.025-.007.061A.897.897 0 0014 16.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0016 16.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026a.998.998 0 00-1.843.043l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047zM9 9.5a2 2 0 011.936 1.498L19.5 11a.5.5 0 010 1l-8.563.001a2.001 2.001 0 01-3.874 0L4.5 12a.5.5 0 010-1l2.564-.002A2 2 0 019 9.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C8 11.441 8 11.471 8 11.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0010 11.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 009 10.5zm6-6a2 2 0 011.936 1.498L19.5 6a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 7a.5.5 0 010-1l8.564-.002A2 2 0 0115 4.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C14 6.441 14 6.471 14 6.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06C16 6.557 16 6.528 16 6.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 0015 5.5z';
+
+  // eslint-disable-next-line max-len
+  const PLUS_SVG_PATH = 'M12 6a.462.462 0 00-.461.462v5.077H6.462a.462.462 0 100 .922h5.077v5.077a.461.461 0 10.922 0v-5.077h5.077a.461.461 0 100-.922h-5.077V6.462A.462.462 0 0012 6z';
+
+  /*****************************************************************************
    * Utilities
    */
 
@@ -4464,6 +4422,10 @@
     return true;
   }
 
+  function matchingText(text) {
+    return (el) => el.innerText === text;
+  }
+
   function matchingAction(action) {
     return matchingAttr('data-action-hint', action);
   }
@@ -4489,13 +4451,6 @@
       return false;
     };
   }
-
-  // Returns predicate which returns 'true' if the element has the
-  // specified id suffix.
-  function matchingIdSuffix(suffix) {
-    return (el) => el.id.endsWith(suffix);
-  }
-
 
   // Returns predicate which returns 'true' if the element has the
   // specified tag.
