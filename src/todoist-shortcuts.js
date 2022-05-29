@@ -1854,7 +1854,7 @@
     let tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
-        const task = getTaskById(lastCursorId, 'ignore-indent');
+        const task = getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
         if (task) {
           debug('found task that was being edited.');
           found = true;
@@ -1867,10 +1867,10 @@
           const oldTask = lastCursorTasks[i];
           if (oldTask) {
             const oldTaskId = getTaskId(oldTask);
-            task = getTaskById(oldTaskId, 'ignore-indent');
+            task = getTaskById(oldTaskId, 'ignore-indent', );
             if (task) {
               const taskSection = getSectionName(task);
-              // Don't jump back to the same task if it moved changed section.
+              // Don't jump back to the same task if it changed section.
               if (i !== lastCursorIndex || taskSection === lastCursorSection) {
                 debug(
                     'found still-existing task that is',
@@ -3219,21 +3219,33 @@
   // are scheduled for different days. Since a task will only appear once at a
   // given indent, this is sufficient to distinguish different. Also, this is
   // stable because you can't adjust indent level in agenda mode.
-  function getTaskById(id, indent) {
+  function getTaskById(id, indent, section) {
     const indentNumber = indent ? stripIndentClass(indent) : null;
     const els = document.getElementsByClassName('task_list_item');
     for (const el of els) {
       const itemIdAttr = el.attributes['data-item-id'];
       if (itemIdAttr && itemIdAttr.value === id) {
         if (indent === 'ignore-indent') {
-          return el;
+          if (!section || getSectionName(el) === section) {
+            return el;
+          }
         } else if (!indent) {
           error('getTaskById called with no indent value.');
           return el;
         } else if (el.attributes['data-item-indent'].value === indentNumber) {
-          return el;
+          if (!section || getSectionName(el) === section) {
+            return el;
+          }
         }
       }
+    }
+    if (section) {
+      // Fallback on not constraining by section.
+      return getTaskById(id, indent);
+    }
+    if (indent !== 'ignore-indent') {
+      // Fallback on not constraining by indent.
+      return getTaskById(id, 'ignore-indent');
     }
     debug('No task found by getTaskById. ',
         'viewMode = ', viewMode, '; id = ', id, '; indent = ', indent);
@@ -3980,7 +3992,7 @@
 
   // Returns the <li> element which corresponds to the current cursor.
   function getCursor() {
-    return getTaskById(lastCursorId, lastCursorIndent);
+    return getTaskById(lastCursorId, lastCursorIndent, lastCursorSection);
   }
 
   // A functional-ish idiom to reduce boilerplate.
