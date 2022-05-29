@@ -4,6 +4,9 @@
 
 ### Fixes ###
 
+* Fixes keyboard shortcuts for new task view, no longer falls back to
+  native keybindings. See [#204][].
+
 * Fixes cursor motion when a task is present in multiple sections.
   For example, before this fix, if the cursor is on the second
   instance of such a task then pressing down would instead move the
