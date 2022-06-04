@@ -659,7 +659,7 @@
         // Click save button.
         withUnique(
             document,
-            '.task_editor__form_actions button[type="submit"]',
+            'div[data-testid="task-editor-action-buttons"] button[type="submit"]',
             click,
         );
       } else {
