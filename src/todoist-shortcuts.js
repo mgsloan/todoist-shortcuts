@@ -3271,7 +3271,7 @@
           }
           if (!nameSpan) {
             // Handle new favorites DOM.
-            const link = getUniqueTag(li, 'a');
+            const link = getFirstTag(li, 'a');
             if (link) {
               const spanChildren = link.querySelectorAll(':scope > span');
               if (spanChildren.length > 0) {
