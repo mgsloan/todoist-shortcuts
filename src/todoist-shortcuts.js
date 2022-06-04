@@ -1055,6 +1055,7 @@
         // Set a variable that will be read by 'handlePageChange', which will
         // tell it to select this task.
         selectAfterNavigate = getTaskId(cursor);
+        debug('set selectAfterNavigate to', selectAfterNavigate);
         click(projectEl);
       } else {
         error('couldn\'t find project button');
@@ -1961,27 +1962,25 @@
     );
   }
 
-  // MUTABLE. Stores the last page hash, to detect page changes.
-  let lastHash = null;
+  // MUTABLE. Stores the last page path, to detect page changes.
+  let lastPath = null;
 
   // MUTABLE. If set, then the specified task ID will be selected after
   // navigation.
   let selectAfterNavigate = null;
 
   function handlePageChange() {
+    debug('handling page change');
     updateKeymap();
     updateViewMode();
-    let currentHash = document.location.hash;
-    let isTaskViewHash = currentHash.startsWith('#task');
-    if (currentHash === '') {
-      currentHash = document.location.pathname;
-      isTaskViewHash = currentHash.includes('/task/');
-    }
-    if (lastHash !== currentHash && !isTaskViewHash) {
-      lastHash = currentHash;
+    let currentPath = document.location.pathname;
+    isTaskViewPath = currentPath.includes('/task/');
+    if (lastPath !== currentPath && !isTaskViewPath) {
+      lastPath = currentPath;
       debug('Setting cursor to first task after navigation');
       if (selectAfterNavigate) {
         const newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
+        debug('Initial attempt to select', selectAfterNavigate, 'yielded', newEl);
         if (newEl) {
           setCursor(newEl, 'scroll');
         } else {
@@ -2005,6 +2004,7 @@
 
   function persistentlySelectAfterNavigate(taskId, retriesLeft) {
     const taskEl = getTaskById(taskId, 'ignore-indent');
+    debug('Retry attempt to select', taskId, 'yielded', newEl, '. ', retriesLeft, ' retries left.');
     if (taskEl) {
       setCursor(taskEl, 'scroll');
     } else if (retriesLeft > 1) {
@@ -4006,13 +4006,7 @@
   }
 
   function getIsFilterView() {
-    let currentHash = document.location.hash;
-    if (currentHash === '') {
-      currentHash = document.location.pathname;
-      return currentHash.includes('/filter/');
-    } else {
-      return currentHash.startsWith('#/filter/');
-    }
+    return document.location.pathname.includes('/filter/')
   }
 
   // MUTABLE. Should always correspond to getViewMode result, as it is updated
