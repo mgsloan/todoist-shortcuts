@@ -876,12 +876,7 @@
 
   function addTaskTop() {
     if (viewMode === 'agenda') {
-      withUniqueTag(
-          document,
-          'button',
-          matchingAttr('data-track', 'navigation|quick_add'),
-          click,
-      );
+      quickAddTask();
     } else {
       const tasks = getTasks();
       if (tasks.length > 0) {
@@ -1110,7 +1105,12 @@
   // Clicks quick add task button.  Would be better to use todoist's builtin
   // shortcut, but that logic is currently WIP and broken.
   function quickAddTask() {
-    withId('quick_add_task_holder', click);
+    withUniqueTag(
+          document,
+          'button',
+          matchingAttr('data-track', 'navigation|quick_add'),
+          click,
+      );
   }
 
   // Trigger undo by simulating a keypress.
