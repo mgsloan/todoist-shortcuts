@@ -12,6 +12,10 @@
   project. Previously it did not select the correct task after
   navigate (I believe due to changes in todoist URLs).
 
+* Fixes `1`/`2`/`3`/`4` bindings for changing task priority (broken
+  due to Todoist changes in HTML structure). See recent discussion on
+  [#207].
+
 [#209]: https://github.com/mgsloan/todoist-shortcuts/issues/209
 
 
