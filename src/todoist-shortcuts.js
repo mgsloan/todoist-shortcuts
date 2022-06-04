@@ -870,22 +870,7 @@
   }
 
   function addTaskBottom() {
-    if (viewMode === 'agenda') {
-      withUniqueTag(
-          document,
-          'button',
-          matchingAttr('data-track', 'navigation|quick_add'),
-          click,
-      );
-    } else {
-      addToSectionContaining(getCursor());
-      const tasks = getTasks();
-      if (tasks.length > 0) {
-        addBelowTask(tasks[tasks.length - 1]);
-      } else {
-        quickAddTask();
-      }
-    }
+    addToSectionContaining(getCursor());
   }
 
   function addTaskTop() {
@@ -2751,11 +2736,7 @@
   // Common code implementing addAbove / addBelow.
   function addAboveOrBelowTask(task, menuText, action) {
     if (task === null) {
-      if (getUniqueClass(document, 'plus_add_button')) {
-        clickInlineAddTask();
-      } else {
-        quickAddTask();
-      }
+      clickInlineAddTask();
     } else if (viewMode === 'agenda') {
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
@@ -2813,13 +2794,14 @@
   }
 
   function clickInlineAddTask(section) {
-    withUniqueClass(
-      section ? section : document,
-      'plus_add_button',
-      all,
-      click,
-    );
-    scrollTaskEditorIntoView();
+    const addButton = withUniqueClass(section ? section : document, 'plus_add_button');
+    if (addButton) {
+      click(addButton);
+      scrollTaskEditorIntoView();
+    } else {
+      warn('Couldn\'t find task add button so falling back on quick-add');
+      quickAddTask();
+    }
   }
 
   const SHOULD_MUTATE_CURSOR =
