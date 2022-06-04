@@ -659,7 +659,8 @@
         // Click save button.
         withUnique(
             document,
-            'div[data-testid="task-editor-action-buttons"] button[type="submit"]',
+            'div[data-testid="task-editor-action-buttons"] ' +
+            'button[type="submit"]',
             click,
         );
       } else {
@@ -1958,14 +1959,15 @@
     debug('handling page change');
     updateKeymap();
     updateViewMode();
-    let currentPath = document.location.pathname;
+    const currentPath = document.location.pathname;
     isTaskViewPath = currentPath.includes('/task/');
     if (lastPath !== currentPath && !isTaskViewPath) {
       lastPath = currentPath;
       debug('Setting cursor to first task after navigation');
       if (selectAfterNavigate) {
         const newEl = getTaskById(selectAfterNavigate, 'ignore-indent');
-        debug('Initial attempt to select', selectAfterNavigate, 'yielded', newEl);
+        debug('Initial attempt to select', selectAfterNavigate,
+            'yielded', newEl);
         if (newEl) {
           setCursor(newEl, 'scroll');
         } else {
@@ -1989,7 +1991,9 @@
 
   function persistentlySelectAfterNavigate(taskId, retriesLeft) {
     const taskEl = getTaskById(taskId, 'ignore-indent');
-    debug('Retry attempt to select', taskId, 'yielded', newEl, '. ', retriesLeft, ' retries left.');
+    debug('Retry attempt to select', taskId,
+        'yielded', newEl, '. ',
+        retriesLeft, ' retries left.');
     if (taskEl) {
       setCursor(taskEl, 'scroll');
     } else if (retriesLeft > 1) {
@@ -2794,7 +2798,8 @@
   }
 
   function clickInlineAddTask(section) {
-    const addButton = withUniqueClass(section ? section : document, 'plus_add_button');
+    const addButton = withUniqueClass(
+      section ? section : document, 'plus_add_button');
     if (addButton) {
       click(addButton);
       scrollTaskEditorIntoView();
@@ -3988,7 +3993,7 @@
   }
 
   function getIsFilterView() {
-    return document.location.pathname.includes('/filter/')
+    return document.location.pathname.includes('/filter/');
   }
 
   // MUTABLE. Should always correspond to getViewMode result, as it is updated
