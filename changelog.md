@@ -6,7 +6,10 @@
 
 * Fixes adding a subtask in task view mode. See [#209][].
 
+* Fixes `g` project navigation tags for projects that have sub-projects.
+
 [#209]: https://github.com/mgsloan/todoist-shortcuts/issues/209
+
 
 ## Version 149
 
