@@ -8,6 +8,10 @@
 
 * Fixes `g` project navigation tags for projects that have sub-projects.
 
+* Fixes behavior of `shift-g` to navigate to current task's
+  project. Previously it did not select the correct task after
+  navigate (I believe due to changes in todoist URLs).
+
 [#209]: https://github.com/mgsloan/todoist-shortcuts/issues/209
 
 
