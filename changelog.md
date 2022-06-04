@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 150
+
+### Fixes ###
+
+* Fixes adding a subtask in task view mode. See [#209][].
+
+[#209]: https://github.com/mgsloan/todoist-shortcuts/issues/209
+
 ## Version 149
 
 ### Fixes ###
