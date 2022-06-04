@@ -16,7 +16,11 @@
   due to Todoist changes in HTML structure). See recent discussion on
   [#207].
 
+* Fixes use of `a` to add tasks in grouped agenda views (today /
+  upcoming). May fix other cases too. See [#211][].
+
 [#209]: https://github.com/mgsloan/todoist-shortcuts/issues/209
+[#211]: https://github.com/mgsloan/todoist-shortcuts/issues/211
 
 
 ## Version 149
