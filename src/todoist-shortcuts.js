@@ -1394,7 +1394,7 @@
         const actualLevel = invertPriorityLevel(level);
         if (!getUniqueClass(document, 'priority_picker')) {
           withUnique(taskView,
-              'div[aria-label="Priority"] button',
+              '[data-icon-name=priority-icon]',
               click);
         }
         withUniqueClass(document, 'priority_picker', all, (picker) => {
