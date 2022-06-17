@@ -1108,11 +1108,11 @@
   // shortcut, but that logic is currently WIP and broken.
   function quickAddTask() {
     withUniqueTag(
-          document,
-          'button',
-          matchingAttr('data-track', 'navigation|quick_add'),
-          click,
-      );
+        document,
+        'button',
+        matchingAttr('data-track', 'navigation|quick_add'),
+        click,
+    );
   }
 
   // Trigger undo by simulating a keypress.
