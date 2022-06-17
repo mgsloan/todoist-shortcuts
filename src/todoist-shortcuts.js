@@ -963,7 +963,9 @@
     click(document.body);
     withClass(document, 'manager', (manager) => {
       const cancelBtn = getUniqueClass(manager, 'cancel');
-      click(cancelBtn);
+      if (cancelBtn) {
+        click(cancelBtn);
+      }
     });
     // Close windows with close buttons, particularly move-to-project
     //
