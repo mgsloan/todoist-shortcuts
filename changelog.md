@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 152
+
+### Fixes ###
+
+* Has `o` / `O` fallback attempt to add task to current section before
+  falling back on quick add. See [#211][].
+
+
 ## Version 151
 
 ### Fixes ###
