@@ -2759,8 +2759,8 @@
       if (editor) {
         scrollTaskEditorIntoView();
       } else {
-        info('Clicking quick add task, as filter view has no task adding.');
-        quickAddTask();
+        info('Falling back on adding in section');
+        addToSectionContaining(task);
       }
     } else {
       error('Unexpected viewMode:', viewMode);
