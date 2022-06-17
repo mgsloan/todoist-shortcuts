@@ -2800,7 +2800,7 @@
   }
 
   function clickInlineAddTask(section) {
-    const addButton = withUniqueClass(
+    const addButton = getUniqueClass(
       section ? section : document, 'plus_add_button');
     if (addButton) {
       click(addButton);
