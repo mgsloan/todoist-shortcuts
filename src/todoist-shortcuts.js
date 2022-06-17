@@ -1360,15 +1360,13 @@
   }
 
   function taskViewSchedule() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueTag(taskView, 'span', matchingText('Due date'), click);
-      blurSchedulerInput();
-    });
+    taskViewScheduleText();
+    blurSchedulerInput();
   }
 
   function taskViewScheduleText() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueTag(taskView, 'span', matchingText('Due date'), click);
+      withUniqueClass(taskView, 'task-due-date-button', all, click);
     });
   }
 
