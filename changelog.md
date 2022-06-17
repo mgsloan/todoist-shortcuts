@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 151
+
+### Fixes ###
+
+* Fixes `o` / `O` bindings for adding tasks before / after.  This was
+  due to a bug in todoist-shortcuts (Oops!). See [#211][].
+
+* Fixes `t` for scheduling in task view (may have only been broken
+  when experimental features on, not sure, not bothering to check).
+
+
 ## Version 150
 
 ### Fixes ###
