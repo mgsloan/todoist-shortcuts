@@ -87,9 +87,6 @@
 
     // Other
 
-    // TODO: Once #67 is resolved, the definition of undo() should be
-    // reverted to what it was, and the binding for 'u' should not be
-    // overridden here.
     [['u', 'z', 'ctrl+z'], undo],
 
     ['q', quickAdd],
@@ -1141,25 +1138,7 @@
 
   // Trigger undo by simulating a keypress.
   function undo() {
-    // TODO: not using this approach due to https://github.com/mgsloan/todoist-shortcuts/issues/67
-    //
-    // todoistShortcut({ key: 'u', charCode: 117 });
-    //
-    // I believe this approach was superior because it worked even
-    // after the todo link disappeared.
-    const undoToast = getUniqueClass(document, 'undo_toast');
-    let undoLink = null;
-    if (undoToast) {
-      undoLink = getUniqueTag(
-          undoToast, 'button', not(matchingClass('close_button')));
-    }
-    if (undoLink) {
-      click(undoLink);
-    } else {
-      info('Couldn\'t find undo link.',
-          'Once issue #67 is fixed in Todoist (upstream),',
-          'I believe visibility of undo link will not be necessary.');
-    }
+    todoistShortcut({ key: 'z' });
   }
 
   function sortByDate() {
@@ -2063,7 +2042,6 @@
       //
       // TODO: remove this once unnecessary.
       if (!initializing) {
-        overwriteKeyHandlers();
         updateViewMode();
       }
       if (dragInProgress) {
@@ -2315,7 +2293,6 @@
     }
   }
 
-  /*
   // Simulate a key press with todoist's global handlers.
   function todoistShortcut(options0) {
     const options = typeof options0 === 'string' ? {key: options0} : options0;
@@ -2341,7 +2318,6 @@
       window.originalTodoistKeypress.apply(document, [ev]);
     }
   }
-  */
 
   // Indent task.
   function moveIn() {
@@ -5022,19 +4998,22 @@
 
   function overwriteKeyHandlers() {
     if (document.onkeydown !== null) {
-      debug('overwrote onkeydown');
+      window.originalTodoistKeydown = document.onkeydown;
       document.onkeydown = null;
       document.addEventListener('keydown', keydownHandler, {capture: true});
+      debug('overwrote onkeydown');
     }
     if (document.onkeypress !== null) {
-      debug('overwrote onkeypress');
+      window.originalTodoistKeypress = document.onkeypress;
       document.onkeypress = null;
       document.addEventListener('keypress', genericKeyHandler, {capture: true});
+      debug('overwrote onkeypress');
     }
     if (document.onkeyup !== null) {
-      debug('overwrote onkeyup');
+      window.originalTodoistKeyup = document.onkeyup;
       document.onkeyup = null;
       document.addEventListener('keyup', genericKeyHandler, {capture: true});
+      debug('overwrote onkeyup');
     }
   }
 
