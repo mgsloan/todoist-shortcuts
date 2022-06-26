@@ -9,6 +9,13 @@
 
 [#214]: https://github.com/mgsloan/todoist-shortcuts/issues/214
 
+### Fixes ###
+
+* Fixes which task is selected after inline editing (via "enter"). See
+  [#213][].
+
+[#213]: https://github.com/mgsloan/todoist-shortcuts/issues/213
+
 
 ## Version 152
 
