@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 156
+
+### Fixes
+
+* Fixes shortcuts for undo. See [#67][].
+
+
 ## Version 155
 
 Version created due to mozilla upload UI not seeming to take a revised
@@ -1246,7 +1253,7 @@ upload after aborting the process due to validation errors.
   caused the sidebar to be displayed.  This is now fixed by making
   todoist-shortcut's CSS match Todoist's. See [#70].
 
-[#70]: https://github.com/mgsloan/todoist-shortcuts/issues/67
+[#70]: https://github.com/mgsloan/todoist-shortcuts/issues/70
 
 
 ## Version 49 ##
