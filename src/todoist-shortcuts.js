@@ -1266,22 +1266,26 @@
     const optionsUrl =
           document.body.getAttribute('data-todoist-shortcuts-options-url');
     optionsLink.setAttribute('href', optionsUrl);
+    optionsLink.setAttribute('target', '_blank');
     const docsLink = element(
         'a', '',
         text('Full todoist-shortcuts documentation'),
     );
     docsLink.setAttribute(
         'href', TODOIST_SHORTCUTS_GITHUB + '/blob/master/readme.md');
+    docsLink.setAttribute('target', '_blank');
     const originalLink = element(
         'a', '',
         text('Original Todoist keyboard shortcuts documentation'),
     );
     originalLink.setAttribute('href', 'https://get.todoist.help/hc/en-us/articles/205063212');
+    originalLink.setAttribute('target', '_blank');
     const sheetsLink = element(
         'a', '',
         text('Printable shortcuts guide (displayed below)'),
     );
     sheetsLink.setAttribute('href', 'https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk');
+    sheetsLink.setAttribute('target', '_blank');
     const linksList = element(
         'ul', '',
         element('li', '', optionsLink),
