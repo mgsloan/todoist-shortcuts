@@ -1821,12 +1821,24 @@
     let tasks = null;
     if (lastCursorIndex >= 0) {
       if (wasEditing) {
-        const task =
+        const taskPrecedingEditor =
             getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
-        if (task) {
-          debug('found task that was being edited.');
-          found = true;
-          setCursor(task, 'no-scroll');
+        if (taskPrecedingEditor) {
+          if (!tasks) {
+            tasks = getTasks();
+          }
+          for (let i = 0; i < tasks.length; i++) {
+            if (tasks[i] === taskPrecedingEditor && i + 1 < tasks.length) {
+              debug('found task after task that preceded the editor.');
+              setCursor(tasks[i + 1], 'no-scroll');
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            debug('falling back on selecting task that preceded editor.');
+            setCursor(taskPrecedingEditor, 'no-scroll');
+          }
         } else {
           warn('expected to find task that was being edited.');
         }
