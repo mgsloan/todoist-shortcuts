@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 154
+
+### Enhancements ###
+
+* Links in the help modal now open in new tabs.
+
+### Fixes
+
+* Fixes mozilla validation errors related to API usage.
+
+
 ## Version 153
 
 ### Enhancements ###
