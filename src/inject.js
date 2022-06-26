@@ -3,7 +3,7 @@
 
 function inject(scriptName) {
   const scriptEl = document.createElement('script');
-  scriptEl.setAttribute('src', chrome.extension.getURL(scriptName));
+  scriptEl.setAttribute('src', chrome.runtime.getURL(scriptName));
   // In testing doesn't seem to be necessary, but may lead to more
   // predictable execution order.
   scriptEl.setAttribute('defer', 'defer');
