@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 153
+
+### Enhancements ###
+
+* Adds an options page with a single option to enable/disable "Mouse
+  hover over task moves cursor to task". See [#214][].
+
+[#214]: https://github.com/mgsloan/todoist-shortcuts/issues/214
+
+
 ## Version 152
 
 ### Fixes ###
