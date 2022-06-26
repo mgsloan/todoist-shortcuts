@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 155
+
+Version created due to mozilla upload UI not seeming to take a revised
+upload after aborting the process due to validation errors.
+
+
 ## Version 154
 
 ### Enhancements ###
