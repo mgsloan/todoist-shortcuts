@@ -15,9 +15,11 @@
       "all_frames": true
     }
   ],
+  "permissions": ["storage"],
   "web_accessible_resources": [
     "mousetrap.js",
-    "todoist-shortcuts.js"
+    "todoist-shortcuts.js",
+    "options-page.html"
   ],
   "icons": {
     "128": "icon128.png"
@@ -26,6 +28,10 @@
     "default_icon": {
       "128": "icon128.png"
     }
+  },
+  "options_ui": {
+    "page": "options-page.html",
+    "open_in_tab": true
   },
   "content_security_policy": "default-src 'self'",
   "manifest_version": 2

@@ -313,6 +313,30 @@
   let mousetrap = null;
 
   /*****************************************************************************
+   * Options
+   */
+
+  let options = {};
+
+  function loadOptions() {
+    try {
+      const serializedOptions = document.body.getAttribute('data-todoist-shortcuts-options');
+      options = JSON.parse(serializedOptions);
+      info('Loaded options:', options)
+    } catch (e) {
+      error('ignoring error loading options (will use defaults instead):', e);
+    }
+  }
+
+  function getFocusFollowsMouseOption() {
+    const result = options['focus-follows-mouse'];
+    if (result === null) {
+      return true;
+    }
+    return result;
+  }
+
+  /*****************************************************************************
    * Action combiners
    */
 
@@ -1231,15 +1255,17 @@
 
   // Create DOM nodes for help documentation.
   function createHelpModal() {
-    // Remove old help modals, if any.
-    withClass(document, TODOIST_SHORTCUTS_HELP, (x) => {
-      x.parentElement.removeChild(x);
-    });
     // Create new help modal.
     const header = element(
         'h1', '',
         text('Keyboard shortcuts'),
     );
+    const optionsLink = element(
+      'a', '', text('Configure todoist-shortcuts options')
+    );
+    const optionsUrl =
+          document.body.getAttribute('data-todoist-shortcuts-options-url');
+    optionsLink.setAttribute('href', optionsUrl);
     const docsLink = element(
         'a', '',
         text('Full todoist-shortcuts documentation'),
@@ -1258,6 +1284,7 @@
     sheetsLink.setAttribute('href', 'https://docs.google.com/spreadsheets/d/1AGh85HlDze19bWpCa2OTErv9xc7grmMOMRV9S2OS7Xk');
     const linksList = element(
         'ul', '',
+        element('li', '', optionsLink),
         element('li', '', docsLink),
         element('li', '', originalLink),
         element('li', '', sheetsLink),
@@ -1699,21 +1726,26 @@
   }
 
   function handleMouseOver(ev) {
-    if (ev.isTrusted) {
-      try {
-        const predicate = matchingClass('task_list_item');
-        const hoveredTask = findParent(ev.target, predicate);
-        if (mouseGotMoved && hoveredTask) {
-          debug('Due to mouse hover, setting cursor');
-          setCursor(hoveredTask, 'no-scroll');
-        }
-      } finally {
-        mouseGotMoved = false;
-      }
-    } else {
+
+    if (!ev.isTrusted) {
       // Synthetic mouse move events are generated when dragging
       // tasks.
       debug('handleMouseOver ignoring synthetic mouse hover event.');
+      return;
+    }
+    try {
+      const predicate = matchingClass('task_list_item');
+      const hoveredTask = findParent(ev.target, predicate);
+      if (mouseGotMoved && hoveredTask) {
+        if (!getFocusFollowsMouseOption()) {
+          info('Not setting cursor on mouse move (disabled in settings).');
+          return;
+        }
+        debug('Due to mouse hover, setting cursor');
+        setCursor(hoveredTask, 'no-scroll');
+      }
+    } finally {
+      mouseGotMoved = false;
     }
   }
 
@@ -2661,17 +2693,17 @@
   }
 
   function withTaskHovered(task, f) {
-    const options = {
+    const eventOptions = {
       bubbles: true,
       cancelable: true,
       view: window,
       button: 0,
     };
-    task.dispatchEvent(new MouseEvent('mouseover', options));
+    task.dispatchEvent(new MouseEvent('mouseover', eventOptions));
     try {
       f();
     } finally {
-      task.dispatchEvent(new MouseEvent('mouseout', options));
+      task.dispatchEvent(new MouseEvent('mouseout', eventOptions));
     }
   }
 
@@ -4370,10 +4402,10 @@
 
   // Simulate a mouse click.
   function click(el) {
-    const options = {bubbles: true, cancelable: true, view: window};
-    el.dispatchEvent(new MouseEvent('mousedown', options));
-    el.dispatchEvent(new MouseEvent('mouseup', options));
-    el.dispatchEvent(new MouseEvent('click', options));
+    const eventOptions = {bubbles: true, cancelable: true, view: window};
+    el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+    el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
+    el.dispatchEvent(new MouseEvent('click', eventOptions));
   }
 
   // Sum offsetTop / offsetLeft of all offsetParent to compute x / y.
@@ -4998,6 +5030,7 @@
   let initializing = true;
 
   function initialize() {
+    loadOptions();
     handlePageChange();
     updateViewMode();
 

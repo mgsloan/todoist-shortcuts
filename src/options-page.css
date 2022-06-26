@@ -1,0 +1,9 @@
+body {
+  max-width: 37em;
+  margin: auto;
+  font-size: 110%;
+}
+
+#status {
+  font-style: italic;
+}
