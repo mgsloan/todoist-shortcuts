@@ -1,15 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const FOCUS_FOLLOWS_MOUSE = 'focus-follows-mouse';
-  const focusFollowsMouseEl = document.getElementById(FOCUS_FOLLOWS_MOUSE);
+  const MOUSE_BEHAVIOR = 'mouse-behavior';
+
+  const mouseBehaviorOptionEls =
+        document.querySelectorAll('input[name="mouse-behavior"]');
   const statusEl = document.getElementById('status');
   let clearStatusTimeout = null;
 
   function save() {
     const options = {};
-    options[FOCUS_FOLLOWS_MOUSE] = focusFollowsMouseEl.checked;
-    const valuesToSave = {options: JSON.stringify(options)};
-    console.log('valuesToSave = ', valuesToSave);
-    chrome.storage.sync.set(valuesToSave, () => {
+    for (const radioButton of mouseBehaviorOptionEls) {
+      if (radioButton.checked) {
+        options[MOUSE_BEHAVIOR] = radioButton.id;
+        break;
+      }
+    }
+    todoistShortcutsSaveOptions(options, () => {
       statusEl.textContent = 'Changes saved.';
       if (clearStatusTimeout) {
         clearTimeout(clearStatusTimeout);
@@ -20,20 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function initialize(storedValues) {
-    const serializedOptions = storedValues['options'];
-    console.log('serializedOptions = ', serializedOptions);
-    let options = {};
-    if (serializedOptions) {
-      try {
-        options = JSON.parse(serializedOptions);
-      } catch (e) {
-        alert('Oops, failed to parse saved options.. Error is:\n' + e);
+  function initialize(options) {
+    const mouseBehavior = options[MOUSE_BEHAVIOR];
+    let foundMouseBehaviorOption = false;
+    for (const radioButton of mouseBehaviorOptionEls) {
+      radioButton.addEventListener('click', save);
+      if (radioButton.id === mouseBehavior) {
+        radioButton.checked = true;
+        foundMouseBehaviorOption = true;
       }
     }
-    focusFollowsMouseEl.checked = options[FOCUS_FOLLOWS_MOUSE];
-    focusFollowsMouseEl.addEventListener('change', save);
+    if (!foundMouseBehaviorOption) {
+      console.warn('No mouse behavior option matching ' + mouseBehavior);
+    }
   }
 
-  chrome.storage.sync.get({options: '{}'}, initialize);
+  todoistShortcutsLoadOptions(initialize, (e) => {
+    alert('Oops, error while loading saved options... Error is:\n' + e);
+  });
 });

@@ -325,10 +325,10 @@
     }
   }
 
-  function getFocusFollowsMouseOption() {
-    const result = options['focus-follows-mouse'];
-    if (result === null) {
-      return true;
+  function getMouseBehaviorOption() {
+    const result = options['mouse-behavior'];
+    if (!result) {
+      return 'focus-follows-mouse';
     }
     return result;
   }
@@ -1659,6 +1659,8 @@
   let lastCursorSection = null;
   let mouseGotMoved = false;
   let wasEditing = false;
+  let windowRecentlyFocused = false;
+  let focusTimeout = null;
 
   function storeCursorContext(cursor, tasks, index, editing) {
     lastCursorTasks = tasks;
@@ -1709,7 +1711,6 @@
   }
 
   function handleMouseOver(ev) {
-
     if (!ev.isTrusted) {
       // Synthetic mouse move events are generated when dragging
       // tasks.
@@ -1720,9 +1721,23 @@
       const predicate = matchingClass('task_list_item');
       const hoveredTask = findParent(ev.target, predicate);
       if (mouseGotMoved && hoveredTask) {
-        if (!getFocusFollowsMouseOption()) {
-          info('Not setting cursor on mouse move (disabled in settings).');
+        const mouseBehavior = getMouseBehaviorOption();
+        switch (mouseBehavior) {
+        case 'focus-follows-mouse':
+          break;
+        case 'focus-follows-mouse-delay-after-window-focus':
+          if (windowRecentlyFocused) {
+            debug('Not setting cursor on mouse move, ',
+                  'because window was recently focused.');
+            return;
+          }
+          break;
+        case 'no-mouse-behavior':
+          debug('Not setting cursor on mouse move (disabled in settings).');
           return;
+        default:
+          warn('Unrecognized mouse behavior option: ', mouseBehavior);
+          break;
         }
         debug('Due to mouse hover, setting cursor');
         setCursor(hoveredTask, 'no-scroll');
@@ -1730,6 +1745,17 @@
     } finally {
       mouseGotMoved = false;
     }
+  }
+
+  function handleWindowFocus() {
+    debug("FOCUS EVENT");
+    if (focusTimeout) {
+      clearTimeout(focusTimeout);
+    }
+    windowRecentlyFocused = true;
+    focusTimeout = setTimeout(() => {
+      windowRecentlyFocused = false;
+    }, 500);
   }
 
   // If the cursor exists, set 'lastCursorTasks' / 'lastCursorIndex'. If it
@@ -5070,6 +5096,10 @@
     document.addEventListener('mouseover', handleMouseOver);
     onDisable(() => {
       document.removeEventListener('mouseover', handleMouseOver);
+    });
+    window.addEventListener('focus', handleWindowFocus);
+    onDisable(() => {
+      window.removeEventListener('focus', handleWindowFocus);
     });
 
     initializing = false;

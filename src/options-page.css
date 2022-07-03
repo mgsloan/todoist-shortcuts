@@ -7,3 +7,7 @@ body {
 #status {
   font-style: italic;
 }
+
+.mouse-behavior-option {
+  margin-left: 2em;
+}

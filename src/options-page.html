@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>todoist-shortcuts Configuration</title>
     <link rel="stylesheet" href="options-page.css">
+    <script src="common.js"></script>
     <script src="options-page.js"></script>
   </head>
   <body>
@@ -25,8 +26,24 @@
     </p>
     <h2>Settings</h2>
     <p>
-      <input type="checkbox" id="focus-follows-mouse"/>
-      <label for="focus-follows-mouse">Mouse hover over task moves cursor to task</label>
+      Mouse hover behavior:
+    </p>
+    <p class="mouse-behavior-option">
+      <input type="radio" name="mouse-behavior" id="focus-follows-mouse">
+      <label for="focus-follows-mouse">
+        Mouse hover over task moves cursor to task
+      </label>
+    <p class="mouse-behavior-option">
+      <input type="radio" name="mouse-behavior" id="focus-follows-mouse-delay-after-window-focus">
+      <label for="focus-follows-mouse-delay-after-window-focus">
+        Mouse hover over task moves cursor to task, but not within 0.5 seconds after browser window focused
+      </label>
+    </p>
+    <p class="mouse-behavior-option">
+      <input type="radio" name="mouse-behavior" id="no-mouse-behavior">
+      <label for="no-mouse-behavior">
+        Ignore mouse hover
+      </label>
     </p>
     <p id="status"></p>
   </body>

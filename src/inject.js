@@ -10,16 +10,15 @@ function inject(scriptName) {
   document.getElementsByTagName('body')[0].appendChild(scriptEl);
 }
 
-// Set current options as an attribute on the body so that they are accessible
-// to the injected scripts.
-try {
-  chrome.storage.sync.get({'options': '{}'}, (storedValues) => {
-    document.body.setAttribute(
-        'data-todoist-shortcuts-options', storedValues['options']);
-  });
-} catch (e) {
+// Set current options as an attribute on the body so that they are
+// accessible to the injected scripts.
+todoistShortcutsLoadOptions((options) => {
+  document.body.setAttribute(
+      'data-todoist-shortcuts-options', JSON.stringify(options));
+}, (e) => {
   console.warning('Failed to load settings:', e);
-}
+});
+
 
 // Inject the scripts
 inject('mousetrap.js');

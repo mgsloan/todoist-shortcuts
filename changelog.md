@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 157
+
+### Enhancements ###
+
+* Adds a mouse behavior option which uses mouse hovers to move the
+  cursor, but not within 0.5s of the browser window being focused.
+  This is a bit of an idiosyncratic option.  The problem is that my
+  tiling window manager teleports the mouse to the middle of windows
+  when I switch windows.  This setting causes these teleports to be
+  ignored, while still allowing use of the mouse for cursor movement.
+
+
 ## Version 156
 
 ### Fixes
