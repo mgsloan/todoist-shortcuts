@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 159
+
+### Fixes ###
+
+* Fixes "escape" key in task view mode. See [#217][].
+
+[#217]: https://github.com/mgsloan/todoist-shortcuts/issues/217
+
 ## Version 158
 
 ### Fixes ###

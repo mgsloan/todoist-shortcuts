@@ -5012,7 +5012,10 @@
       return handleBulkMoveKey(ev);
     }
     if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
-      closeContextMenus();
+      // Workaround for #217
+      if (!checkTaskViewOpen()) {
+        closeContextMenus();
+      }
     }
     if (deferLastKeyDownEnabled) {
       lastDeferredEvent = ev;
