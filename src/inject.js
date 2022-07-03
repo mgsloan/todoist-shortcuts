@@ -12,19 +12,20 @@ function inject(scriptName) {
 
 // Set current options as an attribute on the body so that they are
 // accessible to the injected scripts.
-todoistShortcutsLoadOptions((options) => {
+try {
+  todoistShortcutsLoadOptions((options) => {
+    document.body.setAttribute(
+        'data-todoist-shortcuts-options', JSON.stringify(options));
+  }, (e) => {
+    console.warning('Failed to load settings:', e);
+  });
+} finally {
+  // Inject the scripts
+  inject('mousetrap.js');
+  inject('todoist-shortcuts.js');
+
+  // Set options URL so that help modal can link to it.
   document.body.setAttribute(
-      'data-todoist-shortcuts-options', JSON.stringify(options));
-}, (e) => {
-  console.warning('Failed to load settings:', e);
-});
-
-
-// Inject the scripts
-inject('mousetrap.js');
-inject('todoist-shortcuts.js');
-
-// Set options URL so that help modal can link to it.
-document.body.setAttribute(
-    'data-todoist-shortcuts-options-url',
-    chrome.runtime.getURL('options-page.html'));
+      'data-todoist-shortcuts-options-url',
+      chrome.runtime.getURL('options-page.html'));
+}
