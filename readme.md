@@ -209,7 +209,7 @@ Once bulk move mode is entered, it will repeatedly bring up the move-to-project
 dialog until there are no more tasks after the cursor. By holding down `alt`,
 you can use the normal cursor navigation keys in this mode.
 
-## Task side panel
+## Task view
 
 NOTE: Some shortcuts may only work in the english translation, as the
 DOM structure chosen by Todoist for this part of the UI has obfuscated
