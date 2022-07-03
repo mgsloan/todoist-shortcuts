@@ -2,6 +2,12 @@
 
 ## Version 157
 
+### Fixes ###
+
+* Fixes `make-zip.sh` - it was omitting the files defining the options
+  page.  Due to this error versions 153-156 never made it to the
+  chrome webstore.
+
 ### Enhancements ###
 
 * Adds a mouse behavior option which uses mouse hovers to move the
