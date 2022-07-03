@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 158
+
+### Fixes ###
+
+* Fixes order of content scripts so that options loading works.  Not
+  sure how I didn't catch this in testing of v157.
+
+
 ## Version 157
 
 ### Fixes ###
