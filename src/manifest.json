@@ -11,7 +11,7 @@
         [ "https://todoist.com/app*"
         , "https://*.todoist.com/app*"
         ],
-      "js": ["inject.js", "common.js"],
+      "js": ["common.js", "inject.js"],
       "all_frames": true
     }
   ],
