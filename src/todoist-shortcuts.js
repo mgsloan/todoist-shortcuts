@@ -395,7 +395,8 @@
     disabledWithLazyLoading('Moving cursor up a section', () => {
       const cursor = requireCursor();
       let section = getSection(cursor);
-      let firstTask = getFirstTaskInSection(section);
+      section = findParent(section, matchingTag('li')) || section;
+      let firstTask = getFirstTaskIn(section);
       if (firstTask && !sameElement(cursor)(firstTask)) {
         // Not on first task, so move the cursor.
         setCursor(firstTask, 'scroll');
@@ -404,7 +405,7 @@
         // first task of prior populated section, if any exists.
         section = section.previousSibling;
         for (; section; section = section.previousSibling) {
-          firstTask = getFirstTaskInSection(section);
+          firstTask = getFirstTaskIn(section);
           if (firstTask) {
             setCursor(firstTask, 'scroll');
             return;
@@ -417,11 +418,12 @@
   function cursorDownSection() {
     disabledWithLazyLoading('Moving cursor down a section', () => {
       const cursor = requireCursor();
-      const curSection = getSection(cursor);
-      let section = curSection;
-      section = section.nextSibling;
+      let startSection = getSection(cursor);
+      startSection = findParent(startSection, matchingTag('li')) || startSection;
+      let section = startSection.nextSibling;
       for (; section; section = section.nextSibling) {
-        const firstTask = getFirstTaskInSection(section);
+        debug('section = ', section);
+        const firstTask = getFirstTaskIn(section);
         if (firstTask) {
           setCursor(firstTask, 'scroll');
           return;
@@ -429,8 +431,8 @@
       }
       // If execution has reached this point, then we must already be
       // on the last section.
-      const lastTask = getLastTaskInSection(curSection);
-      warn(lastTask);
+      const lastTask = getLastTaskInSection(startSection);
+      warn('Already on last section. lastTask =', lastTask);
       if (lastTask) {
         setCursor(lastTask, 'scroll');
       }
@@ -1917,10 +1919,10 @@
     return findParent(task, matchingTag('section'));
   }
 
-  function getFirstTaskInSection(section) {
+  function getFirstTaskIn(section) {
     return getFirstClass(
         section,
-        'task_item',
+        'task_list_item',
         not(matchingClass('reorder_item')),
     );
   }
@@ -1928,7 +1930,7 @@
   function getLastTaskInSection(section) {
     return getLastClass(
         section,
-        'task_item',
+        'task_list_item',
         not(matchingClass('reorder_item')),
     );
   }
