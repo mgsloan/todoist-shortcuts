@@ -1902,87 +1902,19 @@
 
   // Gets the name of the section that a task is in.
   function getSectionName(task) {
-    // Only really relevant in agenda mode, since nested project tasks
-    // no longer appear in parent projects.
-    if (viewMode !== 'agenda') {
-      return '';
-    }
     const section = getSection(task);
-    let result = null;
-    if (section) {
-      const outerHeaders = section.querySelectorAll('header');
-      let outerHeader;
-      if (outerHeaders.length === 0) {
-        outerHeader = getUniqueClass(document, 'view_header');
-        if (!outerHeader) {
-          error('Failed to find header for section', section);
-          return null;
-        }
-      } else {
-        outerHeader = outerHeaders[outerHeaders.length - 1];
-      }
-      let header = null;
-      if (outerHeader) {
-        header = getUniqueTag(outerHeader, 'h1');
-        if (!header) {
-          header = getUniqueTag(outerHeader, 'h2');
-        }
-      }
-      if (header) {
-        result = header.textContent;
-      }
-      if (!result) {
-        error('Failed to find section name for', task);
-      } else {
-        debug('Section name is', result);
-      }
+    if (!section) {
+      error('Failed to find section div for', task);
+    } else if ("aria-label" in section.attributes) {
+      return section.attributes['aria-label'];
     } else {
-      error(
-          'Failed to find section div for', task,
-          'viewMode =', viewMode);
+      error('Section', section, 'lacks an aria-label attribute');
     }
-    return result;
+    return "";
   }
 
   function getSection(task) {
-    let predicate;
-    if (viewMode === 'agenda') {
-      predicate = or(
-          // overdue / upcoming / filters
-          matchingClass('section'),
-          // used for today / labels
-          matchingId('agenda_view'),
-      );
-    } else if (viewMode === 'project') {
-      predicate = or(
-          matchingClass('section'),
-          matchingClass('list_editor'),
-          matchingClass('filter_view'),
-          matchingClass('project_editor_instance'));
-    } else {
-      error('Unexpected viewMode:', viewMode);
-      return null;
-    }
-    const section = findParent(task, predicate);
-    if (section &&
-        viewMode === 'project' &&
-        not(or(matchingClass('filter_view'),
-            matchingClass('project_editor_instance')))(section)) {
-      const result = findParent(
-          section,
-          or(matchingClass('project_editor_instance'),
-              matchingClass('filter_view')),
-      );
-      if (result) {
-        return result;
-      } else {
-        error(
-            'Expected', section,
-            'to have parent with class project_editor_instance or filter_view');
-        return null;
-      }
-    }
-    return section;
+    return findParent(task, matchingTag('section'));
   }
 
   function getFirstTaskInSection(section) {
