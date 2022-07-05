@@ -14,7 +14,7 @@
 * Fixes functioning of `{` / `}` keybindings for navigating to next /
   prior sections.
 
-[#216]: https://github.com/mgsloan/todoist-shortcuts/issues/217
+[#216]: https://github.com/mgsloan/todoist-shortcuts/issues/216
 [#217]: https://github.com/mgsloan/todoist-shortcuts/issues/217
 
 
