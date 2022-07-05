@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 160
+
+### Enhancements ###
+
+* Adds `* s` keybinding to add tasks in current section to selection.
+
+### Fixes ###
+
+* Fixes issue with disappearing cursor after task indent / dedent.
+
+
 ## Version 159
 
 ### Fixes ###
