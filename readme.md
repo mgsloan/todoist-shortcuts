@@ -112,17 +112,19 @@ Note that there are some known bugs related to task motion - see
 
 ## Selection
 
-| keys                     | action                                |
-|--------------------------|---------------------------------------|
-| `x`                      | add task at cursor to selection       |
-| `* a`                    | select all tasks                      |
-| `* n` or `escape`        | clear selection                       |
-| `* 1`                    | add all priority 1 tasks to selection |
-| `* 2`                    | add all priority 2 tasks to selection |
-| `* 3`                    | add all priority 3 tasks to selection |
-| `* 4` or `* 0`           | add all priority 4 tasks to selection |
-| `* h` or `* left-arrow`  | collapses all tasks                   |
-| `* l` or `* right-arrow` | expands all tasks                     |
+| keys                     | action                                        |
+|--------------------------|-----------------------------------------------|
+| `x`                      | add task at cursor to selection               |
+| `* a`                    | select all tasks                              |
+| `* n` or `escape`        | clear selection                               |
+| `* s`                    | add all tasks in current section to selection |
+| `* o`                    | add all tasks in overdue section to selection |
+| `* 1`                    | add all priority 1 tasks to selection         |
+| `* 2`                    | add all priority 2 tasks to selection         |
+| `* 3`                    | add all priority 3 tasks to selection         |
+| `* 4` or `* 0`           | add all priority 4 tasks to selection         |
+| `* h` or `* left-arrow`  | collapses all tasks                           |
+| `* l` or `* right-arrow` | expands all tasks                             |
 
 ## Manipulation of selected items
 

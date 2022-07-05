@@ -53,6 +53,7 @@
     ['* a', selectAllTasks],
     ['* n', deselectAllTasks],
     ['* o', selectAllOverdue],
+    ['* s', selectSection],
     ['* 1', selectPriority('1')],
     ['* 2', selectPriority('2')],
     ['* 3', selectPriority('3')],
@@ -892,6 +893,19 @@
       }
     } else {
       info('Can only select all overdue in agenda mode');
+    }
+  }
+
+  function selectSection() {
+    const cursor = getCursor();
+    if (!cursor) {
+      return;
+    }
+    const section = getSection(cursor);
+    for (const task of getTasks()) {
+      if (getSection(task) === section) {
+        selectTask(task);
+      }
     }
   }
 
