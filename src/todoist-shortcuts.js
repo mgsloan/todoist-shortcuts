@@ -2500,11 +2500,7 @@
     if (cursor) {
       scrollTaskIntoView(cursor);
     }
-    // Terrible but effective hack - the cursor sometimes disappears
-    // after drag for some reason.
-    setTimeout(() => {
-      ensureCursor();
-    }, 50);
+    updateCursorStyle();
     if (!task || task.classList.contains('on_drag')) {
       warn('didn\'t find spot to drop for drag and drop, so cancelling');
       closeContextMenus();
