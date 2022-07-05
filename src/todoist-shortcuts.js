@@ -883,16 +883,10 @@
 
   // Selects all overdue tasks.
   function selectAllOverdue() {
-    if (viewMode === 'agenda') {
-      const allTasks = getTasks();
-      for (let i = 0; i < allTasks.length; i++) {
-        const sectionName = getSectionName(allTasks[i]);
-        if (sectionName === 'Overdue') {
-          selectTask(allTasks[i]);
-        }
+    for (const task of getTasks()) {
+      if (getUniqueClass(task, 'date_overdue')) {
+        selectTask(task);
       }
-    } else {
-      info('Can only select all overdue in agenda mode');
     }
   }
 
