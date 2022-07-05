@@ -6,7 +6,17 @@
 
 * Fixes "escape" key in task view mode. See [#217][].
 
+* Fixes logic which extracts out section names. This probably fixes
+  quite a few things in the presence of grouped views. It also fixes
+  maintaining cursor position when tasks move to a different section
+  (see [#216][]).
+
+* Fixes functioning of `{` / `}` keybindings for navigating to next /
+  prior sections.
+
+[#216]: https://github.com/mgsloan/todoist-shortcuts/issues/217
 [#217]: https://github.com/mgsloan/todoist-shortcuts/issues/217
+
 
 ## Version 158
 
