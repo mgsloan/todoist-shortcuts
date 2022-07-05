@@ -1,8 +1,9 @@
 function todoistShortcutsSaveOptions(options, callback) {
-  console.debug('Saving options: ', {...options});
+  console.debug('Saving options: ', Object.assign({}, options));
   chrome.storage.sync.set({options: JSON.stringify(options)}, callback);
 }
 
+// eslint-disable-next-line no-unused-vars
 function todoistShortcutsLoadOptions(handleOptions, handleError) {
   const MOUSE_BEHAVIOR = 'mouse-behavior';
   const FOCUS_FOLLOWS_MOUSE = 'focus-follows-mouse';
@@ -21,7 +22,8 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
       }
 
       console.debug(
-        'Todoist shortcuts options before canonicalization: ', {...options});
+          'Todoist shortcuts options before canonicalization: ',
+          Object.assign({}, options));
 
       // Handle old settings
       let changed = false;
@@ -51,7 +53,8 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
       }
 
       console.debug(
-        'Todoist shortcuts options after canonicalization: ', {...options});
+          'Todoist shortcuts options after canonicalization: ',
+          Object.assign({}, options));
       handleOptions(options);
     });
   } catch (e) {

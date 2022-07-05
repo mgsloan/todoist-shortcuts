@@ -317,9 +317,10 @@
 
   function loadOptions() {
     try {
-      const serializedOptions = document.body.getAttribute('data-todoist-shortcuts-options');
+      const serializedOptions =
+            document.body.getAttribute('data-todoist-shortcuts-options');
       options = JSON.parse(serializedOptions);
-      info('Loaded options:', options)
+      info('Loaded options:', options);
     } catch (e) {
       error('ignoring error loading options (will use defaults instead):', e);
     }
@@ -419,7 +420,8 @@
     disabledWithLazyLoading('Moving cursor down a section', () => {
       const cursor = requireCursor();
       let startSection = getSection(cursor);
-      startSection = findParent(startSection, matchingTag('li')) || startSection;
+      startSection =
+        findParent(startSection, matchingTag('li')) || startSection;
       let section = startSection.nextSibling;
       for (; section; section = section.nextSibling) {
         debug('section = ', section);
@@ -1140,7 +1142,7 @@
 
   // Trigger undo by simulating a keypress.
   function undo() {
-    todoistShortcut({ key: 'z' });
+    todoistShortcut({key: 'z'});
   }
 
   function sortByDate() {
@@ -1242,7 +1244,7 @@
         text('Keyboard shortcuts'),
     );
     const optionsLink = element(
-      'a', '', text('Configure todoist-shortcuts options')
+        'a', '', text('Configure todoist-shortcuts options'),
     );
     const optionsUrl =
           document.body.getAttribute('data-todoist-shortcuts-options-url');
@@ -1725,21 +1727,21 @@
       if (mouseGotMoved && hoveredTask) {
         const mouseBehavior = getMouseBehaviorOption();
         switch (mouseBehavior) {
-        case 'focus-follows-mouse':
-          break;
-        case 'focus-follows-mouse-delay-after-window-focus':
-          if (windowRecentlyFocused) {
-            debug('Not setting cursor on mouse move, ',
+          case 'focus-follows-mouse':
+            break;
+          case 'focus-follows-mouse-delay-after-window-focus':
+            if (windowRecentlyFocused) {
+              debug('Not setting cursor on mouse move, ',
                   'because window was recently focused.');
+              return;
+            }
+            break;
+          case 'no-mouse-behavior':
+            debug('Not setting cursor on mouse move (disabled in settings).');
             return;
-          }
-          break;
-        case 'no-mouse-behavior':
-          debug('Not setting cursor on mouse move (disabled in settings).');
-          return;
-        default:
-          warn('Unrecognized mouse behavior option: ', mouseBehavior);
-          break;
+          default:
+            warn('Unrecognized mouse behavior option: ', mouseBehavior);
+            break;
         }
         debug('Due to mouse hover, setting cursor');
         setCursor(hoveredTask, 'no-scroll');
@@ -1750,7 +1752,7 @@
   }
 
   function handleWindowFocus() {
-    debug("FOCUS EVENT");
+    debug('FOCUS EVENT');
     if (focusTimeout) {
       clearTimeout(focusTimeout);
     }
@@ -1907,12 +1909,12 @@
     const section = getSection(task);
     if (!section) {
       error('Failed to find section div for', task);
-    } else if ("aria-label" in section.attributes) {
+    } else if ('aria-label' in section.attributes) {
       return section.attributes['aria-label'];
     } else {
       error('Section', section, 'lacks an aria-label attribute');
     }
-    return "";
+    return '';
   }
 
   function getSection(task) {
@@ -4431,6 +4433,8 @@
 
   // Returns predicate which returns 'true' if the element has the
   // specified id.
+  //
+  // eslint-disable-next-line no-unused-vars
   function matchingId(id) {
     return (el) => el.id === id;
   }

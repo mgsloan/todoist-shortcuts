@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-./node_modules/eslint/bin/eslint.js src/inject.js src/options-page.js $@
+./node_modules/eslint/bin/eslint.js src/inject.js src/options-page.js src/todoist-shortcuts.js src/common.js $@
 
 CMP_STATUS="$(cmp --silent -- src/mousetrap.js mousetrap/mousetrap.js; echo $?)"
 if [[ "$CMP_STATUS" -ne 0 ]]; then
