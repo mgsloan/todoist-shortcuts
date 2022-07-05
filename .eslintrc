@@ -7,5 +7,7 @@
       "require-jsdoc": "off",
       "spaced-comment": "off",
       "guard-for-in": "off",
+      "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+      "block-spacing": ["error", "always"],
     }
 }
