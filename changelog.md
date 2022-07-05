@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 161
+
+### Fixes ###
+
+* Changes how `* o` keybinding for selecting overdue works. Instead of
+  relying on the existence of an "overdue" section in agenda view, now
+  selects any overdue class in any view.
+
+
 ## Version 160
 
 ### Enhancements ###
