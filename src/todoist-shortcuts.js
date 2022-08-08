@@ -2,7 +2,7 @@
 
 (function() {
   // Set this to true to get more log output.
-  const DEBUG = false;
+  const DEBUG = true;
 
   const IS_CHROME =
     /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -331,6 +331,14 @@
     const result = options['mouse-behavior'];
     if (!result) {
       return 'focus-follows-mouse';
+    }
+    return result;
+  }
+
+  function getCursorMovementOption() {
+    const result = options['cursor-movement'];
+    if (!result) {
+      return 'follows-task-within-section';
     }
     return result;
   }
@@ -1829,7 +1837,10 @@
     // the cursor doesn't follow the task for these moves, hence this logic.
     let changedSection = false;
     let currentSection = null;
-    if (cursor && lastCursorType === TYPE_NORMAL) {
+    const cursorMovement = getCursorMovementOption();
+    if (cursor &&
+        cursorMovement === 'follows-task-within-section' &&
+        lastCursorType === TYPE_NORMAL) {
       const cursorId = getTaskId(cursor);
       const cursorIndent = getIndentClass(cursor);
       if (lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
@@ -1879,15 +1890,18 @@
           tasks = getTasks();
           for (let i = 0; i < tasks.length; i++) {
             if (tasks[i] === taskPrecedingEditor && i + 1 < tasks.length) {
-              debug('found task after task that preceded the editor.');
-              setCursor(tasks[i + 1], 'no-scroll');
-              found = true;
+              found = restoreCursor(tasks[i + 1], 'no-scroll');
+              if (found) {
+                debug('found task after task that preceded the editor.');
+              }
               break;
             }
           }
           if (!found) {
-            debug('falling back on selecting task that preceded editor.');
-            setCursor(taskPrecedingEditor, 'no-scroll');
+            found = restoreCursor(taskPrecedingEditor, 'no-scroll');
+            if (found) {
+              debug('falling back on selecting task that preceded editor.');
+            }
           }
         } else {
           warn('expected to find task that was being edited.');
@@ -1896,9 +1910,10 @@
         const task =
             getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
         if (task) {
-          debug('found task that was being explicitly edited.');
-          found = true;
-          setCursor(task, 'scroll');
+          found = restoreCursor(task, 'scroll');
+          if (found) {
+            debug('found task that was being explicitly edited.');
+          }
         }
       } else if (lastCursorType == TYPE_NORMAL) {
         for (let i = lastCursorIndex; i < lastCursorTasks.length; i++) {
@@ -1907,17 +1922,16 @@
             const oldTaskId = getTaskId(oldTask);
             task = getTaskById(oldTaskId, 'ignore-indent' );
             if (task) {
-              const taskSection = getSectionName(task);
-              // Don't jump back to the same task if it changed section.
-              if (i !== lastCursorIndex || taskSection === lastCursorSection) {
-                debug(
+              if (i !== lastCursorIndex) {
+                found = restoreCursor(task, 'no-scroll');
+                if (found) {
+                  debug(
                     'found still-existing task that is',
                     i - lastCursorIndex,
                     'tasks after old cursor position, at',
                     lastCursorIndex,
-                    ', setting cursor to it');
-                found = true;
-                setCursor(task, 'no-scroll');
+                    ', set cursor to it');
+                }
                 break;
               } else {
                 debug('cursor changed section, finding new location');
@@ -1932,23 +1946,54 @@
       debug('lastCursorIndex wasn\'t set yet');
     }
     if (!found) {
-      debug('didn\'t find a particular task to select.');
-      if (!tasks) {
-        tasks = getTasks();
-      }
-      if (lastCursorIndex < tasks.length - lastCursorIndex) {
-        debug('cursoring first task, because it\'s nearer to lastCursorIndex.');
+      debug('didn\'t find a particular task to select, so selecting by index.');
+      restoreCursorViaIndex(tasks);
+    }
+  }
+
+  function restoreCursorViaIndex(tasks) {
+    if (!tasks) {
+      tasks = getTasks();
+    }
+
+    // Attempt to adjust index if cursored task is now earlier in the list.
+    let indexBasedOnLastCursor = lastCursorIndex;
+    const foundLastTaskEl = getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
+    const foundLastTaskIndex = tasks.indexOf(foundLastTaskEl);
+    if (foundLastTaskIndex !== -1 && foundLastTaskIndex < indexBasedOnLastCursor) {
+      indexBasedOnLastCursor += 1;
+    }
+
+    if (0 <= indexBasedOnLastCursor && indexBasedOnLastCursor < tasks.length) {
+      debug('cursoring to index', indexBasedOnLastCursor);
+      setCursor(tasks[indexBasedOnLastCursor] , 'no-scroll');
+    } else if (lastCursorIndex < tasks.length - lastCursorIndex) {
+      debug('cursoring first task, because it\'s nearer to lastCursorIndex.');
+      setCursorToFirstTask('no-scroll');
+    } else {
+      debug('cursoring last task, because it\'s nearer to lastCursorIndex.');
+      setCursorToLastTask('no-scroll');
+      if (!getCursor()) {
+        // This can happen if the last task is a nested sub-project.
+        debug('failed to set the cursor to last task, so setting to first');
         setCursorToFirstTask('no-scroll');
-      } else {
-        debug('cursoring last task, because it\'s nearer to lastCursorIndex.');
-        setCursorToLastTask('no-scroll');
-        if (!getCursor()) {
-          // This can happen if the last task is a nested sub-project.
-          debug('failed to set the cursor to last task, so setting to first');
-          setCursorToFirstTask('no-scroll');
-        }
       }
     }
+  }
+
+  function restoreCursor(task, scroll) {
+    // Don't jump back to the same task if it changed section and
+    // cursor movement setting does not follow across sections
+    const taskSection = getSectionName(task);
+    const cursorMovement = getCursorMovementOption();
+    let changedSection =
+        cursorMovement === 'follows-task-within-section' &&
+        lastCursorSection !== taskSection;
+    if (!changedSection) {
+      setCursor(task, scroll);
+      return true;
+    }
+    return false;
   }
 
   // Gets the name of the section that a task is in.
@@ -1957,7 +2002,7 @@
     if (!section) {
       error('Failed to find section div for', task);
     } else if ('aria-label' in section.attributes) {
-      return section.attributes['aria-label'];
+      return section.attributes['aria-label'].value;
     } else {
       error('Section', section, 'lacks an aria-label attribute');
     }

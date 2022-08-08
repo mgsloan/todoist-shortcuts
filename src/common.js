@@ -9,6 +9,9 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
   const FOCUS_FOLLOWS_MOUSE = 'focus-follows-mouse';
   const NO_MOUSE_BEHAVIOR = 'no-mouse-behavior';
 
+  const CURSOR_MOVEMENT = 'cursor-movement';
+  const FOLLOWS_TASK_WITHIN_SECTION = 'follows-task-within-section';
+
   try {
     chrome.storage.sync.get({options: '{}'}, (storedValues) => {
       const serializedOptions = storedValues['options'];
@@ -41,6 +44,9 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
       if (!(MOUSE_BEHAVIOR in options)) {
         options[MOUSE_BEHAVIOR] = FOCUS_FOLLOWS_MOUSE;
         changed = true;
+      }
+      if (!(CURSOR_MOVEMENT in options)) {
+        options[CURSOR_MOVEMENT] = FOLLOWS_TASK_WITHIN_SECTION;
       }
 
       // Save if canonicalization changed the options

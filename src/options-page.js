@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   const MOUSE_BEHAVIOR = 'mouse-behavior';
+  const CURSOR_MOVEMENT = 'cursor-movement';
 
   const mouseBehaviorOptionEls =
         document.querySelectorAll('input[name="mouse-behavior"]');
+  const cursorMovementOptionEls =
+        document.querySelectorAll('input[name="cursor-movement"]');
   const statusEl = document.getElementById('status');
   let clearStatusTimeout = null;
 
@@ -11,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const radioButton of mouseBehaviorOptionEls) {
       if (radioButton.checked) {
         options[MOUSE_BEHAVIOR] = radioButton.id;
+        break;
+      }
+    }
+    for (const radioButton of cursorMovementOptionEls) {
+      if (radioButton.checked) {
+        options[CURSOR_MOVEMENT] = radioButton.id;
         break;
       }
     }
@@ -37,6 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!foundMouseBehaviorOption) {
       console.warn('No mouse behavior option matching ' + mouseBehavior);
+    }
+
+    const cursorMovement = options[CURSOR_MOVEMENT];
+    let foundCursorMovementOption = false;
+    for (const radioButton of cursorMovementOptionEls) {
+      radioButton.addEventListener('click', save);
+      if (radioButton.id === cursorMovement) {
+        radioButton.checked = true;
+        foundCursorMovementOption = true;
+      }
+    }
+    if (!foundCursorMovementOption) {
+      console.warn('No cursor movement option matching ' + cursorMovement);
     }
   }
 
