@@ -1,5 +1,19 @@
 # todoist-shortcuts changelog
 
+## Version 162
+
+### Enhancements ###
+
+* Adds an option for determining whether cursor follows across section
+  changes. See [#211][].
+
+### Fixes ###
+
+* Fixes logic for detecting section changes.
+
+[#211]: https://github.com/mgsloan/todoist-shortcuts/issues/221
+
+
 ## Version 161
 
 ### Fixes ###
