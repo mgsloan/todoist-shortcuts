@@ -1677,7 +1677,7 @@
   const TYPE_NORMAL = 'normal';
   // Cursor based on editing initiated by todoist-shortcuts.
   const TYPE_EXPLICIT_EDITING = 'explicit-editing';
-  // Cursor based on inferred editing. Stored task is the one that precedes the editor.
+  // Cursor based on inferred editing. Stored task precedes the editor.
   const TYPE_IMPLICIT_EDITING = 'implicit-editing';
 
   // All MUTABLE. Only mutated by 'storeCursorContext'.
@@ -1926,11 +1926,11 @@
                 found = restoreCursor(task, 'no-scroll');
                 if (found) {
                   debug(
-                    'found still-existing task that is',
-                    i - lastCursorIndex,
-                    'tasks after old cursor position, at',
-                    lastCursorIndex,
-                    ', set cursor to it');
+                      'found still-existing task that is',
+                      i - lastCursorIndex,
+                      'tasks after old cursor position, at',
+                      lastCursorIndex,
+                      ', set cursor to it');
                 }
                 break;
               } else {
@@ -1958,15 +1958,17 @@
 
     // Attempt to adjust index if cursored task is now earlier in the list.
     let indexBasedOnLastCursor = lastCursorIndex;
-    const foundLastTaskEl = getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
+    const foundLastTaskEl =
+          getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
     const foundLastTaskIndex = tasks.indexOf(foundLastTaskEl);
-    if (foundLastTaskIndex !== -1 && foundLastTaskIndex < indexBasedOnLastCursor) {
+    if (foundLastTaskIndex !== -1 &&
+        foundLastTaskIndex < indexBasedOnLastCursor) {
       indexBasedOnLastCursor += 1;
     }
 
     if (0 <= indexBasedOnLastCursor && indexBasedOnLastCursor < tasks.length) {
       debug('cursoring to index', indexBasedOnLastCursor);
-      setCursor(tasks[indexBasedOnLastCursor] , 'no-scroll');
+      setCursor(tasks[indexBasedOnLastCursor], 'no-scroll');
     } else if (lastCursorIndex < tasks.length - lastCursorIndex) {
       debug('cursoring first task, because it\'s nearer to lastCursorIndex.');
       setCursorToFirstTask('no-scroll');
@@ -1986,7 +1988,7 @@
     // cursor movement setting does not follow across sections
     const taskSection = getSectionName(task);
     const cursorMovement = getCursorMovementOption();
-    let changedSection =
+    const changedSection =
         cursorMovement === 'follows-task-within-section' &&
         lastCursorSection !== taskSection;
     if (!changedSection) {
