@@ -1663,31 +1663,46 @@
     return selectedTasks;
   }
 
+  // Valid values for lastCursorType:
+
+  // Normal cursor position
+  const TYPE_NORMAL = 'normal';
+  // Cursor based on editing initiated by todoist-shortcuts.
+  const TYPE_EXPLICIT_EDITING = 'explicit-editing';
+  // Cursor based on inferred editing. Stored task is the one that precedes the editor.
+  const TYPE_IMPLICIT_EDITING = 'implicit-editing';
+
   // All MUTABLE. Only mutated by 'storeCursorContext'.
   let lastCursorTasks = [];
   let lastCursorIndex = -1;
   let lastCursorId = null;
   let lastCursorIndent = null;
   let lastCursorSection = null;
+  let lastCursorType = TYPE_NORMAL;
   let mouseGotMoved = false;
-  let wasEditing = false;
   let windowRecentlyFocused = false;
   let focusTimeout = null;
 
-  function storeCursorContext(cursor, tasks, index, editing) {
+  function storeCursorContext(cursor, tasks, index, type) {
     lastCursorTasks = tasks;
     lastCursorIndex = index;
     lastCursorId = getTaskId(cursor);
     lastCursorIndent = getIndentClass(cursor);
     lastCursorSection = getSectionName(cursor);
+    lastCursorType = type;
     mouseGotMoved = false;
-    wasEditing = editing;
+    debugCursorContext('wrote down cursor context:');
+  }
+
+  function debugCursorContext(prefix) {
     debug(
-        'wrote down cursor context:',
+        prefix,
         'id =', lastCursorId,
         'indent =', lastCursorIndent,
         'section =', lastCursorSection,
-        'idx =', lastCursorIndex);
+        'idx =', lastCursorIndex,
+        'type =', lastCursorType,
+        'mouseGotMoved =', mouseGotMoved);
   }
 
   function storeNormalContext(cursor) {
@@ -1695,12 +1710,26 @@
     const index = tasks.indexOf(cursor);
     if (index < 0) {
       clearEditingContext(tasks);
+    } else {
+      storeCursorContext(cursor, tasks, index, TYPE_NORMAL);
     }
-    storeCursorContext(cursor, tasks, index, false);
   }
 
-  function storeEditingContext(cursor, index) {
-    storeCursorContext(cursor, getTasks(), index, true);
+  function storeImplicitEditingContext(cursor, index) {
+    // Do not overwrite an explicitly stored cursor position.
+    if (lastCursorType !== TYPE_EXPLICIT_EDITING) {
+      storeCursorContext(cursor, getTasks(), index, TYPE_IMPLICIT_EDITING);
+    }
+  }
+
+  function storeExplicitEditingContext(cursor) {
+    const tasks = getTasks();
+    const index = tasks.indexOf(cursor);
+    if (index < 0) {
+      clearEditingContext(tasks);
+    } else {
+      storeCursorContext(cursor, tasks, index, TYPE_EXPLICIT_EDITING);
+    }
   }
 
   function clearEditingContext(tasks) {
@@ -1709,7 +1738,8 @@
     lastCursorId = null;
     lastCursorIndent = null;
     lastCursorSection = null;
-    wasEditing = false;
+    lastCursorType = TYPE_NORMAL;
+    debugCursorContext('Cleared cursor context');
   }
 
   function handleMouseMove(ev) {
@@ -1781,12 +1811,12 @@
     // above.
     const manager = getUniqueClass(content, 'manager');
     if (manager) {
-      const tasks = getTasks('include-collapsed', 'include-editors');
+      const tasks = getTasks('no-collapsed', 'include-editors');
       const managerIndex =
             tasks.findIndex((task) => task.classList.contains('manager'));
       debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
-        storeEditingContext(tasks[managerIndex - 1], true);
+        storeImplicitEditingContext(tasks[managerIndex - 1], true);
       } else if (managerIndex < 0) {
         error('There seems to be a task editor, but then couldn\'t find it.');
       }
@@ -1799,7 +1829,7 @@
     // the cursor doesn't follow the task for these moves, hence this logic.
     let changedSection = false;
     let currentSection = null;
-    if (cursor && !wasEditing) {
+    if (cursor && lastCursorType === TYPE_NORMAL) {
       const cursorId = getTaskId(cursor);
       const cursorIndent = getIndentClass(cursor);
       if (lastCursorId === cursorId && lastCursorIndent === cursorIndent) {
@@ -1814,7 +1844,7 @@
       }
     }
     if (cursor && !changedSection) {
-      if (wasEditing) {
+      if (lastCursorType !== TYPE_NORMAL) {
         // This invocation is to handle the circumstance where the user inserts
         // a task, moving the task list. The task under the mouse then gets
         // hovered, even if the mouse wasn't moved, which erroneously changes
@@ -1838,16 +1868,15 @@
   }
 
   function restoreLastCursor() {
+    debugCursorContext('restoring last cursor based on context:');
     let found = false;
     let tasks = null;
     if (lastCursorIndex >= 0) {
-      if (wasEditing) {
+      if (lastCursorType === TYPE_IMPLICIT_EDITING) {
         const taskPrecedingEditor =
             getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
         if (taskPrecedingEditor) {
-          if (!tasks) {
-            tasks = getTasks();
-          }
+          tasks = getTasks();
           for (let i = 0; i < tasks.length; i++) {
             if (tasks[i] === taskPrecedingEditor && i + 1 < tasks.length) {
               debug('found task after task that preceded the editor.');
@@ -1863,7 +1892,15 @@
         } else {
           warn('expected to find task that was being edited.');
         }
-      } else {
+      } else if (lastCursorType === TYPE_EXPLICIT_EDITING) {
+        const task =
+            getTaskById(lastCursorId, 'ignore-indent', lastCursorSection);
+        if (task) {
+          debug('found task that was being explicitly edited.');
+          found = true;
+          setCursor(task, 'scroll');
+        }
+      } else if (lastCursorType == TYPE_NORMAL) {
         for (let i = lastCursorIndex; i < lastCursorTasks.length; i++) {
           const oldTask = lastCursorTasks[i];
           if (oldTask) {
@@ -1888,6 +1925,8 @@
             }
           }
         }
+      } else {
+        error('Invalid value for lastCursorType: ', lastCursorType);
       }
     } else {
       debug('lastCursorIndex wasn\'t set yet');
@@ -2629,6 +2668,7 @@
   }
 
   function clickTaskEdit(task) {
+    storeExplicitEditingContext(task);
     withUniqueClass(task, 'task_content', all, (content) => {
       const options = {
         bubbles: true,
