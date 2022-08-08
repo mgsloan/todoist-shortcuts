@@ -1,17 +1,26 @@
 # todoist-shortcuts changelog
 
+## Version 163
+
+### Enhancements ###
+
+* Adds "c" shortcut in task view for focusing comments. See [#219][].
+
+[#219]: https://github.com/mgsloan/todoist-shortcuts/issues/219
+
+
 ## Version 162
 
 ### Enhancements ###
 
 * Adds an option for determining whether cursor follows across section
-  changes. See [#211][].
+  changes. See [#221][].
 
 ### Fixes ###
 
 * Fixes logic for detecting section changes.
 
-[#211]: https://github.com/mgsloan/todoist-shortcuts/issues/221
+[#221]: https://github.com/mgsloan/todoist-shortcuts/issues/221
 
 
 ## Version 161
