@@ -161,6 +161,7 @@
     ['h', taskViewParent],
     ['j', taskViewNext],
     ['k', taskViewPrevious],
+    ['c', taskViewComments],
     // TODO(#94): proper bindings for o / O.
     [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
     ['t', taskViewSchedule],
@@ -947,8 +948,7 @@
   // Open comments sidepane
   function openComments() {
     openTaskView();
-    withUnique(
-        document, 'button[data-testid="open-comment-editor-button"]', click);
+    taskViewComments();
   }
 
   // Open reminders dialog
@@ -1374,6 +1374,15 @@
   function taskViewNext() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(taskView, '[aria-label="Next task"', click);
+    });
+  }
+
+  function taskViewComments() {
+    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(
+          taskView,
+          'button[data-testid="open-comment-editor-button"]',
+          click);
     });
   }
 
