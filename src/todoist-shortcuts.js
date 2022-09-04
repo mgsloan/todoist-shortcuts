@@ -136,6 +136,7 @@
     ['8', schedulePlusN(8)],
     ['9', schedulePlusN(9)],
     ['alt+t', scheduleTime],
+    ['shift+t', scheduleText],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback],
   ]);
@@ -516,6 +517,10 @@
   // when the task is scheduled. Only works for the cursor, not for the
   // selection.
   function scheduleText() {
+    const scheduler = findScheduler();
+    if (scheduler) {
+      withTag(scheduler, 'input', (el) => el.focus() );
+    }
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
@@ -529,7 +534,6 @@
   }
 
   function scheduleTime() {
-    warn('scheduleTime');
     if (!findScheduler()) {
       scheduleText();
     }
