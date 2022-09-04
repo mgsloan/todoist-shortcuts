@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 164
+
+### Enhancements ###
+
+* Allows `shift+t` to focus the text input of the scheduler when the
+  scheduler is open.
+
+
 ## Version 163
 
 ### Enhancements ###
