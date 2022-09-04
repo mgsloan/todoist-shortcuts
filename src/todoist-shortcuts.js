@@ -520,6 +520,7 @@
     const scheduler = findScheduler();
     if (scheduler) {
       withTag(scheduler, 'input', (el) => el.focus() );
+      return;
     }
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
