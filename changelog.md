@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 165
+
+* Now supports browsers that do not support extension options. See
+  [#225][], fix contributed by [Mikael Vaaltola][].
+
+[#225]: https://github.com/mgsloan/todoist-shortcuts/issues/225
+[Mikael Vaaltola]: https://github.com/mvaaltola
+
+
 ## Version 164
 
 ### Enhancements ###
