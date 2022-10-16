@@ -322,7 +322,7 @@
     try {
       const serializedOptions =
             document.body.getAttribute('data-todoist-shortcuts-options');
-      if (!serializedOptions) throw 'Missing options data';
+      if (!serializedOptions) throw new Error('Missing options data');
       options = JSON.parse(serializedOptions);
       info('Loaded options:', options);
     } catch (e) {
