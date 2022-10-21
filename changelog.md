@@ -1,5 +1,9 @@
 # todoist-shortcuts changelog
 
+## Version 166
+
+* `g` navigation was briefly broken by changes in Todoist v2590.
+
 ## Version 165
 
 * Now supports browsers that do not support extension options. See
