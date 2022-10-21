@@ -1031,7 +1031,7 @@
   // Switches to a navigation mode, where navigation targets are annotated
   // with letters to press to click.
   function navigate() {
-    withId('list_holder', (listHolder) => {
+    withNavigationContainer((listHolder) => {
       // Since the projects list can get reconstructed, watch for changes and
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
@@ -1047,6 +1047,10 @@
       };
       setupNavigate(listHolder);
     });
+  }
+
+  function withNavigationContainer(f) {
+    withQuery(document, '#left_menu,#list_holder', f);
   }
 
   // When viewing something other than a project, and the current task has a
@@ -1122,8 +1126,8 @@
   // Cycles down through left navigation items.
   // eslint-disable-next-line no-unused-vars
   function nextNavItem() {
-    withId('list_holder', (listHolder) => {
-      withNavigationLinks([listHolder], (items, current) => {
+    withNavigationContainer((navigationContainer) => {
+      withNavigationLinks([navigationContainer], (items, current) => {
         // If on the last item, or no item, select the first item.
         if (current >= items.length - 1 || current < 0) {
           items[0].click();
@@ -1138,8 +1142,8 @@
   // Cycles up through right navigation items.
   // eslint-disable-next-line no-unused-vars
   function prevNavItem() {
-    withId('list_holder', (listHolder) => {
-      withNavigationLinks([listHolder], (items, current) => {
+    withNavigationContainer((navigationContainer) => {
+      withNavigationLinks([navigationContainer], (items, current) => {
         // If on the first item, or no item, select the last item.
         if (current <= 0) {
           items[items.length - 1].click();
@@ -3322,13 +3326,17 @@
   // be re-invoked every time the DOM refreshes, in order to ensure they are
   // displayed. It overrides the keyboard handler such that it temporarily
   // expects a key.
-  function setupNavigate(listHolder) {
+  function setupNavigate(navigationContainer) {
     switchKeymap(NAVIGATE_KEYMAP);
     document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
     debug('Creating navigation shortcut tips');
     try {
       const navigateItems = [];
-      withTag(listHolder, 'li', (li) => {
+      withTag(navigationContainer, 'li', (li) => {
+        // Ignore empty li elements, which happen for collapsed parent projects.
+        if (li.childElementCount == 0) {
+          return;
+        }
         let mustBeKeys = null;
         let txt = '';
         let initials = null;
@@ -3413,7 +3421,7 @@
           error('Couldn\'t figure out text for', li);
         }
       });
-      withClass(listHolder, 'expansion_panel__toggle', (summary) => {
+      withClass(navigationContainer, 'expansion_panel__toggle', (summary) => {
         let mustBeKeys = null;
         const dataTrackAttr = summary.attributes['data-track'];
         if (dataTrackAttr) {
@@ -3765,8 +3773,8 @@
               // filters, then close the other sections.
               if (el.classList.contains('expansion_panel__toggle') &&
                   !isFavoritesSection(el)) {
-                withId('list_holder', (listHolder) => {
-                  withClass(listHolder, 'expansion_panel__toggle', (ps) => {
+                withNavigationContainer((navContainer) => {
+                  withClass(navContainer, 'expansion_panel__toggle', (ps) => {
                     const isExpanded =
                           ps.attributes['aria-expanded'].value === 'true';
                     if (!sameElement(el)(ps) &&
