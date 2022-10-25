@@ -4720,8 +4720,8 @@
     '',
     '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
-    '  margin-top: 4px;',
-    '  margin-left: -22px;',
+    '  margin-top: 5px;',
+    '  margin-left: -18px;',
     '  width: 22px;',
     '  font-family: monospace;',
     '  font-weight: normal;',
@@ -4858,6 +4858,12 @@
     '',
     '.task_list_item--keyboard_shortcuts_active .task_list_item__body {',
     '  background: transparent !important;',
+    '}',
+    // Fix adaptive padding of left menu so that there is space for the
+    // navigation hints.
+    '',
+    '#left_menu_inner {',
+    '  padding-left: 24px;',
     '}',
   ].join('\n'));
 
