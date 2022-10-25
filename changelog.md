@@ -4,7 +4,7 @@
 
 ### Fixes ###
 
- Fixes display of `g` navigation hints in Todoist v2596.
+* Fixes display of `g` navigation hints in Todoist v2596.
 
 
 ## Version 166
