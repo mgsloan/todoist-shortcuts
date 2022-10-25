@@ -1,10 +1,22 @@
 # todoist-shortcuts changelog
 
+## Version 167
+
+### Fixes ###
+
+ Fixes display of `g` navigation hints in Todoist v2596.
+
+
 ## Version 166
+
+### Fixes ###
 
 * `g` navigation was briefly broken by changes in Todoist v2590.
 
+
 ## Version 165
+
+### Enhancements ###
 
 * Now supports browsers that do not support extension options. See
   [#225][], fix contributed by [Mikael Vaaltola][].
