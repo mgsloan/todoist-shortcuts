@@ -1174,34 +1174,34 @@
   function sortByDate() {
     if (resetIfSortTypeAlready('date')) return;
     openSortMenu();
-    withUnique(document, 'li[aria-label="DUE_DATE"]', click);
+    withUnique(document, 'li[data-value="DUE_DATE"]', click);
     closeContextMenus();
   }
 
   function sortByPriority() {
     if (resetIfSortTypeAlready('priority')) return;
     openSortMenu();
-    withUnique(document, 'li[aria-label="PRIORITY"]', click);
+    withUnique(document, 'li[data-value="PRIORITY"]', click);
     withUniqueClass(
         document,
         'menu_item',
         matchingAttr('aria-labelledby', 'view_menu__order'),
         click);
-    withUnique(document, 'li[aria-label="DESC"]', click);
+    withUnique(document, 'li[data-value="DESC"]', click);
     closeContextMenus();
   }
 
   function sortByName() {
     if (resetIfSortTypeAlready('alphabetically')) return;
     openSortMenu();
-    withUnique(document, 'li[aria-label="ALPHABETICALLY"]', click);
+    withUnique(document, 'li[data-value="ALPHABETICALLY"]', click);
     closeContextMenus();
   }
 
   function sortByAssignee() {
     if (resetIfSortTypeAlready('assignee')) return;
     openSortMenu();
-    withUnique(document, 'li[aria-label="ASSIGNEE"]', click);
+    withUnique(document, 'li[data-value="ASSIGNEE"]', click);
     closeContextMenus();
   }
 
