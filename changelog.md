@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 168
+
+### Fixes ###
+
+* Fixes sorting keybindings. See [#228][].
+
+[#228]: https://github.com/mgsloan/todoist-shortcuts/issues/228
+
+
 ## Version 167
 
 ### Fixes ###
