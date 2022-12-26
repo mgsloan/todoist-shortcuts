@@ -2,6 +2,12 @@
 
 ## Version 169 (not yet released)
 
+### Fixes ###
+
+* Fixes `g` navigation opening left sidebar when it is hidden.
+
+### Changes ###
+
 * Removes backtick and `~` shortcuts for selecting next / previous top
   level section, since they no longer work, probably for a while, and
   no one seems to notice (myself included). Allows for a fair bit of
