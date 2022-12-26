@@ -29,8 +29,6 @@
     // Navigation
     ['g', navigate],
     ['G', navigateToTask],
-    ['`', nextTopSection],
-    ['shift+`', prevTopSection],
 
     // Manipulation of tasks at cursor
     ['enter', edit],
@@ -1095,64 +1093,6 @@
         error('couldn\'t find project button');
       }
     }
-  }
-
-  // Cycles down through top sections (inbox / today / next 7 days + favorites).
-  function nextTopSection() {
-    withTopFilters((topItems, current) => {
-      // If on the last item, or no item, select the first item.
-      if (current >= topItems.length - 1 || current < 0) {
-        topItems[0].click();
-      // Otherwise, select the next item.
-      } else {
-        topItems[current + 1].click();
-      }
-    });
-  }
-
-  // Cycles up through top sections (inbox / today / next 7 days + favorites).
-  function prevTopSection() {
-    withTopFilters((topItems, current) => {
-      // If on the first item, or no item, select the last item.
-      if (current <= 0) {
-        topItems[topItems.length - 1].click();
-      // Otherwise, select the previous item.
-      } else {
-        topItems[current - 1].click();
-      }
-    });
-  }
-
-  // Cycles down through left navigation items.
-  // eslint-disable-next-line no-unused-vars
-  function nextNavItem() {
-    withNavigationContainer((navigationContainer) => {
-      withNavigationLinks([navigationContainer], (items, current) => {
-        // If on the last item, or no item, select the first item.
-        if (current >= items.length - 1 || current < 0) {
-          items[0].click();
-        // Otherwise, select the next item.
-        } else {
-          items[current + 1].click();
-        }
-      });
-    });
-  }
-
-  // Cycles up through right navigation items.
-  // eslint-disable-next-line no-unused-vars
-  function prevNavItem() {
-    withNavigationContainer((navigationContainer) => {
-      withNavigationLinks([navigationContainer], (items, current) => {
-        // If on the first item, or no item, select the last item.
-        if (current <= 0) {
-          items[items.length - 1].click();
-        // Otherwise, select the previous item.
-        } else {
-          items[current - 1].click();
-        }
-      });
-    });
   }
 
   // Clicks quick add task button.  Would be better to use todoist's builtin
@@ -3903,52 +3843,6 @@
       }
       toDelete = document.getElementsByClassName(TODOIST_SHORTCUTS_TIP);
     } while (toDelete.length > 0);
-  }
-
-  // Run a function on the array of top filters, along with the index of the
-  // currently selected one, if any.
-  function withTopFilters(f) {
-    withId('top-menu', (topFilters) => {
-      const favoritesPanel = withId('left_menu', (leftMenu) =>
-        getFirstClass(leftMenu, 'expansion_panel'));
-      debug('favoritesPanel = ', favoritesPanel);
-      withNavigationLinks([topFilters, favoritesPanel], f);
-    });
-  }
-
-  function withNavigationLinks(containers, f) {
-    const links = [];
-    let current = -1;
-    const allCurrents = [];
-    for (const container of containers) {
-      withTag(container, 'li', (item) => {
-        const link =
-              getFirstClass(item, 'item_content') ||
-              getFirstTag(item, 'a') ||
-              getFirstClass(item, 'name');
-        if (hidden(item)) {
-        } else if (!link) {
-          warn('Didn\'t find link in', item.innerHTML);
-        } else {
-          links.push(link);
-          const firstChild = item.firstElementChild;
-          // Terrible hack around obfuscated class names.
-          if (matchingClass('current')(item) ||
-              (firstChild.tagName === 'DIV' &&
-               !firstChild.classList.contains('arrow') &&
-               firstChild.classList.length > 1)) {
-            if (!allCurrents.length) {
-              current = links.length - 1;
-            }
-            allCurrents.push(item.innerHTML);
-          }
-        }
-      });
-    }
-    if (allCurrents.length > 1) {
-      warn('Multiple navigation items: ', allCurrents);
-    }
-    f(links, current);
   }
 
   /*****************************************************************************
