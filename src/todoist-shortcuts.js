@@ -296,7 +296,6 @@
   const TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   const TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
   const TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
-  const TODOIST_SHORTCUTS_NAVIGATE = 'todoist_shortcuts_navigate';
   const TODOIST_SHORTCUTS_HELP = 'todoist_shortcuts_help';
   const TODOIST_SHORTCUTS_HELP_CONTAINER = 'todoist_shortcuts_help_container';
 
@@ -1030,6 +1029,7 @@
   // with letters to press to click.
   function navigate() {
     withNavigationContainer((listHolder) => {
+      openedLeftNavForNavigate = false;
       // Since the projects list can get reconstructed, watch for changes and
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
@@ -1042,6 +1042,9 @@
         finishNavigate = null;
         switchKeymap(DEFAULT_KEYMAP);
         updateKeymap();
+        if (openedLeftNavForNavigate && !leftNavIsHidden()) {
+          toggleLeftNav();
+        }
       };
       setupNavigate(listHolder);
     });
@@ -1182,6 +1185,10 @@
 
   function quickAdd() {
     withId('quick_add_task_holder', click);
+  }
+
+  function leftNavIsHidden() {
+    return document.documentElement.classList.contains('left_menu_hide');
   }
 
   function toggleLeftNav() {
@@ -3261,6 +3268,9 @@
   // MUTABLE. Keys the user has pressed so far.
   let navigateKeysPressed = '';
 
+  // MUTABLE. Records whether the left nav was opened for navigation.
+  let openedLeftNavForNavigate = false;
+
   // Assigns key bindings to sections like inbox / today / various projects.
   // These keybindings get displayed along the options.  This function should
   // be re-invoked every time the DOM refreshes, in order to ensure they are
@@ -3268,7 +3278,10 @@
   // expects a key.
   function setupNavigate(navigationContainer) {
     switchKeymap(NAVIGATE_KEYMAP);
-    document.body.classList.add(TODOIST_SHORTCUTS_NAVIGATE);
+    if (leftNavIsHidden()) {
+      toggleLeftNav();
+      openedLeftNavForNavigate = true;
+    }
     debug('Creating navigation shortcut tips');
     try {
       const navigateItems = [];
@@ -3415,7 +3428,6 @@
         finishNavigate();
       }
       removeOldTips();
-      document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
       throw ex;
     }
   }
@@ -3812,7 +3824,6 @@
             updateKeymap();
           });
           removeOldTips();
-          document.body.classList.remove(TODOIST_SHORTCUTS_NAVIGATE);
         }
       }
     }
@@ -4659,11 +4670,6 @@
     // When it is hidden in the settings menu (default).
     '.version .' + TODOIST_SHORTCUTS_WARNING + ' {',
     '  position: static;',
-    '}',
-    '',
-    'body.' + TODOIST_SHORTCUTS_NAVIGATE + ' #left_menu {',
-    '  left: 0;',
-    '  bottom: 0;',
     '}',
     '',
     // Based directly on Todoist's .notifier
