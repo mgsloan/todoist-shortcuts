@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 169 (not yet released)
+## Version 169
 
 ### Fixes ###
 

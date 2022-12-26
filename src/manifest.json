@@ -3,7 +3,7 @@
   "short_name": "Todoist Keys",
   "author": "Michael Sloan",
   "description": "Adds a comprehensive suite of keyboard shortcuts to Todoist. More info: https://github.com/mgsloan/todoist-shortcuts",
-  "version": "168",
+  "version": "169",
   "homepage_url": "https://github.com/mgsloan/todoist-shortcuts",
   "content_scripts": [
     {
