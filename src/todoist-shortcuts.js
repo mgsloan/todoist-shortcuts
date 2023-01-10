@@ -2,7 +2,7 @@
 
 (function() {
   // Set this to true to get more log output.
-  const DEBUG = true;
+  const DEBUG = false;
 
   const IS_CHROME =
     /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
