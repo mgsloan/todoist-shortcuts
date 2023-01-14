@@ -2232,7 +2232,8 @@
         switchKeymap(SCHEDULE_KEYMAP);
         return;
       }
-      if (checkTaskViewOpen()) {
+      /*
+      if (getTaskViewContainer()) {
         switchKeymap(TASK_VIEW_KEYMAP);
         return;
       }
@@ -2242,7 +2243,7 @@
       if (popupWindow) {
         switchKeymap(POPUP_KEYMAP);
         return;
-      }
+      } */
       switchKeymap(DEFAULT_KEYMAP);
     }
   }
@@ -2258,8 +2259,8 @@
     }
   }
 
-  function checkTaskViewOpen() {
-    return selectUnique(document, 'div[data-item-detail-root]') !== null;
+  function getTaskViewContainer() {
+    return selectUnique(document, 'div[data-item-detail-root]');
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -3077,23 +3078,29 @@
       error('Unexpected value for includeSections:', includeSections);
       return [];
     }
+
+    // When task view is open, navigate tasks inside instead.
+    const taskViewContainer = getTaskViewContainer();
+    const container = taskViewContainer ? taskViewContainer : getById('content');
+    if (!container) {
+      error('Failed to find task container');
+      return [];
+    }
     const results = [];
-    withId('content', (content) => {
-      withTag(content, 'li', (item) => {
-        // Skip elements which don't correspond to tasks or sections
-        const matches =
-          !item.classList.contains('reorder_item') &&
-          ( item.classList.contains('task_list_item') ||
-          (item.classList.contains('manager') && shouldIncludeEditors) ||
-          (isSectionLi(item) && shouldIncludeSections)
-          );
-        // Skip nested tasks that are not visible (if includeCollapsed
-        // is not set).
-        const visible = shouldIncludeCollapsed || !hidden(item);
-        if (matches && visible) {
-          results.push(item);
-        }
-      });
+    withTag(container , 'li', (item) => {
+      // Skip elements which don't correspond to tasks or sections
+      const matches =
+        !item.classList.contains('reorder_item') &&
+        ( item.classList.contains('task_list_item') ||
+        (item.classList.contains('manager') && shouldIncludeEditors) ||
+        (isSectionLi(item) && shouldIncludeSections)
+        );
+      // Skip nested tasks that are not visible (if includeCollapsed
+      // is not set).
+      const visible = shouldIncludeCollapsed || !hidden(item);
+      if (matches && visible) {
+        results.push(item);
+      }
     });
     return results;
   }
@@ -3957,7 +3964,13 @@
   function setCursor(task, shouldScroll) {
     if (task) {
       if (shouldScroll === 'scroll') {
-        scrollTaskIntoView(task);
+        const inTaskView =
+              findParent(task, matchingClass('task-main-content-container'));
+        if (inTaskView) {
+          info('Skipping scrolling to task as this is not supported in task view');
+        } else {
+          scrollTaskIntoView(task);
+        }
       } else if (shouldScroll !== 'no-scroll') {
         error('Unexpected shouldScroll argument to setCursor:', shouldScroll);
       }
@@ -4878,8 +4891,11 @@
 
   // See comment on 'getTaskById' for explanation
   function getKeySelecter(id, indent) {
+    if (!id) {
+      return null;
+    }
     return '.task_list_item[data-item-id="' + id + '"]' +
-      '[data-item-indent="' + stripIndentClass(indent) + '"]';
+      (indent ? '[data-item-indent="' + stripIndentClass(indent) + '"]' : '');
   }
 
   function isUpcomingView() {
@@ -5048,7 +5064,7 @@
     }
     if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
       // Workaround for #217
-      if (!checkTaskViewOpen()) {
+      if (!getTaskViewContainer()) {
         closeContextMenus();
       }
     }
