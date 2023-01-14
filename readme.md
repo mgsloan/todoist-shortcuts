@@ -64,6 +64,8 @@ described in this document.
 | `/` or `f`     | focus search input                                                    |
 | `g`            | enter section navigation mode                                         |
 | `shift+g`      | navigate to task's project, or select in agenda if already on project |
+| `` ` ``        | select the next left nav section                                      |
+| `~`            | select the previous left nav section                                  |
 
 In "section navigation mode", the different selections in the left
 pane are annotated with the keys to press to navigate to that

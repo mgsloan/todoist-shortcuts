@@ -29,6 +29,8 @@
     // Navigation
     ['g', navigate],
     ['G', navigateToTask],
+    ['`', nextLeftMenuItem],
+    ['shift+`', prevLeftMenuItem],
 
     // Manipulation of tasks at cursor
     ['enter', edit],
@@ -1096,6 +1098,79 @@
         error('couldn\'t find project button');
       }
     }
+  }
+
+  // Cycles down through menu items.
+  function nextLeftMenuItem() {
+    withLeftMenuItems((menuItems, current) => {
+      // If on the last item, or no item, select the first item.
+      if (current >= menuItems.length - 1 || current < 0) {
+        menuItems[0].click();
+      // Otherwise, select the next item.
+      } else {
+        menuItems[current + 1].click();
+      }
+    });
+  }
+
+  // Cycles up through top sections (inbox / today / next 7 days + favorites).
+  function prevLeftMenuItem() {
+    withLeftMenuItems((menuItems, current) => {
+      // If on the first item, or no item, select the last item.
+      if (current <= 0) {
+        menuItems[menuItems.length - 1].click();
+      // Otherwise, select the previous item.
+      } else {
+        menuItems[current - 1].click();
+      }
+    });
+  }
+
+  // Run a function on the array of left menu items, along with the index of the
+  // currently selected one, if any.
+  function withLeftMenuItems(f) {
+    withId('top-menu', (topItems) => {
+      const favoritesPanel =
+            withId('left-menu-favorites-panel', (panel) => { return panel; });
+      const projectsPanel =
+            withId('left-menu-projects-panel', (panel) => { return panel; });
+      withLeftMenuItemLinks([topItems, favoritesPanel, projectsPanel], f);
+    });
+  }
+
+  function withLeftMenuItemLinks(containers, f) {
+    const links = [];
+    let current = -1;
+    const allCurrents = [];
+    for (const container of containers) {
+      withTag(container, 'li', (item) => {
+        const link =
+              getFirstClass(item, 'item_content') ||
+              getFirstTag(item, 'a') ||
+              getFirstClass(item, 'name');
+        if (hidden(item)) {
+        } else if (!link) {
+          warn('Didn\'t find link in', item.innerHTML);
+        } else {
+          links.push(link);
+          const firstChild = item.firstElementChild;
+          // Terrible hack around obfuscated class names.
+          if (matchingClass('current')(item) ||
+              (firstChild.tagName === 'DIV' &&
+               !firstChild.classList.contains('arrow') &&
+               firstChild.classList.length >= 6)) {
+            if (!allCurrents.length) {
+              current = links.length - 1;
+            }
+            allCurrents.push(item.innerHTML);
+          }
+        }
+      });
+    }
+    if (allCurrents.length > 1) {
+      warn('Multiple current menu items: ', allCurrents);
+    }
+    f(links, current);
   }
 
   // Clicks quick add task button.  Would be better to use todoist's builtin
