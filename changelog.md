@@ -6,6 +6,16 @@
 
 * Attempt to fix deselecting scheduler input on Safari. See [#191][].
 
+### Changes ###
+
+* Reinstates backtick and `~` shortcuts for selecting next / previous
+  nav section. The code changes are thanks to
+  [@mdbraber](https://github.com/mdbraber)! The behavior is a little
+  different, now it will also cycle through all navigation items
+  including projects, but I think this is more useful. See [#232][].
+
+[#232]: https://github.com/mgsloan/todoist-shortcuts/issues/232
+
 
 ## Version 169
 
