@@ -692,7 +692,9 @@
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
-        withUniqueClass(document, 'item_actions_priority', all, click);
+        withQuery(document,
+            '[data-action-hint="task-actions-priority-picker"]',
+            click);
         withUniqueClass(document, 'popper', all, (menu) => {
           clickPriorityMenu(menu, level);
         });
