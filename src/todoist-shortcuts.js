@@ -2720,7 +2720,7 @@
 
   function blurSchedulerInput() {
     enterDeferLastBinding();
-    setTimeout(() => blurSchedulerInputImpl(20), 0);
+    setTimeout(() => blurSchedulerInputImpl(50), 0);
   }
 
   function blurSchedulerInputImpl(fuel) {
@@ -2739,7 +2739,7 @@
         exitDeferLastBinding();
       }
     } else {
-      setTimeout(() => blurSchedulerInputImpl(fuel - 1), 10);
+      setTimeout(() => blurSchedulerInputImpl(fuel - 1), 20);
     }
   }
 
