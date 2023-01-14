@@ -17,7 +17,7 @@
   including projects, but I think this is more useful. See [#232][].
 
 [#232]: https://github.com/mgsloan/todoist-shortcuts/issues/232
-[#233]: https://github.com/mgsloan/todoist-shortcuts/issues/232
+[#233]: https://github.com/mgsloan/todoist-shortcuts/issues/233
 
 
 ## Version 169
