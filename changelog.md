@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 170
+
+### Fixes ###
+
+* Attempt to fix deselecting scheduler input on Safari. See [#191][].
+
+
 ## Version 169
 
 ### Fixes ###
