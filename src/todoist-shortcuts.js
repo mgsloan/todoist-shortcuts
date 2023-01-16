@@ -2143,7 +2143,7 @@
   // DOM.  Run on initialization of todoist-shortcuts.
   function registerTopMutationObservers(content) {
     registerMutationObserver(content, handlePageChange);
-    registerMutationObserver(content, (mutations) => {
+    registerMutationObserver(document, (mutations) => {
       // Not sure how to do this at intelligent times. Instead doing
       // it all the time.
       //
@@ -2175,8 +2175,9 @@
         return true;
       });
       if (filtered.length > 0) {
-        debug('ensuring cursor due to mutations:', mutations);
+        debug('ensuring cursor + updating keymap due to mutations:', mutations);
         ensureCursor(content);
+        updateKeymap();
       }
     }, {childList: true, subtree: true});
     registerMutationObserver(document.body, handleBodyChange);
@@ -2184,7 +2185,6 @@
 
   function handleBodyChange() {
     let nextTask;
-    updateKeymap();
     if (inBulkScheduleMode) {
       if (!checkSchedulerOpen()) {
         if (nextBulkScheduleKey) {
@@ -2246,7 +2246,9 @@
       }
       const popupWindow =
             getUniqueClass(document, 'GB_window') ||
-            selectUnique(document, '[data-testid="modal-overlay"]');
+            selectUnique(document, '[data-testid="modal-overlay"]') ||
+            // Search dropdown
+            selectUnique(document, '#quick_find > [role="presentation"]');
       if (popupWindow) {
         switchKeymap(POPUP_KEYMAP);
         return;
