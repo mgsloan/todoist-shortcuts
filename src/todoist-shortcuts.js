@@ -972,16 +972,24 @@
 
   // Open assign dialog
   function openAssign() {
-    const cursor = requireCursor();
-    withTaskHovered(cursor, () => {
-      const assignButton =
-            getUniqueClass(cursor, 'task_list_item__person_picker');
-      if (assignButton) {
-        click(assignButton);
-      } else {
-        info('Could not find assign button, maybe project not shared?');
-      }
-    });
+    const mutateCursor = getCursorToMutate();
+    if (mutateCursor) {
+      withTaskHovered(mutateCursor, () => {
+        const assignButton =
+              getUniqueClass(mutateCursor, 'task_list_item__person_picker');
+        if (assignButton) {
+          click(assignButton);
+        } else {
+          info('Could not find assign button, maybe project not shared?');
+        }
+      });
+    } else {
+      withUnique(
+          openMoreMenu(),
+          'li[data-action-hint="multi-select-toolbar-overflow-menu-asssign"]',
+          click,
+      );
+    }
   }
 
   // Open the task view sidepane.
