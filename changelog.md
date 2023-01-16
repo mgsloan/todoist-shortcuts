@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 172
+
+### Fixes ###
+
+* Fixes keyboard interaction with search popdown. See [#231][].
+
+[#231]: https://github.com/mgsloan/todoist-shortcuts/issues/231
+
+
 ## Version 171
 
 ### Fixes ###
