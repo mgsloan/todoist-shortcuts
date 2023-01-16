@@ -2808,16 +2808,17 @@
     }
     const scheduler = findScheduler();
     if (scheduler) {
-      try {
-        withTag(scheduler, 'input', (el) => {
-          el.blur();
-        });
-      } finally {
-        exitDeferLastBinding();
+      const schedulerInput = selectUnique(scheduler, 'input');
+      if (schedulerInput && schedulerInput === document.activeElement) {
+        try {
+          schedulerInput.blur();
+        } finally {
+          exitDeferLastBinding();
+        }
+        return;
       }
-    } else {
-      setTimeout(() => blurSchedulerInputImpl(fuel - 1), 20);
     }
+    setTimeout(() => blurSchedulerInputImpl(fuel - 1), 10);
   }
 
   function focusTimeInput() {
