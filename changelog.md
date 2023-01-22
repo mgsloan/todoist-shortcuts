@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 173
+
+### Fixes ###
+
+* Yet another attempt to fix to deselecting scheduler input on Safari. See [#191][].
+
+
 ## Version 172
 
 ### Fixes ###
@@ -13,7 +20,7 @@
 
 ### Fixes ###
 
-* Actual fix to deselecting scheduler input on Safari. See [#191][].
+* Another attempt to fix to deselecting scheduler input on Safari. See [#191][].
 
 * Makes `+` assign shortcut work when multiple tasks are selected. See [#234][].
 
