@@ -7,12 +7,18 @@
 * Follow link binding (shift+enter) now also clicks link in
   description. See [#236][].
 
+* Adds a function `moveToProjectNamed` for moving tasks to a specific
+  project, written by [@mdbraber][]. Usage of this requires manually
+  editing the extension code as described in
+  [README.md](./README.md). See [#237][].
+
 ### Fixes ###
 
 * Yet another attempt to fix to deselecting scheduler input on
   Safari. See [#191][].
 
 [#236]: https://github.com/mgsloan/todoist-shortcuts/issues/236
+[#237]: https://github.com/mgsloan/todoist-shortcuts/issues/237
 
 
 ## Version 172
@@ -48,13 +54,14 @@
 ### Changes ###
 
 * Reinstates backtick and `~` shortcuts for selecting next / previous
-  nav section. The code changes are thanks to
-  [@mdbraber](https://github.com/mdbraber)! The behavior is a little
-  different, now it will also cycle through all navigation items
-  including projects, but I think this is more useful. See [#232][].
+  nav section. The code changes are thanks to [@mdbraber][]! The
+  behavior is a little different, now it will also cycle through all
+  navigation items including projects, but I think this is more
+  useful. See [#232][].
 
 [#232]: https://github.com/mgsloan/todoist-shortcuts/issues/232
 [#233]: https://github.com/mgsloan/todoist-shortcuts/issues/233
+[@mdbraber]: https://github.com/mdbraber
 
 
 ## Version 169
