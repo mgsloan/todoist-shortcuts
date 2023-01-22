@@ -2,9 +2,17 @@
 
 ## Version 173
 
+### Enhancements ###
+
+* Follow link binding (shift+enter) now also clicks link in
+  description. See [#236][].
+
 ### Fixes ###
 
-* Yet another attempt to fix to deselecting scheduler input on Safari. See [#191][].
+* Yet another attempt to fix to deselecting scheduler input on
+  Safari. See [#191][].
+
+[#236]: https://github.com/mgsloan/todoist-shortcuts/issues/236
 
 
 ## Version 172
@@ -20,9 +28,11 @@
 
 ### Fixes ###
 
-* Another attempt to fix to deselecting scheduler input on Safari. See [#191][].
+* Another attempt to fix to deselecting scheduler input on Safari. See
+  [#191][].
 
-* Makes `+` assign shortcut work when multiple tasks are selected. See [#234][].
+* Makes `+` assign shortcut work when multiple tasks are selected. See
+  [#234][].
 
 [#234]: https://github.com/mgsloan/todoist-shortcuts/issues/234
 
