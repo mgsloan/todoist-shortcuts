@@ -684,6 +684,54 @@
     }
   }
 
+  // Clicks 'Move to project' for the selection, and moves to the
+  // named project.
+  // eslint-disable-next-line no-unused-vars
+  function moveToProjectNamed(projectName) {
+    return () => {
+      const mutateCursor = getCursorToMutate();
+      if (mutateCursor) {
+        clickTaskMenu(
+            mutateCursor,
+            'task-overflow-menu-move-to-project',
+            false);
+        withUniqueClass(
+            document,
+            'popper',
+            hasChild('[aria-label="'+projectName+'"]'),
+            (menu) => {
+              withUniqueTag(
+                  menu,
+                  'li',
+                  matchingAttr('aria-label', projectName),
+                  click);
+            });
+        if (inBulkMoveMode) {
+          bulkMoveCursorChanged();
+        }
+      } else {
+        withUnique(
+            document,
+            'button[data-action-hint="multi-select-toolbar-project-picker"]',
+            (menu) => {
+              click(menu);
+              withUniqueClass(
+                  document,
+                  'popper',
+                  hasChild('[aria-label="'+projectName+'"]'),
+                  (menu) => {
+                    withUniqueTag(
+                        menu,
+                        'li',
+                        matchingAttr('aria-label', projectName),
+                        click);
+                  });
+            },
+        );
+      }
+    };
+  }
+
   // Sets the priority of the selected tasks to the specified level. If
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
