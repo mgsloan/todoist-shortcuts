@@ -1161,6 +1161,21 @@
     }
   }
 
+  // Navigate to left menu item based on ID (`today`, `upcoming`, etc).
+  // eslint-disable-next-line no-unused-vars
+  function navigateToLeftMenuItem(itemId) {
+    return () => {
+      const sections = ['top', 'favorites', 'projects'];
+      withLeftMenuItems(sections, (menuItems, current) => {
+        for (const menuItem of menuItems) {
+          if (menuItem.href.indexOf(itemId) > 0) {
+            click(menuItem);
+          }
+        }
+      });
+    };
+  }
+
   // Cycles down through menu items.
   function nextLeftMenuItem() {
     withLeftMenuItems((menuItems, current) => {
