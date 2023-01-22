@@ -12,6 +12,10 @@
   editing the extension code as described in
   [README.md](./README.md). See [#237][].
 
+* Adds a function `navigateToLeftMenuItem` for binding a shortcut to
+  click a specific left nav section, written by [@mdbraber][].
+  Similarly, requires manually editing to use it. See [#239][].
+
 ### Fixes ###
 
 * Yet another attempt to fix to deselecting scheduler input on
@@ -19,6 +23,7 @@
 
 [#236]: https://github.com/mgsloan/todoist-shortcuts/issues/236
 [#237]: https://github.com/mgsloan/todoist-shortcuts/issues/237
+[#239]: https://github.com/mgsloan/todoist-shortcuts/issues/237
 
 
 ## Version 172
