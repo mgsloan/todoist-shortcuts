@@ -7,6 +7,9 @@
   const IS_CHROME =
     /Chrom/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
+  const IS_SAFARI =
+    /Safari/.test(navigator.userAgent) && /Apple/.test(navigator.vendor);
+
   // Cursor navigation.
   //
   // Note that modifying these will not affect the cursor motion bindings in
@@ -2807,7 +2810,11 @@
 
   function blurSchedulerInput() {
     enterDeferLastBinding();
-    setTimeout(() => blurSchedulerInputImpl(50), 0);
+    if (IS_SAFARI) {
+      setTimeout(() => blurSchedulerInputImpl(50), 20);
+    } else {
+      setTimeout(() => blurSchedulerInputImpl(50), 0);
+    }
   }
 
   function blurSchedulerInputImpl(fuel) {
