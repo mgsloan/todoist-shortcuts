@@ -7,4 +7,3 @@ node_modules
 /etc/secrets.json
 /etc/notes.md
 /etc/monitor.js
-/package-lock.json

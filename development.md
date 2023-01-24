@@ -32,10 +32,11 @@ propose a new feature!
 
 # Running eslint
 
-First, install eslint:
+First, install eslint. The `package.json` only contains the dev
+dependencies for eslint and upload automation:
 
 ```
-npm install --dev eslint eslint-config-google
+npm install
 ```
 
 Then, run `eslint.sh` to use it to do checking.
