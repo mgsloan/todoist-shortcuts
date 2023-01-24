@@ -323,6 +323,20 @@ See the git documentation.  A miscellaneous aside is that I highly recommend
 [git from the bottom up](https://jwiegley.github.io/git-from-the-bottom-up/) as
 a guide to understanding git's data model.
 
+# Extra functionality only available via manual editing
+
+There are some extra functions that can be used to define your own
+keybindings:
+
+* `navigateToLeftMenuItem` selects a specific section from the left
+  menu. See [#239][].
+
+* `moveToProjectNamed` moves the current selected tasks to a specific
+  project. See [#237][].
+
+[#237]: https://github.com/mgsloan/todoist-shortcuts/issues/237
+[#239]: https://github.com/mgsloan/todoist-shortcuts/issues/239
+
 # `todoist-shortcuts` in [electron] application
 
 This repository provides browser extentions for both Chrome and Firefox, and
