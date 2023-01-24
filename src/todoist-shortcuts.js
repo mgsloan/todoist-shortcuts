@@ -3459,6 +3459,8 @@
           mustBeKeys = 'g';
         } else if (matchingAttr('data-track', 'navigation|upcoming')(li)) {
           mustBeKeys = 'n';
+        } else if (matchingAttr('data-track', 'navigation|completed')(li)) {
+          mustBeKeys = 'co';
         } else {
           nameSpan = getUniqueClass(li, 'simple_content');
           if (!nameSpan) {

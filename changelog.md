@@ -16,6 +16,10 @@
   click a specific left nav section, written by [@mdbraber][].
   Similarly, requires manually editing to use it. See [#239][].
 
+* Now always assigns the keys `co` to the new "completed"
+  section. This is probably what would always be used anyway, but this
+  is more robust.
+
 ### Fixes ###
 
 * Yet another attempt to fix to deselecting scheduler input on
