@@ -746,7 +746,7 @@
         withQuery(document,
             '[data-action-hint="task-actions-priority-picker"]',
             click);
-        withUniqueClass(document, 'popper', all, (menu) => {
+        withUniqueClass(document, 'priority_picker', all, (menu) => {
           clickPriorityMenu(menu, level);
         });
         // Click save button.
