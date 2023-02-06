@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 174
+
+### Fixes ###
+
+* Fixes another instance of issues with setting priority of a single
+  task, broken only in experimental Todoist mode. See [#238][]
+
+[#238]: https://github.com/mgsloan/todoist-shortcuts/issues/238
+
+
 ## Version 173
 
 ### Enhancements ###
@@ -27,7 +37,7 @@
 
 [#236]: https://github.com/mgsloan/todoist-shortcuts/issues/236
 [#237]: https://github.com/mgsloan/todoist-shortcuts/issues/237
-[#239]: https://github.com/mgsloan/todoist-shortcuts/issues/237
+[#239]: https://github.com/mgsloan/todoist-shortcuts/issues/239
 
 
 ## Version 172
