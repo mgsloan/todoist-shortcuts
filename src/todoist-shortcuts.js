@@ -79,6 +79,9 @@
     [['4', '0'], setPriority('1')],
     ['shift+c', toggleTimer],
 
+    // Projects
+    ['shift+p', addProjectAboveCurrent],
+
     // Sorting
     ['s', sortByDate],
     ['p', sortByPriority],
@@ -1086,6 +1089,27 @@
     withQuery(document, '[aria-label="Close modal"]', click);
     // Close todoist-shortcuts' modals
     withClass(document, 'ts-modal-close', click);
+  }
+
+  function addProjectAboveCurrent() {
+    const projects = document.querySelectorAll("#left-menu-projects-panel li")
+    const projectList = {};
+    for (const project of projects) {
+      const projectNameAnchorTag = project.querySelector("a");
+      if (projectNameAnchorTag) {
+        const projectNameWithTasks = projectNameAnchorTag.getAttribute("aria-label")
+          const [projectName] = projectNameWithTasks.split(",")
+          // Note: if project has children, the button we register here will be the expand/collapse button, not the "more project options" button
+          projectList[projectName] = project.querySelector("button")
+      }
+    }
+    const currentProject = document.querySelector(".simple_content").innerText
+    projectList[currentProject].click()
+
+    const moreProjectActionsDiv = document.querySelector(".popper")
+
+    const [addProjectAbove, addProjectBelow] = moreProjectActionsDiv.querySelectorAll("li")
+    addProjectAbove.click()
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
