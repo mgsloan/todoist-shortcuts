@@ -1099,8 +1099,10 @@
       if (projectNameAnchorTag) {
         const projectNameWithTasks = projectNameAnchorTag.getAttribute("aria-label")
           const [projectName] = projectNameWithTasks.split(",")
-          // Note: if project has children, the button we register here will be the expand/collapse button, not the "more project options" button
-          projectList[projectName] = project.querySelector("button")
+          const projectButtons = project.querySelectorAll("button")
+          // If a project has more than one button, the first is the "toggle collapse" button and the second is the "more actions" button
+          const moreProjectActionsButton = projectButtons.length > 1 ? projectButtons[1] : projectButtons[0];
+          projectList[projectName] = moreProjectActionsButton;
       }
     }
     const currentProject = document.querySelector(".simple_content").innerText
