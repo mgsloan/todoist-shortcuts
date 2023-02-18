@@ -1109,7 +1109,6 @@
         projectNameAnchorTag.getAttribute("aria-label");
       const [projectName] = projectNameWithTasks.split(",");
       if (projectName === currentProjectName) {
-        console.log("found current project");
         const projectButtons = selectAll(project, "button");
         // If a project has more than one button, the first is the "toggle collapse" button and the second is the "more actions" button
         moreProjectActionsButton =
