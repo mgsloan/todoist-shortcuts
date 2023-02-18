@@ -1092,26 +1092,38 @@
   }
 
   function addProjectAboveCurrent() {
-    const projects = document.querySelectorAll("#left-menu-projects-panel li")
-    const projectList = {};
+    const projects = selectAll(document, "#left-menu-projects-panel li");
+    const currentProjectName = getFirstClass(
+      document,
+      "simple_content"
+    )?.innerText;
+    let moreProjectActionsButton;
+    // I use a for loop instead of withQuery because as soon as we find current project, we want to stop iterating
     for (const project of projects) {
-      const projectNameAnchorTag = project.querySelector("a");
-      if (projectNameAnchorTag) {
-        const projectNameWithTasks = projectNameAnchorTag.getAttribute("aria-label")
-          const [projectName] = projectNameWithTasks.split(",")
-          const projectButtons = project.querySelectorAll("button")
-          // If a project has more than one button, the first is the "toggle collapse" button and the second is the "more actions" button
-          const moreProjectActionsButton = projectButtons.length > 1 ? projectButtons[1] : projectButtons[0];
-          projectList[projectName] = moreProjectActionsButton;
+      // If a project doesn't have an anchor tag, it's hidden and we want to skip it.
+      const projectNameAnchorTag = selectUnique(project, "a");
+      if (!projectNameAnchorTag) {
+        continue;
+      }
+      const projectNameWithTasks =
+        projectNameAnchorTag.getAttribute("aria-label");
+      const [projectName] = projectNameWithTasks.split(",");
+      if (projectName === currentProjectName) {
+        console.log("found current project");
+        const projectButtons = selectAll(project, "button");
+        // If a project has more than one button, the first is the "toggle collapse" button and the second is the "more actions" button
+        moreProjectActionsButton =
+          projectButtons.length > 1 ? projectButtons[1] : projectButtons[0];
+        break;
       }
     }
-    const currentProject = document.querySelector(".simple_content").innerText
-    projectList[currentProject].click()
-
-    const moreProjectActionsDiv = document.querySelector(".popper")
-
-    const [addProjectAbove, addProjectBelow] = moreProjectActionsDiv.querySelectorAll("li")
-    addProjectAbove.click()
+    click(moreProjectActionsButton);
+    const moreProjectActionsDiv = getFirstClass(document, "popper");
+    const [addProjectAboveLi, _addProjectBelowLi] = selectAll(
+      moreProjectActionsDiv,
+      "li"
+    );
+    click(addProjectAboveLi);
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
