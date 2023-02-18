@@ -1117,6 +1117,10 @@
         break;
       }
     }
+    if (!moreProjectActionsButton) {
+      info("Could not find more project actions button, which probably means we're not inside a project view.");
+      return;
+    }
     click(moreProjectActionsButton);
     const moreProjectActionsDiv = getFirstClass(document, "popper");
     const [addProjectAboveLi, _addProjectBelowLi] = selectAll(
