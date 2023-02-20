@@ -1092,41 +1092,46 @@
   }
 
   function addProjectAboveCurrent() {
-    const projects = selectAll(document, "#left-menu-projects-panel li");
-    const currentProjectName = getFirstClass(
-      document,
-      "simple_content"
-    )?.innerText;
-    let moreProjectActionsButton;
-    // I use a for loop instead of withQuery because as soon as we find current project, we want to stop iterating
-    for (const project of projects) {
-      // If a project doesn't have an anchor tag, it's hidden and we want to skip it.
-      const projectNameAnchorTag = selectUnique(project, "a");
-      if (!projectNameAnchorTag) {
-        continue;
-      }
-      const projectNameWithTasks =
-        projectNameAnchorTag.getAttribute("aria-label");
-      const [projectName] = projectNameWithTasks.split(",");
-      if (projectName === currentProjectName) {
-        const projectButtons = selectAll(project, "button");
-        // If a project has more than one button, the first is the "toggle collapse" button and the second is the "more actions" button
-        moreProjectActionsButton =
-          projectButtons.length > 1 ? projectButtons[1] : projectButtons[0];
-        break;
-      }
+    const currentPath = document.location.pathname;
+    const currentProject = selectUnique(
+        document, '#left-menu-projects-panel li', (project) => {
+          const link = selectUnique(project, 'a');
+          // If a project doesn't have an anchor tag, it's hidden and
+          // we want to skip it.
+          return link && link.href.endsWith(currentPath);
+        });
+    if (!currentProject) {
+      throw new Error(
+          'Could not find current project while adding project above.');
     }
-    if (!moreProjectActionsButton) {
-      info("Could not find more project actions button, which probably means we're not inside a project view.");
-      return;
+    const projectButtons = selectAll(currentProject, 'button');
+    let moreProjectActionsButton = null;
+    switch (projectButtons.length) {
+      case 1:
+        moreProjectActionsButton = projectButtons[0];
+        break;
+      case 2:
+        // If a project has two buttons, the first is the "toggle
+        // collapse" button and the second is the "more actions"
+        // button.
+        moreProjectActionsButton = projectButtons[1];
+        break;
+      case 0:
+        throw new Error(
+            'Project element has no buttons (expected"more actions" button.');
+      default:
+        throw new Error(
+            'Project element has more than two buttons, which is unexpected.');
     }
     click(moreProjectActionsButton);
-    const moreProjectActionsDiv = getFirstClass(document, "popper");
-    const [addProjectAboveLi, _addProjectBelowLi] = selectAll(
-      moreProjectActionsDiv,
-      "li"
-    );
-    click(addProjectAboveLi);
+    const addAboveSvgPath = selectUnique(
+        document,
+        '.item_menu_list path',
+        matchingAttr('d', ADD_ABOVE_SVG_PATH));
+    if (!addAboveSvgPath) {
+      throw new Error('Did not find "add above" menu item.');
+    }
+    click(addAboveSvgPath);
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
@@ -4218,6 +4223,9 @@
   // eslint-disable-next-line max-len
   const SORT_SVG_PATH = 'M15 14.5a2 2 0 011.936 1.498L19.5 16a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 17a.5.5 0 010-1l8.564-.002A2 2 0 0115 14.5zm-.982 1.81l.005-.025-.005.026-.003.014-.004.025-.007.061A.897.897 0 0014 16.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0016 16.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026a.998.998 0 00-1.843.043l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047zM9 9.5a2 2 0 011.936 1.498L19.5 11a.5.5 0 010 1l-8.563.001a2.001 2.001 0 01-3.874 0L4.5 12a.5.5 0 010-1l2.564-.002A2 2 0 019 9.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C8 11.441 8 11.471 8 11.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06A.877.877 0 0010 11.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 009 10.5zm6-6a2 2 0 011.936 1.498L19.5 6a.5.5 0 010 1l-2.563.001a2.001 2.001 0 01-3.874 0L4.5 7a.5.5 0 010-1l8.564-.002A2 2 0 0115 4.5zm0 1a.998.998 0 00-.93.634l-.014.034-.007.022-.014.047-.002.009v.001l-.005.016-.01.047.005-.025-.005.026-.003.014-.004.025-.007.061C14 6.441 14 6.471 14 6.5l.008.125.007.047-.001.002.003.014.006.024h-.001l.004.018.016.058.007.021.004.013.009.026.013.033.012.027-.011-.026.019.043-.008-.017.029.06-.018-.037.048.09a1 1 0 001.784-.155l.015-.039.006-.018-.015.039.022-.06-.001-.001.016-.057.004-.018.005-.024.001-.006v-.001l.005-.033.008-.06C16 6.557 16 6.528 16 6.5l-.008-.124-.007-.051-.001-.001-.003-.014-.01-.047-.004-.016-.007-.024-.01-.034-.004-.012-.01-.03-.006-.013-.007-.017-.01-.026A1.002 1.002 0 0015 5.5z';
 
+  // eslint-disable-next-line max-len
+  const ADD_ABOVE_SVG_PATH = 'M9 6.74L6.35 9.4a.5.5 0 0 1-.7-.7l3.53-3.54a.5.5 0 0 1 .7 0l3.55 3.53a.5.5 0 0 1-.71.7L10 6.69V18.5a.5.5 0 1 1-1 0V6.74zM17 15h2.5a.5.5 0 1 1 0 1H17v2.5a.5.5 0 1 1-1 0V16h-2.5a.5.5 0 1 1 0-1H16v-2.5a.5.5 0 1 1 1 0V15z';
+
   /*****************************************************************************
    * Utilities
    */
@@ -4324,8 +4332,8 @@
   }
 
   // Uses querySelectorAll, but requires a unique result.
-  function selectUnique(parent, query) {
-    return findUnique(all, selectAll(parent, query));
+  function selectUnique(parent, query, predicate) {
+    return findUnique(predicate, selectAll(parent, query));
   }
 
   // Users querySelectorAll, requires unique result, and applies the
