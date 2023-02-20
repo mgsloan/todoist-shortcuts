@@ -79,6 +79,9 @@
     [['4', '0'], setPriority('1')],
     ['shift+c', toggleTimer],
 
+    // Projects
+    ['shift+p', addProjectAboveCurrent],
+
     // Sorting
     ['s', sortByDate],
     ['p', sortByPriority],
@@ -1086,6 +1089,44 @@
     withQuery(document, '[aria-label="Close modal"]', click);
     // Close todoist-shortcuts' modals
     withClass(document, 'ts-modal-close', click);
+  }
+
+  function addProjectAboveCurrent() {
+    const projects = selectAll(document, "#left-menu-projects-panel li");
+    const currentProjectName = getFirstClass(
+      document,
+      "simple_content"
+    )?.innerText;
+    let moreProjectActionsButton;
+    // I use a for loop instead of withQuery because as soon as we find current project, we want to stop iterating
+    for (const project of projects) {
+      // If a project doesn't have an anchor tag, it's hidden and we want to skip it.
+      const projectNameAnchorTag = selectUnique(project, "a");
+      if (!projectNameAnchorTag) {
+        continue;
+      }
+      const projectNameWithTasks =
+        projectNameAnchorTag.getAttribute("aria-label");
+      const [projectName] = projectNameWithTasks.split(",");
+      if (projectName === currentProjectName) {
+        const projectButtons = selectAll(project, "button");
+        // If a project has more than one button, the first is the "toggle collapse" button and the second is the "more actions" button
+        moreProjectActionsButton =
+          projectButtons.length > 1 ? projectButtons[1] : projectButtons[0];
+        break;
+      }
+    }
+    if (!moreProjectActionsButton) {
+      info("Could not find more project actions button, which probably means we're not inside a project view.");
+      return;
+    }
+    click(moreProjectActionsButton);
+    const moreProjectActionsDiv = getFirstClass(document, "popper");
+    const [addProjectAboveLi, _addProjectBelowLi] = selectAll(
+      moreProjectActionsDiv,
+      "li"
+    );
+    click(addProjectAboveLi);
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
