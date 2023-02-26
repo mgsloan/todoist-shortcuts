@@ -1,5 +1,23 @@
 # todoist-shortcuts changelog
 
+## Version 175
+
+### Enhancements ###
+
+* Adds `shift+p` shortcut for adding a project above current
+  project. Thanks to contribution from [@kory-smith][] in [#240][]!
+
+### Fixes ###
+
+* Undo (`u`) seems to no longer work by simulating a keypress of
+  Todoist's native shortcut, so switched back to pressing the button
+  in the UI. The downside of this is that it doesn't work after the
+  undo button disappears.
+
+[#240]: https://github.com/mgsloan/todoist-shortcuts/issues/240
+[@kory-smith]: https://github.com/kory-smith
+
+
 ## Version 174
 
 ### Fixes ###
