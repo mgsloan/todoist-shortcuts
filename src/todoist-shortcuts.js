@@ -80,8 +80,7 @@
     ['shift+c', toggleTimer],
 
     // Projects
-    ['alt+p', addProjectBelowCurrent],
-    ['alt+shift+p', addProjectAboveCurrent],
+    ['shift+p', addProjectAboveCurrent],
 
     // Sorting
     ['s', sortByDate],
@@ -1104,6 +1103,7 @@
     click(addAboveSvgPath);
   }
 
+  // eslint-disable-next-line no-unused-vars
   function addProjectBelowCurrent() {
     openCurrentProjectMoreMenu();
     const addBelowSvgPath = selectUnique(
