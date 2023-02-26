@@ -248,6 +248,16 @@ Listed here for completeness:
 | `#`               | delete                                                                    |
 | `shift+c`         | clicks [toggl-button (time tracking integration extension)][toggl-button] |
 
+## Menus
+
+| keys                   | action                                                 |
+|------------------------|--------------------------------------------------------|
+| `shift+p`              | open left nav menu for current project                 |
+
+Once a menu is open, the native shortcuts can be used to interact with
+it - `tab` or `shift-tab` to cycle which item is selected, and `enter`
+to select.
+
 ## Other
 
 | keys                   | action                                                 |
@@ -260,7 +270,6 @@ Listed here for completeness:
 | `!`                    | open notifications                                     |
 | `ctrl+k`               | open Todoist command pallette                          |
 | `ctrl+shift+/`         | open random task from current view                     |
-| `shift+p`              | add project above current project                      |
 
 Note that undo only works when the "UNDO" button is visible at the bottom of the
 screen. Some actions are not undo-able, such as [deletion or archiving multiple
