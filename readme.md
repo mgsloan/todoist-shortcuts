@@ -260,6 +260,7 @@ Listed here for completeness:
 | `!`                    | open notifications                                     |
 | `ctrl+k`               | open Todoist command pallette                          |
 | `ctrl+shift+/`         | open random task from current view                     |
+| `shift+p`              | add project above current project                      |
 
 Note that undo only works when the "UNDO" button is visible at the bottom of the
 screen. Some actions are not undo-able, such as [deletion or archiving multiple
