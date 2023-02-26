@@ -1384,7 +1384,7 @@
   }
 
   function openNotifications() {
-    withUnique(document, '.top_bar_btn.notifications_btn', click);
+    withUnique(document, '[aria-owns="notification_popup"]', click);
   }
 
   function quickAdd() {
