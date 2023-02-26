@@ -1,5 +1,19 @@
 # todoist-shortcuts changelog
 
+## Version 176
+
+### Enhancements ###
+
+* Changes `shift+p` to instead open current project left nav menu.
+
+* Adds `w` keybinding, matching the native shortcut, to open the
+  current view's "more actions" menu.
+
+### Fixes ###
+
+* Fixes `!` keybinding for opening notifications.
+
+
 ## Version 175
 
 ### Enhancements ###
