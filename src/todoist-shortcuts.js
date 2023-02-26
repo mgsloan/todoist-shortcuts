@@ -1324,7 +1324,20 @@
 
   // Trigger undo by simulating a keypress.
   function undo() {
-    todoistShortcut({key: 'z'});
+    // Triggering native shortcut no longer seems to be working, so instead
+    // clicking the undo button. The main downside of this is that it only
+    // works if the undo button is visible.
+    //
+    // todoistShortcut({key: 'z'});
+    const undoToast = getUniqueClass(document, 'undo_toast');
+    let undoLink = null;
+    if (undoToast) {
+      undoLink = getUniqueTag(
+          undoToast, 'button', not(matchingClass('close_button')));
+    }
+    if (undoLink) {
+      click(undoLink);
+    }
   }
 
   function sortByDate() {
@@ -2531,6 +2544,7 @@
   }
 
   // Simulate a key press with todoist's global handlers.
+  // eslint-disable-next-line no-unused-vars
   function todoistShortcut(options0) {
     const options = typeof options0 === 'string' ? {key: options0} : options0;
     let ev = new Event('keydown');
