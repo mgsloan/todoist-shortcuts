@@ -107,6 +107,7 @@
     ['ctrl+,', copyCursorOrSelectedTitles],
     ['ctrl+c', copyCursorOrSelectedAsMarkdown],
     ['ctrl+shift+/', openRandomTask],
+    ['w', openMoreActionsMenu],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
@@ -1089,6 +1090,21 @@
     withQuery(document, '[aria-label="Close modal"]', click);
     // Close todoist-shortcuts' modals
     withClass(document, 'ts-modal-close', click);
+  }
+
+  function openMoreActionsMenu() {
+    withUniqueClass(document, 'view_header__actions', all, (header) => {
+      for (const button of selectAll(header, 'button')) {
+        // If it contains 3 svg circles, it's the more menu
+        // button. Sad that there is no other identifying
+        // characteristic in the dom.
+        if (selectAll(button, 'circle').length == 3) {
+          click(button);
+          return;
+        }
+      }
+      throw new Error('Failed to find more actions menu');
+    });
   }
 
   function openCurrentProjectLeftNavMenu() {

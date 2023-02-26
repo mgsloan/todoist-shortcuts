@@ -252,6 +252,7 @@ Listed here for completeness:
 
 | keys                   | action                                                 |
 |------------------------|--------------------------------------------------------|
+| `w`                    | open 'more actions' menu for current view              |
 | `shift+p`              | open left nav menu for current project                 |
 
 Once a menu is open, the native shortcuts can be used to interact with
