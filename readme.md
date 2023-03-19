@@ -255,9 +255,13 @@ Listed here for completeness:
 | `w`                    | open 'more actions' menu for current view              |
 | `shift+p`              | open left nav menu for current project                 |
 
-Once a menu is open, the native shortcuts can be used to interact with
-it - `tab` or `shift-tab` to cycle which item is selected, and `enter`
-to select.
+Once a menu is open, the following shortcuts can be used to interact with it:
+
+| keys                       | action                   |
+|----------------------------|--------------------------|
+| `j` or `down` or `tab`     | focus next menu item     |
+| `k` or `up` or `shift+tab` | focus previous menu item |
+| `enter` or `space`         | select current menu item |
 
 ## Other
 

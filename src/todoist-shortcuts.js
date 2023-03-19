@@ -191,6 +191,13 @@
   ];
   const TASK_VIEW_KEYMAP = 'task_view';
 
+  const MENU_LIST_BINDINGS = [
+    [['j', 'down', 'tab'], nextMenuListItem],
+    [['k', 'up', 'shift+tab'], prevMenuListItem],
+    [['enter', 'space'], selectMenuListItem],
+  ];
+  const MENU_LIST_KEYMAP = 'menu_list';
+
   // Keycode constants
   const LEFT_ARROW_KEYCODE = 37;
   const UP_ARROW_KEYCODE = 38;
@@ -1142,6 +1149,7 @@
             'Project element has more than two buttons, which is unexpected.');
     }
     click(moreProjectActionsButton);
+    setTimeout(updateKeymap, 10);
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
@@ -1678,6 +1686,36 @@
     const tasks = getTasks();
     setCursor(tasks[Math.floor(Math.random()*tasks.length)], 'scroll');
     openTaskView();
+  }
+
+  function nextMenuListItem() {
+    withCurrentFocusedMenuListItem((focusedItem) => {
+      let item = focusedItem;
+      do {
+        item = item.nextElementSibling;
+      } while (item && !item.classList.contains('menu_item'));
+      if (!item) {
+        item = focusedItem.parentElement.firstElementChild;
+      }
+      item.focus();
+    });
+  }
+
+  function prevMenuListItem() {
+    withCurrentFocusedMenuListItem((focusedItem) => {
+      let item = focusedItem;
+      do {
+        item = item.previousElementSibling;
+      } while (item && !item.classList.contains('menu_item'));
+      if (!item) {
+        item = focusedItem.parentElement.lastElementChild;
+      }
+      item.focus();
+    });
+  }
+
+  function selectMenuListItem() {
+    withCurrentFocusedMenuListItem(click);
   }
 
   /*****************************************************************************
@@ -2361,6 +2399,10 @@
     if (mousetrap) {
       // Navigation mode manages switching away from NAVIGATE_KEYMAP.
       if (currentKeymap === NAVIGATE_KEYMAP) {
+        return;
+      }
+      if (getCurrentFocusedMenuListItem()) {
+        switchKeymap(MENU_LIST_KEYMAP);
         return;
       }
       if (inBulkScheduleMode) {
@@ -5116,6 +5158,24 @@
     return result;
   }
 
+  function withCurrentFocusedMenuListItem(f) {
+    const item = getCurrentFocusedMenuListItem();
+    if (item === null) {
+      warn('Expected to find a focused menu list, but found none.');
+    }
+    f(item);
+  }
+
+  function getCurrentFocusedMenuListItem() {
+    const item = document.activeElement;
+    const parent = item.parentElement;
+    if (parent && parent.classList.contains('item_menu_list')) {
+      return item;
+    }
+    warn(item, 'is not menu list item');
+    return null;
+  }
+
   function todoistModalIsOpen() {
     const modal =
           document.getElementsByClassName('reactist_modal_box').item(0);
@@ -5126,10 +5186,6 @@
     const findSelector =
           selectAll(document, 'div[role="listbox"][data-dialog="true"]');
     if (findSelector.length && findSelector[0].style.display !== 'none') {
-      return true;
-    }
-
-    if (selectAll(document, '.item_menu_list').length) {
       return true;
     }
 
@@ -5273,6 +5329,7 @@
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
     registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
+    registerKeybindings(MENU_LIST_KEYMAP, MENU_LIST_BINDINGS);
 
     // Update the keymap.  Necessary now that the side panel can start
     // out visible.
