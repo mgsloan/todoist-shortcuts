@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 177
+
+* Improves keyboard shorcuts for navigating open menus.  Specifically,
+  adds `j` or `down` keys in addition to the existing `tab` as well as
+  `k` or `up` keys in addition to `shift+tab`.
+
+
 ## Version 176
 
 ### Enhancements ###
