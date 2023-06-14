@@ -5177,7 +5177,6 @@
     if (parent && parent.classList.contains('item_menu_list')) {
       return item;
     }
-    warn(item, 'is not menu list item');
     return null;
   }
 
