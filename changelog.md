@@ -9,7 +9,11 @@
   some other buttons, but I think these are benign clicks (like
   opening a task after creating it). See [#243][]
 
+* Fixes expand / collapse shortcuts due to changes in Todoist DOM. See
+  [#244][].
+
 [#243]: https://github.com/mgsloan/todoist-shortcuts/issues/243
+[#244]: https://github.com/mgsloan/todoist-shortcuts/issues/244
 
 
 ## Version 177
