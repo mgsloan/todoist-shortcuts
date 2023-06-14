@@ -1331,15 +1331,20 @@
     // works if the undo button is visible.
     //
     // todoistShortcut({key: 'z'});
-    const undoToast = getUniqueClass(document, 'undo_toast');
-    let undoLink = null;
-    if (undoToast) {
-      undoLink = getUniqueTag(
-          undoToast, 'button', not(matchingClass('close_button')));
-    }
-    if (undoLink) {
-      click(undoLink);
-    }
+    withUnique(document, '[role=alert]', (alertContainer) => {
+      let undoButton = null;
+      for (button of selectAll(alertContainer, ' button')) {
+        if (button.querySelector('svg') === null) {
+          if (undoButton !== null) {
+            throw new Error('Multiple buttons in alert might be undo button');
+          }
+          undoButton = button;
+        }
+      }
+      if (undoButton) {
+        click(undoButton);
+      }
+    });
   }
 
   function sortByDate() {

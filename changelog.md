@@ -1,5 +1,17 @@
 # todoist-shortcuts changelog
 
+## Version 178
+
+### Fixes ###
+
+* Fixes undo keyboard shortcut. Unfortunately, Todoist's DOM for this
+  is quite obtuse now, and so now the undo shortcut may also click
+  some other buttons, but I think these are benign clicks (like
+  opening a task after creating it). See [#243][]
+
+[#243]: https://github.com/mgsloan/todoist-shortcuts/issues/243
+
+
 ## Version 177
 
 * Improves keyboard shorcuts for navigating open menus.  Specifically,
