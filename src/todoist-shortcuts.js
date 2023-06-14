@@ -877,7 +877,10 @@
 
   // Toggles collapse / expand of a task, if it has children.
   function toggleCollapse(task) {
-    withUniqueClass(task ? task : requireCursor(), 'arrow', all, click);
+    withUnique(
+      task ? task : requireCursor(),
+      '[data-action-hint=task-toggle-collapse]',
+      click);
   }
 
   // Collapse cursor. If it is already collapsed, select and collapse parent.
