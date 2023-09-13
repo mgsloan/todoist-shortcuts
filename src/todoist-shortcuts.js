@@ -3006,18 +3006,17 @@
       error('Expected to find scheduler after opening it.');
       return;
     }
-    const scheduler = findScheduler();
-    if (scheduler) {
-      const schedulerInput = selectUnique(scheduler, 'input');
-      if (schedulerInput && schedulerInput === document.activeElement) {
-        try {
-          schedulerInput.blur();
-        } finally {
-          exitDeferLastBinding();
-        }
+
+    const focusedEl = document.activeElement;
+    if (focusedEl && findParent(focusedEl, matchingClass('scheduler'))) {
+      try {
+        focusedEl.blur();
         return;
+      } finally {
+        exitDeferLastBinding();
       }
     }
+
     setTimeout(() => blurSchedulerInputImpl(fuel - 1), 10);
   }
 
