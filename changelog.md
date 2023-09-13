@@ -1,5 +1,20 @@
 # todoist-shortcuts changelog
 
+## Version 179
+
+### Fixes ###
+
+* Fixes `t` shortcut to open scheduler without the text input
+  focused. It was behaving the same as `T` and selecting the scheduler
+  text.
+
+* Fixes display of navigation hints. See [#250][].
+
+* Minor enhancement to the appearance of navigation hints
+
+[#250]: https://github.com/mgsloan/todoist-shortcuts/issues/250
+
+
 ## Version 178
 
 ### Fixes ###
