@@ -1,5 +1,25 @@
 # todoist-shortcuts changelog
 
+## Version 180
+
+### Fixes ###
+
+* Fixes `/` / `f` keybinding for opening search. See [#251][].
+
+* Has `j` / `k` / `up` / `down` keys do nothing in scheduler
+  mode. Previously they would cause the scheduler to get duplicates
+  for unknown reasons. See [#252][].
+
+### Enhancements ###
+
+* Adds `taskViewActivity` function (but no keybinding) for opening
+  activity from task view. See [#247][].
+
+[#251]: https://github.com/mgsloan/todoist-shortcuts/issues/251
+[#252]: https://github.com/mgsloan/todoist-shortcuts/issues/252
+[#247]: https://github.com/mgsloan/todoist-shortcuts/issues/247
+
+
 ## Version 179
 
 ### Fixes ###
