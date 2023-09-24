@@ -1660,6 +1660,13 @@
     });
   }
 
+  // eslint-disable-next-line no-unused-vars
+  function taskViewActivity() {
+    withTaskViewMoreMenu((menu) => {
+      withUniqueTag(menu, 'div', matchingText('View task activity'), click);
+    });
+  }
+
   function withTaskViewMoreMenu(f) {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       let overflowMenu = getTaskViewMoreMenu();
