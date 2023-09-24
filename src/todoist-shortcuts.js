@@ -146,6 +146,8 @@
     ['shift+t', scheduleText],
     ['escape', closeContextMenus],
     ['fallback', schedulerFallback],
+    // See #252 for why these are disabled.
+    [['j', 'k', 'up', 'down'], noop],
   ]);
   const SCHEDULE_KEYMAP = 'schedule';
 
@@ -1725,6 +1727,8 @@
   function selectMenuListItem() {
     withCurrentFocusedMenuListItem(click);
   }
+
+  function noop() {}
 
   /*****************************************************************************
   * Bulk schedule
