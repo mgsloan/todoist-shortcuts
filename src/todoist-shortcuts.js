@@ -1434,7 +1434,7 @@
   }
 
   function focusSearch() {
-    withUniqueClass(document, 'quick_find__input', all, (el) => el.focus());
+    withId('quick_find', click);
   }
 
   // Open help documentation.
