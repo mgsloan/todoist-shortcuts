@@ -1081,6 +1081,10 @@
       }
       if (i == 99) {
         warn('Tried a lot to close poppers.');
+        notifyUser(
+          'Closing popups is currently broken with new Todoist UI design. ' +
+            'You may be able to fix this via Settings -> Advanced -> ' +
+            'uncheck "Experimental features"')
       }
     }
     click(document.body);
@@ -3189,7 +3193,7 @@
   }
 
   function notifyUser(msg) {
-    withId('app_holder', (appHolder) => {
+    withId('todoist_app', (appHolder) => {
       withClass(appHolder, 'ts-note', (oldNote) => {
         appHolder.removeChild(oldNote);
       });
@@ -3214,7 +3218,7 @@
 
   function createModal(msg) {
     let modal;
-    withId('app_holder', (appHolder) => {
+    withId('todoist_app', (appHolder) => {
       const close = div('ts-modal-close');
       close.innerHTML = svgs['sm1/close_small.svg'];
       const content = div(
