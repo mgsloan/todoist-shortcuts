@@ -1867,6 +1867,15 @@
    * Utilities for manipulating the UI
    */
 
+  function getViewContent() {
+    // If current experimental UI launches #content will no longer exist.
+    return selectUnique(document, 'main');
+  }
+
+  function withViewContent(f) {
+    return withUnique(document, 'main', f);
+  }
+
   function toggleSelectTask(task) {
     // Control click toggles selection state.
     const isMacOS = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
@@ -2055,9 +2064,7 @@
   // doesn't exist, then use previously stored info to place it after its prior
   // location.
   function ensureCursor(content) {
-    if (!content) {
-      content = getById('content');
-    }
+    content = content || getViewContent();
     // If there's an editor open to add a task, then set the cursor to the item
     // above.
     const manager = getUniqueClass(content, 'manager');
@@ -2520,7 +2527,7 @@
   // Persistently clicks until the class can no longer be found. Used to
   // collapse / expand all items.
   function repeatedlyClickArrows(cls) {
-    withId('content', (content) => {
+    withViewContent((content) => {
       let i = 0;
       let clickedSomething = false;
       const doClick = (el) => {
@@ -3289,7 +3296,7 @@
       return [];
     }
     const results = [];
-    withId('content', (content) => {
+    withViewContent((content) => {
       withTag(content, 'li', (item) => {
         // Skip elements which don't correspond to tasks or sections
         const matches =
@@ -4371,7 +4378,7 @@
   // view. Does not work well for elements that are larger than half a screen
   // full.
   function verticalScrollIntoView(el, marginTop, marginBottom, skipCheck, t) {
-    withId('content', (content) => {
+    withViewContent((content) => {
       const oy = pageOffset(el).y - pageOffset(content).y;
       const cy = oy - content.scrollTop;
       const h = el.offsetHeight;
@@ -5365,17 +5372,21 @@
     initializing = false;
   }
 
-  function initializeWhenContentAppears() {
-    const content = getById('content');
-    if (content === null) {
+  function initializeWhenContentAppears(gas) {
+    const content = getViewContent();
+    if (gas > 0 && content === null) {
       info('Waiting for #content div before initializing todoist-shortcuts');
-      setTimeout(initializeWhenContentAppears, 50);
+      setTimeout(() => initializeWhenContentAppears(gas - 1), 50);
     } else {
-      info('Found #content div - initializing todoist-shortcuts!');
-      registerTopMutationObservers(content);
+      if (content === null) {
+        error('Ran out of gas looking for content div - initializing todoist-shortcuts anyway.');
+      } else {
+        info('Found content div - initializing todoist-shortcuts!');
+      }
+      registerTopMutationObservers(content || document);
       initialize();
     }
   }
 
-  initializeWhenContentAppears();
+  initializeWhenContentAppears(100);
 })();
