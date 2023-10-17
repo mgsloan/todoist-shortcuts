@@ -1438,7 +1438,15 @@
   }
 
   function focusSearch() {
-    withId('quick_find', click);
+    // TODO: remove once gone
+    const quickFind = getById('quick_find');
+    if (quickFind) {
+      click(quickFind);
+      return;
+    }
+
+    // TODO: does it work in other UI languages?
+    withUnique(document, 'nav a[aria-label=Search]', click);
   }
 
   // Open help documentation.
