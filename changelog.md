@@ -1,5 +1,20 @@
 # todoist-shortcuts changelog
 
+## Version 181
+
+### Fixes ###
+
+* Fixes functioning with new UI design (only currently on if you
+  enable "Experimental features" in advanced settings). See [#254][].
+
+### Enhancements ###
+
+* Notifies user of a couple known breakages - sorting and popup
+  closing bindings.
+
+[#254]: https://github.com/mgsloan/todoist-shortcuts/issues/254
+
+
 ## Version 180
 
 ### Fixes ###
