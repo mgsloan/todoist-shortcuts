@@ -1400,7 +1400,8 @@
   }
 
   function sortingCurrentlyBroken() {
-    notifyUser('Sort keybindings are currently not working. Hopefully fixed soon!');
+    notifyUser(
+        'Sort keybindings are currently not working. Hopefully fixed soon!');
   }
 
   /*
@@ -3683,31 +3684,33 @@
           error('Couldn\'t figure out text for', li);
         }
       });
-      withQuery(navigationContainer, '[data-expansion-panel-header=true]', (summary) => {
-        let mustBeKeys = null;
-        const dataTrackAttr = summary.attributes['data-track'];
-        if (dataTrackAttr) {
-          const dataTrack = dataTrackAttr.value;
-          if (dataTrack === 'navigation|projects_panel') {
-            mustBeKeys = 'tp';
-          } else if (dataTrack === 'navigation|labels_panel') {
-            mustBeKeys = 'tl';
-          } else if (dataTrack === 'navigation|filters_panel') {
-            mustBeKeys = 'tf';
-          } else if (dataTrack === 'navigation|favorites_panel') {
-            mustBeKeys = 'tt';
-          } else {
-            error('Unexpected dataTrack value:', dataTrack);
-          }
-        }
-        if (mustBeKeys) {
-          navigateItems.push({
-            element: summary,
-            mustBeKeys,
-            keepGoing: true,
+      withQuery(navigationContainer,
+          '[data-expansion-panel-header=true]',
+          (summary) => {
+            let mustBeKeys = null;
+            const dataTrackAttr = summary.attributes['data-track'];
+            if (dataTrackAttr) {
+              const dataTrack = dataTrackAttr.value;
+              if (dataTrack === 'navigation|projects_panel') {
+                mustBeKeys = 'tp';
+              } else if (dataTrack === 'navigation|labels_panel') {
+                mustBeKeys = 'tl';
+              } else if (dataTrack === 'navigation|filters_panel') {
+                mustBeKeys = 'tf';
+              } else if (dataTrack === 'navigation|favorites_panel') {
+                mustBeKeys = 'tt';
+              } else {
+                error('Unexpected dataTrack value:', dataTrack);
+              }
+            }
+            if (mustBeKeys) {
+              navigateItems.push({
+                element: summary,
+                mustBeKeys,
+                keepGoing: true,
+              });
+            }
           });
-        }
-      });
       navigateOptions = assignKeysToItems(navigateItems);
       let different = false;
       for (const key in navigateOptions) {
@@ -4470,7 +4473,6 @@
   }
 
   // Uses querySelectorAll, and applies the provided function to each result.
-  // eslint-disable-next-line no-unused-vars
   function withQuery(parent, query, f) {
     const els = selectAll(parent, query);
     for (let i = 0; i < els.length; i++) {
@@ -5431,7 +5433,8 @@
       setTimeout(() => initializeWhenContentAppears(gas - 1), 50);
     } else {
       if (content === null) {
-        error('Ran out of gas looking for content div - initializing todoist-shortcuts anyway.');
+        error('Ran out of gas looking for content div. ' +
+              'Initializing todoist-shortcuts anyway.');
       } else {
         info('Found content div - initializing todoist-shortcuts!');
       }
