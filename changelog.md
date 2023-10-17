@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 182
+
+### Fixes ###
+
+* Fixes `q` quick-add shortcut with new UI design.
+
+
 ## Version 181
 
 ### Fixes ###
