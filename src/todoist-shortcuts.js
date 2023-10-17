@@ -1442,7 +1442,7 @@
   }
 
   function quickAdd() {
-    withId('quick_add_task_holder', click);
+    withUnique(document, 'button[data-track="navigation|quick_add"]', click);
   }
 
   function leftNavIsHidden() {
