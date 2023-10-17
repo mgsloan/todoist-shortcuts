@@ -1183,7 +1183,7 @@
   }
 
   function withNavigationContainer(f) {
-    withQuery(document, '#left_menu,#list_holder', f);
+    withUnique(document, '[role=navigation]', f);
   }
 
   // When viewing something other than a project, and the current task has a
@@ -3649,7 +3649,7 @@
           error('Couldn\'t figure out text for', li);
         }
       });
-      withClass(navigationContainer, 'expansion_panel__toggle', (summary) => {
+      withQuery(navigationContainer, '[data-expansion-panel-header=true]', (summary) => {
         let mustBeKeys = null;
         const dataTrackAttr = summary.attributes['data-track'];
         if (dataTrackAttr) {
@@ -3976,24 +3976,24 @@
         // Space to scroll down.  Shift+space to scroll up.
         if (ev.key === ' ') {
           keepGoing = true;
-          withId('left_menu', (leftMenu) => {
+          withNavScroll((navScroll) => {
             if (ev.shiftKey) {
-              leftMenu.scrollBy(0, leftMenu.clientHeight / -2);
+              navScroll.scrollBy(0, navScroll.clientHeight / -2);
             } else {
-              leftMenu.scrollBy(0, leftMenu.clientHeight / 2);
+              navScroll.scrollBy(0, navScroll.clientHeight / 2);
             }
           });
         } else if (ev.keyCode === UP_ARROW_KEYCODE) {
           // Up arrow to scroll up a little bit.
           keepGoing = true;
-          withId('left_menu', (leftMenu) => {
-            leftMenu.scrollBy(0, -40);
+          withNavScroll((navScroll) => {
+            navScroll.scrollBy(0, -40);
           });
         } else if (ev.keyCode === DOWN_ARROW_KEYCODE) {
           // Down arrow to scroll down a little bit.
           keepGoing = true;
-          withId('left_menu', (leftMenu) => {
-            leftMenu.scrollBy(0, 40);
+          withNavScroll((navScroll) => {
+            navScroll.scrollBy(0, 40);
           });
         } else if (ev.keyCode === BACKSPACE_KEYCODE) {
           // Backspace removes keys from list of pressed keys.
@@ -4113,6 +4113,11 @@
         }
       }
     }
+  }
+
+  function withNavScroll(f) {
+    // TODO: remove #left_menu once it no longer exists
+    withUnique(document, 'nav > div:last-child', f);
   }
 
   function isFavoritesSection(el) {
@@ -5047,11 +5052,25 @@
     '.task_list_item--keyboard_shortcuts_active .task_list_item__body {',
     '  background: transparent !important;',
     '}',
-    // Fix adaptive padding of left menu so that there is space for the
-    // navigation hints.
+    // Create space for navigation hints. My apologies to Todoist designers.
+    // Tho tbh I think the top looks better this way.
     '',
+    'nav {',
+    '  padding-left: 0 !important;',
+    '}',
+    '',
+    'nav > div:last-child {',
+    '  padding-left: 15px !important;',
+    '}',
+    '',
+    // TODO: remove once this no longer exists.
     '#left_menu_inner {',
     '  padding-left: 24px;',
+    '}',
+    // Fix for new navigation pane not having position: relative for some li
+    '',
+    'nav li {',
+    '  position: relative;',
     '}',
   ].join('\n'));
 
