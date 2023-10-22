@@ -1163,6 +1163,10 @@
   function navigate() {
     withNavigationContainer((listHolder) => {
       openedLeftNavForNavigate = false;
+      if (leftNavIsHidden()) {
+        toggleLeftNav();
+        openedLeftNavForNavigate = true;
+      }
       // Since the projects list can get reconstructed, watch for changes and
       // reconstruct the shortcut tips.  A function to unregister the mutation
       // observer is passed in.
@@ -1446,11 +1450,21 @@
   }
 
   function leftNavIsHidden() {
-    return document.documentElement.classList.contains('left_menu_hide');
+    if (document.documentElement.classList.contains('left_menu_hide')) {
+      return true;
+    }
+    const appSidebar = getUniqueClass(document, 'app-sidebar-container');
+    if (appSidebar) {
+      return appSidebar.computedStyleMap().get('margin-left').value != 0;
+    }
+    warn('Couldn\'t figure out if left nav is open or not.');
   }
 
   function toggleLeftNav() {
-    withUnique(document, '.top_bar_btn.left_menu_toggle ', click);
+    withUnique(
+        document,
+        'button[aria-controls=sidebar], .top_bar_btn.left_menu_toggle',
+        click);
   }
 
   function focusSearch() {
@@ -3608,6 +3622,7 @@
   // expects a key.
   function setupNavigate(navigationContainer) {
     switchKeymap(NAVIGATE_KEYMAP);
+    // TODO: remove once switch to new UI is done
     if (leftNavIsHidden()) {
       toggleLeftNav();
       openedLeftNavForNavigate = true;
