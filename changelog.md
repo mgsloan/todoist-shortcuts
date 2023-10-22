@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 183
+
+### Fixes ###
+
+* Fixes `g` navigate shortcut opening of left sidebar.
+
+
 ## Version 182
 
 ### Fixes ###
