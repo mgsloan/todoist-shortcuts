@@ -166,6 +166,7 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `w`                     | next week                                 |
 | `p` or `s`              | postpone (recurring tasks)                |
 | `r`                     | remove                                    |
+| `1` to `9`              | move `n` days into the future             |
 | `backspace` or `delete` | clear and focus text date entry           |
 | `enter`                 | focus text date entry without clearing it |
 | `alt+t`                 | open time of day scheduler                |
