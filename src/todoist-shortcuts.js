@@ -145,7 +145,8 @@
     ['alt+t', scheduleTime],
     ['shift+t', scheduleText],
     ['escape', closeContextMenus],
-    ['fallback', schedulerFallback],
+    // See #256 for why this is no longer needed
+    // ['fallback', schedulerFallback],
     // See #252 for why these are disabled.
     [['j', 'k', 'up', 'down'], noop],
   ]);
@@ -556,7 +557,7 @@
     }
     setTimeout(() => {
       withScheduler('scheduleTime', (scheduler) => {
-        const addTime = getUniqueClass(scheduler, 'scheduler-actions-addtime');
+        const addTime = getUniqueClass(scheduler, 'nKhVnNg');
         if (addTime) {
           click(addTime);
         } else {
