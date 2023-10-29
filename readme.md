@@ -161,14 +161,17 @@ When scheduling is opened via `t`, the following keybindings will apply:
 
 | keys                    | date                                      |
 |-------------------------|-------------------------------------------|
-| `c`                     | today (mnemonic is "current day")         |
+| `c` or `0`              | today (mnemonic is "current day")         |
 | `t`                     | tomorrow                                  |
 | `w`                     | next week                                 |
+| `n`                     | next weekend                              |
+| `m`                     | next month                                |
 | `p` or `s`              | postpone (recurring tasks)                |
 | `r`                     | remove                                    |
-| `1` to `9`              | move `n` days into the future             |
+| `1` to `9`              | move `x` days into the future             |
 | `backspace` or `delete` | clear and focus text date entry           |
 | `enter`                 | focus text date entry without clearing it |
+| `shift+t`               | focus smart entry field                   |
 | `alt+t`                 | open time of day scheduler                |
 | `escape`                | exit scheduling                           |
 
