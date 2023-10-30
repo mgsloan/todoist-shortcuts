@@ -1,5 +1,23 @@
 # todoist-shortcuts changelog
 
+## Version 184
+
+Reports and fixes in this release thanks to [adamleerich][]
+
+### Fixes ###
+
+* Fixes `alt-t` in scheduler opening the time settings. See [#256][].
+
+* Adds documentation for `0-9` shortcuts for scheduling items N days
+  in the future. See [#257][].
+
+* Removes documentation for scheduler `delete` + `enter` shortcuts as
+  they don't appear to work anyway. See [#256][].
+
+[#256]: https://github.com/mgsloan/todoist-shortcuts/issues/256
+[#257]: https://github.com/mgsloan/todoist-shortcuts/issues/257
+
+
 ## Version 183
 
 ### Fixes ###
