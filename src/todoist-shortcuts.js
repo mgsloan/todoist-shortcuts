@@ -207,7 +207,6 @@
   const RIGHT_ARROW_KEYCODE = 39;
   const DOWN_ARROW_KEYCODE = 40;
   const BACKSPACE_KEYCODE = 8;
-  const DELETE_KEYCODE = 46;
   const ENTER_KEYCODE = 13;
   const ESCAPE_KEYCODE = 27;
 
@@ -267,33 +266,6 @@
   // Keymap used when there is a floating window.
   const POPUP_BINDINGS = [];
   const POPUP_KEYMAP = 'popup';
-
-  function schedulerFallback(ev) {
-    const scheduler = findScheduler();
-    if (scheduler) {
-      // The idea here is that backspace or delete will clear and
-      // focus the date entry box. Enter will just focus it.
-      if (ev.type === 'keydown' &&
-          (ev.keyCode === BACKSPACE_KEYCODE ||
-           ev.keyCode === DELETE_KEYCODE ||
-           ev.keyCode === ENTER_KEYCODE)) {
-        withUniqueClass(scheduler, 'scheduler-input', all, (inputDiv) => {
-          withUniqueTag(inputDiv, 'input', all, (inputEl) => {
-            if (ev.keyCode !== ENTER_KEYCODE) {
-              inputEl.value = '';
-            }
-            inputEl.focus();
-          });
-        });
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      warn('Expected to find scheduler, but it wasn\'t found.');
-      return true;
-    }
-  }
 
   // Which selection-oriented commands to apply to the cursor if there is no
   // selection. A few possible values:
@@ -556,14 +528,17 @@
       scheduleText();
     }
     setTimeout(() => {
-      withScheduler('scheduleTime', (scheduler) => {
-        const addTime = getUniqueClass(scheduler, 'nKhVnNg');
-        if (addTime) {
-          click(addTime);
-        } else {
-          withUniqueClass(document, 'scheduler-actions-time-label', all, click);
-        }
-      });
+      // TODO: less fragile way to find the "Time" button than relying
+      // on no other buttons having this attribute.
+      const success = withUnique(document, '.scheduler button[aria-controls]',
+          (button) => {
+            click(button);
+            return true;
+          });
+      // Fallback on english text matching if the above doesn't work.
+      if (!success) {
+        withUniqueTag(findScheduler(), 'button', matchingText('Time'), click);
+      }
       focusTimeInput();
     }, 50);
   }
