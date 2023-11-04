@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 185
+
+### Fixes ###
+
+* Fixes `q` quick-add with new UI layout (experimental). Unfortunately
+  Todoist seems to no longer be using semantic attributes and so this
+  fix probably only works with the english version of Todoist.
+
+
 ## Version 184
 
 Reports and fixes in this release thanks to [adamleerich][]
