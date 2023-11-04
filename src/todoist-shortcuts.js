@@ -1422,7 +1422,12 @@
   }
 
   function quickAdd() {
-    withUnique(document, 'button[data-track="navigation|quick_add"]', click);
+    // TODO: Remove navigation|quick_add when new UI rolled out.
+    // TODO: make this selector with with all languages
+    withUnique(document,
+        'button[data-track="navigation|quick_add"], ' +
+               'nav a[aria-label="Add task"]',
+        click);
   }
 
   function leftNavIsHidden() {
