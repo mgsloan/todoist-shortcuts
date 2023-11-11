@@ -33,15 +33,37 @@ Todoist by pressing `?`.
 [kimaero]: https://github.com/kimaero
 [#71]: https://github.com/mgsloan/todoist-shortcuts/issues/71
 
+# Main shortcuts
+
+These are the main shortcuts I use all the time:
+
+| keys                   | action                                            |
+|------------------------|---------------------------------------------------|
+| `g`                    | enter left-sidebar navigation mode                |
+| `q`                    | add task                                          |
+| `j` or `down`          | move cursor down                                  |
+| `k` or `up`            | move cursor up                                    |
+| `x`                    | select task at cursor                             |
+| `enter`                | edit task at cursor                               |
+| `d`                    | done: mark task(s) as complete                    |
+| `e`                    | archive task(s)                                   |
+| `t`                    | open scheduler (see [scheduling section][] below) |
+| `t` then `c`           | schedule today                                    |
+| `t` then `t`           | schedule tomorrow                                 |
+| `t` then `w`           | schedule next week                                |
+| `shift+t`              | open scheduler with text input focused            |
+| `/` or `f`             | focus search input                                |
+| `u` or `z` or `ctrl+z` | undo                                              |
+
 # Keyboard shortcut details
 
 ## Add tasks
 
 | keys | action                                 |
 |------|----------------------------------------|
-| `q`  | Add task                               |
-| `a`  | Add new task at the bottom of the list |
-| `A`  | Add new task at the top of the list    |
+| `q`  | add task                               |
+| `a`  | add new task at the bottom of the list |
+| `A`  | add new task at the top of the list    |
 
 See the "Task Quick Add shortcuts" section of [todoist's keyboard shortcuts
 documentation](https://support.todoist.com/hc/en-us/articles/205063212) for
@@ -62,7 +84,7 @@ described in this document.
 | `{`            | move cursor up to first section task                                  |
 | `}`            | move cursor down to next section                                      |
 | `/` or `f`     | focus search input                                                    |
-| `g`            | enter section navigation mode                                         |
+| `g`            | enter left-sidebar navigation mode                                    |
 | `shift+g`      | navigate to task's project, or select in agenda if already on project |
 | `` ` ``        | select the next left nav section                                      |
 | `~`            | select the previous left nav section                                  |
@@ -78,14 +100,16 @@ When projects have sub-projects, they are automatically expanded when the
 project is selected from the list. To collapse the sub-projects, just use
 navigation mode to select the same project again.
 
-## Manipulation of tasks at cursor
+## Manipulation of tasks
 
 | keys                       | action                                                   |
 |----------------------------|----------------------------------------------------------|
 | `enter`                    | edit task at cursor                                      |
 | `o`                        | add task after cursor                                    |
 | `shift+o`                  | add task before cursor                                   |
-| `i`                        | open task side panel (see [side panel section][], below) |
+| `t`                        | open scheduler (see [scheduling section][] below)        |
+| `shift+t`                  | open scheduler with text input focused                   |
+| `i`                        | open task side panel (see [side panel section][] below)  |
 | `c`                        | open comments for task at cursor                         |
 | `shift+r`                  | open reminders for task at cursor                        |
 | `+`                        | open assign dialog for task at cursor                    |
@@ -108,23 +132,24 @@ Note that there are some known bugs related to task motion - see
 
 [toggl]: https://toggl.com/toggl-button/
 [clockify]: https://chrome.google.com/webstore/detail/clockify-time-tracker/pmjeegjhjdlccodhacdgbgfagbpmccpe
+[scheduling section]: #scheduling
 [side panel section]: #task-side-panel
 
 ## Selection
 
-| keys                     | action                                        |
-|--------------------------|-----------------------------------------------|
-| `x`                      | add task at cursor to selection               |
-| `* a`                    | select all tasks                              |
-| `* n` or `escape`        | clear selection                               |
-| `* s`                    | add all tasks in current section to selection |
-| `* o`                    | add all tasks in overdue section to selection |
-| `* 1`                    | add all priority 1 tasks to selection         |
-| `* 2`                    | add all priority 2 tasks to selection         |
-| `* 3`                    | add all priority 3 tasks to selection         |
-| `* 4` or `* 0`           | add all priority 4 tasks to selection         |
-| `* h` or `* left-arrow`  | collapses all tasks                           |
-| `* l` or `* right-arrow` | expands all tasks                             |
+| keys                          | action                                        |
+|-------------------------------|-----------------------------------------------|
+| `x`                           | select task at cursor                         |
+| `*` then `a`                  | select all tasks                              |
+| `*` then `n` or `escape`      | clear selection                               |
+| `*` then `s`                  | add all tasks in current section to selection |
+| `*` then `o`                  | add all tasks in overdue section to selection |
+| `*` then `1`                  | add all priority 1 tasks to selection         |
+| `*` then `2`                  | add all priority 2 tasks to selection         |
+| `*` then `3`                  | add all priority 3 tasks to selection         |
+| `*` then `4` or `0`           | add all priority 4 tasks to selection         |
+| `*` then `h` or `left-arrow`  | collapses all tasks                           |
+| `*` then `l` or `right-arrow` | expands all tasks                             |
 
 ## Manipulation of selected items
 
@@ -135,7 +160,7 @@ If none are selected, then these will apply to the cursor instead.
 | `t`        | schedule                          |
 | `T`        | schedule by editing text          |
 | `alt+t`    | open time-of-day scheduler        |
-| `d`        | done: mark task as complete       |
+| `d`        | done: mark task(s) as complete    |
 | `e` or `#` | delete                            |
 | `&`        | duplicate                         |
 | `v`        | move to project via search prompt |
@@ -193,7 +218,7 @@ sort the tasks:
 
 | keys           | action                               |
 |----------------|--------------------------------------|
-| `* t`          | enter bulk reschedule mode           |
+| `*` then `t`   | enter bulk reschedule mode           |
 | `v` or `alt+v` | switch to bulk move mode (see below) |
 | `escape`       | exit bulk reschedule mode            |
 
@@ -203,11 +228,11 @@ navigation keys can be used while in this mode.
 
 ## Bulk move mode
 
-| keys     | action                                     |
-|----------|--------------------------------------------|
-| `* v`    | enter bulk move mode                       |
-| `alt+t`  | switch to bulk reschedule mode (see above) |
-| `escape` | exit bulk move mode                        |
+| keys         | action                                     |
+|--------------|--------------------------------------------|
+| `*` then `v` | enter bulk move mode                       |
+| `alt+t`      | switch to bulk reschedule mode (see above) |
+| `escape`     | exit bulk move mode                        |
 
 Once bulk move mode is entered, it will repeatedly bring up the move-to-project
 dialog until there are no more tasks after the cursor. By holding down `alt`,
