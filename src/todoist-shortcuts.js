@@ -5084,14 +5084,9 @@
     '  background: transparent !important;',
     '}',
     // Create space for navigation hints. My apologies to Todoist designers.
-    // Tho tbh I think the top looks better this way.
     '',
-    'nav {',
-    '  padding-left: 0 !important;',
-    '}',
-    '',
-    'nav > div:last-child {',
-    '  padding-left: 15px !important;',
+    'nav > div {',
+    '  padding-left: 12px !important;',
     '}',
     '',
     // TODO: remove once this no longer exists.
