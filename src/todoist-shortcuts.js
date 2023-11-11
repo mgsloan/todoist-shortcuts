@@ -3629,6 +3629,10 @@
           mustBeKeys = 'n';
         } else if (matchingAttr('data-track', 'navigation|completed')(li)) {
           mustBeKeys = 'co';
+        } else if (selectUnique(li, 'a[aria-label="Add task"]')) {
+          mustBeKeys = 'q';
+        } else if (selectUnique(li, 'a[aria-label="Search"]')) {
+          mustBeKeys = '/';
         } else {
           const rawText = getNavItemText(li).split('\n')[0];
           if (rawText.length > 0) {
@@ -4034,7 +4038,8 @@
           keepGoing = rerenderTips();
         } else {
           const char = ev.key.toLowerCase();
-          if (char.length === 1 && lowercaseCharIsAlphanum(char)) {
+          if (char.length === 1 &&
+              (lowercaseCharIsAlphanum(char) || char == '/')) {
             navigateKeysPressed += char;
             const option = navigateOptions[navigateKeysPressed];
             if (option) {
