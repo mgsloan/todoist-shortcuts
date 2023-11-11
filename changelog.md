@@ -1,5 +1,18 @@
 # todoist-shortcuts changelog
 
+## Version 186
+
+### Fixes ###
+
+* Fixes adding left hand space for navigation hints with the most
+  recent version of the new UI design.
+
+### Enhancements ###
+
+* Uses `q` and `/` for hints on Add task / Search items in navigation
+  mode, to match typical shortcuts.
+
+
 ## Version 185
 
 ### Fixes ###
