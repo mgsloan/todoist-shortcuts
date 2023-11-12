@@ -126,7 +126,7 @@
   // Scheduling keybindings (used when scheduler is open)
   const SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
     ['c', scheduleToday],
-    ['t', scheduleTomorrow],
+    ['t', schedulePlusN(1)],
     ['w', scheduleNextWeek],
     ['n', scheduleNextWeekend],
     ['m', scheduleNextMonth],
@@ -552,20 +552,6 @@
               scheduler,
               'button',
               matchingAttr('data-track', 'scheduler|date_shortcut_today'),
-              click,
-          );
-        });
-  }
-
-  // Click 'tomorrow' in schedule. Only does anything if schedule is open.
-  function scheduleTomorrow() {
-    withScheduler(
-        'scheduleTomorrow',
-        (scheduler) => {
-          withUniqueTag(
-              scheduler,
-              'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_tomorrow'),
               click,
           );
         });
