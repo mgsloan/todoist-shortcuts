@@ -1436,9 +1436,16 @@
     }
     const appSidebar = getUniqueClass(document, 'app-sidebar-container');
     if (appSidebar) {
-      return appSidebar.computedStyleMap().get('margin-left').value != 0;
+      // TODO: Fix this on firefox - always fails.
+      try {
+        return appSidebar.computedStyleMap().get('margin-left').value != 0;
+      } catch (e) {
+        warn('Failed to check if left nav is open:', e);
+        return false;
+      }
     }
     warn('Couldn\'t figure out if left nav is open or not.');
+    return false;
   }
 
   function toggleLeftNav() {
