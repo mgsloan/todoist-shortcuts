@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 188
+
+### Fixes ###
+
+* Fixes `t` schedulre binding for scheduling tomorrow, broken by
+  removal of that option in Todoist.
+
+
 ## Version 187
 
 ### Fixes ###
