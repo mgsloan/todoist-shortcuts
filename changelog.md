@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 187
+
+### Fixes ###
+
+* Fixes `g` left hand navigation in Firefox. See [#259][].
+
+[#259]: https://github.com/mgsloan/todoist-shortcuts/issues/259
+
+
 ## Version 186
 
 ### Fixes ###
