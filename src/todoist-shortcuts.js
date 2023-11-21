@@ -4148,7 +4148,20 @@
 
   function withNavScroll(f) {
     // TODO: remove #left_menu once it no longer exists
-    withUnique(document, 'nav > div:last-child', f);
+    const scrollDiv =
+      selectUnique(
+          document,
+          'nav > div,#left_menu',
+          isVerticallyScrollable);
+    if (scrollDiv) {
+      f(scrollDiv);
+    } else {
+      warn('Failed to find scroll div');
+    }
+  }
+
+  function isVerticallyScrollable(el) {
+    return el.scrollHeight > el.clientHeight;
   }
 
   function isFavoritesSection(el) {
