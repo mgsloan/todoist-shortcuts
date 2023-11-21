@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 189
+
+### Fixes ###
+
+* Fixes `g` scrolling in navigation mode (space bar / up+down arrows)
+
+
 ## Version 188
 
 ### Fixes ###
