@@ -3704,6 +3704,58 @@
               });
             }
           });
+
+      // Add labels and filters if that content is visible
+      withUnique(document, 'section[aria-label="Filters"]', (filtersHolder) => {
+        withTag(filtersHolder, 'li', (li) => {
+          let txt = '';
+          let initials = null;
+          nameSpan = getUniqueClass(li, 'simple_content');
+
+          if (nameSpan) {
+            txt = preprocessItemText(nameSpan.textContent);
+            initials = getItemInitials(nameSpan.textContent);
+          } else {
+            warn('failed to get nav link text for', li);
+          }
+
+          if (txt) {
+            navigateItems.push({
+              element: li,
+              text: txt,
+              initials,
+            });
+          } else {
+            error('Couldn\'t figure out text for', li);
+          }
+        });
+      });
+
+      withUnique(document, 'section[aria-label="Labels"]', (labelsHolder) => {
+        withTag(labelsHolder, 'li', (li) => {
+          let txt = '';
+          let initials = null;
+          nameSpan = getUniqueClass(li, 'simple_content');
+
+          if (nameSpan) {
+            txt = preprocessItemText(nameSpan.textContent);
+            initials = getItemInitials(nameSpan.textContent);
+          } else {
+            warn('failed to get nav link text for', li);
+          }
+
+          if (txt) {
+            navigateItems.push({
+              element: li,
+              text: txt,
+              initials,
+            });
+          } else {
+            error('Couldn\'t figure out text for', li);
+          }
+        });
+      });
+
       navigateOptions = assignKeysToItems(navigateItems);
       let different = false;
       for (const key in navigateOptions) {
