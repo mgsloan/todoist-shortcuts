@@ -35,11 +35,11 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "{2ff71f49-5a35-4396-89e3-7913a0d12247}",
-      "strict_min_version": "57.0"
+      "strict_min_version": "109.0"
     }
   },
   "content_security_policy": {
-    "script-src": ["'self'"]
+    "script-src": "'self'"
   },
   "manifest_version": 3
 }
