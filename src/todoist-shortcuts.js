@@ -776,7 +776,7 @@
     } else {
       withUnique(
           openMoreMenu(),
-          'li[data-action-hint="multi-select-toolbar-overflow-menu-complete"]',
+          '[data-action-hint="multi-select-toolbar-overflow-menu-complete"]',
           click,
       );
     }
@@ -793,7 +793,7 @@
     } else {
       withUnique(
           openMoreMenu(),
-          'li[data-action-hint="multi-select-toolbar-overflow-menu-delete"]',
+          '[data-action-hint="multi-select-toolbar-overflow-menu-delete"]',
           click,
       );
     }
@@ -806,7 +806,7 @@
     } else {
       withUnique(
           openMoreMenu(),
-          'li[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]',
+          '[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]',
           click,
       );
     }
@@ -1015,7 +1015,7 @@
     } else {
       withUnique(
           openMoreMenu(),
-          'li[data-action-hint="multi-select-toolbar-overflow-menu-asssign"]',
+          '[data-action-hint="multi-select-toolbar-overflow-menu-asssign"]',
           click,
       );
     }
@@ -2522,7 +2522,7 @@
         matchingAction('multi-select-toolbar-overflow-menu-trigger'),
         click,
     );
-    const result = getUniqueTag(document, 'ul', matchingClass('menu_list'));
+    const result = selectUnique(document, '.reactist_menulist[data-dialog]');
     if (!result) {
       throw new Error('Failed to find "More" menu');
     }
@@ -2590,10 +2590,10 @@
       const query = 'button[data-action-hint="task-overflow-menu"]';
       withUnique(task, query, (openMenu) => {
         click(openMenu);
-        withUniqueClass(
+        withUnique(
             document,
-            'popper',
-            hasChild('[data-action-hint="task-overflow-menu-move-to-project"]'),
+            '.reactist_menulist' +
+            '[data-navigation-hint="navigation-hint-scheduler"]',
             f,
         );
       });
