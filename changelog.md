@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 190
+
+### Fixes ###
+
+* Fixes shortcuts that involve opening context menus. See [#263] and [#264]
+
+[#263]: https://github.com/mgsloan/todoist-shortcuts/issues/263
+[#264]: https://github.com/mgsloan/todoist-shortcuts/issues/264
+
+
 ## Version 189
 
 ### Fixes ###
