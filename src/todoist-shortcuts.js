@@ -3099,7 +3099,7 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       withTaskMenu(task, true, (menu) => {
-        const btn = getUniqueClass(menu, 'menu_item', matchingAction(action));
+        const btn = selectUnique('[data-action-hint="' + action + '"]');
         if (btn) {
           click(btn);
         } else {
