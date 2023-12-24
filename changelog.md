@@ -2,9 +2,21 @@
 
 ## Unreleased
 
+### Fixes ###
+
+* Fixes add task "q" shortcut - broken by Todoist's use of HTML DOM
+  becoming more obfuscated. Probably now only works for English. See
+  [#266][].
+
 ### Enhancements ###
 
+* Adds `enter` keybinding for editing the task text in task view. See
+  [#265][]
+
 * Updates to extension manifest v3
+
+[#265]: https://github.com/mgsloan/todoist-shortcuts/issues/266
+[#266]: https://github.com/mgsloan/todoist-shortcuts/issues/266
 
 
 ## Version 190
