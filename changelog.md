@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Unreleased
+## Version 191
 
 ### Fixes ###
 
@@ -10,12 +10,16 @@
 
 ### Enhancements ###
 
+* Adds support for filters&labels view in navigation mode, thanks for
+  a contribution from [adamleerich][] - see [#262][]
+
 * Adds `enter` keybinding for editing the task text in task view. See
   [#265][]
 
 * Updates to extension manifest v3
 
-[#265]: https://github.com/mgsloan/todoist-shortcuts/issues/266
+[#262]: https://github.com/mgsloan/todoist-shortcuts/issues/262
+[#265]: https://github.com/mgsloan/todoist-shortcuts/issues/265
 [#266]: https://github.com/mgsloan/todoist-shortcuts/issues/266
 
 
