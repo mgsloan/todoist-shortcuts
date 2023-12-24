@@ -3607,6 +3607,7 @@
         let mustBeKeys = null;
         let txt = '';
         let initials = null;
+        let keepGoing = false;
         if (matchingAttr('data-track', 'navigation|inbox')(li)) {
           mustBeKeys = 'i';
         } else if (matchingAttr('data-track', 'navigation|team_inbox')(li)) {
@@ -3615,6 +3616,11 @@
           mustBeKeys = 'g';
         } else if (matchingAttr('data-track', 'navigation|upcoming')(li)) {
           mustBeKeys = 'n';
+        } else if (matchingAttr(
+            'data-track',
+            'navigation|filters-labels')(li)) {
+          mustBeKeys = 'fl';
+          keepGoing = true;
         } else if (matchingAttr('data-track', 'navigation|completed')(li)) {
           mustBeKeys = 'co';
         } else if (selectUnique(li, 'a[aria-label="Add task"]')) {
@@ -3661,12 +3667,14 @@
             mustBeKeys,
             text: txt,
             initials,
+            keepGoing,
           });
         } else if (txt) {
           navigateItems.push({
             element: li,
             text: txt,
             initials,
+            keepGoing,
           });
         } else {
           error('Couldn\'t figure out text for', li);
@@ -3701,7 +3709,7 @@
           });
 
       // Add labels and filters if that content is visible
-      withUnique(document, 'section[aria-label="Filters"]', (filtersHolder) => {
+      withQuery(document, 'section[aria-label="Filters"]', (filtersHolder) => {
         withTag(filtersHolder, 'li', (li) => {
           let txt = '';
           let initials = null;
@@ -3726,7 +3734,7 @@
         });
       });
 
-      withUnique(document, 'section[aria-label="Labels"]', (labelsHolder) => {
+      withQuery(document, 'section[aria-label="Labels"]', (labelsHolder) => {
         withTag(labelsHolder, 'li', (li) => {
           let txt = '';
           let initials = null;
