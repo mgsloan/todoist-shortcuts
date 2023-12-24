@@ -250,6 +250,7 @@ following shortcuts:
 
 | keys            | action                     |
 |-----------------|----------------------------|
+| `enter`         | edit the text of the task  |
 | `i` or `escape` | close the task side panel  |
 | `h`             | navigate to parent task    |
 | `j`             | navigate to next task      |

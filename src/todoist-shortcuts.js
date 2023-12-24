@@ -167,6 +167,7 @@
   const BULK_MOVE_KEYMAP = 'bulk_move';
 
   const TASK_VIEW_BINDINGS = [
+    ['enter', taskViewEdit],
     ['d', taskViewDone],
     [['i', 'escape'], taskViewClose],
     ['h', taskViewParent],
@@ -1554,6 +1555,10 @@
   }
 
   const TASK_VIEW_SELECTOR = 'div[data-testid="task-details-modal"]';
+
+  function taskViewEdit() {
+    withUnique(document, '.task-detail-editor-container .task_content', click);
+  }
 
   function taskViewDone() {
     withUnique(document, '[data-action-hint=task-detail-view-complete]', click);
