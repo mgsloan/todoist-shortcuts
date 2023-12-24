@@ -954,13 +954,13 @@
 
   function addTaskTop() {
     if (viewMode === 'agenda') {
-      quickAddTask();
+      quickAdd();
     } else {
       const tasks = getTasks();
       if (tasks.length > 0) {
         addAboveTask(tasks[0]);
       } else {
-        quickAddTask();
+        quickAdd();
       }
     }
   }
@@ -1285,17 +1285,6 @@
     f(links, current);
   }
 
-  // Clicks quick add task button.  Would be better to use todoist's builtin
-  // shortcut, but that logic is currently WIP and broken.
-  function quickAddTask() {
-    withUniqueTag(
-        document,
-        'button',
-        matchingAttr('data-track', 'navigation|quick_add'),
-        click,
-    );
-  }
-
   // Trigger undo by simulating a keypress.
   function undo() {
     // Triggering native shortcut no longer seems to be working, so instead
@@ -1408,12 +1397,13 @@
   }
 
   function quickAdd() {
-    // TODO: Remove navigation|quick_add when new UI rolled out.
-    // TODO: make this selector with with all languages
-    withUnique(document,
-        'button[data-track="navigation|quick_add"], ' +
-               'nav a[aria-label="Add task"]',
-        click);
+    withUniqueClass(document, 'app-sidebar-container', all, (appSidebar) =>
+      withUniqueTag(
+          appSidebar,
+          'button',
+          (button) => button.innerText.includes('Add task'),
+          click),
+    );
   }
 
   function leftNavIsHidden() {
@@ -3141,7 +3131,7 @@
       // TODO: This works well in labels, but may be a bit unexpected in filters
       // like "Priority 1", since quick add will not adjust the task such that
       // it ends up in the filter.
-      quickAddTask();
+      quickAdd();
       return;
     }
     if (viewMode === 'agenda' &&
@@ -3159,7 +3149,7 @@
       scrollTaskEditorIntoView();
     } else {
       warn('Couldn\'t find task add button so falling back on quick-add');
-      quickAddTask();
+      quickAdd();
     }
   }
 
