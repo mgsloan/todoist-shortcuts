@@ -990,14 +990,7 @@
 
   // Open reminders dialog
   function openReminders() {
-    withTaskMenu(requireCursor(), false, (menu) => {
-      withUniqueClass(
-          menu,
-          'menu_item',
-          matchingAction('task-overflow-menu-reminders'),
-          click,
-      );
-    });
+    clickTaskMenu(requireCursor(), 'task-overflow-menu-reminders');
   }
 
   // Open assign dialog
@@ -2565,32 +2558,27 @@
 
   // Opens up the task's contextual menu and clicks an item via text match.
   function clickTaskMenu(task, action, shouldScroll) {
-    withTaskMenu(task, shouldScroll, (menu) => {
-      withUnique(menu, '[data-action-hint="' + action + '"]', click);
+    withTaskMenuOpen(task, shouldScroll, () => {
+      withUnique(document, '[data-action-hint="' + action + '"]', click);
     });
   }
 
-  function withTaskMenu(task, shouldScroll, f) {
+  function withTaskMenuOpen(task, shouldScroll, f) {
     if (shouldScroll) {
-      withTaskMenuImpl(task, f);
+      withTaskMenuOpenImpl(task, f);
     } else {
       withScrollIgnoredFor(400, () => {
-        withTaskMenuImpl(task, f);
+        withTaskMenuOpenImpl(task, f);
       });
     }
   }
 
-  function withTaskMenuImpl(task, f) {
+  function withTaskMenuOpenImpl(task, f) {
     withTaskHovered(task, () => {
       const query = 'button[data-action-hint="task-overflow-menu"]';
       withUnique(task, query, (openMenu) => {
         click(openMenu);
-        withUnique(
-            document,
-            '.reactist_menulist' +
-            '[data-navigation-hint="navigation-hint-scheduler"]',
-            f,
-        );
+        f();
       });
     });
   }
@@ -3093,7 +3081,7 @@
     } else if (viewMode === 'agenda') {
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
-      withTaskMenu(task, true, (menu) => {
+      withTaskMenuOpen(task, true, () => {
         const btn = selectUnique('[data-action-hint="' + action + '"]');
         if (btn) {
           click(btn);
