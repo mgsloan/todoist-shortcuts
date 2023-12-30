@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 192
+
+### Fixes ###
+
+* Fixes clicking on buttons from the "more actions" menu on a single
+  task. Fixes common shortcuts like `v` (move), `e` or `#` (delete),
+  etc.
+
+
 ## Version 191
 
 ### Fixes ###
