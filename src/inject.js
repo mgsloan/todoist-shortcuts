@@ -1,10 +1,9 @@
 // Injects the main script. This is necessary in order to bind a
 // keyhandler.
 
-const browser = window.browser || window.chrome;
 function inject(scriptName) {
   const scriptEl = document.createElement('script');
-  scriptEl.setAttribute('src', browser.runtime.getURL(scriptName));
+  scriptEl.setAttribute('src', chrome.runtime.getURL(scriptName));
   // In testing doesn't seem to be necessary, but may lead to more
   // predictable execution order.
   scriptEl.setAttribute('defer', 'defer');
