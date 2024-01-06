@@ -1401,9 +1401,6 @@
   }
 
   function leftNavIsHidden() {
-    if (document.documentElement.classList.contains('left_menu_hide')) {
-      return true;
-    }
     const appSidebar = getUniqueClass(document, 'app-sidebar-container');
     if (appSidebar) {
       // TODO: Fix this on firefox - always fails.
@@ -1426,13 +1423,6 @@
   }
 
   function focusSearch() {
-    // TODO: remove once gone
-    const quickFind = getById('quick_find');
-    if (quickFind) {
-      click(quickFind);
-      return;
-    }
-
     // TODO: does it work in other UI languages?
     withUnique(document, 'nav a[aria-label=Search]', click);
   }
@@ -3579,7 +3569,6 @@
   // expects a key.
   function setupNavigate(navigationContainer) {
     switchKeymap(NAVIGATE_KEYMAP);
-    // TODO: remove once switch to new UI is done
     if (leftNavIsHidden()) {
       toggleLeftNav();
       openedLeftNavForNavigate = true;
@@ -4193,11 +4182,10 @@
   }
 
   function withNavScroll(f) {
-    // TODO: remove #left_menu once it no longer exists
     const scrollDiv =
       selectUnique(
           document,
-          'nav > div,#left_menu',
+          'nav > div',
           isVerticallyScrollable);
     if (scrollDiv) {
       f(scrollDiv);
@@ -5152,10 +5140,6 @@
     '  padding-left: 12px !important;',
     '}',
     '',
-    // TODO: remove once this no longer exists.
-    '#left_menu_inner {',
-    '  padding-left: 24px;',
-    '}',
     // Fix for new navigation pane not having position: relative for some li
     '',
     'nav li {',
