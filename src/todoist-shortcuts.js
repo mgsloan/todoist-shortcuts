@@ -4157,11 +4157,14 @@
               let elToClick = getUniqueTag(el, 'a', all);
               elToClick = elToClick || el;
               click(elToClick);
-              // Scroll the task into view, if needed. The delay is
-              // to give time to the uncollapsing.
-              setTimeout(() => {
-                el.scrollIntoViewIfNeeded();
-              }, 300);
+              // Scroll the nav element into view, if needed. The
+              // delay is to give time to the uncollapsing. Not
+              // supported on firefox etc.
+              if (el.scrollIntoViewIfNeeded) {
+                setTimeout(() => {
+                  el.scrollIntoViewIfNeeded();
+                }, 300);
+              }
               // If we're just changing folding, then the user probably wants to
               // stay in navigation mode, so reset and rerender.
               if (keepGoing) {
@@ -4972,7 +4975,8 @@
         // Issue is that we can't even enumerate the stylesheet rules as the
         // theme CSS is from a different domain.  Could possibly be resolved
         // by loading the CSS file directly, but that seems way too inovlved.
-        log('Figuring out background color not supported in some browsers');
+        warn('Figuring out background color not supported in some browsers');
+        return;
       }
       const todoistBackgroundColor =
         currentStyle.get('background-color').toString();
