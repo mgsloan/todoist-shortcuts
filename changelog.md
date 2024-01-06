@@ -1,5 +1,15 @@
 # todoist-shortcuts changelog
 
+## Version 193
+
+### Fixes ###
+
+* Fixes functioning in Firefox. Probably broken by manifest v3 change?
+  See [#267][].
+
+[#267]: https://github.com/mgsloan/todoist-shortcuts/issues/267
+
+
 ## Version 192
 
 ### Fixes ###
