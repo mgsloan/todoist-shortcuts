@@ -1281,25 +1281,26 @@
 
   // Trigger undo by simulating a keypress.
   function undo() {
-    // Triggering native shortcut no longer seems to be working, so instead
-    // clicking the undo button. The main downside of this is that it only
-    // works if the undo button is visible.
-    //
-    // todoistShortcut({key: 'z'});
+    todoistShortcut({key: 'z'});
+    /*
+    // Old strategy for clicking the button.
     withUnique(document, '[role=alert]', (alertContainer) => {
       let undoButton = null;
-      for (button of selectAll(alertContainer, ' button')) {
-        if (button.querySelector('svg') === null) {
-          if (undoButton !== null) {
-            throw new Error('Multiple buttons in alert might be undo button');
-          }
-          undoButton = button;
-        }
+      const foundByText = getUniqueTag(
+        alertContainer, 'button', (el) => el.innerText === 'Undo');
+      if (foundByText) {
+        click(foundByText);
+        return;
       }
-      if (undoButton) {
-        click(undoButton);
+      const foundByLackOfSvg = getUniqueTag(
+        alertContainer, 'button', (el) => el.querySelector('svg') == null);
+      if (foundByLackOfSvg) {
+        click(foundByLackOfSvg);
+        return;
       }
+      notifyUser('Didn\'t find undo button, undo only works popup is visible.');
     });
+    */
   }
 
   function sortByDate() {
@@ -2595,7 +2596,6 @@
   }
 
   // Simulate a key press with todoist's global handlers.
-  // eslint-disable-next-line no-unused-vars
   function todoistShortcut(options0) {
     const options = typeof options0 === 'string' ? {key: options0} : options0;
     let ev = new Event('keydown');
