@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 194
+
+### Fixes ###
+
+* Fixes undo shortcuts by simulating press of Todoist's native undo
+  shortcut.
+
+
 ## Version 193
 
 ### Fixes ###
