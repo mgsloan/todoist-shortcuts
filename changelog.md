@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 195
+
+### Fixes ###
+
+* Todoist added some UI that overlaps with the task view, causing
+  cursoring up to not properly scroll tasks into view. This scrolling
+  behavior is now fixed.
+
+
 ## Version 194
 
 ### Fixes ###

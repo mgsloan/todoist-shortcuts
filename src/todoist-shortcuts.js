@@ -4265,12 +4265,12 @@
   }
 
   function scrollTaskToBottom(task) {
-    verticalScrollIntoView(task, getTopHeight(), 0, true, 0.9);
+    verticalScrollIntoView(task, getTopHeight(), 0, true, 1);
     scrollTaskIntoView(task);
   }
 
   function scrollTaskToTop(task) {
-    verticalScrollIntoView(task, getTopHeight(), 0, true, 0.1);
+    verticalScrollIntoView(task, getTopHeight(), 0, true, 0);
     scrollTaskIntoView(task);
   }
 
@@ -4465,8 +4465,11 @@
       const oy = pageOffset(el).y - pageOffset(content).y;
       const cy = oy - content.scrollTop;
       const h = el.offsetHeight;
+      const overflowDiv = getUniqueClass(
+          content, 'action_head__overflow_actions');
+      const overflowHeight = overflowDiv ? overflowDiv.offsetHeight : 0;
       if (skipCheck ||
-          cy < marginTop ||
+          cy < marginTop + el.offsetHeight + overflowHeight ||
           cy + h > content.offsetHeight - marginBottom) {
         // TODO: for very large tasks, this could end up with the whole task not
         // being in view.
