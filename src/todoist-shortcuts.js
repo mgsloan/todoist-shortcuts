@@ -1056,6 +1056,7 @@
       });
     });
     // Close windows with close buttons
+    withQuery(document, '[aria-label="Close task"]', click);
     withQuery(document, '[aria-label="Close modal"]', click);
     // Close todoist-shortcuts' modals
     withClass(document, 'ts-modal-close', click);
@@ -1550,7 +1551,7 @@
 
   function taskViewClose() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'button[aria-label="Close modal"]', click);
+      withUnique(taskView, 'button[aria-label="Close task"]', click);
     });
   }
 

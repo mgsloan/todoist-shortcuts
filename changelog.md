@@ -8,6 +8,10 @@
   cursoring up to not properly scroll tasks into view. This scrolling
   behavior is now fixed.
 
+* Fixes `escape` to close task view modal. See [#269][].
+
+[#269]: https://github.com/mgsloan/todoist-shortcuts/issues/269
+
 
 ## Version 194
 
