@@ -1,5 +1,12 @@
 # todoist-shortcuts changelog
 
+## Version 196
+
+* Removes bulk move (`* v`) and bulk reschedule (`* t`) as these were
+  quite broken - caused browser tab to freeze. Fix was nontrivial so
+  instead removing this feature.
+
+
 ## Version 195
 
 ### Fixes ###

@@ -11,9 +11,6 @@
     /Safari/.test(navigator.userAgent) && /Apple/.test(navigator.vendor);
 
   // Cursor navigation.
-  //
-  // Note that modifying these will not affect the cursor motion bindings in
-  // 'handleBulkMoveKey'.
   const CURSOR_BINDINGS = [
     [['j', 'down'], cursorDown],
     [['k', 'up'], cursorUp],
@@ -88,9 +85,9 @@
     ['n', sortByName],
     ['r', sortByAssignee],
 
-    // Bulk reschedule / move mode
-    ['* t', bulkSchedule],
-    ['* v', bulkMove],
+    // Bulk reschedule / move modes were removed
+    ['* t', notifyBulkActionsRemoved],
+    ['* v', notifyBulkActionsRemoved],
 
     // Other
 
@@ -152,20 +149,6 @@
   ]);
   const SCHEDULE_KEYMAP = 'schedule';
 
-  // Bulk schedule mode keybindings
-  const BULK_SCHEDULE_BINDINGS = [].concat(SCHEDULE_BINDINGS, [
-    [['v', 'alt+v'], sequence([exitBulkSchedule, bulkMove])],
-    ['escape', exitBulkSchedule],
-  ]);
-  const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
-
-  // Bulk move keybindings
-  //
-  // These can't be handled by mousetrap, because they need to be triggered
-  // while an input is focused. See 'handleBulkMoveKey' below.
-  const BULK_MOVE_BINDINGS = [];
-  const BULK_MOVE_KEYMAP = 'bulk_move';
-
   const TASK_VIEW_BINDINGS = [
     ['enter', taskViewEdit],
     ['d', taskViewDone],
@@ -203,62 +186,11 @@
   const MENU_LIST_KEYMAP = 'menu_list';
 
   // Keycode constants
-  const LEFT_ARROW_KEYCODE = 37;
   const UP_ARROW_KEYCODE = 38;
-  const RIGHT_ARROW_KEYCODE = 39;
   const DOWN_ARROW_KEYCODE = 40;
   const BACKSPACE_KEYCODE = 8;
   const ENTER_KEYCODE = 13;
   const ESCAPE_KEYCODE = 27;
-
-  function handleBulkMoveKey(ev) {
-    if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
-      exitBulkMove();
-      closeContextMenus();
-    } else if (ev.altKey && !ev.ctrlKey && !ev.metaKey) {
-      if (!ev.shiftKey) {
-        if (ev.key === 't') {
-          // alt+t -> switch to bulk schedule mode
-          exitBulkMove();
-          bulkSchedule();
-          return false;
-        } else if (ev.key === 'j' || ev.keyCode === DOWN_ARROW_KEYCODE) {
-          // alt-j or alt-down -> move cursor down
-          return wrapBulkMoveCursorChange(cursorDown);
-        } else if (ev.key === 'k' || ev.keyCode === UP_ARROW_KEYCODE) {
-          // alt-k or alt-up-> move cursor up
-          return wrapBulkMoveCursorChange(cursorUp);
-        } else if (ev.key === 'h' || ev.keyCode === LEFT_ARROW_KEYCODE) {
-          // alt-h or alt-left-> move cursor left
-          return wrapBulkMoveCursorChange(cursorLeft);
-        } else if (ev.key === 'h' || ev.keyCode === RIGHT_ARROW_KEYCODE) {
-          // alt-l or alt-right -> move cursor right
-          return wrapBulkMoveCursorChange(cursorRight);
-        }
-      }
-      if (ev.key === '^') {
-        // alt-^ -> move cursor to first item
-        return wrapBulkMoveCursorChange(cursorFirst);
-      } else if (ev.key === '$') {
-        // alt-^ -> move cursor to first item
-        return wrapBulkMoveCursorChange(cursorLast);
-      } else if (ev.key === '{') {
-        // alt-{ -> move cursor up section
-        return wrapBulkMoveCursorChange(cursorUpSection);
-      } else if (ev.key === '{') {
-        // alt-{ -> move cursor up section
-        return wrapBulkMoveCursorChange(cursorDownSection);
-      }
-    }
-    return true;
-  }
-
-  function wrapBulkMoveCursorChange(f) {
-    closeContextMenus();
-    f();
-    moveToProject();
-    return false;
-  }
 
   // Navigation mode uses its own key handler.
   const NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
@@ -491,9 +423,6 @@
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
       blurSchedulerInput();
-      if (inBulkScheduleMode) {
-        bulkScheduleCursorChanged();
-      }
     } else {
       const query = 'button[data-action-hint="multi-select-toolbar-scheduler"]';
       withUnique(document, query, (button) => {
@@ -648,9 +577,6 @@
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-move-to-project', true);
-      if (inBulkMoveMode) {
-        bulkMoveCursorChanged();
-      }
     } else {
       withUnique(
           document,
@@ -682,9 +608,6 @@
                   matchingAttr('aria-label', projectName),
                   click);
             });
-        if (inBulkMoveMode) {
-          bulkMoveCursorChanged();
-        }
       } else {
         withUnique(
             document,
@@ -1731,133 +1654,13 @@
     withCurrentFocusedMenuListItem(click);
   }
 
+  function notifyBulkActionsRemoved() {
+    notifyUser('Bulk move (* v) and bulk reschedule (* t) shortcuts were ' +
+               'removed as they had stopped working and were not ' +
+               'straightforward to fix.');
+  }
+
   function noop() {}
-
-  /*****************************************************************************
-  * Bulk schedule
-  */
-
-  // MUTABLE. Is 'true' if we're in bulk schedule mode.
-  let inBulkScheduleMode = false;
-  let nextBulkScheduleKey = null;
-
-  function bulkSchedule() {
-    deselectAllTasks();
-    const cursor = requireCursor();
-    inBulkScheduleMode = true;
-    nextBulkScheduleKey = getTaskKey(cursor);
-    updateKeymap();
-    oneBulkSchedule(cursor);
-  }
-
-  // TODO(new-scheduler): Exiting doesn't work immediately - visits an
-  // extra item.
-  function exitBulkSchedule() {
-    inBulkScheduleMode = false;
-    nextBulkScheduleKey = null;
-    updateKeymap();
-    closeContextMenus();
-  }
-
-  // NOTE: This is called internally, not intended for use as keybinding action.
-  function oneBulkSchedule() {
-    if (!nextBulkScheduleKey) {
-      debug('Exiting bulk schedule mode - nothing left to schedule.');
-      exitBulkSchedule();
-      return;
-    }
-    const curBulkScheduleTask = getTaskByKey(nextBulkScheduleKey);
-    if (!curBulkScheduleTask) {
-      warn(
-          'Exiting bulk schedule mode because it couldn\'t find',
-          nextBulkScheduleKey,
-      );
-      exitBulkSchedule();
-      return;
-    }
-    setCursor(curBulkScheduleTask, 'scroll');
-    bulkScheduleCursorChanged();
-    clickTaskSchedule(curBulkScheduleTask);
-    blurSchedulerInput();
-  }
-
-  function bulkScheduleCursorChanged() {
-    const cursor = getCursor();
-    if (cursor) {
-      const tasks = getTasks();
-      const nextBulkScheduleTask =
-            getNextCursorableTask(tasks, getTaskKey(cursor));
-      if (nextBulkScheduleTask) {
-        nextBulkScheduleKey = getTaskKey(nextBulkScheduleTask);
-        return;
-      }
-    }
-    nextBulkScheduleKey = null;
-  }
-
-  /*****************************************************************************
-  * Bulk move
-  */
-
-  // MUTABLE. Is 'true' if we're in bulk move mode.
-  let inBulkMoveMode = false;
-  let nextBulkMoveKey = null;
-
-  function bulkMove() {
-    deselectAllTasks();
-    const cursor = requireCursor();
-    inBulkMoveMode = true;
-    nextBulkMoveKey = getTaskKey(cursor);
-    updateKeymap();
-    oneBulkMove();
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  function skipBulkMove() {
-    if (nextBulkMoveKey) {
-      // Closing the calendar will make it open the next.
-      closeContextMenus();
-    } else {
-      exitBulkMove();
-    }
-  }
-
-  function exitBulkMove() {
-    inBulkMoveMode = false;
-    updateKeymap();
-    closeContextMenus();
-  }
-
-  // NOTE: This is called internally, not intended for use as keybinding action.
-  function oneBulkMove() {
-    if (!nextBulkMoveKey) {
-      debug('Exiting bulk move mode because there is nothing left to move.');
-      exitBulkMove();
-      return;
-    }
-    const curBulkMoveTask = getTaskByKey(nextBulkMoveKey);
-    if (!curBulkMoveTask) {
-      warn('Exiting bulk move mode because it couldn\'t find', nextBulkMoveKey);
-      exitBulkMove();
-      return;
-    }
-    setCursor(curBulkMoveTask, 'scroll');
-    bulkMoveCursorChanged();
-    clickTaskMenu(curBulkMoveTask, 'task-overflow-menu-move-to-project', true);
-  }
-
-  function bulkMoveCursorChanged() {
-    const cursor = getCursor();
-    if (cursor) {
-      const tasks = getTasks();
-      const nextBulkMoveTask = getNextCursorableTask(tasks, getTaskKey(cursor));
-      if (nextBulkMoveTask) {
-        nextBulkMoveKey = getTaskKey(nextBulkMoveTask);
-        return;
-      }
-    }
-    nextBulkScheduleKey = null;
-  }
 
   /*****************************************************************************
    * Utilities for manipulating the UI
@@ -2375,46 +2178,6 @@
         updateKeymap();
       }
     }, {childList: true, subtree: true});
-    registerMutationObserver(document.body, handleBodyChange);
-  }
-
-  function handleBodyChange() {
-    let nextTask;
-    if (inBulkScheduleMode) {
-      if (!checkSchedulerOpen()) {
-        if (nextBulkScheduleKey) {
-          nextTask = getTaskByKey(nextBulkScheduleKey);
-          if (nextTask) {
-            debug('Bulk schedule dialog is closed, so scheduling next task.');
-            oneBulkSchedule();
-          } else {
-            error('Could not find next task for bulk schedule.');
-            exitBulkSchedule();
-          }
-        } else {
-          debug('Bulk schedule done because there\'s no next task.');
-          exitBulkSchedule();
-        }
-      }
-    }
-    if (inBulkMoveMode) {
-      if (!checkMoveToProjectOpen()) {
-        if (nextBulkMoveKey) {
-          nextTask = getTaskByKey(nextBulkMoveKey);
-          if (nextTask) {
-            debug('Bulk move dialog is closed, so scheduling next task.');
-            setCursor(nextTask, 'no-scroll');
-            oneBulkMove();
-          } else {
-            error('Could not find next task for bulk move.');
-            exitBulkMove();
-          }
-        } else {
-          debug('Bulk move done because there\'s no next task.');
-          exitBulkMove();
-        }
-      }
-    }
   }
 
   function updateKeymap() {
@@ -2425,14 +2188,6 @@
       }
       if (getCurrentFocusedMenuListItem()) {
         switchKeymap(MENU_LIST_KEYMAP);
-        return;
-      }
-      if (inBulkScheduleMode) {
-        switchKeymap(BULK_SCHEDULE_KEYMAP);
-        return;
-      }
-      if (inBulkMoveMode) {
-        switchKeymap(BULK_MOVE_KEYMAP);
         return;
       }
       if (checkSchedulerOpen()) {
@@ -2573,10 +2328,6 @@
         f();
       });
     });
-  }
-
-  function checkMoveToProjectOpen() {
-    return getFirstClass(document, 'project_picker') !== null;
   }
 
   function checkSchedulerOpen() {
@@ -3529,18 +3280,14 @@
   }
 
   // Gets the next task the cursor can be moved to, after the specified task.
+  //
+  // eslint-disable-next-line no-unused-vars
   function getNextCursorableTask(tasks, currentKey) {
     for (let i = 0; i < tasks.length; i++) {
       if (getTaskKey(tasks[i]) === currentKey) {
         if (i + 1 < tasks.length) {
           return tasks[i + 1];
         }
-        /*
-        for (let j = i + 1; j < tasks.length; j++) {
-          const task = tasks[j];
-          return task;
-        }
-        */
       }
     }
     return null;
@@ -5362,13 +5109,8 @@
       // eslint-disable-next-line no-debugger
       debugger;
     }
-    // Focus is on an input box during bulk move code, and mousetrap doesn't
-    // handle those events.  So this handling needs to be done manually.
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
-    }
-    if (inBulkMoveMode) {
-      return handleBulkMoveKey(ev);
     }
     if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
       // Workaround for #217
@@ -5435,8 +5177,6 @@
     // Register key bindings with mousetrap.
     registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
     registerKeybindings(SCHEDULE_KEYMAP, SCHEDULE_BINDINGS);
-    registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
-    registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
     registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
