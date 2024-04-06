@@ -1,5 +1,10 @@
 # todoist-shortcuts changelog
 
+## Version 197
+
+* Fixes `/` and `f` shortcuts for search.
+
+
 ## Version 196
 
 * Removes bulk move (`* v`) and bulk reschedule (`* t`) as these were
