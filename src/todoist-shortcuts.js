@@ -1349,7 +1349,7 @@
 
   function focusSearch() {
     // TODO: does it work in other UI languages?
-    withUnique(document, 'nav a[aria-label=Search]', click);
+    withUnique(document, 'nav *[aria-label=Search]', click);
   }
 
   // Open help documentation.
