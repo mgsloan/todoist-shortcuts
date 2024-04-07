@@ -846,7 +846,7 @@
   function selectAllTasks() {
     const allTasks = getTasks('include-collapsed');
     for (let i = 0; i < allTasks.length; i++) {
-      selectTask(allTasks[i]);
+      setTimeout(() => selectTask(allTasks[i]));
     }
   }
 
@@ -854,7 +854,7 @@
   function selectAllOverdue() {
     for (const task of getTasks()) {
       if (getUniqueClass(task, 'date_overdue')) {
-        selectTask(task);
+        setTimeout(() => selectTask(task));
       }
     }
   }
@@ -867,7 +867,7 @@
     const section = getSection(cursor);
     for (const task of getTasks()) {
       if (getSection(task) === section) {
-        selectTask(task);
+        setTimeout(() => selectTask(task));
       }
     }
   }
@@ -1705,11 +1705,13 @@
     const allTasks = getTasks('include-collapsed');
     for (const task of allTasks) {
       const key = getTaskKey(task);
-      if (selections[key]) {
-        selectTask(task);
-      } else {
-        deselectTask(task);
-      }
+      setTimeout(() => {
+        if (selections[key]) {
+          selectTask(task);
+        } else {
+          deselectTask(task);
+        }
+      });
     }
   }
 
