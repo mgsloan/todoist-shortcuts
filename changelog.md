@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Version 198
+
+* Makes bulk task selection async due to slowdown in Todoist. For some
+reason selecting a task is now slow, so it would take multiple seconds
+after `* a` for all of them to be selected. Doing the selections
+asynchronously makes it clear that the keyboard shortcut did
+something.
+
+
 ## Version 197
 
 * Fixes `/` and `f` shortcuts for search.
