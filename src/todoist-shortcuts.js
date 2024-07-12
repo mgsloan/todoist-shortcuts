@@ -891,7 +891,7 @@
 
   function scrollTaskEditorIntoView() {
     withUniqueClass(document, 'task_editor', all, (editor) => {
-      verticalScrollIntoView(editor, getTopHeight(), 0, true, 0.6);
+      verticalScrollIntoView(editor, 0, true, 0.6);
     });
   }
 
@@ -4011,32 +4011,17 @@
   }
 
   function scrollTaskIntoView(task) {
-    verticalScrollIntoView(task, getTopHeight(), 0, false, 0.5);
+    verticalScrollIntoView(task, 0, false, 0.5);
   }
 
   function scrollTaskToBottom(task) {
-    verticalScrollIntoView(task, getTopHeight(), 0, true, 1);
+    verticalScrollIntoView(task, 0, true, 1);
     scrollTaskIntoView(task);
   }
 
   function scrollTaskToTop(task) {
-    verticalScrollIntoView(task, getTopHeight(), 0, true, 0);
+    verticalScrollIntoView(task, 0, true, 0);
     scrollTaskIntoView(task);
-  }
-
-  function getTopHeight() {
-    const upcomingHeader = getUniqueClass(document, 'upcoming_view__calendar');
-    if (upcomingHeader) {
-      return upcomingHeader.clientHeight;
-    }
-
-    const viewHeader = getUniqueClass(document, 'view_header');
-    if (viewHeader) {
-      return viewHeader.clientHeight;
-    }
-
-    warn('No top bar to measure.');
-    return 0;
   }
 
   // Exception thrown by requireCursor.
@@ -4210,7 +4195,7 @@
   // element in the middle of the window, but only if necessary to bring it into
   // view. Does not work well for elements that are larger than half a screen
   // full.
-  function verticalScrollIntoView(el, marginTop, marginBottom, skipCheck, t) {
+  function verticalScrollIntoView(el, marginBottom, skipCheck, t) {
     withViewContent((content) => {
       const oy = pageOffset(el).y - pageOffset(content).y;
       const cy = oy - content.scrollTop;
@@ -4219,7 +4204,7 @@
           content, 'action_head__overflow_actions');
       const overflowHeight = overflowDiv ? overflowDiv.offsetHeight : 0;
       if (skipCheck ||
-          cy < marginTop + el.offsetHeight + overflowHeight ||
+          cy < el.offsetHeight + overflowHeight ||
           cy + h > content.offsetHeight - marginBottom) {
         // TODO: for very large tasks, this could end up with the whole task not
         // being in view.
