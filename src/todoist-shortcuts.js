@@ -1203,28 +1203,24 @@
     f(links, current);
   }
 
-  // Trigger undo by simulating a keypress.
   function undo() {
-    todoistShortcut({key: 'z'});
-    /*
-    // Old strategy for clicking the button.
+    // Triggering keypress appears to be broken.
+    // todoistShortcut({key: 'z'});
     withUnique(document, '[role=alert]', (alertContainer) => {
-      let undoButton = null;
       const foundByText = getUniqueTag(
-        alertContainer, 'button', (el) => el.innerText === 'Undo');
+          alertContainer, 'button', (el) => el.innerText === 'Undo');
       if (foundByText) {
         click(foundByText);
         return;
       }
       const foundByLackOfSvg = getUniqueTag(
-        alertContainer, 'button', (el) => el.querySelector('svg') == null);
+          alertContainer, 'button', (el) => el.querySelector('svg') == null);
       if (foundByLackOfSvg) {
         click(foundByLackOfSvg);
         return;
       }
       notifyUser('Didn\'t find undo button, undo only works popup is visible.');
     });
-    */
   }
 
   function sortByDate() {
@@ -2350,6 +2346,7 @@
   }
 
   // Simulate a key press with todoist's global handlers.
+  // eslint-disable-next-line no-unused-vars
   function todoistShortcut(options0) {
     const options = typeof options0 === 'string' ? {key: options0} : options0;
     let ev = new Event('keydown');
