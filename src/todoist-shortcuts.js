@@ -3360,7 +3360,7 @@
             txt = preprocessItemText(rawText);
             initials = getItemInitials(rawText);
           } else {
-            warn('failed to get nav link text for', li);
+            debug('failed to get nav link text for', li);
           }
         }
         // Add some stable sequences for common text
@@ -3404,7 +3404,7 @@
             keepGoing,
           });
         } else {
-          error('Couldn\'t figure out text for', li);
+          debug('Couldn\'t figure out text for', li);
         }
       });
       withQuery(navigationContainer,
