@@ -576,14 +576,21 @@
   function moveToProject() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, 'task-overflow-menu-move-to-project', true);
-    } else {
-      withUnique(
-          document,
-          'button[data-action-hint="multi-select-toolbar-project-picker"]',
-          click,
-      );
+      // TODO: Didn't dig into it too much but this seems to be
+      // inscrutably broken.For now instead just selecting a task
+      // and then using the multi-task move which works.
+      //
+      // clickTaskMenu(
+      //     mutateCursor,
+      //     'task-overflow-menu-move-to-project',
+      //     false);
+      selectTask(mutateCursor);
     }
+    withUnique(
+        document,
+        'button[data-action-hint="multi-select-toolbar-project-picker"]',
+        click,
+    );
   }
 
   // Clicks 'Move to project' for the selection, and moves to the
