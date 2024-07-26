@@ -1,5 +1,10 @@
 # todoist-shortcuts changelog
 
+## Version 199
+
+* Fixes `v` shortcut (move to project) when there's no selection.
+
+
 ## Version 198
 
 * Makes bulk task selection async due to slowdown in Todoist. For some
