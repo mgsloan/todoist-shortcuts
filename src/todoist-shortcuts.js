@@ -2129,7 +2129,7 @@
   function persistentlySelectAfterNavigate(taskId, retriesLeft) {
     const taskEl = getTaskById(taskId, 'ignore-indent');
     debug('Retry attempt to select', taskId,
-        'yielded', newEl, '. ',
+        'yielded', taskEl, '. ',
         retriesLeft, ' retries left.');
     if (taskEl) {
       setCursor(taskEl, 'scroll');
