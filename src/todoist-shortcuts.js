@@ -1090,26 +1090,20 @@
     if (viewMode === 'project' && !isFilterView) {
       const dateSpan = getUniqueClass(cursor, 'date');
       if (dateSpan) {
-        withId('top_filters', (topFilters) => {
-          const predicate = matchingAttr('data-track', 'navigation|upcoming');
-          withUniqueTag(topFilters, 'li', predicate, (upcomingLi) => {
-            withUniqueTag(upcomingLi, 'a', all, (upcomingLink) => {
-              // Set a variable that will be read by 'handlePageChange',
-              // which will tell it to select this task.
-              selectAfterNavigate = getTaskId(cursor);
-              click(upcomingLink);
-            });
-          });
+        withUnique(document, '#filter_upcoming a', (upcomingLink) => {
+          // Set a variable that will be read by 'handlePageChange',
+          // which will tell it to select this task.
+          selectAfterNavigate = getTaskId(cursor);
+          click(upcomingLink);
         });
       } else {
         info('Not switching to "Upcoming", because task is not scheduled.');
       }
     } else {
-      let projectEl = null;
-      const projectSpanEl = getUniqueClass(cursor, 'task_list_item__project');
-      if (projectSpanEl) {
-        projectEl = getUniqueTag(projectSpanEl, 'a');
-      }
+      const projectEl = selectUnique(
+          cursor,
+          'a',
+          (linkEl) => linkEl.href && linkEl.href.includes('/project/'));
       if (projectEl) {
         // Set a variable that will be read by 'handlePageChange', which will
         // tell it to select this task.
@@ -4750,16 +4744,6 @@
     '',
     '.' + TODOIST_SHORTCUTS_TIP_TYPED + ' {',
     '  color: #aaa;',
-    '}',
-    '',
-    '#top_filters > li > .' + TODOIST_SHORTCUTS_TIP + ' {',
-    '  margin-top: 0;',
-    '  margin-left: -20px;',
-    '}',
-    '',
-    '#top_filters .collapse__wrapper .' + TODOIST_SHORTCUTS_TIP + ' {',
-    '  margin-top: 5px;',
-    '  margin-left: -22px;',
     '}',
     '',
     '.expansion_panel__toggle .' + TODOIST_SHORTCUTS_TIP + ' {',

@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 200
+
+* Fixes `shift+g` shortcut for switching between upcoming and project
+  view while keeping the same task selected.
+
+
 ## Version 199
 
 * Fixes `v` shortcut (move to project) when there's no selection.
