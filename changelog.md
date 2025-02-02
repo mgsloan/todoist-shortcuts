@@ -1,5 +1,10 @@
 # todoist-shortcuts changelog
 
+## Version 201
+
+* Adds `>` shortcut for opening current task's deadline editor.
+
+
 ## Version 200
 
 * Fixes `shift+g` shortcut for switching between upcoming and project
