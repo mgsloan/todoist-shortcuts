@@ -2,7 +2,10 @@
 
 ## Version 201
 
-* Adds `>` shortcut for opening current task's deadline editor.
+* Adds `>` shortcut for opening current task's deadline editor. See
+  [#274][].
+
+[#274]: https://github.com/mgsloan/todoist-shortcuts/issues/274
 
 
 ## Version 200
