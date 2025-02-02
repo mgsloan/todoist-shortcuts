@@ -5187,7 +5187,7 @@
     const content = getViewContent();
     if (gas > 0 && content === null && window['TodoistShortcutsMousetrap']) {
       info('Waiting for #content and mousetrap before initializing');
-      setTimeout(() => initializeWhenContentAppears(gas - 1), 50);
+      setTimeout(() => initializeWhenContentAppears(gas - 1), 25);
     } else {
       if (content === null) {
         error('Ran out of gas looking for content div. ' +
@@ -5200,5 +5200,5 @@
     }
   }
 
-  initializeWhenContentAppears(100);
+  initializeWhenContentAppears(200);
 })();
