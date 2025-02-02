@@ -5185,8 +5185,8 @@
 
   function initializeWhenContentAppears(gas) {
     const content = getViewContent();
-    if (gas > 0 && content === null) {
-      info('Waiting for #content div before initializing todoist-shortcuts');
+    if (gas > 0 && content === null && window['TodoistShortcutsMousetrap']) {
+      info('Waiting for #content and mousetrap before initializing');
       setTimeout(() => initializeWhenContentAppears(gas - 1), 50);
     } else {
       if (content === null) {
