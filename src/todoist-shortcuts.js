@@ -530,8 +530,13 @@
   function scheduleNextMonth() {
     withScheduler(
         'scheduleNextMonth',
-        () => {
-          error('schedule next month no longer supported.');
+        (scheduler) => {
+          withUniqueTag(
+              scheduler,
+              'button',
+              matchingAttr('data-track', 'scheduler|date_shortcut_nextmonth'),
+              click,
+          );
         });
   }
 
