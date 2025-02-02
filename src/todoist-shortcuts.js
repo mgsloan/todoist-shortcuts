@@ -43,6 +43,7 @@
     ['c', openComments],
     ['shift+r', openReminders],
     ['+', openAssign],
+    ['>', openDeadline],
     [['shift+j', 'shift+down'], moveDown],
     [['shift+k', 'shift+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
@@ -471,6 +472,14 @@
       }
       focusTimeInput();
     }, 50);
+  }
+
+  function openDeadline() {
+    const mutateCursor = getCursorToMutate();
+    if (mutateCursor) {
+      clickTaskEdit(mutateCursor);
+      withQuery(document, '[aria-label="Set deadline"]', click);
+    }
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.

@@ -113,6 +113,7 @@ navigation mode to select the same project again.
 | `c`                        | open comments for task at cursor                         |
 | `shift+r`                  | open reminders for task at cursor                        |
 | `+`                        | open assign dialog for task at cursor                    |
+| `>`                        | open deadline for task at cursor                         |
 | `shift+j` or `shift+down`  | move task at cursor downwards                            |
 | `shift+k` or `shift+up`    | move task at cursor upwards                              |
 | `shift+l` or `shift+left`  | dedent task at cursor                                    |
