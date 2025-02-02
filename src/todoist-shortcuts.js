@@ -479,6 +479,11 @@
     if (mutateCursor) {
       clickTaskEdit(mutateCursor);
       withQuery(document, '[aria-label="Set deadline"]', click);
+      // Todoist seems to put back the focus, so try a few times to blur.
+      blurSchedulerInput();
+      setTimeout(blurSchedulerInput, 20);
+      setTimeout(blurSchedulerInput, 50);
+      setTimeout(blurSchedulerInput, 100);
     }
   }
 
