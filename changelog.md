@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Version 202
+
+* New `>` shortcut for deadline now defocuses the text input so that
+  scheduler shortcuts can be used.
+
+* Brings back support for `m` in scheduler for "Next month".
+
+
 ## Version 201
 
 * Adds `>` shortcut for opening current task's deadline editor. See
