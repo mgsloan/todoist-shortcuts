@@ -2,7 +2,10 @@
   "devDependencies": {
     "eslint": "^8.32.0",
     "eslint-config-google": "^0.14.0",
-    "grunt": "^1.5.3",
+    "grunt": "^1.6.1",
     "grunt-webstore-upload": "^0.9.24"
+  },
+  "dependencies": {
+    "addons-linter": "^7.8.0"
   }
 }

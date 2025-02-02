@@ -50,7 +50,7 @@ I'd document it anyway incase someone wondered what's up with the
 Install grunt and https://github.com/c301/grunt-webstore-upload via
 
 ```
-npm install grunt grunt-webstore-upload
+npm install grunt grunt-webstore-upload addons-linter
 ```
 
 Then, populate `etc/secrets.json` with a json object with `chrome_client_id` and
