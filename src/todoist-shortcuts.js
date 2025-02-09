@@ -1139,8 +1139,7 @@
   // eslint-disable-next-line no-unused-vars
   function navigateToLeftMenuItem(itemId) {
     return () => {
-      const sections = ['top', 'favorites', 'projects'];
-      withLeftMenuItems(sections, (menuItems, current) => {
+      withLeftMenuItems((menuItems, current) => {
         for (const menuItem of menuItems) {
           if (menuItem.href.indexOf(itemId) > 0) {
             click(menuItem);
