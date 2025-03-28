@@ -1012,7 +1012,7 @@
   }
 
   function openMoreActionsMenu() {
-    withUniqueClass(document, 'view_header__actions', all, (header) => {
+    withUnique(document, 'header[aria-label^="Header:"]', (header) => {
       for (const button of selectAll(header, 'button')) {
         // If it contains 3 svg circles, it's the more menu
         // button. Sad that there is no other identifying
