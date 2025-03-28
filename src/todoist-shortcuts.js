@@ -79,6 +79,7 @@
 
     // Projects
     ['shift+p', openCurrentProjectLeftNavMenu],
+    ['alt+a', archiveProject],
 
     // Sorting
     ['s', sortByDate],
@@ -1012,7 +1013,7 @@
   }
 
   function openMoreActionsMenu() {
-    withUniqueClass(document, 'view_header__actions', all, (header) => {
+    withUnique(document, 'header[aria-label^="Header:"]', (header) => {
       for (const button of selectAll(header, 'button')) {
         // If it contains 3 svg circles, it's the more menu
         // button. Sad that there is no other identifying
@@ -1062,6 +1063,30 @@
     }
     click(moreProjectActionsButton);
     setTimeout(updateKeymap, 10);
+  }
+
+  function archiveProject() {
+    openMoreActionsMenu();
+
+    const menu = selectUnique(
+        document,
+        '.reactist_menulist',
+        null,
+    );
+
+    const menuItem = selectUnique(menu, 'div',
+        (item) => {
+          const textContentIsArchive = item.textContent.includes('Archive');
+          const roleIsMenuItem = item.getAttribute('role') === 'menuitem';
+          return textContentIsArchive && roleIsMenuItem;
+        },
+    );
+
+    if (menuItem) {
+      click(menuItem);
+    } else {
+      warn('Could not find "Archive" option in more actions menu');
+    }
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
