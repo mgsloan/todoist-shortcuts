@@ -668,19 +668,25 @@
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
-        withQuery(document,
-            '[data-action-hint="task-actions-priority-picker"]',
-            click);
-        withUniqueClass(document, 'priority_picker', all, (menu) => {
-          clickPriorityMenu(menu, level);
-        });
-        // Click save button.
-        withUnique(
-            document,
-            'div[data-testid="task-editor-action-buttons"] ' +
-            'button[type="submit"]',
-            click,
-        );
+        retryWithDelay(
+            50,
+            () => selectAll(
+                document,
+                '[data-action-hint="task-actions-priority-picker"]'),
+            (priorityButton) => {
+              priorityButton.click();
+              withUniqueClass(document, 'priority_picker', all, (menu) => {
+                clickPriorityMenu(menu, level);
+              });
+              // Click save button.
+              withUnique(
+                  document,
+                  'div[data-testid="task-editor-action-buttons"] ' +
+                'button[type="submit"]',
+                  click,
+              );
+            },
+            () => console.error('Failed to find priority picker button'));
       } else {
         withUnique(
             document,
