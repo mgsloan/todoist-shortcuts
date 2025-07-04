@@ -79,6 +79,7 @@
 
     // Projects
     ['shift+p', openCurrentProjectLeftNavMenu],
+    ['alt+a', archiveProject],
 
     // Sorting
     ['s', sortByDate],
@@ -1062,6 +1063,30 @@
     }
     click(moreProjectActionsButton);
     setTimeout(updateKeymap, 10);
+  }
+
+  function archiveProject() {
+    openMoreActionsMenu();
+
+    const menu = selectUnique(
+        document,
+        '.reactist_menulist',
+        null,
+    );
+
+    const menuItem = selectUnique(menu, 'div',
+        (item) => {
+          const textContentIsArchive = item.textContent.includes('Archive');
+          const roleIsMenuItem = item.getAttribute('role') === 'menuitem';
+          return textContentIsArchive && roleIsMenuItem;
+        },
+    );
+
+    if (menuItem) {
+      click(menuItem);
+    } else {
+      warn('Could not find "Archive" option in more actions menu');
+    }
   }
 
   // Switches to a navigation mode, where navigation targets are annotated
