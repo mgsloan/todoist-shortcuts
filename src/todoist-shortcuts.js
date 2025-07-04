@@ -2768,58 +2768,72 @@
     }
   }
 
-  function blurSchedulerInput() {
-    enterDeferLastBinding();
-    if (IS_SAFARI) {
-      setTimeout(() => blurSchedulerInputImpl(50), 20);
-    } else {
-      setTimeout(() => blurSchedulerInputImpl(50), 0);
-    }
-  }
-
-  function blurSchedulerInputImpl(fuel) {
+  // Generic retry with delay between retries
+  function retryWithDelay(fuel, task, onSuccess, onFailure, delay = 10) {
     if (fuel <= 0) {
-      exitDeferLastBinding();
-      error('Expected to find scheduler after opening it.');
+      onFailure();
       return;
     }
 
-    const focusedEl = document.activeElement;
-    if (focusedEl && findParent(focusedEl, matchingClass('scheduler'))) {
-      try {
-        focusedEl.blur();
-        return;
-      } finally {
-        exitDeferLastBinding();
-      }
+    const result = task();
+    if (result) {
+      onSuccess(result);
+    } else {
+      setTimeout(() =>
+        retryWithDelay(fuel - 1, task, onSuccess, onFailure, delay),
+      delay);
     }
+  }
 
-    setTimeout(() => blurSchedulerInputImpl(fuel - 1), 10);
+  function blurSchedulerInput() {
+    enterDeferLastBinding();
+    const initialDelay = IS_SAFARI ? 20 : 0;
+    setTimeout(() => {
+      retryWithDelay(
+          50,
+          () => {
+            const focusedEl = document.activeElement;
+            if (focusedEl) {
+              if (findParent(focusedEl, matchingClass('scheduler'))) {
+                return focusedEl;
+              } else {
+                return null;
+              }
+            }
+          },
+          (focusedEl) => {
+            try {
+              focusedEl.blur();
+            } finally {
+              exitDeferLastBinding();
+            }
+          },
+          () => {
+            exitDeferLastBinding();
+            error('Expected to find scheduler after opening it.');
+          },
+      );
+    }, initialDelay);
   }
 
   function focusTimeInput() {
     enterDeferLastBinding();
-    setTimeout(() => focusTimeInputImpl(20), 0);
-  }
-
-  // TODO: deduplicate this with other "persistent" retry code.
-  function focusTimeInputImpl(fuel) {
-    if (fuel <= 0) {
-      exitDeferLastBinding();
-      error('Expected to find time input after opening it.');
-      return;
-    }
-    const timepicker = getById('scheduler-timepicker-input-element');
-    if (timepicker) {
-      try {
-        warn('focusing ', timepicker);
-        timepicker.focus();
-      } finally {
-        exitDeferLastBinding();
-      }
-    } else {
-      setTimeout(() => focusTimeInputImpl(fuel - 1), 10);
-    }
+    retryWithDelay(
+        20,
+        () => getById('scheduler-timepicker-input-element'),
+        (timepicker) => {
+          try {
+            warn('focusing ', timepicker);
+            timepicker.focus();
+          } finally {
+            exitDeferLastBinding();
+          }
+        },
+        () => {
+          exitDeferLastBinding();
+          error('Expected to find time input after opening it.');
+        },
+    );
   }
 
   function clickTaskDone(task) {
