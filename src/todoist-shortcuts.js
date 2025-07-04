@@ -5224,5 +5224,5 @@
     }
   }
 
-  initializeWhenContentAppears(200);
+  initializeWhenContentAppears(2000);
 })();
