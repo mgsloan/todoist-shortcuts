@@ -300,13 +300,13 @@
    */
 
   // Move the cursor up and down.
-  function cursorDown() {
+  async function cursorDown() {
     const cursorChanged = modifyCursorIndex((ix) => ix + 1);
     if (!cursorChanged && isUpcomingView()) {
       scrollTaskToTop(getCursor());
     }
   }
-  function cursorUp() {
+  async function cursorUp() {
     const cursorChanged = modifyCursorIndex((ix) => ix - 1);
     if (!cursorChanged && isUpcomingView()) {
       info('scrolling task to bottom');
@@ -315,18 +315,18 @@
   }
 
   // Move the cursor to first / last task.
-  function cursorFirst() {
+  async function cursorFirst() {
     disabledWithLazyLoading('Cursoring first task', () => {
       setCursorToFirstTask('scroll');
     });
   }
-  function cursorLast() {
+  async function cursorLast() {
     disabledWithLazyLoading('Cursoring last task', () => {
       setCursorToLastTask('scroll');
     });
   }
 
-  function cursorUpSection() {
+  async function cursorUpSection() {
     disabledWithLazyLoading('Moving cursor up a section', () => {
       const cursor = requireCursor();
       let section = getSection(cursor);
@@ -350,7 +350,7 @@
     });
   }
 
-  function cursorDownSection() {
+  async function cursorDownSection() {
     disabledWithLazyLoading('Moving cursor down a section', () => {
       const cursor = requireCursor();
       let startSection = getSection(cursor);
@@ -376,12 +376,12 @@
   }
 
   // Edit the task under the cursor.
-  function edit() {
+  async function edit() {
     clickTaskEdit(requireCursor());
   }
 
   // Follow the first link of the task under the cursor.
-  function followLink() {
+  async function followLink() {
     const contentClass = 'task_list_item__content';
     withUniqueClass(requireCursor(), contentClass, all, (content) => {
       const link = getFirstTag(content, 'a');
@@ -400,26 +400,26 @@
   }
 
   // Toggles selection of the task focused by the cursor.
-  function toggleSelect() {
+  async function toggleSelect() {
     toggleSelectTask(requireCursor());
   }
 
   // Selects the task focused by the cursor.
   // eslint-disable-next-line no-unused-vars
-  function select() {
+  async function select() {
     selectTask(requireCursor());
   }
 
   // Deselects the task focused by the cursor.
   // eslint-disable-next-line no-unused-vars
-  function deselect() {
+  async function deselect() {
     deselectTask(requireCursor());
   }
 
   // Clicks the 'schedule' link when tasks are selected.  If
   // WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead applies to the
   // cursor if there is no selection.
-  function schedule() {
+  async function schedule() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
@@ -436,7 +436,7 @@
   // Edits the task under the cursor and focuses the textual representation of
   // when the task is scheduled. Only works for the cursor, not for the
   // selection.
-  function scheduleText() {
+  async function scheduleText() {
     const scheduler = findScheduler();
     if (scheduler) {
       withTag(scheduler, 'input', (el) => el.focus() );
@@ -454,7 +454,7 @@
     }
   }
 
-  function scheduleTime() {
+  async function scheduleTime() {
     if (!findScheduler()) {
       scheduleText();
     }
@@ -474,7 +474,7 @@
     }, 50);
   }
 
-  function openDeadline() {
+  async function openDeadline() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskEdit(mutateCursor);
@@ -488,7 +488,7 @@
   }
 
   // Click 'today' in schedule. Only does anything if schedule is open.
-  function scheduleToday() {
+  async function scheduleToday() {
     withScheduler(
         'scheduleToday',
         (scheduler) => {
@@ -502,7 +502,7 @@
   }
 
   // Click 'next week' in schedule. Only does anything if schedule is open.
-  function scheduleNextWeek() {
+  async function scheduleNextWeek() {
     const date = new Date();
     const day = date.getDay();
     if (day === 0) {
@@ -513,7 +513,7 @@
   }
 
   // Click 'next weekend' in schedule. Only does anything if schedule is open.
-  function scheduleNextWeekend() {
+  async function scheduleNextWeekend() {
     withScheduler(
         'scheduleNextWeekend',
         (scheduler) => {
@@ -527,7 +527,7 @@
   }
 
   // Click 'next month' in schedule. Only does anything if schedule is open.
-  function scheduleNextMonth() {
+  async function scheduleNextMonth() {
     withScheduler(
         'scheduleNextMonth',
         (scheduler) => {
@@ -541,7 +541,7 @@
   }
 
   // Clicks 'postpone' in scheduler.
-  function schedulePostpone() {
+  async function schedulePostpone() {
     withScheduler(
         'schedulePostpone',
         (scheduler) => {
@@ -557,7 +557,7 @@
 
   // Clicks date on scheduler 1-9 days in the future
   function schedulePlusN(n) {
-    return () => {
+    return async () => {
       const date = new Date();
       date.setDate(date.getDate() + n);
       buttonAriaLabel = dateToIsoFormatUsingCurrentTimezone(date);
@@ -576,7 +576,7 @@
   }
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
-  function unschedule() {
+  async function unschedule() {
     withScheduler(
         'unschedule',
         (scheduler) => {
@@ -592,7 +592,7 @@
   // Clicks 'Move to project' for the selection. If WHAT_CURSOR_APPLIES_TO is
   // 'all' or 'most', then instead applies to the cursor if there is no
   // selection.
-  function moveToProject() {
+  async function moveToProject() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       // TODO: Didn't dig into it too much but this seems to be
@@ -616,7 +616,7 @@
   // named project.
   // eslint-disable-next-line no-unused-vars
   function moveToProjectNamed(projectName) {
-    return () => {
+    return async () => {
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskMenu(
@@ -664,32 +664,30 @@
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
   function setPriority(level) {
-    return () => {
+    return async () => {
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
-        (async () => {
-          const priorityButtons = await retryWithDelay(
-              50,
-              'finding priority button',
-              () => selectAll(
-                  document,
-                  '[data-action-hint="task-actions-priority-picker"]')
-          );
-          for (button in priorityButtons) {
-            click(button);
-          }
-          withUniqueClass(document, 'priority_picker', all, (menu) => {
-            clickPriorityMenu(menu, level);
-          });
-          // Click save button.
-          withUnique(
-              document,
-              'div[data-testid="task-editor-action-buttons"] ' +
-              'button[type="submit"]',
-              click,
-          );
-        })();
+        const priorityButtons = await retryWithDelay(
+            50,
+            'finding priority button',
+            () => selectAll(
+                document,
+                '[data-action-hint="task-actions-priority-picker"]'),
+        );
+        for (button in priorityButtons) {
+          click(button);
+        }
+        withUniqueClass(document, 'priority_picker', all, (menu) => {
+          clickPriorityMenu(menu, level);
+        });
+        // Click save button.
+        withUnique(
+            document,
+            'div[data-testid="task-editor-action-buttons"] ' +
+            'button[type="submit"]',
+            click,
+        );
       } else {
         withUnique(
             document,
@@ -708,7 +706,7 @@
   //
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
-  function selectPriority(level) {
+  async function selectPriority(level) {
     return () => {
       const actualLevel = invertPriorityLevel(level);
       const allTasks = getTasks('include-collapsed');
@@ -728,7 +726,7 @@
 
   // Mark all the tasks as completed. If WHAT_CURSOR_APPLIES_TO is 'all', then
   // instead applies to the cursor if there is no selection.
-  function done() {
+  async function done() {
     const mutateCursor = getCursorToMutate('dangerous');
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
@@ -745,7 +743,7 @@
   // todoist prompts, this is not treated as a 'dangerous' action.  As
   // such, if WHAT_CURSOR_APPLIES_TO is 'all' or 'most', then instead
   // applies to the cursor if there is no selection.
-  function deleteTasks() {
+  async function deleteTasks() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
@@ -758,7 +756,7 @@
     }
   }
 
-  function duplicateTasks() {
+  async function duplicateTasks() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
@@ -772,7 +770,7 @@
   }
 
   // Opens the label toggling menu.
-  function openLabelMenu() {
+  async function openLabelMenu() {
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
@@ -794,12 +792,12 @@
 
   // If toggl-button or clockify extension is in use, clicks the
   // button element in the task.
-  function toggleTimer() {
+  async function toggleTimer() {
     withUniqueClass(requireCursor(), TIMER_CLASSES, all, click);
   }
 
   // Toggles collapse / expand of a task, if it has children.
-  function toggleCollapse(task) {
+  async function toggleCollapse(task) {
     withUnique(
       task ? task : requireCursor(),
       '[data-action-hint=task-toggle-collapse]',
@@ -807,7 +805,7 @@
   }
 
   // Collapse cursor. If it is already collapsed, select and collapse parent.
-  function cursorLeft() {
+  async function cursorLeft() {
     if (checkTaskExpanded(requireCursor())) {
       toggleCollapse();
     } else {
@@ -816,7 +814,7 @@
   }
 
   // Expand cursor and move down.
-  function cursorRight() {
+  async function cursorRight() {
     if (checkTaskCollapsed(requireCursor())) {
       toggleCollapse();
       cursorDown();
@@ -826,14 +824,14 @@
   // Collapses or expands task under the cursor, that have children. Does
   // nothing if it's already in the desired state.
 
-  function collapse(task0) {
+  async function collapse(task0) {
     const task = task0 ? task0 : requireCursor();
     if (checkTaskExpanded(task)) {
       toggleCollapse(task);
     }
   }
   // eslint-disable-next-line no-unused-vars
-  function expand(task0) {
+  async function expand(task0) {
     const task = task0 ? task0 : requireCursor();
     if (checkTaskCollapsed(task)) {
       toggleCollapse(task);
@@ -841,7 +839,7 @@
   }
 
   // Move selection to parent project.
-  function selectAndCollapseParent() {
+  async function selectAndCollapseParent() {
     const cursor = requireCursor();
     const tasks = getTasks();
     for (let i = 0; i < tasks.length; i++) {
@@ -865,20 +863,20 @@
   }
 
   // Collapses or expands all tasks.
-  function collapseAll() {
+  async function collapseAll() {
     repeatedlyClickArrows('down');
   }
-  function expandAll() {
+  async function expandAll() {
     repeatedlyClickArrows('right');
   }
 
   // Clears all selections.
-  function deselectAllTasks() {
+  async function deselectAllTasks() {
     click(document.body);
   }
 
   // Selects all tasks, even those hidden by collapsing.
-  function selectAllTasks() {
+  async function selectAllTasks() {
     const allTasks = getTasks('include-collapsed');
     for (let i = 0; i < allTasks.length; i++) {
       setTimeout(() => selectTask(allTasks[i]));
@@ -886,7 +884,7 @@
   }
 
   // Selects all overdue tasks.
-  function selectAllOverdue() {
+  async function selectAllOverdue() {
     for (const task of getTasks()) {
       if (getUniqueClass(task, 'date_overdue')) {
         setTimeout(() => selectTask(task));
@@ -894,7 +892,7 @@
     }
   }
 
-  function selectSection() {
+  async function selectSection() {
     const cursor = getCursor();
     if (!cursor) {
       return;
@@ -907,11 +905,11 @@
     }
   }
 
-  function addTaskBottom() {
+  async function addTaskBottom() {
     addToSectionContaining(getCursor());
   }
 
-  function addTaskTop() {
+  async function addTaskTop() {
     if (viewMode === 'agenda') {
       quickAdd();
     } else {
@@ -924,7 +922,7 @@
     }
   }
 
-  function scrollTaskEditorIntoView() {
+  async function scrollTaskEditorIntoView() {
     withUniqueClass(document, 'task_editor', all, (editor) => {
       verticalScrollIntoView(editor, 0, true, 0.6);
     });
@@ -933,26 +931,26 @@
   // Add a task above / below cursor. Unfortunately these options do not exist
   // in agenda mode, so in that case, instead it is added to the current
   // section.
-  function addAbove() {
+  async function addAbove() {
     addAboveTask(getCursor());
   }
-  function addBelow() {
+  async function addBelow() {
     addBelowTask(getCursor());
   }
 
   // Open comments sidepane
-  function openComments() {
+  async function openComments() {
     openTaskView();
     taskViewComments();
   }
 
   // Open reminders dialog
-  function openReminders() {
+  async function openReminders() {
     clickTaskMenu(requireCursor(), 'task-overflow-menu-reminders');
   }
 
   // Open assign dialog
-  function openAssign() {
+  async function openAssign() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       withTaskHovered(mutateCursor, () => {
@@ -974,7 +972,7 @@
   }
 
   // Open the task view sidepane.
-  function openTaskView() {
+  async function openTaskView() {
     withUniqueClass(
         requireCursor(),
         ['content', 'task_list_item__body'],
@@ -985,7 +983,7 @@
 
   // Click somewhere on the page that shouldn't do anything in particular except
   // closing context menus.  Also clicks 'Cancel' on any task adding.
-  function closeContextMenus() {
+  async function closeContextMenus() {
     for (let i = 0; i < 100; i++) {
       const popperOverlay = getLastClass(document, 'popper__overlay');
       if (popperOverlay) {
@@ -1020,7 +1018,7 @@
     withClass(document, 'ts-modal-close', click);
   }
 
-  function openMoreActionsMenu() {
+  async function openMoreActionsMenu() {
     withUnique(document, 'header[aria-label^="Header:"]', (header) => {
       for (const button of selectAll(header, 'button')) {
         // If it contains 3 svg circles, it's the more menu
@@ -1035,7 +1033,7 @@
     });
   }
 
-  function openCurrentProjectLeftNavMenu() {
+  async function openCurrentProjectLeftNavMenu() {
     if (leftNavIsHidden()) {
       toggleLeftNav();
     }
@@ -1075,7 +1073,7 @@
 
   // Switches to a navigation mode, where navigation targets are annotated
   // with letters to press to click.
-  function navigate() {
+  async function navigate() {
     withNavigationContainer((listHolder) => {
       openedLeftNavForNavigate = false;
       if (leftNavIsHidden()) {
@@ -1112,7 +1110,7 @@
   // When viewing a project, and the current task has a time associated with
   // it that is within the next 7 days, then it jumps to "next 7 days" and
   // reselects the task.
-  function navigateToTask() {
+  async function navigateToTask() {
     const cursor = requireCursor();
     const isFilterView = getIsFilterView();
     if (viewMode === 'project' && !isFilterView) {
@@ -1146,7 +1144,7 @@
 
   // Navigate to left menu item based on ID (`today`, `upcoming`, etc).
   // eslint-disable-next-line no-unused-vars
-  function navigateToLeftMenuItem(itemId) {
+  async function navigateToLeftMenuItem(itemId) {
     return () => {
       withLeftMenuItems((menuItems, current) => {
         for (const menuItem of menuItems) {
@@ -1159,7 +1157,7 @@
   }
 
   // Cycles down through menu items.
-  function nextLeftMenuItem() {
+  async function nextLeftMenuItem() {
     withLeftMenuItems((menuItems, current) => {
       // If on the last item, or no item, select the first item.
       if (current >= menuItems.length - 1 || current < 0) {
@@ -1172,7 +1170,7 @@
   }
 
   // Cycles up through top sections (inbox / today / next 7 days + favorites).
-  function prevLeftMenuItem() {
+  async function prevLeftMenuItem() {
     withLeftMenuItems((menuItems, current) => {
       // If on the first item, or no item, select the last item.
       if (current <= 0) {
@@ -1231,7 +1229,7 @@
     f(links, current);
   }
 
-  function undo() {
+  async function undo() {
     // Triggering keypress appears to be broken.
     // todoistShortcut({key: 'z'});
     withUnique(document, '[role=alert]', (alertContainer) => {
@@ -1251,7 +1249,7 @@
     });
   }
 
-  function sortByDate() {
+  async function sortByDate() {
     sortingCurrentlyBroken();
     /*
     if (resetIfSortTypeAlready('date')) return;
@@ -1261,7 +1259,7 @@
     */
   }
 
-  function sortByPriority() {
+  async function sortByPriority() {
     sortingCurrentlyBroken();
     /*
     if (resetIfSortTypeAlready('priority')) return;
@@ -1277,7 +1275,7 @@
     */
   }
 
-  function sortByName() {
+  async function sortByName() {
     sortingCurrentlyBroken();
     /*
     if (resetIfSortTypeAlready('alphabetically')) return;
@@ -1287,7 +1285,7 @@
     */
   }
 
-  function sortByAssignee() {
+  async function sortByAssignee() {
     sortingCurrentlyBroken();
     /*
     if (resetIfSortTypeAlready('assignee')) return;
@@ -1297,7 +1295,7 @@
     */
   }
 
-  function sortingCurrentlyBroken() {
+  async function sortingCurrentlyBroken() {
     notifyUser(
         'Sort keybindings are currently not working. Hopefully fixed soon!');
   }
@@ -1335,11 +1333,11 @@
   }
   */
 
-  function openNotifications() {
+  async function openNotifications() {
     withUnique(document, '[aria-owns="notification_popup"]', click);
   }
 
-  function quickAdd() {
+  async function quickAdd() {
     withUniqueClass(document, 'app-sidebar-container', all, (appSidebar) =>
       withUniqueTag(
           appSidebar,
@@ -1364,20 +1362,20 @@
     return false;
   }
 
-  function toggleLeftNav() {
+  async function toggleLeftNav() {
     withUnique(
         document,
         'button[aria-controls=sidebar], .top_bar_btn.left_menu_toggle',
         click);
   }
 
-  function focusSearch() {
+  async function focusSearch() {
     // TODO: does it work in other UI languages?
     withUnique(document, 'nav *[aria-label=Search]', click);
   }
 
   // Open help documentation.
-  function openHelpModal() {
+  async function openHelpModal() {
     let modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
     if (modal === null) {
       createHelpModal();
@@ -1437,7 +1435,7 @@
 
   // Click "import from template" in project menu
   // eslint-disable-next-line no-unused-vars
-  function importFromTemplate() {
+  async function importFromTemplate() {
     withClass(document, 'menu_item', (tr) => {
       const predicate =
             matchingAttr('data-track', 'project|actions_import_from_template');
@@ -1458,7 +1456,7 @@
     });
   }
 
-  function sync() {
+  async function sync() {
     let lastSynced = getById('last_synced');
     if (!lastSynced) {
       withId('help_btn', click);
@@ -1476,7 +1474,7 @@
   const COMMAND_MENU_SELECTOR =
         'button[aria-labelledby="command-menu-description"]';
 
-  function openCommandMenu() {
+  async function openCommandMenu() {
     const button = selectUnique(document, COMMAND_MENU_SELECTOR);
     if (button) {
       click(button);
@@ -1488,34 +1486,34 @@
 
   const TASK_VIEW_SELECTOR = 'div[data-testid="task-details-modal"]';
 
-  function taskViewEdit() {
+  async function taskViewEdit() {
     withUnique(document, '.task-detail-editor-container .task_content', click);
   }
 
-  function taskViewDone() {
+  async function taskViewDone() {
     withUnique(document, '[data-action-hint=task-detail-view-complete]', click);
   }
 
-  function taskViewClose() {
+  async function taskViewClose() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(taskView, 'button[aria-label="Close task"]', click);
     });
   }
 
-  function taskViewParent() {
+  async function taskViewParent() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(
           taskView, 'div[data-testid="task-detail-breadcrumbs"] > a', click);
     });
   }
 
-  function taskViewNext() {
+  async function taskViewNext() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(taskView, '[aria-label="Next task"', click);
     });
   }
 
-  function taskViewComments() {
+  async function taskViewComments() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(
           taskView,
@@ -1524,48 +1522,48 @@
     });
   }
 
-  function taskViewPrevious() {
+  async function taskViewPrevious() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(taskView, '[aria-label="Previous task"', click);
     });
   }
 
-  function taskViewAddSubtask() {
+  async function taskViewAddSubtask() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUniqueTag(taskView, 'button', matchingText('Add sub-task'), click);
     });
   }
 
-  function taskViewSchedule() {
+  async function taskViewSchedule() {
     taskViewScheduleText();
     blurSchedulerInput();
   }
 
-  function taskViewScheduleText() {
+  async function taskViewScheduleText() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUniqueClass(taskView, 'task-due-date-button', all, click);
     });
   }
 
-  function taskViewOpenAssign() {
+  async function taskViewOpenAssign() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUniqueTag(taskView, 'span', matchingText('Assignee'), click);
     });
   }
 
-  function taskViewMoveToProject() {
+  async function taskViewMoveToProject() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUnique(taskView, 'button[aria-label="Select a project"]', click);
     });
   }
 
-  function taskViewLabel() {
+  async function taskViewLabel() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUniqueTag(taskView, 'span', matchingText('Labels'), click);
     });
   }
 
-  function taskViewSetPriority(level) {
+  async function taskViewSetPriority(level) {
     return () => {
       withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
         const actualLevel = invertPriorityLevel(level);
@@ -1585,26 +1583,26 @@
     };
   }
 
-  function taskViewOpenReminders() {
+  async function taskViewOpenReminders() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       withUniqueTag(taskView, 'span', matchingText('Reminders'), click);
     });
   }
 
-  function taskViewDelete() {
+  async function taskViewDelete() {
     withTaskViewMoreMenu((menu) => {
       withUniqueTag(menu, 'kbd', matchingText('Delete'), click);
     });
   }
 
-  function taskViewToggleTimer() {
+  async function taskViewToggleTimer() {
     withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       withUniqueClass(taskView, TIMER_CLASSES, all, click);
     });
   }
 
   // eslint-disable-next-line no-unused-vars
-  function taskViewActivity() {
+  async function taskViewActivity() {
     withTaskViewMoreMenu((menu) => {
       withUniqueTag(menu, 'div', matchingText('View task activity'), click);
     });
@@ -1630,25 +1628,25 @@
         document, 'div.reactist_menulist[aria-label="More actions"]');
   }
 
-  function copyCursorOrSelectedUrls() {
+  async function copyCursorOrSelectedUrls() {
     setClipboard(selectedTasksOrCursorToText(getTaskUrl));
   }
 
-  function copyCursorOrSelectedTitles() {
+  async function copyCursorOrSelectedTitles() {
     setClipboard(selectedTasksOrCursorToText(getTaskTitle));
   }
 
-  function copyCursorOrSelectedAsMarkdown() {
+  async function copyCursorOrSelectedAsMarkdown() {
     setClipboard(selectedTasksOrCursorToText(getTaskMarkdown, '* '));
   }
 
-  function openRandomTask() {
+  async function openRandomTask() {
     const tasks = getTasks();
     setCursor(tasks[Math.floor(Math.random()*tasks.length)], 'scroll');
     openTaskView();
   }
 
-  function nextMenuListItem() {
+  async function nextMenuListItem() {
     withCurrentFocusedMenuListItem((focusedItem) => {
       let item = focusedItem;
       do {
@@ -1661,7 +1659,7 @@
     });
   }
 
-  function prevMenuListItem() {
+  async function prevMenuListItem() {
     withCurrentFocusedMenuListItem((focusedItem) => {
       let item = focusedItem;
       do {
@@ -1674,7 +1672,7 @@
     });
   }
 
-  function selectMenuListItem() {
+  async function selectMenuListItem() {
     withCurrentFocusedMenuListItem(click);
   }
 
@@ -1684,7 +1682,7 @@
                'straightforward to fix.');
   }
 
-  function noop() {}
+  async function noop() {}
 
   /*****************************************************************************
    * Utilities for manipulating the UI
@@ -2806,7 +2804,7 @@
             if (el && findParent(el, matchingClass('scheduler'))) {
               return el;
             }
-          }
+          },
       );
       focusedEl.blur();
     } finally {
@@ -2820,7 +2818,7 @@
       const timepicker = await retryWithDelay(
           20,
           'finding time input',
-          () => getById('scheduler-timepicker-input-element')
+          () => getById('scheduler-timepicker-input-element'),
       );
       timepicker.focus();
     } finally {
@@ -4959,20 +4957,19 @@
       if (todoistModalIsOpen()) {
         return false;
       } else {
-        try {
-          // debug('Invoking action bound to', bind[0]);
-          const result = bind[1].apply(null, args);
-          // Default to stopping propagation.
-          return result === true;
-        } catch (ex) {
-          if (ex instanceof CursorRequired) {
-            warn('Shortcut for keys ' + bind[0] +
-                 ' requires a cursored task, but none found.');
-            return false;
-          } else {
-            throw ex;
+        (async () => {
+          try {
+            await bind[1].apply(null, args);
+          } catch (ex) {
+            if (ex instanceof CursorRequired) {
+              warn('Shortcut for keys ' + bind[0] +
+                ' requires a cursored task, but none found.');
+            } else {
+              throw ex;
+            }
           }
-        }
+        })();
+        return false;
       }
     };
   }
