@@ -668,25 +668,28 @@
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
-        retryWithDelay(
-            50,
-            () => selectAll(
-                document,
-                '[data-action-hint="task-actions-priority-picker"]'),
-            (priorityButton) => {
-              priorityButton.click();
-              withUniqueClass(document, 'priority_picker', all, (menu) => {
-                clickPriorityMenu(menu, level);
-              });
-              // Click save button.
-              withUnique(
+        (async () => {
+          const priorityButtons = await retryWithDelay(
+              50,
+              'finding priority button',
+              () => selectAll(
                   document,
-                  'div[data-testid="task-editor-action-buttons"] ' +
-                'button[type="submit"]',
-                  click,
-              );
-            },
-            () => console.error('Failed to find priority picker button'));
+                  '[data-action-hint="task-actions-priority-picker"]')
+          );
+          for (button in priorityButtons) {
+            click(button);
+          }
+          withUniqueClass(document, 'priority_picker', all, (menu) => {
+            clickPriorityMenu(menu, level);
+          });
+          // Click save button.
+          withUnique(
+              document,
+              'div[data-testid="task-editor-action-buttons"] ' +
+              'button[type="submit"]',
+              click,
+          );
+        })();
       } else {
         withUnique(
             document,
@@ -2774,72 +2777,55 @@
     }
   }
 
-  // Generic retry with delay between retries
-  function retryWithDelay(fuel, task, onSuccess, onFailure, delay = 10) {
-    if (fuel <= 0) {
-      onFailure();
-      return;
+  // Generic retry with delay between retries - returns a Promise
+  async function retryWithDelay(fuel, taskName, task, delay = 10) {
+    while (fuel > 0) {
+      const result = task();
+      if (result) {
+        return result;
+      }
+      await sleep(delay);
+      fuel -= 1;
     }
-
-    const result = task();
-    if (result) {
-      onSuccess(result);
-    } else {
-      setTimeout(() =>
-        retryWithDelay(fuel - 1, task, onSuccess, onFailure, delay),
-      delay);
-    }
+    throw new Error('Ran out of retries while ' + taskName);
   }
 
-  function blurSchedulerInput() {
+  async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function blurSchedulerInput() {
     enterDeferLastBinding();
-    const initialDelay = IS_SAFARI ? 20 : 0;
-    setTimeout(() => {
-      retryWithDelay(
+    await sleep(IS_SAFARI ? 20 : 0);
+    try {
+      const focusedEl = await retryWithDelay(
           50,
+          'finding scheduler input',
           () => {
-            const focusedEl = document.activeElement;
-            if (focusedEl) {
-              if (findParent(focusedEl, matchingClass('scheduler'))) {
-                return focusedEl;
-              } else {
-                return null;
-              }
+            const el = document.activeElement;
+            if (el && findParent(el, matchingClass('scheduler'))) {
+              return el;
             }
-          },
-          (focusedEl) => {
-            try {
-              focusedEl.blur();
-            } finally {
-              exitDeferLastBinding();
-            }
-          },
-          () => {
-            exitDeferLastBinding();
-            error('Expected to find scheduler after opening it.');
-          },
+          }
       );
-    }, initialDelay);
+      focusedEl.blur();
+    } finally {
+      exitDeferLastBinding();
+    }
   }
 
-  function focusTimeInput() {
+  async function focusTimeInput() {
     enterDeferLastBinding();
-    retryWithDelay(
-        20,
-        () => getById('scheduler-timepicker-input-element'),
-        (timepicker) => {
-          try {
-            warn('focusing ', timepicker);
-            timepicker.focus();
-          } finally {
-            exitDeferLastBinding();
-          }
-        },
-        () => {
-          exitDeferLastBinding();
-          error('Expected to find time input after opening it.');
-        },
-    );
+    try {
+      const timepicker = await retryWithDelay(
+          20,
+          'finding time input',
+          () => getById('scheduler-timepicker-input-element')
+      );
+      timepicker.focus();
+    } finally {
+      exitDeferLastBinding();
+    }
   }
 
   function clickTaskDone(task) {
