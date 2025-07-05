@@ -382,9 +382,9 @@
 
   // Follow the first link of the task under the cursor.
   async function followLink() {
-    const contentClass = 'task_list_item__content';
-    withUniqueClass(requireCursor(), contentClass, all, (content) => {
-      const link = getFirstTag(content, 'a');
+    const contentQuery = '.task_list_item__content';
+    withUnique(requireCursor(), contentQuery, all, (content) => {
+      const link = getFirst(content, 'a');
       if (link) {
         if (IS_CHROME) {
           const middleClick =
@@ -439,7 +439,7 @@
   async function scheduleText() {
     const scheduler = findScheduler();
     if (scheduler) {
-      withTag(scheduler, 'input', (el) => el.focus() );
+      withQuery(scheduler, 'input', (el) => el.focus() );
       return;
     }
     const mutateCursor = getCursorToMutate();
@@ -468,7 +468,7 @@
           });
       // Fallback on english text matching if the above doesn't work.
       if (!success) {
-        withUniqueTag(findScheduler(), 'button', matchingText('Time'), click);
+        withUnique(findScheduler(), 'button', matchingText('Time'), click);
       }
       focusTimeInput();
     }, 50);
@@ -492,7 +492,7 @@
     withScheduler(
         'scheduleToday',
         (scheduler) => {
-          withUniqueTag(
+          withUnique(
               scheduler,
               'button',
               matchingAttr('data-track', 'scheduler|date_shortcut_today'),
@@ -517,7 +517,7 @@
     withScheduler(
         'scheduleNextWeekend',
         (scheduler) => {
-          withUniqueTag(
+          withUnique(
               scheduler,
               'button',
               matchingAttr('data-track', 'scheduler|date_shortcut_nextweekend'),
@@ -531,7 +531,7 @@
     withScheduler(
         'scheduleNextMonth',
         (scheduler) => {
-          withUniqueTag(
+          withUnique(
               scheduler,
               'button',
               matchingAttr('data-track', 'scheduler|date_shortcut_nextmonth'),
@@ -545,7 +545,7 @@
     withScheduler(
         'schedulePostpone',
         (scheduler) => {
-          withUniqueTag(
+          withUnique(
               scheduler,
               'button',
               matchingAttr('data-track',
@@ -565,7 +565,7 @@
       withScheduler(
           'schedulePlusN',
           (scheduler) => {
-            withUniqueTag(
+            withUnique(
                 scheduler,
                 'button',
                 matchingAttr('aria-label', buttonAriaLabel),
@@ -580,7 +580,7 @@
     withScheduler(
         'unschedule',
         (scheduler) => {
-          withUniqueTag(
+          withUnique(
               scheduler,
               'button',
               matchingAttr('data-track', 'scheduler|date_shortcut_nodate'),
@@ -619,12 +619,12 @@
             mutateCursor,
             'task-overflow-menu-move-to-project',
             false);
-        withUniqueClass(
+        withUnique(
             document,
-            'popper',
+            '.popper',
             hasChild('[aria-label="'+projectName+'"]'),
             (menu) => {
-              withUniqueTag(
+              withUnique(
                   menu,
                   'li',
                   matchingAttr('aria-label', projectName),
@@ -636,12 +636,12 @@
             'button[data-action-hint="multi-select-toolbar-project-picker"]',
             (menu) => {
               click(menu);
-              withUniqueClass(
+              withUnique(
                   document,
-                  'popper',
+                  '.popper',
                   hasChild('[aria-label="'+projectName+'"]'),
                   (menu) => {
-                    withUniqueTag(
+                    withUnique(
                         menu,
                         'li',
                         matchingAttr('aria-label', projectName),
@@ -682,7 +682,7 @@
             'button[data-action-hint="multi-select-toolbar-priority-picker"]',
             click,
         );
-        withUniqueClass(document, 'priority_picker', all, (menu) => {
+        withUnique(document, '.priority_picker', all, (menu) => {
           clickPriorityMenu(menu, level);
         });
       }
@@ -762,8 +762,8 @@
     if (isEmptyMap(getSelectedTaskKeys())) {
       select();
     }
-    withUniqueClass(document, 'multi_select_toolbar', all, (toolbar) => {
-      withUniqueTag(
+    withUnique(document, '.multi_select_toolbar', all, (toolbar) => {
+      withUnique(
           toolbar,
           'button',
           matchingAction('multi-select-toolbar-label-picker'),
@@ -772,16 +772,13 @@
     });
   }
 
-  const TIMER_CLASSES = [
-    'toggl-button',
-    'clockify-button-inactive',
-    'clockify-button-active',
-  ];
+  const TIMER_QUERY =
+    '.toggl-button, .clockify-button-inactive, .clockify-button-active';
 
   // If toggl-button or clockify extension is in use, clicks the
   // button element in the task.
   async function toggleTimer() {
-    withUniqueClass(requireCursor(), TIMER_CLASSES, all, click);
+    withUnique(requireCursor(), TIMER_QUERY, all, click);
   }
 
   // Toggles collapse / expand of a task, if it has children.
@@ -835,7 +832,7 @@
       if (task === cursor) {
         for (let j = i; j >= 0; j--) {
           task = tasks[j];
-          if (getUniqueClass(task, 'down')) {
+          if (getUnique(task, '.down')) {
             setCursor(task, 'scroll');
             toggleCollapse(task);
             break;
@@ -852,10 +849,10 @@
 
   // Collapses or expands all tasks.
   async function collapseAll() {
-    repeatedlyClickArrows('down');
+    repeatedlyClickArrows('.down');
   }
   async function expandAll() {
-    repeatedlyClickArrows('right');
+    repeatedlyClickArrows('.right');
   }
 
   // Clears all selections.
@@ -874,7 +871,7 @@
   // Selects all overdue tasks.
   async function selectAllOverdue() {
     for (const task of getTasks()) {
-      if (getUniqueClass(task, 'date_overdue')) {
+      if (getUnique(task, '.date_overdue')) {
         setTimeout(() => selectTask(task));
       }
     }
@@ -911,7 +908,7 @@
   }
 
   async function scrollTaskEditorIntoView() {
-    withUniqueClass(document, 'task_editor', all, (editor) => {
+    withUnique(document, '.task_editor', all, (editor) => {
       verticalScrollIntoView(editor, 0, true, 0.6);
     });
   }
@@ -944,7 +941,7 @@
     if (mutateCursor) {
       withTaskHovered(mutateCursor, () => {
         const assignButton =
-              getUniqueClass(mutateCursor, 'task_list_item__person_picker');
+              getUnique(mutateCursor, '.task_list_item__person_picker');
         if (assignButton) {
           click(assignButton);
         } else {
@@ -962,9 +959,9 @@
 
   // Open the task view sidepane.
   async function openTaskView() {
-    withUniqueClass(
+    withUnique(
         requireCursor(),
-        ['content', 'task_list_item__body'],
+        '.content, .task_list_item__body',
         all,
         click,
     );
@@ -974,7 +971,7 @@
   // closing context menus.  Also clicks 'Cancel' on any task adding.
   async function closeContextMenus() {
     for (let i = 0; i < 100; i++) {
-      const popperOverlay = getLastClass(document, 'popper__overlay');
+      const popperOverlay = getLast(document, '.popper__overlay');
       if (popperOverlay) {
         popperOverlay.click();
       } else {
@@ -985,8 +982,8 @@
       }
     }
     click(document.body);
-    withClass(document, 'manager', (manager) => {
-      const cancelBtn = getUniqueClass(manager, 'cancel');
+    withQuery(document, '.manager', (manager) => {
+      const cancelBtn = getUnique(manager, '.cancel');
       if (cancelBtn) {
         click(cancelBtn);
       }
@@ -994,16 +991,12 @@
     // Close windows with close buttons, particularly move-to-project
     //
     // (probably old)
-    withClass(document, 'GB_window', (gbw) => {
-      withClass(gbw, 'close', (close) => {
-        withTag(close, 'div', click);
-      });
-    });
+    clickAll(document, '.GB_window .close div');
     // Close windows with close buttons
-    withQuery(document, '[aria-label="Close task"]', click);
-    withQuery(document, '[aria-label="Close modal"]', click);
+    clickAll(document, '[aria-label="Close task"]');
+    clickAll(document, '[aria-label="Close modal"]');
     // Close todoist-shortcuts' modals
-    withClass(document, 'ts-modal-close', click);
+    clickAll(document, '.ts-modal-close');
   }
 
   async function openMoreActionsMenu() {
@@ -1102,7 +1095,7 @@
     const cursor = requireCursor();
     const isFilterView = getIsFilterView();
     if (viewMode === 'project' && !isFilterView) {
-      const dateSpan = getUniqueClass(cursor, 'date');
+      const dateSpan = getUnique(cursor, '.date');
       if (dateSpan) {
         withUnique(document, '#filter_upcoming a', (upcomingLink) => {
           // Set a variable that will be read by 'handlePageChange',
@@ -1187,11 +1180,11 @@
     let current = -1;
     const allCurrents = [];
     for (const container of containers) {
-      withTag(container, 'li', (item) => {
+      withQuery(container, 'li', (item) => {
         const link =
-              getFirstClass(item, 'item_content') ||
-              getFirstTag(item, 'a') ||
-              getFirstClass(item, 'name');
+              getFirst(item, '.item_content') ||
+              getFirst(item, 'a') ||
+              getFirst(item, '.name');
         if (hidden(item)) {
         } else if (!link) {
           warn('Didn\'t find link in', item.innerHTML);
@@ -1221,13 +1214,13 @@
     // Triggering keypress appears to be broken.
     // todoistShortcut({key: 'z'});
     withUnique(document, '[role=alert]', (alertContainer) => {
-      const foundByText = getUniqueTag(
+      const foundByText = getUnique(
           alertContainer, 'button', (el) => el.innerText === 'Undo');
       if (foundByText) {
         click(foundByText);
         return;
       }
-      const foundByLackOfSvg = getUniqueTag(
+      const foundByLackOfSvg = getUnique(
           alertContainer, 'button', (el) => el.querySelector('svg') == null);
       if (foundByLackOfSvg) {
         click(foundByLackOfSvg);
@@ -1253,9 +1246,9 @@
     if (resetIfSortTypeAlready('priority')) return;
     openSortMenu();
     withUnique(document, 'li[data-value="PRIORITY"]', click);
-    withUniqueClass(
+    withUnique(
         document,
-        'menu_item',
+        '.menu_item',
         matchingAttr('aria-labelledby', 'view_menu__order'),
         click);
     withUnique(document, 'li[data-value="DESC"]', click);
@@ -1306,16 +1299,16 @@
   }
 
   function openSortMenu() {
-    withUniqueClass(document, 'view_header__actions', all, (actions) => {
+    withUnique(document, '.view_header__actions', all, (actions) => {
       // Ooof, such a terrible hack.
-      withUniqueTag(
+      withUnique(
           actions, 'path', matchingAttr('d', SORT_SVG_PATH), (svgPath) => {
             click(svgPath.parentElement);
           });
     });
-    withUniqueClass(
+    withUnique(
         document,
-        'menu_item',
+        '.menu_item',
         matchingAttr('aria-labelledby', 'view_menu__sort_by'),
         click);
   }
@@ -1326,8 +1319,8 @@
   }
 
   async function quickAdd() {
-    withUniqueClass(document, 'app-sidebar-container', all, (appSidebar) =>
-      withUniqueTag(
+    withUnique(document, '.app-sidebar-container', all, (appSidebar) =>
+      withUnique(
           appSidebar,
           'button',
           (button) => button.innerText.includes('Add task'),
@@ -1336,7 +1329,7 @@
   }
 
   function leftNavIsHidden() {
-    const appSidebar = getUniqueClass(document, 'app-sidebar-container');
+    const appSidebar = getUnique(document, '.app-sidebar-container');
     if (appSidebar) {
       // TODO: Fix this on firefox - always fails.
       try {
@@ -1364,10 +1357,10 @@
 
   // Open help documentation.
   async function openHelpModal() {
-    let modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
+    let modal = getUnique(document, '.' + TODOIST_SHORTCUTS_HELP);
     if (modal === null) {
       createHelpModal();
-      modal = getUniqueClass(document, TODOIST_SHORTCUTS_HELP);
+      modal = getUnique(document, '.' + TODOIST_SHORTCUTS_HELP);
     }
     modal.style.display = 'inline-block';
   }
@@ -1424,14 +1417,14 @@
   // Click "import from template" in project menu
   // eslint-disable-next-line no-unused-vars
   async function importFromTemplate() {
-    withClass(document, 'menu_item', (tr) => {
+    withQuery(document, '.menu_item', (tr) => {
       const predicate =
             matchingAttr('data-track', 'project|actions_import_from_template');
-      withUniqueTag(tr, 'td', predicate, (foundItem) => {
+      withUnique(tr, 'td', predicate, (foundItem) => {
         click(foundItem);
         let foundInput = null;
-        withClass(document, 'file_input_container', (container) => {
-          withTag(container, 'input', (input) => {
+        withQuery(document, '.file_input_container', (container) => {
+          withQuery(container, 'input', (input) => {
             foundInput = input;
           });
         });
@@ -1518,7 +1511,7 @@
 
   async function taskViewAddSubtask() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueTag(taskView, 'button', matchingText('Add sub-task'), click);
+      withUnique(taskView, 'button', matchingText('Add sub-task'), click);
     });
   }
 
@@ -1529,13 +1522,13 @@
 
   async function taskViewScheduleText() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueClass(taskView, 'task-due-date-button', all, click);
+      withUnique(taskView, '.task-due-date-button', all, click);
     });
   }
 
   async function taskViewOpenAssign() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueTag(taskView, 'span', matchingText('Assignee'), click);
+      withUnique(taskView, 'span', matchingText('Assignee'), click);
     });
   }
 
@@ -1547,7 +1540,7 @@
 
   async function taskViewLabel() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueTag(taskView, 'span', matchingText('Labels'), click);
+      withUnique(taskView, 'span', matchingText('Labels'), click);
     });
   }
 
@@ -1555,12 +1548,12 @@
     return async () => {
       withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
         const actualLevel = invertPriorityLevel(level);
-        if (!getUniqueClass(document, 'priority_picker')) {
+        if (!getUnique(document, '.priority_picker')) {
           withUnique(taskView,
               '[data-icon-name=priority-icon]',
               click);
         }
-        withUniqueClass(document, 'priority_picker', all, (picker) => {
+        withUnique(document, '.priority_picker', all, (picker) => {
           withUnique(
               picker,
               '[data-action-hint="task-actions-priority-' + actualLevel + '"]',
@@ -1573,26 +1566,26 @@
 
   async function taskViewOpenReminders() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUniqueTag(taskView, 'span', matchingText('Reminders'), click);
+      withUnique(taskView, 'span', matchingText('Reminders'), click);
     });
   }
 
   async function taskViewDelete() {
     withTaskViewMoreMenu((menu) => {
-      withUniqueTag(menu, 'kbd', matchingText('Delete'), click);
+      withUnique(menu, 'kbd', matchingText('Delete'), click);
     });
   }
 
   async function taskViewToggleTimer() {
     withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
-      withUniqueClass(taskView, TIMER_CLASSES, all, click);
+      withUnique(taskView, TIMER_QUERY, all, click);
     });
   }
 
   // eslint-disable-next-line no-unused-vars
   async function taskViewActivity() {
     withTaskViewMoreMenu((menu) => {
-      withUniqueTag(menu, 'div', matchingText('View task activity'), click);
+      withUnique(menu, 'div', matchingText('View task activity'), click);
     });
   }
 
@@ -1691,7 +1684,7 @@
     const e = isMacOS ?
       new MouseEvent('click', {bubbles: true, metaKey: true}) :
       new MouseEvent('click', {bubbles: true, ctrlKey: true});
-    withUniqueClass(task, 'task_content', all, (content) => {
+    withUnique(task, '.task_content', all, (content) => {
       content.dispatchEvent(e);
     });
     task.dispatchEvent(e);
@@ -1878,7 +1871,7 @@
     content = content || getViewContent();
     // If there's an editor open to add a task, then set the cursor to the item
     // above.
-    const manager = getUniqueClass(content, 'manager');
+    const manager = getUnique(content, '.manager');
     if (manager) {
       const tasks = getTasks('no-collapsed', 'include-editors');
       const managerIndex =
@@ -2077,17 +2070,17 @@
   }
 
   function getFirstTaskIn(section) {
-    return getFirstClass(
+    return getFirst(
         section,
-        'task_list_item',
+        '.task_list_item',
         not(matchingClass('reorder_item')),
     );
   }
 
   function getLastTaskInSection(section) {
-    return getLastClass(
+    return getLast(
         section,
-        'task_list_item',
+        '.task_list_item',
         not(matchingClass('reorder_item')),
     );
   }
@@ -2211,7 +2204,7 @@
         return;
       }
       const popupWindow =
-            getUniqueClass(document, 'GB_window') ||
+            getUnique(document, '.GB_window') ||
             selectUnique(document, '[data-testid="modal-overlay"]') ||
             // Search dropdown
             selectUnique(document, '#quick_find > [role="presentation"]');
@@ -2263,7 +2256,7 @@
   }
 
   function openMoreMenu() {
-    withUniqueTag(
+    withUnique(
         document,
         'button',
         matchingAction('multi-select-toolbar-overflow-menu-trigger'),
@@ -2278,18 +2271,18 @@
 
   // Returns true if the task has children and is collapsed.
   function checkTaskCollapsed(task) {
-    return getUniqueClass(task, 'right');
+    return getUnique(task, '.right');
   }
 
   // Returns true if the task has children and is expanded.
   function checkTaskExpanded(task) {
-    return getUniqueClass(task, 'down');
+    return getUnique(task, '.down');
   }
 
-  // Click elements within the content which match the specified class.
+  // Click elements within the content which match the specified query.
   // Persistently clicks until the class can no longer be found. Used to
   // collapse / expand all items.
-  function repeatedlyClickArrows(cls) {
+  function repeatedlyClickArrows(query) {
     withViewContent((content) => {
       let i = 0;
       let clickedSomething = false;
@@ -2297,21 +2290,21 @@
         click(el);
         clickedSomething = true;
       };
-      let clickAll = null;
-      clickAll = () => {
+      let inner = null;
+      inner = () => {
         clickedSomething = false;
-        withClass(content, cls, doClick);
+        withQuery(content, query, doClick);
         if (!clickedSomething) {
           return;
         }
         if (i < 5) {
           i++;
-          setTimeout(clickAll);
+          setTimeout(inner);
         } else {
           warn('Iteratively clicked arrows but they didn\'t all toggle');
         }
       };
-      clickAll();
+      inner();
     });
   }
 
@@ -2354,7 +2347,7 @@
   }
 
   function findScheduler() {
-    return getUniqueClass(document, 'scheduler');
+    return getUnique(document, '.scheduler');
   }
 
   function withScheduler(name, f) {
@@ -2655,7 +2648,7 @@
     const key = getTaskKey(task);
     task.dispatchEvent(new Event('mouseover'));
     try {
-      const handler = getUniqueClass(task, 'item_dnd_handle');
+      const handler = getUnique(task, '.item_dnd_handle');
       if (handler) {
         const handlerOffset = clientOffset(handler);
         const x = handlerOffset.x + handler.offsetWidth/2 - window.scrollX - 3;
@@ -2734,7 +2727,7 @@
 
   function clickTaskEdit(task) {
     storeExplicitEditingContext(task);
-    withUniqueClass(task, 'task_content', all, (content) => {
+    withUnique(task, '.task_content', all, (content) => {
       const options = {
         bubbles: true,
         cancelable: true,
@@ -2820,7 +2813,7 @@
   }
 
   function clickTaskDone(task) {
-    withUniqueClass(task, ['item_checkbox', 'task_checkbox'], all, click);
+    withUnique(task, '.item_checkbox, .task_checkbox', all, click);
   }
 
   async function addAboveTask(task) {
@@ -2851,7 +2844,7 @@
           closeContextMenus();
         }
       });
-      const editor = getUniqueClass(document, 'task_editor');
+      const editor = getUnique(document, '.task_editor');
       if (editor) {
         scrollTaskEditorIntoView();
       } else {
@@ -2870,9 +2863,9 @@
     if (task) {
       section = getSection(task);
     } else if (viewMode === 'agenda') {
-      section = getFirstClass(document, 'section_day');
+      section = getFirst(document, '.section_day');
     } else {
-      section = getFirstClass(document, 'project_editor_instance');
+      section = getFirst(document, '.project_editor_instance');
     }
     if (!section) {
       warn(
@@ -2888,14 +2881,14 @@
     }
     if (viewMode === 'agenda' &&
         section.classList.contains('section_overdue')) {
-      section = getFirstClass(document, 'section_day');
+      section = getFirst(document, '.section_day');
     }
     clickInlineAddTask(section);
   }
 
   function clickInlineAddTask(section) {
-    const addButton = getUniqueClass(
-      section ? section : document, 'plus_add_button');
+    const addButton = getUnique(
+      section ? section : document, '.plus_add_button');
     if (addButton) {
       click(addButton);
       scrollTaskEditorIntoView();
@@ -2942,7 +2935,7 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    withUniqueTag(
+    withUnique(
         menu, 'li', matchingAction('task-actions-priority-' + level), click);
   }
 
@@ -2955,7 +2948,7 @@
 
   function notifyUser(msg) {
     withId('todoist_app', (appHolder) => {
-      withClass(appHolder, 'ts-note', (oldNote) => {
+      withQuery(appHolder, '.ts-note', (oldNote) => {
         appHolder.removeChild(oldNote);
       });
       const close = div('ts-note-close');
@@ -3062,7 +3055,7 @@
     }
     const results = [];
     withViewContent((content) => {
-      withTag(content, 'li', (item) => {
+      withQuery(content, 'li', (item) => {
         // Skip elements which don't correspond to tasks or sections
         const matches =
           !item.classList.contains('reorder_item') &&
@@ -3145,7 +3138,7 @@
   }
 
   function getTaskTitle(task) {
-    return getUniqueClass(task, ['content', 'task_content']).textContent;
+    return getUnique(task, '.content, .task_content').textContent;
   }
 
   function getTaskUrl(task) {
@@ -3197,7 +3190,7 @@
       return stripPriorityClass(priorityClass);
     } else {
       const taskCheckbox =
-            getUniqueClass(task, ['task_checkbox', 'item_checkbox']);
+            getUnique(task, '.task_checkbox, .item_checkbox');
       if (taskCheckbox) {
         priorityClass = findUnique(isPriorityClass, taskCheckbox.classList);
         if (priorityClass) {
@@ -3341,7 +3334,7 @@
     debug('Creating navigation shortcut tips');
     try {
       const navigateItems = [];
-      withTag(navigationContainer, 'li', (li) => {
+      withQuery(navigationContainer, 'li', (li) => {
         // Ignore empty li elements, which happen for collapsed parent projects.
         if (li.childElementCount == 0) {
           return;
@@ -3452,10 +3445,10 @@
 
       // Add labels and filters if that content is visible
       withQuery(document, 'section[aria-label="Filters"]', (filtersHolder) => {
-        withTag(filtersHolder, 'li', (li) => {
+        withQuery(filtersHolder, 'li', (li) => {
           let txt = '';
           let initials = null;
-          nameSpan = getUniqueClass(li, 'simple_content');
+          nameSpan = getUnique(li, '.simple_content');
 
           if (nameSpan) {
             txt = preprocessItemText(nameSpan.textContent);
@@ -3477,10 +3470,10 @@
       });
 
       withQuery(document, 'section[aria-label="Labels"]', (labelsHolder) => {
-        withTag(labelsHolder, 'li', (li) => {
+        withQuery(labelsHolder, 'li', (li) => {
           let txt = '';
           let initials = null;
-          nameSpan = getUniqueClass(li, 'simple_content');
+          nameSpan = getUnique(li, '.simple_content');
 
           if (nameSpan) {
             txt = preprocessItemText(nameSpan.textContent);
@@ -3840,7 +3833,7 @@
               if (el.classList.contains('expansion_panel__toggle') &&
                   !isFavoritesSection(el)) {
                 withNavigationContainer((navContainer) => {
-                  withClass(navContainer, 'expansion_panel__toggle', (ps) => {
+                  withQuery(navContainer, '.expansion_panel__toggle', (ps) => {
                     const isExpanded =
                           ps.attributes['aria-expanded'].value === 'true';
                     if (!sameElement(el)(ps) &&
@@ -3858,8 +3851,8 @@
                   !matchingClass('collapse--entered')(collapseParent)) {
                 const collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
-                  withUniqueClass(
-                      collapseHeader, 'expansion_panel__toggle', all, click);
+                  withUnique(
+                      collapseHeader, '.expansion_panel__toggle', all, click);
                 } else {
                   warn('Expected to find section collapse header, but did\'nt');
                 }
@@ -3874,7 +3867,7 @@
                 const curIndent = getIndentClass(elAbove);
                 if (curIndent < priorIndent) {
                   priorIndent = curIndent;
-                  const arr = getUniqueClass(elAbove, 'arrow');
+                  const arr = getUnique(elAbove, '.arrow');
                   if (arr && arr.classList.contains('right')) {
                     arrowsToClick.unshift(arr);
                   } else if (elAbove.style.display === 'none') {
@@ -3891,7 +3884,7 @@
                 click(arrowsToClick[i]);
               }
               // Uncollapse the target project, if necessary.
-              const arrow = getUniqueClass(el, 'arrow');
+              const arrow = getUnique(el, '.arrow');
               if (arrow) {
                 // If the user re-selects the same project they are already on,
                 // toggle folding.
@@ -3908,7 +3901,7 @@
                 }
               }
               // The li itself is not responsive to clicks.
-              let elToClick = getUniqueTag(el, 'a', all);
+              let elToClick = getUnique(el, 'a', all);
               elToClick = elToClick || el;
               click(elToClick);
               // Scroll the nav element into view, if needed. The
@@ -4108,7 +4101,7 @@
   function getViewMode() {
     const agendaView =
           getById('agenda_view') ||
-          getUniqueClass(document, 'upcoming_view');
+          getUnique(document, '.upcoming_view');
     if (agendaView === null) {
       return 'project';
     } else {
@@ -4215,8 +4208,8 @@
       const oy = pageOffset(el).y - pageOffset(content).y;
       const cy = oy - content.scrollTop;
       const h = el.offsetHeight;
-      const overflowDiv = getUniqueClass(
-          content, 'action_head__overflow_actions');
+      const overflowDiv = getUnique(
+          content, '.action_head__overflow_actions');
       const overflowHeight = overflowDiv ? overflowDiv.offsetHeight : 0;
       if (skipCheck ||
           cy < el.offsetHeight + overflowHeight ||
@@ -4292,40 +4285,13 @@
   }
 
   // Invokes the function for the matching id, or logs a warning.
-  function withId(id, f, ...rest) {
-    if (rest.length > 0) {
-      error('Too many arguments passed to withId', rest);
-    }
+  function withId(id, f) {
     const el = getById(id);
     if (el) {
       return f(el);
     } else {
       warn('Couldn\'t find ID', id);
       return null;
-    }
-  }
-
-  // Invokes the function for every descendant element that matches
-  // the class name.
-  function withClass(parent, cls, f, ...rest) {
-    if (rest.length > 0) {
-      error('Too many arguments passed to withClass', rest);
-    }
-    const els = parent.getElementsByClassName(cls);
-    for (let i = 0; i < els.length; i++) {
-      f(els[i]);
-    }
-  }
-
-  // Invokes the function for every descendant element that matches a
-  // tag name.
-  function withTag(parent, tag, f, ...rest) {
-    if (rest.length > 0) {
-      error('Too many arguments passed to withTag', rest);
-    }
-    const els = parent.getElementsByTagName(tag);
-    for (let i = 0; i < els.length; i++) {
-      f(els[i]);
     }
   }
 
@@ -4344,81 +4310,37 @@
     return null;
   }
 
-  // Returns first descendant that matches the specified class and
+  // Returns first descendant that matches the specified query and
   // predicate.
-  function getFirstClass(parent, cls, predicate) {
-    return findFirst(predicate, parent.getElementsByClassName(cls));
+  function getFirst(parent, query, predicate) {
+    return findFirst(predicate, selectAll(parent, query));
   }
 
-  // Returns last descendant that matches the specified class and
+  // Returns last descendant that matches the specified query and
   // predicate.
-  function getLastClass(parent, cls, predicate) {
-    return findLast(predicate, parent.getElementsByClassName(cls));
+  function getLast(parent, query, predicate) {
+    return findLast(predicate, selectAll(parent, query));
   }
 
   // Checks that there is only one descendant element that matches the
-  // class name and predicate, and returns it. Returns null if it is
-  // not found or not unique.
-  function getUniqueClass(parent, cls, predicate) {
-    let foundElements = [];
-    if (cls.constructor === Array) {
-      for (let i = 0; i < cls.length; i++) {
-        foundElements = foundElements.concat(
-            Array.from(parent.getElementsByClassName(cls[i])),
-        );
-      }
-    } else {
-      foundElements = parent.getElementsByClassName(cls);
-    }
-    return findUnique(predicate, foundElements);
-  }
-
-  // Checks that there is only one descendant element that matches the
-  // class name, and invokes the function on it. Logs a warning if
-  // there isn't exactly one.
-  function withUniqueClass(parent, cls, predicate, f) {
-    const result = getUniqueClass(parent, cls, predicate);
-    if (result) {
-      return f(result);
-    } else {
-      warn(
-          'Couldn\'t find unique descendant with class',
-          cls,
-          'and matching predicate, instead got',
-          result,
-      );
-      return null;
-    }
-  }
-
-  // Returns first descendant that matches the specified tag and
-  // predicate.
-  function getFirstTag(parent, tag, predicate) {
-    return findFirst(predicate, parent.getElementsByTagName(tag));
-  }
-
-  // Checks that there is only one descendant element that matches the
-  // tag and predicate, and returns it. Returns null if it is not
+  // query and predicate, and returns it. Returns null if it is not
   // found or not unique.
-  function getUniqueTag(parent, tag, predicate) {
-    return findUnique(predicate, parent.getElementsByTagName(tag));
+  function getUnique(parent, query, predicate) {
+    return findUnique(predicate, selectAll(parent, query));
   }
 
-  // Checks that there is only one descendant element that matches the
-  // tag, and invokes the function on it. Logs a warning if there
-  // isn't exactly one.
-  function withUniqueTag(parent, tag, predicate, f) {
-    const result = getUniqueTag(parent, tag, predicate);
-    if (result) {
-      return f(result);
-    } else {
-      warn(
-          'Couldn\'t find unique descendant with tag',
-          tag,
-          'and passing predicate',
-      );
-      return null;
-    }
+  // Finds a unique element matching the query and clicks it.
+  function clickUnique(parent, query, predicate) {
+    return withUnique(parent, query, predicate, click);
+  }
+
+  // Finds all elements matching the query and clicks them.
+  function clickAll(parent, query, predicate) {
+    withQuery(parent, query, (el) => {
+      if (!predicate || predicate(el)) {
+        click(el);
+      }
+    });
   }
 
   // Given a predicate, returns a value if there is a unique child
@@ -4946,7 +4868,7 @@
   }
 
   function isUpcomingView() {
-    return getUniqueClass(document, 'upcoming_view') !== null;
+    return getUnique(document, '.upcoming_view') !== null;
   }
 
   function disabledWithLazyLoading(actionName, f) {
@@ -5073,14 +4995,14 @@
     const modalPredicate =
           not(or(matchingClass('quick_add'), matchingClass('detail_modal')));
     const uniqueModal =
-          getUniqueClass(document, 'reactist_modal_box', modalPredicate);
+          getUnique(document, '.reactist_modal_box', modalPredicate);
     if (uniqueModal) {
       // Special handling for the modal that appears when confirming
       // task discard (esc after q), and for the deletion confirmation
       // modal.
       let cancelButton = null;
       let acceptButton = null;
-      withClass(uniqueModal, 'ist_button', (el) => {
+      withQuery(uniqueModal, '.ist_button', (el) => {
         if (el.innerText === 'Cancel') {
           cancelButton = el;
         } else if (el.innerText === 'Discard task' ||
