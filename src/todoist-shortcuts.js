@@ -426,7 +426,7 @@
       blurSchedulerInput();
     } else {
       const query = 'button[data-action-hint="multi-select-toolbar-scheduler"]';
-      withUnique(document, query, (button) => {
+      withUnique(document, query, all, (button) => {
         click(button);
         blurSchedulerInput();
       });
@@ -439,7 +439,7 @@
   async function scheduleText() {
     const scheduler = findScheduler();
     if (scheduler) {
-      withAll(scheduler, 'input', (el) => el.focus() );
+      withAll(scheduler, 'input', all, (el) => el.focus() );
       return;
     }
     const mutateCursor = getCursorToMutate();
@@ -459,7 +459,10 @@
     setTimeout(() => {
       // TODO: less fragile way to find the "Time" button than relying
       // on no other buttons having this attribute.
-      const success = withUnique(document, '.scheduler button[aria-controls]',
+      const success = withUnique(
+          document,
+          '.scheduler button[aria-controls]',
+          all,
           (button) => {
             click(button);
             return true;
@@ -618,6 +621,7 @@
         withUnique(
             document,
             'button[data-action-hint="multi-select-toolbar-project-picker"]',
+            all,
             (menu) => {
               click(menu);
               withUnique(
@@ -698,10 +702,10 @@
     if (mutateCursor) {
       clickTaskDone(mutateCursor);
     } else {
-      withUnique(
+      clickUnique(
           openMoreMenu(),
           '[data-action-hint="multi-select-toolbar-overflow-menu-complete"]',
-          click,
+          all,
       );
     }
   }
@@ -715,11 +719,9 @@
     if (mutateCursor) {
       await clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
     } else {
-      withUnique(
+      clickUnique(
           openMoreMenu(),
-          '[data-action-hint="multi-select-toolbar-overflow-menu-delete"]',
-          click,
-      );
+          '[data-action-hint="multi-select-toolbar-overflow-menu-delete"]');
     }
   }
 
@@ -728,10 +730,9 @@
     if (mutateCursor) {
       await clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
     } else {
-      withUnique(
+      clickUnique(
           openMoreMenu(),
           '[data-action-hint="multi-select-toolbar-overflow-menu-duplicate"]',
-          click,
       );
     }
   }
@@ -760,10 +761,9 @@
 
   // Toggles collapse / expand of a task, if it has children.
   async function toggleCollapse(task) {
-    withUnique(
-      task ? task : requireCursor(),
-      '[data-action-hint=task-toggle-collapse]',
-      click);
+    clickUnique(
+        task ? task : requireCursor(),
+        '[data-action-hint=task-toggle-collapse]');
   }
 
   // Collapse cursor. If it is already collapsed, select and collapse parent.
@@ -926,10 +926,9 @@
         }
       });
     } else {
-      withUnique(
+      clickUnique(
           openMoreMenu(),
           '[data-action-hint="multi-select-toolbar-overflow-menu-asssign"]',
-          click,
       );
     }
   }
@@ -959,7 +958,7 @@
       }
     }
     click(document.body);
-    withAll(document, '.manager', (manager) => {
+    withAll(document, '.manager', all, (manager) => {
       const cancelBtn = getUnique(manager, '.cancel');
       if (cancelBtn) {
         click(cancelBtn);
@@ -977,7 +976,7 @@
   }
 
   async function openMoreActionsMenu() {
-    withUnique(document, 'header[aria-label^="Header:"]', (header) => {
+    withUnique(document, 'header[aria-label^="Header:"]', all, (header) => {
       for (const button of selectAll(header, 'button')) {
         // If it contains 3 svg circles, it's the more menu
         // button. Sad that there is no other identifying
@@ -1059,7 +1058,7 @@
   }
 
   function withNavigationContainer(f) {
-    withUnique(document, '[role=navigation]', f);
+    withUnique(document, '[role=navigation]', all, f);
   }
 
   // When viewing something other than a project, and the current task has a
@@ -1074,7 +1073,7 @@
     if (viewMode === 'project' && !isFilterView) {
       const dateSpan = getUnique(cursor, '.date');
       if (dateSpan) {
-        withUnique(document, '#filter_upcoming a', (upcomingLink) => {
+        withUnique(document, '#filter_upcoming a', all, (upcomingLink) => {
           // Set a variable that will be read by 'handlePageChange',
           // which will tell it to select this task.
           selectAfterNavigate = getTaskId(cursor);
@@ -1157,7 +1156,7 @@
     let current = -1;
     const allCurrents = [];
     for (const container of containers) {
-      withAll(container, 'li', (item) => {
+      withAll(container, 'li', all, (item) => {
         const link =
               getFirst(item, '.item_content') ||
               getFirst(item, 'a') ||
@@ -1190,7 +1189,7 @@
   async function undo() {
     // Triggering keypress appears to be broken.
     // todoistShortcut({key: 'z'});
-    withUnique(document, '[role=alert]', (alertContainer) => {
+    withUnique(document, '[role=alert]', all, (alertContainer) => {
       const foundByText = getUnique(
           alertContainer, 'button', (el) => el.innerText === 'Undo');
       if (foundByText) {
@@ -1392,14 +1391,14 @@
   // Click "import from template" in project menu
   // eslint-disable-next-line no-unused-vars
   async function importFromTemplate() {
-    withAll(document, '.menu_item', (tr) => {
+    withAll(document, '.menu_item', all, (tr) => {
       const predicate =
             matchingAttr('data-track', 'project|actions_import_from_template');
       withUnique(tr, 'td', predicate, (foundItem) => {
         click(foundItem);
         let foundInput = null;
-        withAll(document, '.file_input_container', (container) => {
-          withAll(container, 'input', (input) => {
+        withAll(document, '.file_input_container', all, (container) => {
+          withAll(container, 'input', all, (input) => {
             foundInput = input;
           });
         });
@@ -1451,40 +1450,37 @@
   }
 
   async function taskViewClose() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, 'button[aria-label="Close task"]');
     });
   }
 
   async function taskViewParent() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      clickUnique(
-          taskView, 'div[data-testid="task-detail-breadcrumbs"] > a');
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
+      clickUnique(taskView, 'div[data-testid="task-detail-breadcrumbs"] > a');
     });
   }
 
   async function taskViewNext() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, '[aria-label="Next task"');
     });
   }
 
   async function taskViewComments() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      clickUnique(
-          taskView,
-          'button[data-testid="open-comment-editor-button"]');
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
+      clickUnique(taskView, 'button[data-testid="open-comment-editor-button"]');
     });
   }
 
   async function taskViewPrevious() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, '[aria-label="Previous task"');
     });
   }
 
   async function taskViewAddSubtask() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, 'button', matchingText('Add sub-task'));
     });
   }
@@ -1495,32 +1491,32 @@
   }
 
   async function taskViewScheduleText() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      clickUnique(taskView, '.task-due-date-button', all);
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
+      clickUnique(taskView, '.task-due-date-button');
     });
   }
 
   async function taskViewOpenAssign() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, 'span', matchingText('Assignee'));
     });
   }
 
   async function taskViewMoveToProject() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, 'button[aria-label="Select a project"]');
     });
   }
 
   async function taskViewLabel() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, 'span', matchingText('Labels'));
     });
   }
 
   function taskViewSetPriority(level) {
     return async () => {
-      withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+      withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
         const actualLevel = invertPriorityLevel(level);
         if (!getUnique(document, '.priority_picker')) {
           clickUnique(taskView,
@@ -1536,7 +1532,7 @@
   }
 
   async function taskViewOpenReminders() {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       clickUnique(taskView, 'span', matchingText('Reminders'));
     });
   }
@@ -1549,7 +1545,7 @@
 
   async function taskViewToggleTimer() {
     withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
-      clickUnique(taskView, TIMER_QUERY, all);
+      clickUnique(taskView, TIMER_QUERY);
     });
   }
 
@@ -1561,7 +1557,7 @@
   }
 
   function withTaskViewMoreMenu(f) {
-    withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
+    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       let overflowMenu = getTaskViewMoreMenu();
       if (!overflowMenu) {
         clickUnique(taskView, 'button[aria-label="More actions"]');
@@ -1646,7 +1642,7 @@
   }
 
   function withViewContent(f) {
-    return withUnique(document, 'main', f);
+    return withUnique(document, 'main', all, f);
   }
 
   function toggleSelectTask(task) {
@@ -2262,7 +2258,7 @@
       let inner = null;
       inner = () => {
         clickedSomething = false;
-        withAll(content, query, doClick);
+        withAll(content, query, all, doClick);
         if (!clickedSomething) {
           return;
         }
@@ -2782,7 +2778,7 @@
   }
 
   function clickTaskDone(task) {
-    clickUnique(task, '.item_checkbox, .task_checkbox', all);
+    clickUnique(task, '.item_checkbox, .task_checkbox');
   }
 
   async function addAboveTask(task) {
@@ -2917,7 +2913,7 @@
 
   function notifyUser(msg) {
     withId('todoist_app', (appHolder) => {
-      withAll(appHolder, '.ts-note', (oldNote) => {
+      withAll(appHolder, '.ts-note', all, (oldNote) => {
         appHolder.removeChild(oldNote);
       });
       const close = div('ts-note-close');
@@ -3024,7 +3020,7 @@
     }
     const results = [];
     withViewContent((content) => {
-      withAll(content, 'li', (item) => {
+      withAll(content, 'li', all, (item) => {
         // Skip elements which don't correspond to tasks or sections
         const matches =
           !item.classList.contains('reorder_item') &&
@@ -3303,7 +3299,7 @@
     debug('Creating navigation shortcut tips');
     try {
       const navigateItems = [];
-      withAll(navigationContainer, 'li', (li) => {
+      withAll(navigationContainer, 'li', all, (li) => {
         // Ignore empty li elements, which happen for collapsed parent projects.
         if (li.childElementCount == 0) {
           return;
@@ -3386,6 +3382,7 @@
       });
       withAll(navigationContainer,
           '[data-expansion-panel-header=true]',
+          all,
           (summary) => {
             let mustBeKeys = null;
             const dataTrackAttr = summary.attributes['data-track'];
@@ -3413,33 +3410,34 @@
           });
 
       // Add labels and filters if that content is visible
-      withAll(document, 'section[aria-label="Filters"]', (filtersHolder) => {
-        withAll(filtersHolder, 'li', (li) => {
-          let txt = '';
-          let initials = null;
-          nameSpan = getUnique(li, '.simple_content');
+      withAll(document, 'section[aria-label="Filters"]', all,
+          (filtersHolder) => {
+            withAll(filtersHolder, 'li', all, (li) => {
+              let txt = '';
+              let initials = null;
+              nameSpan = getUnique(li, '.simple_content');
 
-          if (nameSpan) {
-            txt = preprocessItemText(nameSpan.textContent);
-            initials = getItemInitials(nameSpan.textContent);
-          } else {
-            warn('failed to get nav link text for', li);
-          }
+              if (nameSpan) {
+                txt = preprocessItemText(nameSpan.textContent);
+                initials = getItemInitials(nameSpan.textContent);
+              } else {
+                warn('failed to get nav link text for', li);
+              }
 
-          if (txt) {
-            navigateItems.push({
-              element: li,
-              text: txt,
-              initials,
+              if (txt) {
+                navigateItems.push({
+                  element: li,
+                  text: txt,
+                  initials,
+                });
+              } else {
+                error('Couldn\'t figure out text for', li);
+              }
             });
-          } else {
-            error('Couldn\'t figure out text for', li);
-          }
-        });
-      });
+          });
 
-      withAll(document, 'section[aria-label="Labels"]', (labelsHolder) => {
-        withAll(labelsHolder, 'li', (li) => {
+      withAll(document, 'section[aria-label="Labels"]', all, (labelsHolder) => {
+        withAll(labelsHolder, 'li', all, (li) => {
           let txt = '';
           let initials = null;
           nameSpan = getUnique(li, '.simple_content');
@@ -3802,15 +3800,16 @@
               if (el.classList.contains('expansion_panel__toggle') &&
                   !isFavoritesSection(el)) {
                 withNavigationContainer((navContainer) => {
-                  withAll(navContainer, '.expansion_panel__toggle', (ps) => {
-                    const isExpanded =
-                          ps.attributes['aria-expanded'].value === 'true';
-                    if (!sameElement(el)(ps) &&
-                        isExpanded &&
-                        !isFavoritesSection(ps)) {
-                      ps.click();
-                    }
-                  });
+                  withAll(navContainer, '.expansion_panel__toggle', all,
+                      (ps) => {
+                        const isExpanded =
+                              ps.attributes['aria-expanded'].value === 'true';
+                        if (!sameElement(el)(ps) &&
+                            isExpanded &&
+                            !isFavoritesSection(ps)) {
+                          ps.click();
+                        }
+                      });
                 });
               }
               // Ensure that the item is visible - first, uncollapsing
@@ -3820,8 +3819,7 @@
                   !matchingClass('collapse--entered')(collapseParent)) {
                 const collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
-                  clickUnique(
-                      collapseHeader, '.expansion_panel__toggle', all);
+                  clickUnique(collapseHeader, '.expansion_panel__toggle');
                 } else {
                   warn('Expected to find section collapse header, but did\'nt');
                 }
@@ -4206,11 +4204,12 @@
   }
 
   // eslint-disable-next-line no-unused-vars
-  async function selectAllRetrying(parent, query, fuel=100, delay=10) {
+  async function selectAllRetrying(
+      parent, query, predicate, fuel=100, delay=10) {
     return await retryWithDelay(
         'finding descendants matching ' + query,
         () => {
-          const results = selectAll(parent, query);
+          const results = selectAll(parent, query, predicate);
           if (results.length === 0) {
             return null;
           } else {
@@ -4221,18 +4220,19 @@
         delay);
   }
 
-  async function selectUniqueRetrying(parent, query, fuel=100, delay=10) {
+  async function selectUniqueRetrying(
+      parent, query, predicate, fuel=100, delay=10) {
     return await retryWithDelay(
         'finding unique descendant matching ' + query,
-        () => selectUnique(parent, query),
+        () => selectUnique(parent, query, predicate),
         fuel,
         delay);
   }
 
   // Users querySelectorAll, requires unique result, and applies the
   // user's function to it.  Logs a warning if there isn't one.
-  function withUnique(parent, query, f) {
-    const result = selectUnique(parent, query);
+  function withUnique(parent, query, predicate, f) {
+    const result = selectUnique(parent, query, predicate);
     if (result) {
       return f(result);
     } else {
@@ -4247,8 +4247,8 @@
   }
 
   // Uses querySelectorAll, and applies the provided function to each result.
-  function withAll(parent, query, f) {
-    const els = selectAll(parent, query);
+  function withAll(parent, query, predicate, f) {
+    const els = selectAll(parent, query, predicate);
     for (let i = 0; i < els.length; i++) {
       f(els[i]);
     }
@@ -4301,15 +4301,13 @@
 
   // Finds a unique element matching the query and clicks it.
   function clickUnique(parent, query, predicate) {
-    return withUnique(parent, query, predicate, click);
+    return withUnique(parent, query, predicate || all, click);
   }
 
   // Finds all elements matching the query and clicks them.
   function clickAll(parent, query, predicate) {
-    withAll(parent, query, (el) => {
-      if (!predicate || predicate(el)) {
-        click(el);
-      }
+    withAll(parent, query, predicate || all, (el) => {
+      click(el);
     });
   }
 
@@ -4951,7 +4949,7 @@
       // modal.
       let cancelButton = null;
       let acceptButton = null;
-      withAll(uniqueModal, '.ist_button', (el) => {
+      withAll(uniqueModal, '.ist_button', all, (el) => {
         if (el.innerText === 'Cancel') {
           cancelButton = el;
         } else if (el.innerText === 'Discard task' ||
