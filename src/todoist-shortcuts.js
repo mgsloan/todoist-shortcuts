@@ -439,7 +439,7 @@
   async function scheduleText() {
     const scheduler = findScheduler();
     if (scheduler) {
-      withQuery(scheduler, 'input', (el) => el.focus() );
+      withAll(scheduler, 'input', (el) => el.focus() );
       return;
     }
     const mutateCursor = getCursorToMutate();
@@ -476,7 +476,7 @@
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskEdit(mutateCursor);
-      withQuery(document, '[aria-label="Set deadline"]', click);
+      clickAll(document, '[aria-label="Set deadline"]');
       // Todoist seems to put back the focus, so try a few times to blur.
       blurSchedulerInput();
       setTimeout(blurSchedulerInput, 20);
@@ -959,7 +959,7 @@
       }
     }
     click(document.body);
-    withQuery(document, '.manager', (manager) => {
+    withAll(document, '.manager', (manager) => {
       const cancelBtn = getUnique(manager, '.cancel');
       if (cancelBtn) {
         click(cancelBtn);
@@ -1157,7 +1157,7 @@
     let current = -1;
     const allCurrents = [];
     for (const container of containers) {
-      withQuery(container, 'li', (item) => {
+      withAll(container, 'li', (item) => {
         const link =
               getFirst(item, '.item_content') ||
               getFirst(item, 'a') ||
@@ -1392,14 +1392,14 @@
   // Click "import from template" in project menu
   // eslint-disable-next-line no-unused-vars
   async function importFromTemplate() {
-    withQuery(document, '.menu_item', (tr) => {
+    withAll(document, '.menu_item', (tr) => {
       const predicate =
             matchingAttr('data-track', 'project|actions_import_from_template');
       withUnique(tr, 'td', predicate, (foundItem) => {
         click(foundItem);
         let foundInput = null;
-        withQuery(document, '.file_input_container', (container) => {
-          withQuery(container, 'input', (input) => {
+        withAll(document, '.file_input_container', (container) => {
+          withAll(container, 'input', (input) => {
             foundInput = input;
           });
         });
@@ -2262,7 +2262,7 @@
       let inner = null;
       inner = () => {
         clickedSomething = false;
-        withQuery(content, query, doClick);
+        withAll(content, query, doClick);
         if (!clickedSomething) {
           return;
         }
@@ -2917,7 +2917,7 @@
 
   function notifyUser(msg) {
     withId('todoist_app', (appHolder) => {
-      withQuery(appHolder, '.ts-note', (oldNote) => {
+      withAll(appHolder, '.ts-note', (oldNote) => {
         appHolder.removeChild(oldNote);
       });
       const close = div('ts-note-close');
@@ -3024,7 +3024,7 @@
     }
     const results = [];
     withViewContent((content) => {
-      withQuery(content, 'li', (item) => {
+      withAll(content, 'li', (item) => {
         // Skip elements which don't correspond to tasks or sections
         const matches =
           !item.classList.contains('reorder_item') &&
@@ -3303,7 +3303,7 @@
     debug('Creating navigation shortcut tips');
     try {
       const navigateItems = [];
-      withQuery(navigationContainer, 'li', (li) => {
+      withAll(navigationContainer, 'li', (li) => {
         // Ignore empty li elements, which happen for collapsed parent projects.
         if (li.childElementCount == 0) {
           return;
@@ -3384,7 +3384,7 @@
           debug('Couldn\'t figure out text for', li);
         }
       });
-      withQuery(navigationContainer,
+      withAll(navigationContainer,
           '[data-expansion-panel-header=true]',
           (summary) => {
             let mustBeKeys = null;
@@ -3413,8 +3413,8 @@
           });
 
       // Add labels and filters if that content is visible
-      withQuery(document, 'section[aria-label="Filters"]', (filtersHolder) => {
-        withQuery(filtersHolder, 'li', (li) => {
+      withAll(document, 'section[aria-label="Filters"]', (filtersHolder) => {
+        withAll(filtersHolder, 'li', (li) => {
           let txt = '';
           let initials = null;
           nameSpan = getUnique(li, '.simple_content');
@@ -3438,8 +3438,8 @@
         });
       });
 
-      withQuery(document, 'section[aria-label="Labels"]', (labelsHolder) => {
-        withQuery(labelsHolder, 'li', (li) => {
+      withAll(document, 'section[aria-label="Labels"]', (labelsHolder) => {
+        withAll(labelsHolder, 'li', (li) => {
           let txt = '';
           let initials = null;
           nameSpan = getUnique(li, '.simple_content');
@@ -3802,7 +3802,7 @@
               if (el.classList.contains('expansion_panel__toggle') &&
                   !isFavoritesSection(el)) {
                 withNavigationContainer((navContainer) => {
-                  withQuery(navContainer, '.expansion_panel__toggle', (ps) => {
+                  withAll(navContainer, '.expansion_panel__toggle', (ps) => {
                     const isExpanded =
                           ps.attributes['aria-expanded'].value === 'true';
                     if (!sameElement(el)(ps) &&
@@ -4247,7 +4247,7 @@
   }
 
   // Uses querySelectorAll, and applies the provided function to each result.
-  function withQuery(parent, query, f) {
+  function withAll(parent, query, f) {
     const els = selectAll(parent, query);
     for (let i = 0; i < els.length; i++) {
       f(els[i]);
@@ -4306,7 +4306,7 @@
 
   // Finds all elements matching the query and clicks them.
   function clickAll(parent, query, predicate) {
-    withQuery(parent, query, (el) => {
+    withAll(parent, query, (el) => {
       if (!predicate || predicate(el)) {
         click(el);
       }
@@ -4972,7 +4972,7 @@
       // modal.
       let cancelButton = null;
       let acceptButton = null;
-      withQuery(uniqueModal, '.ist_button', (el) => {
+      withAll(uniqueModal, '.ist_button', (el) => {
         if (el.innerText === 'Cancel') {
           cancelButton = el;
         } else if (el.innerText === 'Discard task' ||
