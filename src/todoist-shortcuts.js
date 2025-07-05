@@ -4313,27 +4313,6 @@
     });
   }
 
-  // Given a predicate, returns a value if there is a unique child
-  // which matches it.
-  function getUniqueChild(parent, predicate) {
-    return findUnique(predicate, parent.children);
-  }
-
-  // Checks that there is only one child element that matches the
-  // predicate, and invokes the function on it. Logs a warning if
-  // there isn't exactly one.
-  //
-  // eslint-disable-next-line no-unused-vars
-  function withUniqueChild(parent, predicate, f) {
-    const result = getUniqueChild(parent, predicate);
-    if (result) {
-      return f(result);
-    } else {
-      warn('Couldn\'t find unique child and passing predicate');
-      return null;
-    }
-  }
-
   // Returns true if the map-like / set-like object is empty.
   function isEmptyMap(obj) {
     for (const key in obj) {
