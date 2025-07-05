@@ -446,11 +446,9 @@
     if (mutateCursor) {
       clickTaskSchedule(mutateCursor);
     } else {
-      withUnique(
+      clickUnique(
           document,
-          'button[data-action-hint="multi-select-toolbar-scheduler"]',
-          click,
-      );
+          'button[data-action-hint="multi-select-toolbar-scheduler"]');
     }
   }
 
@@ -468,7 +466,7 @@
           });
       // Fallback on english text matching if the above doesn't work.
       if (!success) {
-        withUnique(findScheduler(), 'button', matchingText('Time'), click);
+        clickUnique(findScheduler(), 'button', matchingText('Time'));
       }
       focusTimeInput();
     }, 50);
@@ -492,12 +490,10 @@
     withScheduler(
         'scheduleToday',
         (scheduler) => {
-          withUnique(
+          clickUnique(
               scheduler,
               'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_today'),
-              click,
-          );
+              matchingAttr('data-track', 'scheduler|date_shortcut_today'));
         });
   }
 
@@ -517,12 +513,11 @@
     withScheduler(
         'scheduleNextWeekend',
         (scheduler) => {
-          withUnique(
+          clickUnique(
               scheduler,
               'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_nextweekend'),
-              click,
-          );
+              matchingAttr('data-track',
+                  'scheduler|date_shortcut_nextweekend'));
         });
   }
 
@@ -531,12 +526,10 @@
     withScheduler(
         'scheduleNextMonth',
         (scheduler) => {
-          withUnique(
+          clickUnique(
               scheduler,
               'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_nextmonth'),
-              click,
-          );
+              matchingAttr('data-track', 'scheduler|date_shortcut_nextmonth'));
         });
   }
 
@@ -545,13 +538,11 @@
     withScheduler(
         'schedulePostpone',
         (scheduler) => {
-          withUnique(
+          clickUnique(
               scheduler,
               'button',
               matchingAttr('data-track',
-                  'scheduler|date_shortcut_postpone'),
-              click,
-          );
+                  'scheduler|date_shortcut_postpone'));
         });
   }
 
@@ -565,12 +556,10 @@
       withScheduler(
           'schedulePlusN',
           (scheduler) => {
-            withUnique(
+            clickUnique(
                 scheduler,
                 'button',
-                matchingAttr('aria-label', buttonAriaLabel),
-                click,
-            );
+                matchingAttr('aria-label', buttonAriaLabel));
           });
     };
   }
@@ -580,12 +569,10 @@
     withScheduler(
         'unschedule',
         (scheduler) => {
-          withUnique(
+          clickUnique(
               scheduler,
               'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_nodate'),
-              click,
-          );
+              matchingAttr('data-track', 'scheduler|date_shortcut_nodate'));
         });
   }
 
@@ -600,11 +587,9 @@
           'task-overflow-menu-move-to-project',
           false);
     } else {
-      withUnique(
+      clickUnique(
           document,
-          'button[data-action-hint="multi-select-toolbar-project-picker"]',
-          click,
-      );
+          'button[data-action-hint="multi-select-toolbar-project-picker"]');
     }
   }
 
@@ -624,11 +609,10 @@
             '.popper',
             hasChild('[aria-label="'+projectName+'"]'),
             (menu) => {
-              withUnique(
+              clickUnique(
                   menu,
                   'li',
-                  matchingAttr('aria-label', projectName),
-                  click);
+                  matchingAttr('aria-label', projectName));
             });
       } else {
         withUnique(
@@ -641,11 +625,10 @@
                   '.popper',
                   hasChild('[aria-label="'+projectName+'"]'),
                   (menu) => {
-                    withUnique(
+                    clickUnique(
                         menu,
                         'li',
-                        matchingAttr('aria-label', projectName),
-                        click);
+                        matchingAttr('aria-label', projectName));
                   });
             },
         );
@@ -670,18 +653,14 @@
         const menu = await selectUniqueRetrying(document, 'priority_picker');
         clickPriorityMenu(menu, level);
         // Click save button.
-        withUnique(
+        clickUnique(
             document,
             'div[data-testid="task-editor-action-buttons"] ' +
-            'button[type="submit"]',
-            click,
-        );
+            'button[type="submit"]');
       } else {
-        withUnique(
+        clickUnique(
             document,
-            'button[data-action-hint="multi-select-toolbar-priority-picker"]',
-            click,
-        );
+            'button[data-action-hint="multi-select-toolbar-priority-picker"]');
         withUnique(document, '.priority_picker', all, (menu) => {
           clickPriorityMenu(menu, level);
         });
@@ -763,12 +742,10 @@
       select();
     }
     withUnique(document, '.multi_select_toolbar', all, (toolbar) => {
-      withUnique(
+      clickUnique(
           toolbar,
           'button',
-          matchingAction('multi-select-toolbar-label-picker'),
-          click,
-      );
+          matchingAction('multi-select-toolbar-label-picker'));
     });
   }
 
@@ -778,7 +755,7 @@
   // If toggl-button or clockify extension is in use, clicks the
   // button element in the task.
   async function toggleTimer() {
-    withUnique(requireCursor(), TIMER_QUERY, all, click);
+    clickUnique(requireCursor(), TIMER_QUERY, all);
   }
 
   // Toggles collapse / expand of a task, if it has children.
@@ -1235,7 +1212,7 @@
     /*
     if (resetIfSortTypeAlready('date')) return;
     openSortMenu();
-    withUnique(document, 'li[data-value="DUE_DATE"]', click);
+    clickUnique(document, 'li[data-value="DUE_DATE"]');
     closeContextMenus();
     */
   }
@@ -1245,13 +1222,12 @@
     /*
     if (resetIfSortTypeAlready('priority')) return;
     openSortMenu();
-    withUnique(document, 'li[data-value="PRIORITY"]', click);
-    withUnique(
+    clickUnique(document, 'li[data-value="PRIORITY"]');
+    clickUnique(
         document,
         '.menu_item',
-        matchingAttr('aria-labelledby', 'view_menu__order'),
-        click);
-    withUnique(document, 'li[data-value="DESC"]', click);
+        matchingAttr('aria-labelledby', 'view_menu__order'));
+    clickUnique(document, 'li[data-value="DESC"]');
     closeContextMenus();
     */
   }
@@ -1261,7 +1237,7 @@
     /*
     if (resetIfSortTypeAlready('alphabetically')) return;
     openSortMenu();
-    withUnique(document, 'li[data-value="ALPHABETICALLY"]', click);
+    clickUnique(document, 'li[data-value="ALPHABETICALLY"]');
     closeContextMenus();
     */
   }
@@ -1271,7 +1247,7 @@
     /*
     if (resetIfSortTypeAlready('assignee')) return;
     openSortMenu();
-    withUnique(document, 'li[data-value="ASSIGNEE"]', click);
+    clickUnique(document, 'li[data-value="ASSIGNEE"]');
     closeContextMenus();
     */
   }
@@ -1315,7 +1291,7 @@
   */
 
   async function openNotifications() {
-    withUnique(document, '[aria-owns="notification_popup"]', click);
+    clickUnique(document, '[aria-owns="notification_popup"]');
   }
 
   async function quickAdd() {
@@ -1344,15 +1320,14 @@
   }
 
   async function toggleLeftNav() {
-    withUnique(
+    clickUnique(
         document,
-        'button[aria-controls=sidebar], .top_bar_btn.left_menu_toggle',
-        click);
+        'button[aria-controls=sidebar], .top_bar_btn.left_menu_toggle');
   }
 
   async function focusSearch() {
     // TODO: does it work in other UI languages?
-    withUnique(document, 'nav *[aria-label=Search]', click);
+    clickUnique(document, 'nav *[aria-label=Search]');
   }
 
   // Open help documentation.
@@ -1461,57 +1436,56 @@
       click(button);
     } else {
       withId('help_btn', click);
-      withUnique(document, COMMAND_MENU_SELECTOR, click);
+      clickUnique(document, COMMAND_MENU_SELECTOR);
     }
   }
 
   const TASK_VIEW_SELECTOR = 'div[data-testid="task-details-modal"]';
 
   async function taskViewEdit() {
-    withUnique(document, '.task-detail-editor-container .task_content', click);
+    clickUnique(document, '.task-detail-editor-container .task_content');
   }
 
   async function taskViewDone() {
-    withUnique(document, '[data-action-hint=task-detail-view-complete]', click);
+    clickUnique(document, '[data-action-hint=task-detail-view-complete]');
   }
 
   async function taskViewClose() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'button[aria-label="Close task"]', click);
+      clickUnique(taskView, 'button[aria-label="Close task"]');
     });
   }
 
   async function taskViewParent() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(
-          taskView, 'div[data-testid="task-detail-breadcrumbs"] > a', click);
+      clickUnique(
+          taskView, 'div[data-testid="task-detail-breadcrumbs"] > a');
     });
   }
 
   async function taskViewNext() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, '[aria-label="Next task"', click);
+      clickUnique(taskView, '[aria-label="Next task"');
     });
   }
 
   async function taskViewComments() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(
+      clickUnique(
           taskView,
-          'button[data-testid="open-comment-editor-button"]',
-          click);
+          'button[data-testid="open-comment-editor-button"]');
     });
   }
 
   async function taskViewPrevious() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, '[aria-label="Previous task"', click);
+      clickUnique(taskView, '[aria-label="Previous task"');
     });
   }
 
   async function taskViewAddSubtask() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'button', matchingText('Add sub-task'), click);
+      clickUnique(taskView, 'button', matchingText('Add sub-task'));
     });
   }
 
@@ -1522,25 +1496,25 @@
 
   async function taskViewScheduleText() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, '.task-due-date-button', all, click);
+      clickUnique(taskView, '.task-due-date-button', all);
     });
   }
 
   async function taskViewOpenAssign() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'span', matchingText('Assignee'), click);
+      clickUnique(taskView, 'span', matchingText('Assignee'));
     });
   }
 
   async function taskViewMoveToProject() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'button[aria-label="Select a project"]', click);
+      clickUnique(taskView, 'button[aria-label="Select a project"]');
     });
   }
 
   async function taskViewLabel() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'span', matchingText('Labels'), click);
+      clickUnique(taskView, 'span', matchingText('Labels'));
     });
   }
 
@@ -1549,16 +1523,13 @@
       withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
         const actualLevel = invertPriorityLevel(level);
         if (!getUnique(document, '.priority_picker')) {
-          withUnique(taskView,
-              '[data-icon-name=priority-icon]',
-              click);
+          clickUnique(taskView,
+              '[data-icon-name=priority-icon]');
         }
         withUnique(document, '.priority_picker', all, (picker) => {
-          withUnique(
+          clickUnique(
               picker,
-              '[data-action-hint="task-actions-priority-' + actualLevel + '"]',
-              click,
-          );
+              '[data-action-hint="task-actions-priority-' + actualLevel + '"]');
         });
       });
     };
@@ -1566,26 +1537,26 @@
 
   async function taskViewOpenReminders() {
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
-      withUnique(taskView, 'span', matchingText('Reminders'), click);
+      clickUnique(taskView, 'span', matchingText('Reminders'));
     });
   }
 
   async function taskViewDelete() {
     withTaskViewMoreMenu((menu) => {
-      withUnique(menu, 'kbd', matchingText('Delete'), click);
+      clickUnique(menu, 'kbd', matchingText('Delete'));
     });
   }
 
   async function taskViewToggleTimer() {
     withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
-      withUnique(taskView, TIMER_QUERY, all, click);
+      clickUnique(taskView, TIMER_QUERY, all);
     });
   }
 
   // eslint-disable-next-line no-unused-vars
   async function taskViewActivity() {
     withTaskViewMoreMenu((menu) => {
-      withUnique(menu, 'div', matchingText('View task activity'), click);
+      clickUnique(menu, 'div', matchingText('View task activity'));
     });
   }
 
@@ -1593,7 +1564,7 @@
     withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
       let overflowMenu = getTaskViewMoreMenu();
       if (!overflowMenu) {
-        withUnique(taskView, 'button[aria-label="More actions"]', click);
+        clickUnique(taskView, 'button[aria-label="More actions"]');
         overflowMenu = getTaskViewMoreMenu();
       }
       if (overflowMenu) {
@@ -2256,12 +2227,10 @@
   }
 
   function openMoreMenu() {
-    withUnique(
+    clickUnique(
         document,
         'button',
-        matchingAction('multi-select-toolbar-overflow-menu-trigger'),
-        click,
-    );
+        matchingAction('multi-select-toolbar-overflow-menu-trigger'));
     const result = selectUnique(document, '.reactist_menulist[data-dialog]');
     if (!result) {
       throw new Error('Failed to find "More" menu');
@@ -2744,7 +2713,7 @@
 
   function clickTaskSchedule(task) {
     withTaskHovered(task, () => {
-      withUnique(task, '[data-action-hint="task-scheduler"]', click);
+      clickUnique(task, '[data-action-hint="task-scheduler"]');
     });
   }
 
@@ -2813,7 +2782,7 @@
   }
 
   function clickTaskDone(task) {
-    withUnique(task, '.item_checkbox, .task_checkbox', all, click);
+    clickUnique(task, '.item_checkbox, .task_checkbox', all);
   }
 
   async function addAboveTask(task) {
@@ -2935,8 +2904,8 @@
   }
 
   function clickPriorityMenu(menu, level) {
-    withUnique(
-        menu, 'li', matchingAction('task-actions-priority-' + level), click);
+    clickUnique(
+        menu, 'li', matchingAction('task-actions-priority-' + level));
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -3851,8 +3820,8 @@
                   !matchingClass('collapse--entered')(collapseParent)) {
                 const collapseHeader = collapseParent.previousSibling;
                 if (collapseHeader) {
-                  withUnique(
-                      collapseHeader, '.expansion_panel__toggle', all, click);
+                  clickUnique(
+                      collapseHeader, '.expansion_panel__toggle', all);
                 } else {
                   warn('Expected to find section collapse header, but did\'nt');
                 }
@@ -4236,6 +4205,7 @@
     return findUnique(predicate, selectAll(parent, query));
   }
 
+  // eslint-disable-next-line no-unused-vars
   async function selectAllRetrying(parent, query, fuel=100, delay=10) {
     return await retryWithDelay(
         'finding descendants matching ' + query,
