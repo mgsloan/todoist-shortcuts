@@ -595,21 +595,17 @@
   async function moveToProject() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      // TODO: Didn't dig into it too much but this seems to be
-      // inscrutably broken.For now instead just selecting a task
-      // and then using the multi-task move which works.
-      //
-      // clickTaskMenu(
-      //     mutateCursor,
-      //     'task-overflow-menu-move-to-project',
-      //     false);
-      selectTask(mutateCursor);
+      await clickTaskMenu(
+          mutateCursor,
+          'task-overflow-menu-move-to-project',
+          false);
+    } else {
+      withUnique(
+          document,
+          'button[data-action-hint="multi-select-toolbar-project-picker"]',
+          click,
+      );
     }
-    withUnique(
-        document,
-        'button[data-action-hint="multi-select-toolbar-project-picker"]',
-        click,
-    );
   }
 
   // Clicks 'Move to project' for the selection, and moves to the
@@ -619,7 +615,7 @@
     return async () => {
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
-        clickTaskMenu(
+        await clickTaskMenu(
             mutateCursor,
             'task-overflow-menu-move-to-project',
             false);
@@ -668,19 +664,11 @@
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
-        const priorityButtons = await retryWithDelay(
-            50,
-            'finding priority button',
-            () => selectAll(
-                document,
-                '[data-action-hint="task-actions-priority-picker"]'),
-        );
-        for (button in priorityButtons) {
-          click(button);
-        }
-        withUniqueClass(document, 'priority_picker', all, (menu) => {
-          clickPriorityMenu(menu, level);
-        });
+        click(await selectUniqueRetrying(
+            document,
+            '[data-action-hint="task-actions-priority-picker"]'));
+        const menu = await selectUniqueRetrying(document, 'priority_picker');
+        clickPriorityMenu(menu, level);
         // Click save button.
         withUnique(
             document,
@@ -706,8 +694,8 @@
   //
   // NOTE: this returns a function so that it can be used conveniently in the
   // keybindings.
-  async function selectPriority(level) {
-    return () => {
+  function selectPriority(level) {
+    return async () => {
       const actualLevel = invertPriorityLevel(level);
       const allTasks = getTasks('include-collapsed');
       const selected = getSelectedTaskKeys();
@@ -746,7 +734,7 @@
   async function deleteTasks() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
+      await clickTaskMenu(mutateCursor, 'task-overflow-menu-delete', false);
     } else {
       withUnique(
           openMoreMenu(),
@@ -759,7 +747,7 @@
   async function duplicateTasks() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
+      await clickTaskMenu(mutateCursor, 'task-overflow-menu-duplicate', false);
     } else {
       withUnique(
           openMoreMenu(),
@@ -915,7 +903,7 @@
     } else {
       const tasks = getTasks();
       if (tasks.length > 0) {
-        addAboveTask(tasks[0]);
+        await addAboveTask(tasks[0]);
       } else {
         quickAdd();
       }
@@ -932,10 +920,11 @@
   // in agenda mode, so in that case, instead it is added to the current
   // section.
   async function addAbove() {
-    addAboveTask(getCursor());
+    await addAboveTask(getCursor());
   }
+
   async function addBelow() {
-    addBelowTask(getCursor());
+    await addBelowTask(getCursor());
   }
 
   // Open comments sidepane
@@ -946,7 +935,7 @@
 
   // Open reminders dialog
   async function openReminders() {
-    clickTaskMenu(requireCursor(), 'task-overflow-menu-reminders');
+    await clickTaskMenu(requireCursor(), 'task-overflow-menu-reminders');
   }
 
   // Open assign dialog
@@ -993,7 +982,6 @@
       }
       if (i == 99) {
         warn('Tried a lot to close poppers.');
-        notifyUser('Closing popups is currently broken. Hopefully fixed soon!');
       }
     }
     click(document.body);
@@ -1563,8 +1551,8 @@
     });
   }
 
-  async function taskViewSetPriority(level) {
-    return () => {
+  function taskViewSetPriority(level) {
+    return async () => {
       withUnique(document, TASK_VIEW_SELECTOR, (taskView) => {
         const actualLevel = invertPriorityLevel(level);
         if (!getUniqueClass(document, 'priority_picker')) {
@@ -2328,28 +2316,35 @@
   }
 
   // Opens up the task's contextual menu and clicks an item via text match.
-  function clickTaskMenu(task, action, shouldScroll) {
-    withTaskMenuOpen(task, shouldScroll, () => {
-      withUnique(document, '[data-action-hint="' + action + '"]', click);
+  async function clickTaskMenu(task, action, shouldScroll) {
+    await withTaskMenuOpen(task, shouldScroll, async () => {
+      const element = await selectUniqueRetrying(
+          document, '[data-action-hint="' + action + '"]');
+      click(element);
     });
   }
 
-  function withTaskMenuOpen(task, shouldScroll, f) {
+  async function withTaskMenuOpen(task, shouldScroll, f) {
     if (shouldScroll) {
-      withTaskMenuOpenImpl(task, f);
+      await withTaskMenuOpenImpl(task, f);
     } else {
-      withScrollIgnoredFor(400, () => {
-        withTaskMenuOpenImpl(task, f);
+      await new Promise((resolve) => {
+        withScrollIgnoredFor(400, async () => {
+          await withTaskMenuOpenImpl(task, f);
+          resolve();
+        });
       });
     }
   }
 
-  function withTaskMenuOpenImpl(task, f) {
-    withTaskHovered(task, () => {
-      const query = 'button[data-action-hint="task-overflow-menu"]';
-      withUnique(task, query, (openMenu) => {
+  async function withTaskMenuOpenImpl(task, f) {
+    await new Promise((resolve) => {
+      withTaskHovered(task, async () => {
+        const query = 'button[data-action-hint="task-overflow-menu"]';
+        const openMenu = await selectUniqueRetrying(task, query);
         click(openMenu);
-        f();
+        await f();
+        resolve();
       });
     });
   }
@@ -2776,7 +2771,7 @@
   }
 
   // Generic retry with delay between retries - returns a Promise
-  async function retryWithDelay(fuel, taskName, task, delay = 10) {
+  async function retryWithDelay(taskName, task, fuel = 100, delay = 10) {
     while (fuel > 0) {
       const result = task();
       if (result) {
@@ -2797,7 +2792,6 @@
     await sleep(IS_SAFARI ? 20 : 0);
     try {
       const focusedEl = await retryWithDelay(
-          50,
           'finding scheduler input',
           () => {
             const el = document.activeElement;
@@ -2816,7 +2810,6 @@
     enterDeferLastBinding();
     try {
       const timepicker = await retryWithDelay(
-          20,
           'finding time input',
           () => getById('scheduler-timepicker-input-element'),
       );
@@ -2830,22 +2823,24 @@
     withUniqueClass(task, ['item_checkbox', 'task_checkbox'], all, click);
   }
 
-  function addAboveTask(task) {
-    addAboveOrBelowTask(task, 'Add task above', 'task-overflow-menu-add-above');
+  async function addAboveTask(task) {
+    await addAboveOrBelowTask(
+        task, 'Add task above', 'task-overflow-menu-add-above');
   }
 
-  function addBelowTask(task) {
-    addAboveOrBelowTask(task, 'Add task below', 'task-overflow-menu-add-below');
+  async function addBelowTask(task) {
+    await addAboveOrBelowTask(
+        task, 'Add task below', 'task-overflow-menu-add-below');
   }
 
   // Common code implementing addAbove / addBelow.
-  function addAboveOrBelowTask(task, menuText, action) {
+  async function addAboveOrBelowTask(task, menuText, action) {
     if (task === null) {
       clickInlineAddTask();
     } else if (viewMode === 'agenda') {
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
-      withTaskMenuOpen(task, true, () => {
+      await withTaskMenuOpen(task, true, async () => {
         const btn = selectUnique('[data-action-hint="' + action + '"]');
         if (btn) {
           click(btn);
@@ -4240,18 +4235,35 @@
 
   // Alias for querySelectorAll.
   function selectAll(parent, query) {
-    if (!query) {
-      // eslint-disable-next-line no-param-reassign
-      query = parent;
-      // eslint-disable-next-line no-param-reassign
-      parent = document;
-    }
     return parent.querySelectorAll(query);
   }
 
   // Uses querySelectorAll, but requires a unique result.
   function selectUnique(parent, query, predicate) {
     return findUnique(predicate, selectAll(parent, query));
+  }
+
+  async function selectAllRetrying(parent, query, fuel=100, delay=10) {
+    return await retryWithDelay(
+        'finding descendants matching ' + query,
+        () => {
+          const results = selectAll(parent, query);
+          if (results.length === 0) {
+            return null;
+          } else {
+            return results;
+          }
+        },
+        fuel,
+        delay);
+  }
+
+  async function selectUniqueRetrying(parent, query, fuel=100, delay=10) {
+    return await retryWithDelay(
+        'finding unique descendant matching ' + query,
+        () => selectUnique(parent, query),
+        fuel,
+        delay);
   }
 
   // Users querySelectorAll, requires unique result, and applies the
