@@ -654,7 +654,7 @@
         await clickUniqueRetrying(
             document,
             '[data-action-hint="task-actions-priority-picker"]');
-        const menu = await selectUniqueRetrying(document, '.priority_picker');
+        const menu = await getUniqueRetrying(document, '.priority_picker');
         await clickPriorityMenu(menu, level);
         // Click save button.
         await clickUniqueRetrying(
@@ -995,9 +995,9 @@
       toggleLeftNav();
     }
     const currentPath = document.location.pathname;
-    const currentProject = selectUnique(
+    const currentProject = getUnique(
         document, '#left-menu-projects-panel li', (project) => {
-          const link = selectUnique(project, 'a');
+          const link = getUnique(project, 'a');
           // If a project doesn't have an anchor tag, it's hidden and
           // we want to skip it.
           return link && link.href.endsWith(currentPath);
@@ -1083,7 +1083,7 @@
         info('Not switching to "Upcoming", because task is not scheduled.');
       }
     } else {
-      const projectEl = selectUnique(
+      const projectEl = getUnique(
           cursor,
           'a',
           (linkEl) => linkEl.href && linkEl.href.includes('/project/'));
@@ -1258,11 +1258,11 @@
 
   /*
   function resetIfSortTypeAlready(type) {
-    const changeSortButton = selectUnique(
+    const changeSortButton = getUnique(
         document, 'button[aria-label="Change sorting options"]');
     if (changeSortButton) {
       if (changeSortButton.innerText.includes(type)) {
-        const resetSortButton = selectUnique(
+        const resetSortButton = getUnique(
             document, 'button[aria-label="Reset sorting options"]');
         if (resetSortButton) {
           click(resetSortButton);
@@ -1430,7 +1430,7 @@
         'button[aria-labelledby="command-menu-description"]';
 
   async function openCommandMenu() {
-    const button = selectUnique(document, COMMAND_MENU_SELECTOR);
+    const button = getUnique(document, COMMAND_MENU_SELECTOR);
     if (button) {
       click(button);
     } else {
@@ -1572,7 +1572,7 @@
   }
 
   function getTaskViewMoreMenu() {
-    return selectUniqueRetrying(
+    return getUniqueRetrying(
         document, 'div.reactist_menulist[aria-label="More actions"]');
   }
 
@@ -1637,7 +1637,7 @@
    */
 
   function getViewContent() {
-    return selectUnique(document, '#content');
+    return getUnique(document, '#content');
   }
 
   function withViewContent(f) {
@@ -2171,9 +2171,9 @@
       }
       const popupWindow =
             getUnique(document, '.GB_window') ||
-            selectUnique(document, '[data-testid="modal-overlay"]') ||
+            getUnique(document, '[data-testid="modal-overlay"]') ||
             // Search dropdown
-            selectUnique(document, '#quick_find > [role="presentation"]');
+            getUnique(document, '#quick_find > [role="presentation"]');
       if (popupWindow) {
         switchKeymap(POPUP_KEYMAP);
         return;
@@ -2194,7 +2194,7 @@
   }
 
   function checkTaskViewOpen() {
-    return selectUnique(document, 'div[data-item-detail-root]') !== null;
+    return getUnique(document, 'div[data-item-detail-root]') !== null;
   }
 
   // Registers a mutation observer that just observes modifications to its
@@ -2226,7 +2226,7 @@
         document,
         'button',
         matchingAction('multi-select-toolbar-overflow-menu-trigger'));
-    const result = selectUnique(document, '.reactist_menulist[data-dialog]');
+    const result = getUnique(document, '.reactist_menulist[data-dialog]');
     if (!result) {
       throw new Error('Failed to find "More" menu');
     }
@@ -2275,7 +2275,7 @@
   // Opens up the task's contextual menu and clicks an item via text match.
   async function clickTaskMenu(task, action, shouldScroll) {
     await withTaskMenuOpen(task, shouldScroll, async () => {
-      const element = await selectUniqueRetrying(
+      const element = await getUniqueRetrying(
           document, '[data-action-hint="' + action + '"]');
       click(element);
     });
@@ -2297,7 +2297,7 @@
   async function withTaskMenuOpenImpl(task, f) {
     await withTaskHovered(task, async () => {
       const query = 'button[data-action-hint="task-overflow-menu"]';
-      const openMenu = await selectUniqueRetrying(task, query);
+      const openMenu = await getUniqueRetrying(task, query);
       click(openMenu);
       await f();
     });
@@ -2795,7 +2795,7 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       await withTaskMenuOpen(task, true, async () => {
-        const btn = selectUnique(task, '[data-action-hint="' + action + '"]');
+        const btn = getUnique(task, '[data-action-hint="' + action + '"]');
         if (btn) {
           click(btn);
         } else {
@@ -3319,9 +3319,9 @@
           keepGoing = true;
         } else if (matchingAttr('data-track', 'navigation|completed')(li)) {
           mustBeKeys = 'co';
-        } else if (selectUnique(li, 'a[aria-label="Add task"]')) {
+        } else if (getUnique(li, 'a[aria-label="Add task"]')) {
           mustBeKeys = 'q';
-        } else if (selectUnique(li, 'a[aria-label="Search"]')) {
+        } else if (getUnique(li, 'a[aria-label="Search"]')) {
           mustBeKeys = '/';
         } else {
           const rawText = getNavItemText(li).split('\n')[0];
@@ -3904,7 +3904,7 @@
 
   function withNavScroll(f) {
     const scrollDiv =
-      selectUnique(
+      getUnique(
           document,
           'nav > div',
           isVerticallyScrollable);
@@ -4194,13 +4194,6 @@
     return parent.querySelectorAll(query);
   }
 
-  // Checks that there is only one descendant element that matches the
-  // query and predicate, and returns it. Returns null if it is not
-  // found or not unique.
-  function selectUnique(parent, query, predicate) {
-    return findUnique(predicate, selectAll(parent, query));
-  }
-
   // eslint-disable-next-line no-unused-vars
   async function selectAllRetrying(
       parent, query, predicate, fuel=100, delay=10) {
@@ -4218,24 +4211,24 @@
         delay);
   }
 
-  async function selectUniqueRetrying(
+  async function getUniqueRetrying(
       parent, query, predicate, fuel=100, delay=10) {
     return await retryWithDelay(
         'finding unique descendant matching ' + query,
-        () => selectUnique(parent, query, predicate),
+        () => getUnique(parent, query, predicate),
         fuel,
         delay);
   }
 
   async function clickUniqueRetrying(
       parent, query, predicate, fuel=100, delay=10) {
-    click(await selectUniqueRetrying(parent, query, predicate, fuel, delay));
+    click(await getUniqueRetrying(parent, query, predicate, fuel, delay));
   }
 
   // Users querySelectorAll, requires unique result, and applies the
   // user's function to it.  Logs a warning if there isn't one.
   function withUnique(parent, query, predicate, f) {
-    const result = selectUnique(parent, query, predicate);
+    const result = getUnique(parent, query, predicate);
     if (result) {
       return f(result);
     } else {
