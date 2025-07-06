@@ -168,9 +168,9 @@
     ['shift+r', taskViewOpenReminders],
     [['e', '#'], taskViewDelete],
     ['shift+c', taskViewToggleTimer],
-    ['ctrl+shift+/', () => {
-      taskViewClose();
-      openRandomTask();
+    ['ctrl+shift+/', async () => {
+      await taskViewClose();
+      await openRandomTask();
     }],
   ];
   const TASK_VIEW_KEYMAP = 'task_view';
@@ -271,10 +271,10 @@
   // Take multiple actions (functions that take no arguments), and run them in
   // sequence.
   // eslint-disable-next-line no-unused-vars
-  function sequence(actions) {
-    return () => {
+  async function sequence(actions) {
+    return async () => {
       for (let i = 0; i < actions.length; i++) {
-        actions[i]();
+        await actions[i]();
       }
     };
   }
@@ -738,7 +738,7 @@
   // Opens the label toggling menu.
   async function openLabelMenu() {
     if (isEmptyMap(getSelectedTaskKeys())) {
-      select();
+      await select();
     }
     withUnique(document, '.multi_select_toolbar', all, (toolbar) => {
       clickUnique(
@@ -948,7 +948,7 @@
     for (let i = 0; i < 100; i++) {
       const popperOverlay = getLast(document, '.popper__overlay');
       if (popperOverlay) {
-        popperOverlay.click();
+        click(popperOverlay);
       } else {
         break;
       }
@@ -1208,7 +1208,7 @@
   }
 
   async function openNotifications() {
-    clickUnique(document, '[aria-owns="notification_popup"]');
+    clickUnique(document, 'a[aria-label="Notifications"]');
   }
 
   async function quickAdd() {
