@@ -423,13 +423,12 @@
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       await clickTaskSchedule(mutateCursor);
-      blurSchedulerInput();
+      await blurSchedulerInput();
     } else {
-      const query = 'button[data-action-hint="multi-select-toolbar-scheduler"]';
-      withUnique(document, query, all, (button) => {
-        click(button);
-        blurSchedulerInput();
-      });
+      clickUniqueRetrying(
+          document,
+          'button[data-action-hint="multi-select-toolbar-scheduler"]');
+      await blurSchedulerInput();
     }
   }
 
@@ -479,12 +478,15 @@
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
       clickTaskEdit(mutateCursor);
-      clickAll(document, '[aria-label="Set deadline"]');
+      await clickAllRetrying(document, '[aria-label="Set deadline"]');
       // Todoist seems to put back the focus, so try a few times to blur.
-      blurSchedulerInput();
-      setTimeout(blurSchedulerInput, 20);
-      setTimeout(blurSchedulerInput, 50);
-      setTimeout(blurSchedulerInput, 100);
+      await blurSchedulerInput();
+      sleep(20);
+      await blurSchedulerInput();
+      sleep(50);
+      await blurSchedulerInput();
+      sleep(100);
+      await blurSchedulerInput();
     }
   }
 
@@ -904,7 +906,8 @@
   // Open comments sidepane
   async function openComments() {
     openTaskView();
-    taskViewComments();
+    await getUniqueRetrying(document, TASK_VIEW_SELECTOR);
+    await taskViewComments();
   }
 
   // Open reminders dialog
@@ -1487,7 +1490,7 @@
 
   async function taskViewSchedule() {
     taskViewScheduleText();
-    blurSchedulerInput();
+    await blurSchedulerInput();
   }
 
   async function taskViewScheduleText() {
@@ -2795,17 +2798,17 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       await withTaskMenuOpen(task, true, async () => {
-        const btn = getUnique(task, '[data-action-hint="' + action + '"]');
-        if (btn) {
-          click(btn);
-        } else {
+        try {
+          await clickUniqueRetrying(
+              document, '[data-action-hint="' + action + '"]');
+        } finally {
           // If there is no matching menu item (such as when sorting
           // project by priority), then the task menu needs to be
           // explicitly closed.
           closeContextMenus();
         }
       });
-      const editor = getUnique(document, '.task_editor');
+      const editor = await getUniqueRetrying(document, '.task_editor');
       if (editor) {
         scrollTaskEditorIntoView();
       } else {
@@ -4194,7 +4197,6 @@
     return parent.querySelectorAll(query);
   }
 
-  // eslint-disable-next-line no-unused-vars
   async function selectAllRetrying(
       parent, query, predicate, fuel=100, delay=10) {
     return await retryWithDelay(
@@ -4223,6 +4225,15 @@
   async function clickUniqueRetrying(
       parent, query, predicate, fuel=100, delay=10) {
     click(await getUniqueRetrying(parent, query, predicate, fuel, delay));
+  }
+
+  async function clickAllRetrying(
+      parent, query, predicate, fuel=100, delay=10) {
+    const elements =
+      await selectAllRetrying(parent, query, predicate, fuel, delay);
+    for (const element of elements) {
+      click(element);
+    }
   }
 
   // Users querySelectorAll, requires unique result, and applies the
