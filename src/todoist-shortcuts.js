@@ -78,7 +78,9 @@
     ['shift+c', toggleTimer],
 
     // Projects
-    ['shift+p', openCurrentProjectLeftNavMenu],
+    //
+    // Disabled as it's broken
+    // ['shift+p', openCurrentProjectLeftNavMenu],
 
     // Sorting
     ['s', sortByDate],
@@ -993,6 +995,8 @@
     });
   }
 
+  // TODO: Fix this
+  // eslint-disable-next-line no-unused-vars
   async function openCurrentProjectLeftNavMenu() {
     if (leftNavIsHidden()) {
       toggleLeftNav();
@@ -1003,7 +1007,7 @@
           const link = getUnique(project, 'a');
           // If a project doesn't have an anchor tag, it's hidden and
           // we want to skip it.
-          return link && link.href.endsWith(currentPath);
+          return link !== null && link.href.endsWith(currentPath);
         });
     if (!currentProject) {
       throw new Error('Could not find current project.');
