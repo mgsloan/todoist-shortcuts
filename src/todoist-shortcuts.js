@@ -82,12 +82,6 @@
     // Disabled as it's broken
     // ['shift+p', openCurrentProjectLeftNavMenu],
 
-    // Sorting
-    ['s', sortByDate],
-    ['p', sortByPriority],
-    ['n', sortByName],
-    ['r', sortByAssignee],
-
     // Bulk reschedule / move modes were removed
     ['* t', notifyBulkActionsRemoved],
     ['* v', notifyBulkActionsRemoved],
@@ -1212,89 +1206,6 @@
       notifyUser('Didn\'t find undo button, undo only works popup is visible.');
     });
   }
-
-  async function sortByDate() {
-    sortingCurrentlyBroken();
-    /*
-    if (resetIfSortTypeAlready('date')) return;
-    openSortMenu();
-    clickUnique(document, 'li[data-value="DUE_DATE"]');
-    closeContextMenus();
-    */
-  }
-
-  async function sortByPriority() {
-    sortingCurrentlyBroken();
-    /*
-    if (resetIfSortTypeAlready('priority')) return;
-    openSortMenu();
-    clickUnique(document, 'li[data-value="PRIORITY"]');
-    clickUnique(
-        document,
-        '.menu_item',
-        matchingAttr('aria-labelledby', 'view_menu__order'));
-    clickUnique(document, 'li[data-value="DESC"]');
-    closeContextMenus();
-    */
-  }
-
-  async function sortByName() {
-    sortingCurrentlyBroken();
-    /*
-    if (resetIfSortTypeAlready('alphabetically')) return;
-    openSortMenu();
-    clickUnique(document, 'li[data-value="ALPHABETICALLY"]');
-    closeContextMenus();
-    */
-  }
-
-  async function sortByAssignee() {
-    sortingCurrentlyBroken();
-    /*
-    if (resetIfSortTypeAlready('assignee')) return;
-    openSortMenu();
-    clickUnique(document, 'li[data-value="ASSIGNEE"]');
-    closeContextMenus();
-    */
-  }
-
-  async function sortingCurrentlyBroken() {
-    notifyUser(
-        'Sort keybindings are currently not working. Hopefully fixed soon!');
-  }
-
-  /*
-  function resetIfSortTypeAlready(type) {
-    const changeSortButton = getUnique(
-        document, 'button[aria-label="Change sorting options"]');
-    if (changeSortButton) {
-      if (changeSortButton.innerText.includes(type)) {
-        const resetSortButton = getUnique(
-            document, 'button[aria-label="Reset sorting options"]');
-        if (resetSortButton) {
-          click(resetSortButton);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  function openSortMenu() {
-    withUnique(document, '.view_header__actions', all, (actions) => {
-      // Ooof, such a terrible hack.
-      withUnique(
-          actions, 'path', matchingAttr('d', SORT_SVG_PATH), (svgPath) => {
-            click(svgPath.parentElement);
-          });
-    });
-    withUnique(
-        document,
-        '.menu_item',
-        matchingAttr('aria-labelledby', 'view_menu__sort_by'),
-        click);
-  }
-  */
 
   async function openNotifications() {
     clickUnique(document, '[aria-owns="notification_popup"]');

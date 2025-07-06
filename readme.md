@@ -203,18 +203,6 @@ The "Smart Scheduler" is opened by pressing `s` when scheduling
 multiple items. Currently there are only two keybindings for the smart
 scheduler: `enter` to apply the choices, and `escape` to cancel.
 
-## Sorting
-
-When viewing the inbox or a project, the following keybindings can be used to
-sort the tasks:
-
-| keys | sorted by        |
-|------|------------------|
-| `s`  | Sort by date     |
-| `p`  | Sort by priority |
-| `r`  | Sort by assignee |
-| `n`  | Sort by name     |
-
 ## Task view
 
 NOTE: Some shortcuts may only work in the english translation, as the
