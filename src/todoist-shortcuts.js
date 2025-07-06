@@ -1637,12 +1637,11 @@
    */
 
   function getViewContent() {
-    // If current experimental UI launches #content will no longer exist.
-    return selectUnique(document, 'main');
+    return selectUnique(document, '#content');
   }
 
   function withViewContent(f) {
-    return withUnique(document, 'main', all, f);
+    return withUnique(document, '#content', all, f);
   }
 
   function toggleSelectTask(task) {
@@ -5046,10 +5045,10 @@
       window.originalTodoistScrollTo = window.scrollTo;
     }
 
-    overwriteKeyHandlers();
-
     // Initialize mousetrap.
     mousetrap = new TodoistShortcutsMousetrap(document);
+
+    overwriteKeyHandlers();
 
     // Register key bindings with mousetrap.
     registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
@@ -5087,7 +5086,7 @@
 
   function initializeWhenContentAppears(gas) {
     const content = getViewContent();
-    if (gas > 0 && content === null && window['TodoistShortcutsMousetrap']) {
+    if (gas > 0 && (content === null || !window['TodoistShortcutsMousetrap'])) {
       info('Waiting for #content and mousetrap before initializing');
       setTimeout(() => initializeWhenContentAppears(gas - 1), 25);
     } else {
