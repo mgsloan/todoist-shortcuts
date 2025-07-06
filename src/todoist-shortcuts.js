@@ -422,7 +422,7 @@
   async function schedule() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskSchedule(mutateCursor);
+      await clickTaskSchedule(mutateCursor);
       blurSchedulerInput();
     } else {
       const query = 'button[data-action-hint="multi-select-toolbar-scheduler"]';
@@ -444,7 +444,7 @@
     }
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskSchedule(mutateCursor);
+      await clickTaskSchedule(mutateCursor);
     } else {
       clickUnique(
           document,
@@ -651,22 +651,22 @@
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
         clickTaskEdit(mutateCursor);
-        click(await selectUniqueRetrying(
+        await clickUniqueRetrying(
             document,
-            '[data-action-hint="task-actions-priority-picker"]'));
-        const menu = await selectUniqueRetrying(document, 'priority_picker');
-        clickPriorityMenu(menu, level);
+            '[data-action-hint="task-actions-priority-picker"]');
+        const menu = await selectUniqueRetrying(document, '.priority_picker');
+        await clickPriorityMenu(menu, level);
         // Click save button.
-        clickUnique(
+        await clickUniqueRetrying(
             document,
             'div[data-testid="task-editor-action-buttons"] ' +
             'button[type="submit"]');
       } else {
-        clickUnique(
+        await clickUniqueRetrying(
             document,
             'button[data-action-hint="multi-select-toolbar-priority-picker"]');
-        withUnique(document, '.priority_picker', all, (menu) => {
-          clickPriorityMenu(menu, level);
+        await withUnique(document, '.priority_picker', all, async (menu) => {
+          await clickPriorityMenu(menu, level);
         });
       }
     };
@@ -916,7 +916,7 @@
   async function openAssign() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      withTaskHovered(mutateCursor, () => {
+      await withTaskHovered(mutateCursor, () => {
         const assignButton =
               getUnique(mutateCursor, '.task_list_item__person_picker');
         if (assignButton) {
@@ -1560,7 +1560,7 @@
     withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
       let overflowMenu = getTaskViewMoreMenu();
       if (!overflowMenu) {
-        clickUnique(taskView, 'button[aria-label="More actions"]');
+        clickUniqueRetrying(taskView, 'button[aria-label="More actions"]');
         overflowMenu = getTaskViewMoreMenu();
       }
       if (overflowMenu) {
@@ -1572,7 +1572,7 @@
   }
 
   function getTaskViewMoreMenu() {
-    return selectUnique(
+    return selectUniqueRetrying(
         document, 'div.reactist_menulist[aria-label="More actions"]');
   }
 
@@ -2295,14 +2295,11 @@
   }
 
   async function withTaskMenuOpenImpl(task, f) {
-    await new Promise((resolve) => {
-      withTaskHovered(task, async () => {
-        const query = 'button[data-action-hint="task-overflow-menu"]';
-        const openMenu = await selectUniqueRetrying(task, query);
-        click(openMenu);
-        await f();
-        resolve();
-      });
+    await withTaskHovered(task, async () => {
+      const query = 'button[data-action-hint="task-overflow-menu"]';
+      const openMenu = await selectUniqueRetrying(task, query);
+      click(openMenu);
+      await f();
     });
   }
 
@@ -2706,13 +2703,13 @@
     });
   }
 
-  function clickTaskSchedule(task) {
-    withTaskHovered(task, () => {
-      clickUnique(task, '[data-action-hint="task-scheduler"]');
+  async function clickTaskSchedule(task) {
+    await withTaskHovered(task, async () => {
+      await clickUniqueRetrying(task, '[data-action-hint="task-scheduler"]');
     });
   }
 
-  function withTaskHovered(task, f) {
+  async function withTaskHovered(task, f) {
     const eventOptions = {
       bubbles: true,
       cancelable: true,
@@ -2721,7 +2718,7 @@
     };
     task.dispatchEvent(new MouseEvent('mouseover', eventOptions));
     try {
-      f();
+      await f();
     } finally {
       task.dispatchEvent(new MouseEvent('mouseout', eventOptions));
     }
@@ -2798,7 +2795,7 @@
       addToSectionContaining(task);
     } else if (viewMode === 'project') {
       await withTaskMenuOpen(task, true, async () => {
-        const btn = selectUnique('[data-action-hint="' + action + '"]');
+        const btn = selectUnique(task, '[data-action-hint="' + action + '"]');
         if (btn) {
           click(btn);
         } else {
@@ -2898,8 +2895,8 @@
     return null;
   }
 
-  function clickPriorityMenu(menu, level) {
-    clickUnique(
+  async function clickPriorityMenu(menu, level) {
+    await clickUniqueRetrying(
         menu, 'li', matchingAction('task-actions-priority-' + level));
   }
 
@@ -4197,7 +4194,9 @@
     return parent.querySelectorAll(query);
   }
 
-  // Uses querySelectorAll, but requires a unique result.
+  // Checks that there is only one descendant element that matches the
+  // query and predicate, and returns it. Returns null if it is not
+  // found or not unique.
   function selectUnique(parent, query, predicate) {
     return findUnique(predicate, selectAll(parent, query));
   }
@@ -4226,6 +4225,11 @@
         () => selectUnique(parent, query, predicate),
         fuel,
         delay);
+  }
+
+  async function clickUniqueRetrying(
+      parent, query, predicate, fuel=100, delay=10) {
+    click(await selectUniqueRetrying(parent, query, predicate, fuel, delay));
   }
 
   // Users querySelectorAll, requires unique result, and applies the
