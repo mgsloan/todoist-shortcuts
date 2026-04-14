@@ -114,8 +114,8 @@ navigation mode to select the same project again.
 | `shift+r`                  | open reminders for task at cursor                        |
 | `+`                        | open assign dialog for task at cursor                    |
 | `>`                        | open deadline for task at cursor (english Todoist only)  |
-| `shift+j` or `shift+down`  | move task at cursor downwards                            |
-| `shift+k` or `shift+up`    | move task at cursor upwards                              |
+| `shift+j` or `shift+down` or `alt+down` | move task at cursor downwards               |
+| `shift+k` or `shift+up` or `alt+up`     | move task at cursor upwards                 |
 | `shift+l` or `shift+left`  | dedent task at cursor                                    |
 | `shift+h` or `shift+right` | indent task at cursor                                    |
 | `shift+c`                  | clicks [toggl][] or [clockify][] time tracking button    |
