@@ -44,8 +44,8 @@
     ['shift+r', openReminders],
     ['+', openAssign],
     ['>', openDeadline],
-    [['shift+j', 'shift+down'], moveDown],
-    [['shift+k', 'shift+up'], moveUp],
+    [['shift+j', 'shift+down', 'alt+down'], moveDown],
+    [['shift+k', 'shift+up', 'alt+up'], moveUp],
     [['shift+h', 'shift+left'], moveOut],
     [['shift+l', 'shift+right'], moveIn],
 
@@ -2319,12 +2319,12 @@
   }
 
   // Indent task.
-  function moveIn() {
+  async function moveIn() {
     if (viewMode === 'agenda') {
       info('Indenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
       const cursor = requireCursor();
-      dragTaskOver(cursor, () => ({
+      await dragTaskOver(cursor, () => ({
         destination: cursor,
         horizontalOffset: 35,
         verticalOffset: 0,
@@ -2336,7 +2336,7 @@
   }
 
   // Dedent task.
-  function moveOut() {
+  async function moveOut() {
     if (viewMode === 'agenda') {
       info('Dedenting task does not work in agenda mode.');
     } else if (viewMode === 'project') {
@@ -2345,7 +2345,7 @@
         // See https://github.com/mgsloan/todoist-shortcuts/issues/39
         info('Task is already at indent level 1, so not dedenting');
       } else {
-        dragTaskOver(cursor, () => ({
+        await dragTaskOver(cursor, () => ({
           destination: cursor,
           horizontalOffset: -35,
           verticalOffset: 0,
@@ -2359,7 +2359,7 @@
 
   // Move task up, maintaining its indent level and not swizzling any nested
   // structures.
-  function moveUp() {
+  async function moveUp() {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
@@ -2371,7 +2371,7 @@
       // Collapse nested tasks before moving it - see
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
-      dragTaskOver(cursor, () => {
+      await dragTaskOver(cursor, () => {
         const tasks =
               getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
@@ -2387,8 +2387,7 @@
             return {
               destination: task,
               horizontalOffset: 0,
-              verticalOffset: isSectionLi(task) ? 0 : -10,
-              isBelow: isSectionLi(task) ? true : false,
+              dropPosition: isSectionLi(task) ? 'after-section' : 'before',
             };
           } else if (indent < cursorIndent) {
             info('Refusing to dedent task to move it up.');
@@ -2403,7 +2402,7 @@
 
   // Move task down, maintaining its indent level and not swizzling any nested
   // structures.
-  function moveDown() {
+  async function moveDown() {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
@@ -2415,7 +2414,7 @@
       // Collapse nested tasks before moving it - see
       // https://github.com/mgsloan/todoist-shortcuts/issues/29#issuecomment-426121307
       collapse(cursor);
-      dragTaskOver(cursor, () => {
+      await dragTaskOver(cursor, () => {
         const tasks =
               getTasks('no-collapsed', 'no-editors', 'include-sections');
         const cursorIndex = tasks.indexOf(cursor);
@@ -2455,9 +2454,8 @@
           return {
             destination: lastQualifyingTask,
             horizontalOffset: 0,
-            verticalOffset: -cursor.clientHeight +
-              (isSectionLi(lastQualifyingTask) ? 40 : 0),
-            isBelow: isSectionLi(lastQualifyingTask) ? false : true,
+            dropPosition: isSectionLi(lastQualifyingTask) ?
+              'after-section' : 'after',
           };
         } else {
           info('Couldn\'t find task below cursor to move it below.');
@@ -2519,6 +2517,18 @@
   let dragInProgress = false;
   let suppressDrag = false;
 
+  // Todoist now lazily renders the drag handle, so we try a few selectors
+  // after forcing the task row into its hovered state.
+  const DRAG_HANDLE_SELECTORS = [
+    '.item_dnd_handle',
+    '[data-testid="task-drag-handle"]',
+    '.drag_and_drop_handle',
+    'button.task_list_item__drag_handle',
+    'span.drag_and_drop_handler',
+    '[aria-label="Drag"]',
+    '[aria-roledescription="sortable"]',
+  ];
+
   function dragStart() {
     dragInProgress = true;
     suppressDrag = true;
@@ -2544,31 +2554,56 @@
     }
   }
 
-  function dragTaskOver(sourceTask, findDestination) {
-    const sourceY = clientOffset(sourceTask).y;
+  function getTaskDropPointY(task, dropPosition) {
+    const bounds = task.getBoundingClientRect();
+    const centerY = bounds.y + bounds.height / 2;
+    const overshoot = Math.max(4, Math.min(12, bounds.height * 0.2));
+
+    if (dropPosition === 'before') {
+      return centerY - overshoot;
+    } else if (dropPosition === 'after') {
+      return centerY + overshoot;
+    } else if (dropPosition === 'after-section') {
+      return bounds.bottom + 8;
+    }
+
+    return centerY;
+  }
+
+  async function dragTaskOver(sourceTask, findDestination) {
     if (suppressDrag) {
       info('Not executing drag because one already happened quite recently.');
     } else {
       try {
         dragStart();
         const result = findDestination();
-        withDragHandle(sourceTask, (el, x, y) => {
+        await withDragHandle(sourceTask, async (el, x, y) => {
           if (result) {
             const deltaX = result.horizontalOffset;
-            let deltaY =
-                clientOffset(result.destination).y - sourceY +
-                result.verticalOffset;
-            if (result.isBelow) {
-              deltaY += result.destination.clientHeight;
+            let deltaY = 0;
+
+            if (result.dropPosition) {
+              deltaY = getTaskDropPointY(
+                  result.destination, result.dropPosition) - y;
+            } else {
+              const sourceBounds = sourceTask.getBoundingClientRect();
+              const handleOffsetY = y - sourceBounds.y;
+              let targetY = clientOffset(result.destination).y + handleOffsetY +
+                  result.verticalOffset;
+              if (result.isBelow) {
+                targetY += result.destination.clientHeight;
+              }
+              deltaY = targetY - y;
             }
-            animateDrag(el, x, y, x + deltaX, y + deltaY,
-                () => {
-                  dragDone(sourceTask);
-                });
+
+            await animateDrag(el, x, y, x + deltaX, y + deltaY);
+            dragDone(sourceTask);
           } else {
             dragDone(sourceTask);
           }
-        }, dragDone);
+        }, () => {
+          dragDone(sourceTask);
+        });
       } catch (ex) {
         dragDone(sourceTask);
         throw ex;
@@ -2576,55 +2611,90 @@
     }
   }
 
-  function withDragHandle(task, f, finished) {
-    const key = getTaskKey(task);
-    task.dispatchEvent(new Event('mouseover'));
-    try {
-      const handler = getUnique(task, '.item_dnd_handle');
-      if (handler) {
-        const handlerOffset = clientOffset(handler);
-        const x = handlerOffset.x + handler.offsetWidth/2 - window.scrollX - 3;
-        const y = handlerOffset.y + handler.offsetHeight/2 - window.scrollY - 4;
-        f(handler, x, y);
-      } else {
-        // FIXME: Sometimes this triggers, particularly when move up / move
-        // down key is held down with repeat.  Tried some hacks to resolve,
-        // but nothing seems to work well.
-        info('Couldn\'t find item_dnd_handle.');
-        finished();
-      }
-    } finally {
-      withTaskByKey(key, (el) => {
-        el.dispatchEvent(new Event('mouseout'));
-      });
+  function dispatchPointerEvent(el, type, params) {
+    if (typeof PointerEvent === 'function') {
+      el.dispatchEvent(new PointerEvent(type, Object.assign({}, params, {
+        pointerId: 1,
+      })));
     }
   }
 
-  function animateDrag(el, sx, sy, tx, ty, finished) {
-    const startParams = mkMouseParams(sx, sy);
-    el.dispatchEvent(new MouseEvent('mousedown', startParams));
-    const duration = 50;
-    const frameCount = 10;
-    let currentFrame = 0;
-    // NOTE: Animating this may seem overkill, but doing a direct move didn't
-    // work reliably.  This also makes it clearer what's happening.
-    const dragLoop = () => {
-      const alpha = currentFrame / frameCount;
-      currentFrame++;
-      if (alpha >= 1) {
-        const params = mkMouseParams(tx, ty);
-        el.dispatchEvent(new MouseEvent('mousemove', params));
-        el.dispatchEvent(new MouseEvent('mouseup', params));
-        finished();
-      } else {
-        const x = overshootCoslerp(sx, tx, alpha, 0.3, 1.5);
-        const y = overshootCoslerp(sy, ty, alpha, 0.3, 1.5);
-        params = mkMouseParams(x, y);
-        el.dispatchEvent(new MouseEvent('mousemove', params));
-        setTimeout(dragLoop, duration / frameCount);
+  function hoverTaskForDrag(task) {
+    const hoverParams = {bubbles: true, cancelable: true};
+    task.dispatchEvent(new MouseEvent('mouseover', hoverParams));
+    dispatchPointerEvent(task, 'pointerover', hoverParams);
+    dispatchPointerEvent(task, 'pointerenter', hoverParams);
+  }
+
+  async function findDragHandle(task) {
+    for (let i = 0; i < 5; i++) {
+      for (const selector of DRAG_HANDLE_SELECTORS) {
+        const handler = task.querySelector(selector);
+        if (handler) {
+          return handler;
+        }
       }
-    };
-    setTimeout(dragLoop, duration / frameCount);
+      await sleep(10);
+    }
+    return null;
+  }
+
+  async function withDragHandle(task, f, finished) {
+    const key = getTaskKey(task);
+    let currentTask = getTaskByKey(key) || task;
+    hoverTaskForDrag(currentTask);
+    try {
+      await sleep(20);
+      currentTask = getTaskByKey(key) || currentTask;
+      const handler = await findDragHandle(currentTask);
+      if (handler) {
+        const bounds = handler.getBoundingClientRect();
+        const x = bounds.x + bounds.width / 2;
+        const y = bounds.y + bounds.height / 2;
+        await f(handler, x, y);
+      } else {
+        info('Couldn\'t find a drag handle after hovering the task.');
+        finished();
+      }
+    } finally {
+      currentTask = getTaskByKey(key) || currentTask;
+      if (currentTask) {
+        dispatchPointerEvent(currentTask, 'pointerout', {bubbles: true});
+        currentTask.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
+      }
+    }
+  }
+
+  async function animateDrag(el, sx, sy, tx, ty) {
+    const startParams = mkMouseParams(sx, sy);
+    dispatchPointerEvent(el, 'pointerdown', startParams);
+    el.dispatchEvent(new MouseEvent('mousedown', startParams));
+    await sleep(10);
+
+    const initialOffset = ty > sy ? 2 : -2;
+    const initialParams = mkMouseParams(sx, sy + initialOffset);
+    dispatchPointerEvent(el, 'pointermove', initialParams);
+    el.dispatchEvent(new MouseEvent('mousemove', initialParams));
+    await sleep(10);
+
+    const duration = 75;
+    const frameCount = 15;
+    // Keep the animated drag because Todoist is sensitive to abrupt jumps.
+    for (let currentFrame = 1; currentFrame <= frameCount; currentFrame++) {
+      const alpha = currentFrame / frameCount;
+      const x = overshootCoslerp(sx, tx, alpha, 0.3, 1.5);
+      const y = overshootCoslerp(sy, ty, alpha, 0.3, 1.5);
+      const params = mkMouseParams(x, y);
+      dispatchPointerEvent(el, 'pointermove', params);
+      el.dispatchEvent(new MouseEvent('mousemove', params));
+      await sleep(duration / frameCount);
+    }
+
+    const endParams = mkMouseParams(tx, ty);
+    dispatchPointerEvent(el, 'pointermove', endParams);
+    el.dispatchEvent(new MouseEvent('mousemove', endParams));
+    dispatchPointerEvent(el, 'pointerup', endParams);
+    el.dispatchEvent(new MouseEvent('mouseup', endParams));
   }
 
   function lerp(s, e, t) {
@@ -2650,6 +2720,7 @@
   function mkMouseParams(x, y) {
     return {
       bubbles: true,
+      cancelable: true,
       screenX: x,
       screenY: y,
       clientX: x,
