@@ -1,4 +1,4 @@
-/* global svgs, TodoistShortcutsMousetrap */
+/* global TodoistShortcutsMousetrap */
 
 (function() {
   // Set this to true to get more log output.
@@ -2932,13 +2932,25 @@
         'uncheck "Experimental features"');
   }
 
+  // Fall back to a bundled close icon when Todoist doesn't expose its SVG map.
+  function getCloseIconHtml() {
+    if (window.svgs && window.svgs['sm1/close_small.svg']) {
+      return window.svgs['sm1/close_small.svg'];
+    }
+    return '<svg aria-hidden="true" viewBox="0 0 24 24" width="16" ' +
+        'height="16"><path fill="currentColor" d="M18.3 5.71a1 1 0 ' +
+        '0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.12L10.59 12l-4.9 ' +
+        '4.89a1 1 0 0 0 1.42 1.41L12 13.41l4.89 4.9a1 1 0 0 0 ' +
+        '1.41-1.42L13.41 12l4.9-4.89a1 1 0 0 0-.01-1.4z"></path></svg>';
+  }
+
   function notifyUser(msg) {
     withId('todoist_app', (appHolder) => {
       withAll(appHolder, '.ts-note', all, (oldNote) => {
         appHolder.removeChild(oldNote);
       });
       const close = div('ts-note-close');
-      close.innerHTML = svgs['sm1/close_small.svg'];
+      close.innerHTML = getCloseIconHtml();
       const note =
           div('ts-note',
               div('ts-note-content',
@@ -2960,7 +2972,7 @@
     let modal;
     withId('todoist_app', (appHolder) => {
       const close = div('ts-modal-close');
-      close.innerHTML = svgs['sm1/close_small.svg'];
+      close.innerHTML = getCloseIconHtml();
       const content = div(
           'ts-modal-content',
         typeof msg === 'string' ? text(msg) : msg,
