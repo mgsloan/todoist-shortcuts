@@ -2326,9 +2326,7 @@
       const cursor = requireCursor();
       await dragTaskOver(cursor, () => ({
         destination: cursor,
-        horizontalOffset: 35,
-        verticalOffset: 0,
-        isBelow: false,
+        indentDelta: 35,
       }));
     } else {
       error('Unexpected viewMode:', viewMode);
@@ -2347,9 +2345,7 @@
       } else {
         await dragTaskOver(cursor, () => ({
           destination: cursor,
-          horizontalOffset: -35,
-          verticalOffset: 0,
-          isBelow: false,
+          indentDelta: -35,
         }));
       }
     } else {
@@ -2579,6 +2575,16 @@
         const result = findDestination();
         await withDragHandle(sourceTask, async (el, x, y) => {
           if (result) {
+            // Indent / dedent: a purely horizontal move never passes Todoist's
+            // drag activation threshold, so it needs its own gesture that first
+            // nudges vertically to activate the drag, then sweeps horizontally
+            // to change indent without a net vertical move (so no reorder).
+            if (typeof result.indentDelta === 'number') {
+              await animateIndentDrag(el, x, y, result.indentDelta);
+              dragDone(sourceTask);
+              return;
+            }
+
             const deltaX = result.horizontalOffset;
             let deltaY = 0;
 
@@ -2693,6 +2699,47 @@
     const endParams = mkMouseParams(tx, ty);
     dispatchPointerEvent(el, 'pointermove', endParams);
     el.dispatchEvent(new MouseEvent('mousemove', endParams));
+    dispatchPointerEvent(el, 'pointerup', endParams);
+    el.dispatchEvent(new MouseEvent('mouseup', endParams));
+  }
+
+  // Drag gesture for indent / dedent. Unlike a reorder, this must NOT move the
+  // task to a new row: it activates the drag with a vertical nudge, sweeps the
+  // pointer horizontally (Todoist maps horizontal position to indent level and
+  // clamps to the nearest legal level), then settles back near the original row
+  // so the drop only changes indent.  See #248.
+  async function animateIndentDrag(el, sx, sy, deltaX) {
+    const downParams = mkMouseParams(sx, sy);
+    dispatchPointerEvent(el, 'pointerdown', downParams);
+    el.dispatchEvent(new MouseEvent('mousedown', downParams));
+    await sleep(10);
+
+    // Activate: nudge downward past the drag threshold, staying within the
+    // task's own row so no reorder is triggered.
+    for (let dy = 3; dy <= 12; dy += 3) {
+      const params = mkMouseParams(sx, sy + dy);
+      dispatchPointerEvent(el, 'pointermove', params);
+      el.dispatchEvent(new MouseEvent('mousemove', params));
+      await sleep(20);
+    }
+
+    // Sweep horizontally at a small vertical hold so the indent updates but the
+    // task stays put.
+    const holdY = sy + 6;
+    const frameCount = 12;
+    for (let currentFrame = 1; currentFrame <= frameCount; currentFrame++) {
+      const x = coslerp(sx, sx + deltaX, currentFrame / frameCount);
+      const params = mkMouseParams(x, holdY);
+      dispatchPointerEvent(el, 'pointermove', params);
+      el.dispatchEvent(new MouseEvent('mousemove', params));
+      await sleep(15);
+    }
+
+    // Settle back toward the original row and drop.
+    const endParams = mkMouseParams(sx + deltaX, sy + 2);
+    dispatchPointerEvent(el, 'pointermove', endParams);
+    el.dispatchEvent(new MouseEvent('mousemove', endParams));
+    await sleep(10);
     dispatchPointerEvent(el, 'pointerup', endParams);
     el.dispatchEvent(new MouseEvent('mouseup', endParams));
   }
