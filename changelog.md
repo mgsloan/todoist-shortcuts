@@ -1,5 +1,21 @@
 # todoist-shortcuts changelog
 
+## Version 205
+
+* Fixes keyboard task movement (`shift+j` / `shift+k`) with
+  Todoist-compatible drag handling and correct drop targeting for
+  mixed-height tasks. Also adds `alt+up` / `alt+down` aliases for the
+  move shortcuts. Thanks to contribution from [@mmcintyre123][] in
+  [#292][]!
+
+* Fixes a `ReferenceError` from the modal and notification close
+  buttons no longer being able to depend on Todoist's `svgs` global,
+  by adding a local close icon fallback. Thanks to contribution from
+  [@mmcintyre123][] in [#292][]!
+
+[#292]: https://github.com/mgsloan/todoist-shortcuts/pull/292
+[@mmcintyre123]: https://github.com/mmcintyre123
+
 ## Version 204
 
 * Works around very strange Todoist behavior for ctrl-click multi
