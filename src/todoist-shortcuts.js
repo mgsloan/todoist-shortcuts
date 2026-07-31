@@ -904,7 +904,7 @@
 
   async function scrollTaskEditorIntoView() {
     withUnique(document, '.task_editor', all, (editor) => {
-      verticalScrollIntoView(editor, 0, true, 0.6);
+      verticalScrollIntoView(editor, 'nearest', false);
     });
   }
 
@@ -4132,17 +4132,15 @@
   }
 
   function scrollTaskIntoView(task) {
-    verticalScrollIntoView(task, 0, false, 0.5);
+    verticalScrollIntoView(task, 'center', false);
   }
 
   function scrollTaskToBottom(task) {
-    verticalScrollIntoView(task, 0, true, 1);
-    scrollTaskIntoView(task);
+    verticalScrollIntoView(task, 'end', true);
   }
 
   function scrollTaskToTop(task) {
-    verticalScrollIntoView(task, 0, true, 0);
-    scrollTaskIntoView(task);
+    verticalScrollIntoView(task, 'start', true);
   }
 
   // Exception thrown by requireCursor.
@@ -4312,33 +4310,46 @@
     return style;
   }
 
-  // Scrolls the specified element into view by positioning the top of the
-  // element in the middle of the window, but only if necessary to bring it into
-  // view. Does not work well for elements that are larger than half a screen
-  // full.
-  function verticalScrollIntoView(el, marginBottom, skipCheck, t) {
+  // Scrolls the specified element into view, if it isn't already fully
+  // visible. 'align' is scrollIntoView's 'block' option - 'start', 'center',
+  // 'end' or 'nearest'. When 'skipCheck' is set, scrolls even if the element
+  // is already visible.
+  //
+  // The scrolling itself is left to the browser, so that it keeps working as
+  // Todoist shuffles around which element does the scrolling. The scroll
+  // container is located only in order to measure, so getting that wrong now
+  // means imperfect alignment rather than no scrolling at all.
+  function verticalScrollIntoView(el, align, skipCheck) {
     const content = getScrollContainer(el);
     if (!content) {
       warn('Failed to find scroll container for', el);
-      return;
     }
     // Space at the top of the container taken up by sticky headers, which
     // would otherwise obscure the element.
-    const topInset = getStickyTopInset(content);
-    // Position of the element relative to the top of the scrollable content.
-    // offsetTop is unaffected by scrolling, so this is a scroll position.
-    const oy = pageOffset(el).y - pageOffset(content).y;
-    // Position of the element relative to the top of the visible area.
-    const cy = oy - content.scrollTop;
-    const h = el.offsetHeight;
-    const visibleHeight = content.clientHeight;
-    if (skipCheck ||
-        cy < topInset ||
-        cy + h > visibleHeight - marginBottom) {
+    const topInset = content ? getStickyTopInset(content) : 0;
+    if (!skipCheck && content && isFullyVisible(el, content, topInset)) {
+      return;
+    }
+    // The browser has no idea the sticky headers are there, so ask it to keep
+    // clear of them.
+    // MUTABLE: the inline style is restored before returning.
+    const oldScrollMargin = el.style.scrollMarginTop;
+    el.style.scrollMarginTop = topInset + 'px';
+    try {
       // TODO: for very large tasks, this could end up with the whole task not
       // being in view.
-      content.scrollTo(0, oy - topInset - lerp(0, visibleHeight - topInset, t));
+      el.scrollIntoView({block: align, behavior: 'instant'});
+    } finally {
+      el.style.scrollMarginTop = oldScrollMargin;
     }
+  }
+
+  // Whether the element lies entirely within the visible portion of its scroll
+  // container - that is, not counting the part covered by sticky headers.
+  function isFullyVisible(el, content, topInset) {
+    const bounds = el.getBoundingClientRect();
+    const view = content.getBoundingClientRect();
+    return bounds.top >= view.top + topInset && bounds.bottom <= view.bottom;
   }
 
   // Finds the nearest ancestor which actually scrolls the element. Todoist has
@@ -4632,19 +4643,6 @@
     dispatchPointerEvent(el, 'pointerup', eventOptions);
     el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
     el.dispatchEvent(new MouseEvent('click', eventOptions));
-  }
-
-  // Sum offsetTop / offsetLeft of all offsetParent to compute x / y.
-  function pageOffset(el) {
-    let x = 0;
-    let y = 0;
-    let cur = el;
-    while (cur) {
-      x += cur.offsetLeft;
-      y += cur.offsetTop;
-      cur = cur.offsetParent;
-    }
-    return {x, y};
   }
 
   function clientOffset(el) {

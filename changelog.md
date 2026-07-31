@@ -5,11 +5,20 @@
 * Fixes automatic scrolling of the cursored task into view. Todoist
   moved scrolling off of `#content` and onto a `div` nested within it,
   so the scrolling code was a no-op and the cursor could end up off
-  screen. Now the nearest actually-scrollable ancestor is used, rather
-  than a particular element.
+  screen. Scrolling is now left to the browser, which knows which
+  elements scroll without being told. Thanks to contribution from
+  [@kory-smith][] in [#287][]!
 
 * Tasks scrolled into view are no longer hidden behind Todoist's
   sticky view header or sticky section headers.
+
+* In upcoming view, pressing `k` when the cursor is already on the
+  first task now scrolls that task to the bottom of the view, rather
+  than to the middle of it.
+
+* The task editor is now only scrolled into view when it isn't already
+  fully visible, and is no longer positioned two thirds of the way down
+  the screen.
 
 * Fixes indent (`shift+l` / `shift+right`) and dedent (`shift+h` /
   `shift+left`), which did nothing. They dragged the task purely
@@ -38,9 +47,11 @@
 [#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248
 [#282]: https://github.com/mgsloan/todoist-shortcuts/issues/282
 [#285]: https://github.com/mgsloan/todoist-shortcuts/issues/285
+[#287]: https://github.com/mgsloan/todoist-shortcuts/pull/287
 [#290]: https://github.com/mgsloan/todoist-shortcuts/pull/290
 [#294]: https://github.com/mgsloan/todoist-shortcuts/pull/294
 [@anandman]: https://github.com/anandman
+[@kory-smith]: https://github.com/kory-smith
 [@msmouse]: https://github.com/msmouse
 
 ## Version 205
