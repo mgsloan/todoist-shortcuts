@@ -2095,6 +2095,10 @@
         debug('ignoring mutations since drag is in progress:', mutations);
         return;
       }
+      if (checkDragSettling()) {
+        debug('ignoring mutations while task list settles after drag');
+        return;
+      }
       // Ignore mutations from toggl-button extension
       const filtered = mutations.filter((mutation) => {
         if (mutation.target.classList.contains('toggl-button')) {
@@ -2538,16 +2542,73 @@
       suppressDrag = false;
     }, 0);
     restoreScroll();
+    // Don't reconcile the cursor yet - the task list is still changing.
+    startDragSettling();
+    if (!task || task.classList.contains('on_drag')) {
+      warn('didn\'t find spot to drop for drag and drop, so cancelling');
+      closeContextMenus();
+    }
+  }
+
+  // Todoist applies a drop asynchronously, re-rendering the task list a few
+  // times as the change is applied and synced. While that happens the dragged
+  // task's element is briefly absent from the list, which looks to
+  // 'ensureCursor' like the task was deleted - it then moves the cursor to the
+  // task which took its place. So instead of reconciling the cursor at mouseup,
+  // wait for the task list to stop changing, and reconcile once. See #248.
+  const DRAG_SETTLE_QUIET_MILLIS = 150;
+  const DRAG_SETTLE_MAX_MILLIS = 1500;
+
+  // MUTABLE. Non-null while waiting for the task list to settle after a drag.
+  let dragSettleTimeout = null;
+  let dragSettleDeadline = 0;
+
+  function startDragSettling() {
+    dragSettleDeadline = Date.now() + DRAG_SETTLE_MAX_MILLIS;
+    deferDragSettled();
+  }
+
+  function deferDragSettled() {
+    if (dragSettleTimeout !== null) {
+      clearTimeout(dragSettleTimeout);
+    }
+    dragSettleTimeout = setTimeout(dragSettled, DRAG_SETTLE_QUIET_MILLIS);
+  }
+
+  function dragSettled() {
+    dragSettleTimeout = null;
+    if (dragInProgress) {
+      // Another drag started while waiting - it will start the wait again when
+      // it finishes.
+      debug('not reconciling cursor yet, another drag is in progress');
+      return;
+    }
+    debug('task list settled after drag, so reconciling cursor');
     ensureCursor();
     const cursor = getCursor();
     if (cursor) {
       scrollTaskIntoView(cursor);
     }
     updateCursorStyle();
-    if (!task || task.classList.contains('on_drag')) {
-      warn('didn\'t find spot to drop for drag and drop, so cancelling');
-      closeContextMenus();
+    updateKeymap();
+  }
+
+  // Returns true if mutations should be ignored because the task list is still
+  // settling after a drag. Every mutation postpones the reconciliation, up
+  // until a deadline, so that a page which never stops changing can't stop the
+  // cursor from being updated entirely.
+  function checkDragSettling() {
+    if (dragSettleTimeout === null) {
+      return false;
     }
+    if (Date.now() > dragSettleDeadline) {
+      debug('task list still changing after drag, so no longer waiting');
+      clearTimeout(dragSettleTimeout);
+      dragSettled();
+      return false;
+    }
+    deferDragSettled();
+    return true;
   }
 
   function getTaskDropPointY(task, dropPosition) {
