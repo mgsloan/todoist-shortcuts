@@ -2,6 +2,21 @@
 
 ## Version 206
 
+* Fixes setting priority with `1` / `2` / `3` / `4` on the task at the
+  cursor. It used to open the task editor, set the priority there, and
+  click save, but the save button is no longer where it was looked for,
+  so the task was left in the editor waiting for `enter` to be pressed.
+  Priority is now set from the task's contextual menu, which applies it
+  directly and needs no save. Fixes [#284][].
+
+* Fixes setting priority in task view (`i`) needing the number key
+  pressed twice. The priority menu was looked for immediately after the
+  click that opens it, before it existed, so the first press only
+  opened the menu. Now it waits for the menu to appear.
+
+* Setting priority on multiple selected tasks likewise waits for the
+  priority menu to appear rather than assuming it is already there.
+
 * Fixes automatic scrolling of the cursored task into view. Todoist
   moved scrolling off of `#content` and onto a `div` nested within it,
   so the scrolling code was a no-op and the cursor could end up off
@@ -55,6 +70,7 @@
 
 [#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248
 [#282]: https://github.com/mgsloan/todoist-shortcuts/issues/282
+[#284]: https://github.com/mgsloan/todoist-shortcuts/issues/284
 [#285]: https://github.com/mgsloan/todoist-shortcuts/issues/285
 [#287]: https://github.com/mgsloan/todoist-shortcuts/pull/287
 [#290]: https://github.com/mgsloan/todoist-shortcuts/pull/290

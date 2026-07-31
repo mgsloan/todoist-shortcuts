@@ -648,24 +648,18 @@
     return async () => {
       const mutateCursor = getCursorToMutate();
       if (mutateCursor) {
-        clickTaskEdit(mutateCursor);
-        await clickUniqueRetrying(
-            document,
-            '[data-action-hint="task-actions-priority-picker"]');
-        const menu = await getUniqueRetrying(document, '.priority_picker');
-        await clickPriorityMenu(menu, level);
-        // Click save button.
-        await clickUniqueRetrying(
-            document,
-            'div[data-testid="task-editor-action-buttons"] ' +
-            'button[type="submit"]');
+        // The task's contextual menu has priority items in it, so unlike
+        // opening the task editor, no separate save step is needed.
+        await clickTaskMenu(
+            mutateCursor,
+            'task-overflow-menu-priority-' + level,
+            false);
       } else {
         await clickUniqueRetrying(
             document,
             'button[data-action-hint="multi-select-toolbar-priority-picker"]');
-        await withUnique(document, '.priority_picker', all, async (menu) => {
-          await clickPriorityMenu(menu, level);
-        });
+        const menu = await getUniqueRetrying(document, '.priority_picker');
+        await clickPriorityMenu(menu, level);
       }
     };
   }
@@ -1454,18 +1448,16 @@
 
   function taskViewSetPriority(level) {
     return async () => {
-      withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
-        const actualLevel = invertPriorityLevel(level);
-        if (!getUnique(document, '.priority_picker')) {
-          clickUnique(taskView,
-              '[data-icon-name=priority-icon]');
-        }
-        withUnique(document, '.priority_picker', all, (picker) => {
-          clickUnique(
-              picker,
-              '[data-action-hint="task-actions-priority-' + actualLevel + '"]');
+      const actualLevel = invertPriorityLevel(level);
+      // The picker is opened by clicking the priority button, but it only
+      // appears asynchronously, so the click on the level needs to retry.
+      if (!getUnique(document, '.priority_picker')) {
+        withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
+          clickUnique(taskView, '[data-icon-name=priority-icon]');
         });
-      });
+      }
+      const picker = await getUniqueRetrying(document, '.priority_picker');
+      await clickPriorityMenu(picker, actualLevel);
     };
   }
 
@@ -3034,7 +3026,7 @@
 
   async function clickPriorityMenu(menu, level) {
     await clickUniqueRetrying(
-        menu, 'li', matchingAction('task-actions-priority-' + level));
+        menu, '[data-action-hint="task-actions-priority-' + level + '"]');
   }
 
   // eslint-disable-next-line no-unused-vars
