@@ -11,6 +11,26 @@
 * Tasks scrolled into view are no longer hidden behind Todoist's
   sticky view header or sticky section headers.
 
+* Fixes indent (`shift+l` / `shift+right`) and dedent (`shift+h` /
+  `shift+left`), which did nothing. They dragged the task purely
+  horizontally, which never activates Todoist's drag handling, so now
+  the drag is activated with a vertical nudge first. This is the
+  remaining half of [#248][]. Thanks to contribution from [@msmouse][]
+  in [#294][]!
+
+* The cursor no longer moves to the following task after indenting or
+  dedenting. Todoist applies a drop asynchronously, and the task's
+  element is briefly absent while the list re-renders, which looked
+  like the task had been deleted. Now the cursor is updated once the
+  task list stops changing.
+
+* Fixes the readme having the indent and dedent rows swapped. Thanks to
+  contribution from [@msmouse][] in [#294][]!
+
+[#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248
+[#294]: https://github.com/mgsloan/todoist-shortcuts/pull/294
+[@msmouse]: https://github.com/msmouse
+
 ## Version 205
 
 * Fixes keyboard task movement (`shift+j` / `shift+k`) with
