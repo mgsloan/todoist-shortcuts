@@ -33,6 +33,15 @@
   like the task had been deleted. Now the cursor is updated once the
   task list stops changing.
 
+* The cursor highlight is no longer stale after indenting or dedenting.
+  It is a CSS rule keyed on the task's indent level, and used to be
+  regenerated before Todoist had applied the new indent. It is now
+  regenerated along with the cursor, once the task list stops changing.
+
+* Moving tasks (`shift+j` / `shift+k`) now also waits for the task list
+  to stop changing before updating the cursor. This mostly looked right
+  before, since there the cursor is meant to follow the task.
+
 * Fixes the readme having the indent and dedent rows swapped. Thanks to
   contribution from [@msmouse][] in [#294][]!
 
