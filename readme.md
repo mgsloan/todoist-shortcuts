@@ -345,13 +345,18 @@ keybindings:
 [#237]: https://github.com/mgsloan/todoist-shortcuts/issues/237
 [#239]: https://github.com/mgsloan/todoist-shortcuts/issues/239
 
-# `todoist-shortcuts` in [electron] application
+# `todoist-shortcuts` in desktop apps
 
-This repository provides browser extentions for both Chrome and Firefox, and
-therefore augments the browser's web client of Todoist. If you wanted the
-`todoist-shortcuts` in the standalone Todoist desktop application it is not as
-easy/straight-forward. The following article and associated repository outline
-how you can achieve such a solution:
+This repository provides browser extensions for both Chrome and Firefox, and
+therefore augments the browser's web client of Todoist.
+
+If you want a native macOS desktop application that already integrates `todoist-shortcuts`,
+check out [Todoiste](https://github.com/anandman/Todoiste).
+
+If you want the `todoist-shortcuts` in the standalone Todoist desktop
+application, it is not as easy/straight-forward. The following article and
+associated repository outline how you can achieve such a solution using
+[Electron][electron]:
 
 - https://kevinjalbert.com/todoist-with-keyboard-navigation-via-nativefier/
 - https://github.com/kevinjalbert/todoist-shortcuts-nativefier
