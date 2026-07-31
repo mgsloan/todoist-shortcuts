@@ -2671,16 +2671,32 @@
     }
   }
 
+  // Todoist listens for both pointer and mouse events, so synthetic drags need
+  // to dispatch both.
+  function pressPointer(el, x, y) {
+    const params = mkMouseParams(x, y);
+    dispatchPointerEvent(el, 'pointerdown', params);
+    el.dispatchEvent(new MouseEvent('mousedown', params));
+  }
+
+  function movePointer(el, x, y) {
+    const params = mkMouseParams(x, y);
+    dispatchPointerEvent(el, 'pointermove', params);
+    el.dispatchEvent(new MouseEvent('mousemove', params));
+  }
+
+  function releasePointer(el, x, y) {
+    const params = mkMouseParams(x, y);
+    dispatchPointerEvent(el, 'pointerup', params);
+    el.dispatchEvent(new MouseEvent('mouseup', params));
+  }
+
   async function animateDrag(el, sx, sy, tx, ty) {
-    const startParams = mkMouseParams(sx, sy);
-    dispatchPointerEvent(el, 'pointerdown', startParams);
-    el.dispatchEvent(new MouseEvent('mousedown', startParams));
+    pressPointer(el, sx, sy);
     await sleep(10);
 
     const initialOffset = ty > sy ? 2 : -2;
-    const initialParams = mkMouseParams(sx, sy + initialOffset);
-    dispatchPointerEvent(el, 'pointermove', initialParams);
-    el.dispatchEvent(new MouseEvent('mousemove', initialParams));
+    movePointer(el, sx, sy + initialOffset);
     await sleep(10);
 
     const duration = 75;
@@ -2690,17 +2706,12 @@
       const alpha = currentFrame / frameCount;
       const x = overshootCoslerp(sx, tx, alpha, 0.3, 1.5);
       const y = overshootCoslerp(sy, ty, alpha, 0.3, 1.5);
-      const params = mkMouseParams(x, y);
-      dispatchPointerEvent(el, 'pointermove', params);
-      el.dispatchEvent(new MouseEvent('mousemove', params));
+      movePointer(el, x, y);
       await sleep(duration / frameCount);
     }
 
-    const endParams = mkMouseParams(tx, ty);
-    dispatchPointerEvent(el, 'pointermove', endParams);
-    el.dispatchEvent(new MouseEvent('mousemove', endParams));
-    dispatchPointerEvent(el, 'pointerup', endParams);
-    el.dispatchEvent(new MouseEvent('mouseup', endParams));
+    movePointer(el, tx, ty);
+    releasePointer(el, tx, ty);
   }
 
   // Drag gesture for indent / dedent. Unlike a reorder, this must NOT move the
@@ -2709,17 +2720,13 @@
   // clamps to the nearest legal level), then settles back near the original row
   // so the drop only changes indent.  See #248.
   async function animateIndentDrag(el, sx, sy, deltaX) {
-    const downParams = mkMouseParams(sx, sy);
-    dispatchPointerEvent(el, 'pointerdown', downParams);
-    el.dispatchEvent(new MouseEvent('mousedown', downParams));
+    pressPointer(el, sx, sy);
     await sleep(10);
 
     // Activate: nudge downward past the drag threshold, staying within the
     // task's own row so no reorder is triggered.
     for (let dy = 3; dy <= 12; dy += 3) {
-      const params = mkMouseParams(sx, sy + dy);
-      dispatchPointerEvent(el, 'pointermove', params);
-      el.dispatchEvent(new MouseEvent('mousemove', params));
+      movePointer(el, sx, sy + dy);
       await sleep(20);
     }
 
@@ -2729,19 +2736,16 @@
     const frameCount = 12;
     for (let currentFrame = 1; currentFrame <= frameCount; currentFrame++) {
       const x = coslerp(sx, sx + deltaX, currentFrame / frameCount);
-      const params = mkMouseParams(x, holdY);
-      dispatchPointerEvent(el, 'pointermove', params);
-      el.dispatchEvent(new MouseEvent('mousemove', params));
+      movePointer(el, x, holdY);
       await sleep(15);
     }
 
     // Settle back toward the original row and drop.
-    const endParams = mkMouseParams(sx + deltaX, sy + 2);
-    dispatchPointerEvent(el, 'pointermove', endParams);
-    el.dispatchEvent(new MouseEvent('mousemove', endParams));
+    const endX = sx + deltaX;
+    const endY = sy + 2;
+    movePointer(el, endX, endY);
     await sleep(10);
-    dispatchPointerEvent(el, 'pointerup', endParams);
-    el.dispatchEvent(new MouseEvent('mouseup', endParams));
+    releasePointer(el, endX, endY);
   }
 
   function lerp(s, e, t) {
