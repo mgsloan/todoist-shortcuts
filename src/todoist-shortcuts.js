@@ -4617,19 +4617,19 @@
     }
   }
 
-  // Simulate a mouse click.
+  // Simulate a mouse click, in the order a real one arrives: pointerdown,
+  // mousedown, pointerup, mouseup, click.
   //
-  // Dispatches the full browser event sequence including PointerEvents.
-  // Todoist's UI (likely Radix UI) uses pointerdown/pointerup for popover
-  // toggle and outside-click dismissal. Without pointer events, popovers
-  // open and immediately auto-close. See:
-  //   https://github.com/mgsloan/todoist-shortcuts/issues/282
-  //   https://github.com/mgsloan/todoist-shortcuts/issues/285
+  // The pointer events matter because Todoist's popover triggers (label menu,
+  // scheduler, project menu) now open from pointerdown rather than click, so a
+  // mouse-only sequence never reaches the handler that opens them.  See
+  // https://github.com/mgsloan/todoist-shortcuts/issues/282 and
+  // https://github.com/mgsloan/todoist-shortcuts/issues/285
   function click(el) {
     const eventOptions = {bubbles: true, cancelable: true, view: window};
-    el.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
+    dispatchPointerEvent(el, 'pointerdown', eventOptions);
     el.dispatchEvent(new MouseEvent('mousedown', eventOptions));
-    el.dispatchEvent(new PointerEvent('pointerup', eventOptions));
+    dispatchPointerEvent(el, 'pointerup', eventOptions);
     el.dispatchEvent(new MouseEvent('mouseup', eventOptions));
     el.dispatchEvent(new MouseEvent('click', eventOptions));
   }

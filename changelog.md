@@ -27,8 +27,20 @@
 * Fixes the readme having the indent and dedent rows swapped. Thanks to
   contribution from [@msmouse][] in [#294][]!
 
+* Fixes the label dialog (`y` / `@`), scheduler (`t`), and move to
+  project prompt (`v`) opening and immediately closing again. Todoist's
+  popovers now open from `pointerdown` rather than `click`, so the
+  synthetic clicks behind these shortcuts never reached the handler
+  that opens them. Simulated clicks now dispatch the pointer events a
+  real click comes with. Fixes [#282][] and [#285][]. Thanks to
+  contribution from [@anandman][] in [#290][]!
+
 [#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248
+[#282]: https://github.com/mgsloan/todoist-shortcuts/issues/282
+[#285]: https://github.com/mgsloan/todoist-shortcuts/issues/285
+[#290]: https://github.com/mgsloan/todoist-shortcuts/pull/290
 [#294]: https://github.com/mgsloan/todoist-shortcuts/pull/294
+[@anandman]: https://github.com/anandman
 [@msmouse]: https://github.com/msmouse
 
 ## Version 205
