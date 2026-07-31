@@ -2935,12 +2935,52 @@
           },
       );
       focusedEl.blur();
+      keepSchedulerInputBlurred();
     } finally {
       exitDeferLastBinding();
     }
   }
 
+  // How long to keep the scheduler's input blurred after opening the
+  // scheduler.
+  const SCHEDULER_SETTLE_DELAY = 500;
+
+  // Cancels the current keepSchedulerInputBlurred, if any. MUTABLE.
+  let cancelSchedulerBlur = null;
+
+  // Todoist focuses the scheduler's text input when the scheduler opens, and
+  // focuses it again if it is blurred while the scheduler is still opening.
+  // While it has focus, the schedule shortcuts are typed into it rather than
+  // run, so keep blurring it until the scheduler has settled.
+  function keepSchedulerInputBlurred() {
+    stopKeepingSchedulerInputBlurred();
+    const blurSchedulerFocus = (ev) => {
+      const el = ev.target;
+      if (el && el.blur && findParent(el, matchingClass('scheduler'))) {
+        el.blur();
+      }
+    };
+    document.addEventListener('focusin', blurSchedulerFocus, {capture: true});
+    const timeout = setTimeout(
+        stopKeepingSchedulerInputBlurred, SCHEDULER_SETTLE_DELAY);
+    cancelSchedulerBlur = () => {
+      clearTimeout(timeout);
+      document.removeEventListener(
+          'focusin', blurSchedulerFocus, {capture: true});
+    };
+  }
+
+  function stopKeepingSchedulerInputBlurred() {
+    if (cancelSchedulerBlur) {
+      cancelSchedulerBlur();
+      cancelSchedulerBlur = null;
+    }
+  }
+
   async function focusTimeInput() {
+    // Otherwise the time input is blurred right back again when the scheduler
+    // was only just opened.
+    stopKeepingSchedulerInputBlurred();
     enterDeferLastBinding();
     try {
       const timepicker = await retryWithDelay(

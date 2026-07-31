@@ -2,6 +2,13 @@
 
 ## Version 206
 
+* Fixes the schedule shortcuts (`t` followed by `c` / `t` / `w` / `n`
+  / …) intermittently doing nothing, and typing their letter into the
+  scheduler's date field instead. Opening the scheduler focuses that
+  field, and Todoist focuses it again if it is blurred while the
+  scheduler is still opening, so it is now kept blurred until the
+  scheduler settles. Fixes [#205][].
+
 * Fixes sidebar navigation (`` ` `` / ``shift+` ``) doing nothing at all
   for users with no favorites. The favorites panel doesn't exist when
   there is nothing favorited, and looking for it threw before anything
@@ -84,6 +91,7 @@
   real click comes with. Fixes [#282][] and [#285][]. Thanks to
   contribution from [@anandman][] in [#290][]!
 
+[#205]: https://github.com/mgsloan/todoist-shortcuts/issues/205
 [#232]: https://github.com/mgsloan/todoist-shortcuts/issues/232
 [#239]: https://github.com/mgsloan/todoist-shortcuts/issues/239
 [#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248
