@@ -2,6 +2,13 @@
 
 ## Version 206
 
+* Fixes scheduling for next month (`t m`), which did nothing at all.
+  Todoist's scheduler no longer has a "next month" button - it only has
+  today, tomorrow, next week and next weekend - so the same day of the
+  next month is now picked from the calendar, the way `t w` already
+  worked. Months without the day in question, such as the 31st of
+  February, use the last day of the month instead.
+
 * Fixes the schedule shortcuts (`t` followed by `c` / `t` / `w` / `n`
   / …) intermittently doing nothing, and typing their letter into the
   scheduler's date field instead. Opening the scheduler focuses that

@@ -90,6 +90,18 @@ describe('scheduling', {timeout: TIMEOUT}, () => {
     assert.equal(daysBetween(today, due), 1);
   });
 
+  it('schedules for the same day next month with `t m`', async () => {
+    const due = await schedule('month', 'm');
+    const start = new Date(today + 'T00:00:00');
+    const expected = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+    const lastDay = new Date(
+        expected.getFullYear(), expected.getMonth() + 1, 0).getDate();
+    expected.setDate(Math.min(start.getDate(), lastDay));
+    const pad = (n) => String(n).padStart(2, '0');
+    assert.equal(due, expected.getFullYear() + '-' +
+        pad(expected.getMonth() + 1) + '-' + pad(expected.getDate()));
+  });
+
   it('schedules for the next weekend with `t n`', async () => {
     const due = await schedule('weekend', 'n');
     const day = new Date(due + 'T00:00:00').getDay();

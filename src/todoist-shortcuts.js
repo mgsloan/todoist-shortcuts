@@ -522,16 +522,25 @@
         });
   }
 
-  // Click 'next month' in schedule. Only does anything if schedule is open.
+  // Click the same day of the next month in the schedule's calendar. Only does
+  // anything if schedule is open.
+  //
+  // Todoist used to have a button for this, but the scheduler's buttons are
+  // now only today, tomorrow, next week and next weekend.
   async function scheduleNextMonth() {
-    withScheduler(
-        'scheduleNextMonth',
-        (scheduler) => {
-          clickUnique(
-              scheduler,
-              'button',
-              matchingAttr('data-track', 'scheduler|date_shortcut_nextmonth'));
-        });
+    const date = new Date();
+    const dayOfMonth = date.getDate();
+    // Moving to the start of the month before changing month avoids
+    // overshooting: setting the month while on the 31st, when the next month
+    // has 30 days, lands in the month after that instead.
+    date.setDate(1);
+    date.setMonth(date.getMonth() + 1);
+    date.setDate(Math.min(dayOfMonth, daysInMonth(date)));
+    clickSchedulerDate('scheduleNextMonth', date);
+  }
+
+  function daysInMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   }
 
   // Clicks 'postpone' in scheduler.
@@ -552,17 +561,19 @@
     return async () => {
       const date = new Date();
       date.setDate(date.getDate() + n);
-      buttonAriaLabel = dateToIsoFormatUsingCurrentTimezone(date);
-
-      withScheduler(
-          'schedulePlusN',
-          (scheduler) => {
-            clickUnique(
-                scheduler,
-                'button',
-                matchingAttr('aria-label', buttonAriaLabel));
-          });
+      clickSchedulerDate('schedulePlusN', date);
     };
+  }
+
+  // Clicks a day in the scheduler's calendar, which labels them with the date
+  // in ISO format.
+  function clickSchedulerDate(name, date) {
+    const label = dateToIsoFormatUsingCurrentTimezone(date);
+    withScheduler(
+        name,
+        (scheduler) => {
+          clickUnique(scheduler, 'button', matchingAttr('aria-label', label));
+        });
   }
 
   // Click 'no due date' in schedule. Only does anything if schedule is open.
