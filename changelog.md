@@ -1,5 +1,16 @@
 # todoist-shortcuts changelog
 
+## Version 206
+
+* Fixes automatic scrolling of the cursored task into view. Todoist
+  moved scrolling off of `#content` and onto a `div` nested within it,
+  so the scrolling code was a no-op and the cursor could end up off
+  screen. Now the nearest actually-scrollable ancestor is used, rather
+  than a particular element.
+
+* Tasks scrolled into view are no longer hidden behind Todoist's
+  sticky view header or sticky section headers.
+
 ## Version 205
 
 * Fixes keyboard task movement (`shift+j` / `shift+k`) with

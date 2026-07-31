@@ -4205,21 +4205,81 @@
   // view. Does not work well for elements that are larger than half a screen
   // full.
   function verticalScrollIntoView(el, marginBottom, skipCheck, t) {
-    withViewContent((content) => {
-      const oy = pageOffset(el).y - pageOffset(content).y;
-      const cy = oy - content.scrollTop;
-      const h = el.offsetHeight;
-      const overflowDiv = getUnique(
-          content, '.action_head__overflow_actions');
-      const overflowHeight = overflowDiv ? overflowDiv.offsetHeight : 0;
-      if (skipCheck ||
-          cy < el.offsetHeight + overflowHeight ||
-          cy + h > content.offsetHeight - marginBottom) {
-        // TODO: for very large tasks, this could end up with the whole task not
-        // being in view.
-        content.scrollTo(0, oy - lerp(0, content.offsetHeight, t));
+    const content = getScrollContainer(el);
+    if (!content) {
+      warn('Failed to find scroll container for', el);
+      return;
+    }
+    // Space at the top of the container taken up by sticky headers, which
+    // would otherwise obscure the element.
+    const topInset = getStickyTopInset(content);
+    // Position of the element relative to the top of the scrollable content.
+    // offsetTop is unaffected by scrolling, so this is a scroll position.
+    const oy = pageOffset(el).y - pageOffset(content).y;
+    // Position of the element relative to the top of the visible area.
+    const cy = oy - content.scrollTop;
+    const h = el.offsetHeight;
+    const visibleHeight = content.clientHeight;
+    if (skipCheck ||
+        cy < topInset ||
+        cy + h > visibleHeight - marginBottom) {
+      // TODO: for very large tasks, this could end up with the whole task not
+      // being in view.
+      content.scrollTo(0, oy - topInset - lerp(0, visibleHeight - topInset, t));
+    }
+  }
+
+  // Finds the nearest ancestor which actually scrolls the element. Todoist has
+  // moved this around over time - it used to be '#content' itself, but is now
+  // a div nested within it.
+  function getScrollContainer(el) {
+    let cur = el ? el.parentElement : null;
+    while (cur && cur !== document.body && cur !== document.documentElement) {
+      if (isVerticallyScrollable(cur) && hasScrollableOverflow(cur)) {
+        return cur;
       }
-    });
+      cur = cur.parentElement;
+    }
+    // Nothing to scroll (the content fits), but return something sensible so
+    // that positions can still be computed.
+    return getViewContent();
+  }
+
+  function hasScrollableOverflow(el) {
+    const overflowY = window.getComputedStyle(el).overflowY;
+    return overflowY === 'auto' ||
+      overflowY === 'scroll' ||
+      overflowY === 'overlay';
+  }
+
+  // Todoist sticks the view header (and, once scrolled, section headers) to the
+  // top of the scroll container. Returns how much of the top of the container
+  // they cover, by probing downwards from the top for sticky elements.
+  function getStickyTopInset(content) {
+    const bounds = content.getBoundingClientRect();
+    const x = bounds.left + bounds.width / 2;
+    // No sensible answer for tiny / hidden containers.
+    if (bounds.width <= 0 || bounds.height <= 0) {
+      return 0;
+    }
+    let inset = 0;
+    for (let i = 0; i < 3; i++) {
+      const stuck = document.elementsFromPoint(x, bounds.top + inset + 1)
+          .find((el) => el !== content &&
+                content.contains(el) &&
+                window.getComputedStyle(el).position === 'sticky');
+      if (!stuck) {
+        break;
+      }
+      const newInset = stuck.getBoundingClientRect().bottom - bounds.top;
+      // Bail out rather than trust an implausibly large result, which would
+      // mean some big sticky wrapper got mistaken for a header.
+      if (newInset <= inset || newInset > bounds.height / 3) {
+        break;
+      }
+      inset = newInset;
+    }
+    return inset;
   }
 
   // Alias for document.getElementById
