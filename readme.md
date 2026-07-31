@@ -116,8 +116,8 @@ navigation mode to select the same project again.
 | `>`                        | open deadline for task at cursor (english Todoist only)  |
 | `shift+j` or `shift+down` or `alt+down` | move task at cursor downwards               |
 | `shift+k` or `shift+up` or `alt+up`     | move task at cursor upwards                 |
-| `shift+l` or `shift+left`  | dedent task at cursor                                    |
-| `shift+h` or `shift+right` | indent task at cursor                                    |
+| `shift+l` or `shift+right` | indent task at cursor                                    |
+| `shift+h` or `shift+left`  | dedent task at cursor                                    |
 | `shift+c`                  | clicks [toggl][] or [clockify][] time tracking button    |
 | `ctrl+c`                   | copy title and url of task(s) in markdown format         |
 | `ctrl+,`                   | copy task title(s)                                       |
