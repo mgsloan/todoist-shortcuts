@@ -2,6 +2,22 @@
 
 ## Version 206
 
+* Fixes sidebar navigation (`` ` `` / ``shift+` ``) doing nothing at all
+  for users with no favorites. The favorites panel doesn't exist when
+  there is nothing favorited, and looking for it threw before anything
+  was clicked.
+
+* Sidebar navigation now continues from the project being viewed,
+  rather than starting over from the top of the sidebar. Which item is
+  the current one was determined by counting Todoist's obfuscated class
+  names, which no longer identifies projects. It is now determined by
+  comparing the item's link with the address being viewed.
+
+* Sidebar navigation no longer bounces off a favorited project's other
+  entry. Such a project is listed both in favorites and in projects, so
+  moving off of one of them used to resume from the other. Fixes
+  [#232][] and [#239][].
+
 * Fixes setting priority with `1` / `2` / `3` / `4` on the task at the
   cursor. It used to open the task editor, set the priority there, and
   click save, but the save button is no longer where it was looked for,
@@ -68,6 +84,8 @@
   real click comes with. Fixes [#282][] and [#285][]. Thanks to
   contribution from [@anandman][] in [#290][]!
 
+[#232]: https://github.com/mgsloan/todoist-shortcuts/issues/232
+[#239]: https://github.com/mgsloan/todoist-shortcuts/issues/239
 [#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248
 [#282]: https://github.com/mgsloan/todoist-shortcuts/issues/282
 [#284]: https://github.com/mgsloan/todoist-shortcuts/issues/284

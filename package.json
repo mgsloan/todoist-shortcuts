@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "node --test \"test/**/*.test.js\"",
+    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\"",
     "test:login": "node test/login.js",
     "test:clean": "node test/clean.js"
   },

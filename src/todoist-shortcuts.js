@@ -1133,10 +1133,10 @@
     withLeftMenuItems((menuItems, current) => {
       // If on the last item, or no item, select the first item.
       if (current >= menuItems.length - 1 || current < 0) {
-        menuItems[0].click();
+        clickLeftMenuItem(menuItems, 0);
       // Otherwise, select the next item.
       } else {
-        menuItems[current + 1].click();
+        clickLeftMenuItem(menuItems, current + 1);
       }
     });
   }
@@ -1146,10 +1146,10 @@
     withLeftMenuItems((menuItems, current) => {
       // If on the first item, or no item, select the last item.
       if (current <= 0) {
-        menuItems[menuItems.length - 1].click();
+        clickLeftMenuItem(menuItems, menuItems.length - 1);
       // Otherwise, select the previous item.
       } else {
-        menuItems[current - 1].click();
+        clickLeftMenuItem(menuItems, current - 1);
       }
     });
   }
@@ -1158,47 +1158,98 @@
   // currently selected one, if any.
   function withLeftMenuItems(f) {
     withId('top-menu', (topItems) => {
-      const favoritesPanel =
-            withId('left-menu-favorites-panel', (panel) => { return panel; });
-      const projectsPanel =
-            withId('left-menu-projects-panel', (panel) => { return panel; });
-      withLeftMenuItemLinks([topItems, favoritesPanel, projectsPanel], f);
+      // The favorites panel only exists when there are favorites, and the
+      // projects panel only when there are projects, so missing ones are
+      // expected rather than a problem.
+      const panels = [topItems];
+      const panelIds =
+            ['left-menu-favorites-panel', 'left-menu-projects-panel'];
+      for (const id of panelIds) {
+        const panel = getById(id);
+        if (panel) {
+          panels.push(panel);
+        }
+      }
+      withLeftMenuItemLinks(panels, f);
     });
   }
 
   function withLeftMenuItemLinks(containers, f) {
     const links = [];
-    let current = -1;
-    const allCurrents = [];
+    // Indices of the items which link to the page being viewed. There can be
+    // more than one, because a favorited project is listed in both the
+    // favorites and the projects panel.
+    const currents = [];
     for (const container of containers) {
       withAll(container, 'li', all, (item) => {
         const link =
               getFirst(item, '.item_content') ||
               getFirst(item, 'a') ||
               getFirst(item, '.name');
-        if (hidden(item)) {
-        } else if (!link) {
-          warn('Didn\'t find link in', item.innerHTML);
-        } else {
-          links.push(link);
-          const firstChild = item.firstElementChild;
-          // Terrible hack around obfuscated class names.
-          if (matchingClass('current')(item) ||
-              (firstChild.tagName === 'DIV' &&
-               !firstChild.classList.contains('arrow') &&
-               firstChild.classList.length >= 6)) {
-            if (!allCurrents.length) {
-              current = links.length - 1;
-            }
-            allCurrents.push(item.innerHTML);
-          }
+        // Items like the search box have no link, and collapsed projects hide
+        // their children. Neither is worth warning about.
+        if (hidden(item) || !link) {
+          return;
+        }
+        links.push(link);
+        if (isLinkToCurrentPage(getFirst(item, 'a'))) {
+          currents.push(links.length - 1);
         }
       });
     }
-    if (allCurrents.length > 1) {
-      warn('Multiple current menu items: ', allCurrents);
+    f(links, chooseCurrentLeftMenuItem(currents));
+  }
+
+  // Which of the items linking to the current page to navigate relative to.
+  // Preferring the one navigated to last is what keeps navigation from
+  // bouncing between a favorited project's two entries: without it, moving off
+  // the projects entry would start over from the favorites entry.
+  function chooseCurrentLeftMenuItem(currents) {
+    if (!currents.length) {
+      return -1;
     }
-    f(links, current);
+    if (currents.includes(lastLeftMenuIndex)) {
+      return lastLeftMenuIndex;
+    }
+    return currents[0];
+  }
+
+  function isLinkToCurrentPage(link) {
+    if (!link) {
+      return false;
+    }
+    const href = link.getAttribute('href');
+    if (!href) {
+      return false;
+    }
+    // Comparing pathnames rather than hrefs, so that query strings and
+    // fragments don't matter.
+    return identifyPath(new URL(href, document.baseURI).pathname) ===
+      identifyPath(window.location.pathname);
+  }
+
+  // Reduces a path to something comparable, by dropping the slug that Todoist
+  // puts in front of a project / filter / label id. Sidebar links have the
+  // slug ("/app/project/shopping-6X7yz"), but the same page navigated to
+  // directly may not ("/app/project/6X7yz").
+  function identifyPath(pathname) {
+    const segments = pathname.split('/').filter((segment) => segment);
+    const last = segments.pop() || '';
+    const lastDash = last.lastIndexOf('-');
+    segments.push(lastDash < 0 ? last : last.substring(lastDash + 1));
+    return segments.join('/');
+  }
+
+  // Index into the left menu items of the one navigated to by the most recent
+  // nextLeftMenuItem / prevLeftMenuItem. MUTABLE.
+  let lastLeftMenuIndex = -1;
+
+  // Note that this uses the element's own click method rather than the
+  // synthetic click used elsewhere: sidebar items are draggable, and the
+  // pointer events that come with a synthetic click start a drag.
+  function clickLeftMenuItem(menuItems, index) {
+    lastLeftMenuIndex = index;
+    menuItems[index].click();
   }
 
   async function undo() {
