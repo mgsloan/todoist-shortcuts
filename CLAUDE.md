@@ -25,6 +25,35 @@ storing state, mark unavoidable mutable state with a `MUTABLE` comment.
 
 Run `./eslint.sh` before finishing (needs `npm install` once).
 
+## Changelog entries
+
+`changelog.md` is read by users, not by contributors.  An entry says what
+changed for the person using the extension, in one or two sentences, and
+nothing about how it was done.  Leave out what broke internally, which element
+Todoist renamed, what the code used to look for, and how it works now — all of
+that belongs in the commit message, which the issue link leads to anyway.
+
+```
+* Fixes scheduling for next month (`t m`), which did nothing.
+```
+
+not
+
+```
+* Fixes scheduling for next month (`t m`), which did nothing at all.
+  Todoist's scheduler no longer has a "next month" button - it only has
+  today, tomorrow, next week and next weekend - so the same day of the
+  next month is now picked from the calendar, the way `t w` already
+  worked.
+```
+
+Name the keys the shortcut uses, mention the issue it fixes as `[#123][]`, and
+credit contributors ("Thanks to contribution from [@name][] in [#123][]!").
+Reference definitions go at the end of the version's section; repeating one
+that an older section already defines is fine and is what the file does.
+Entries go under a heading for the next version, which is added by the release
+commit that bumps `src/manifest.json`.
+
 ## Local Chrome setup
 
 Two Chrome profiles are relevant on this machine:
