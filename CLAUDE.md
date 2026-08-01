@@ -134,6 +134,31 @@ npm run test:clean   # delete "ts-test " projects left by interrupted runs
 * The cursor has no marker class — it is drawn by generated CSS keyed on the
   task id — so `cursorContent` finds it by its border colour.
 
+### Per-shortcut tests
+
+`test/shortcuts/*.js` are tables describing one test per key spelling, run by
+`test/lib/shortcut-runner.js`.  Each entry says which keymap the key is in,
+what fixture it needs, what to do first, and how to tell it worked.  Keep the
+check to the smallest honest sign — the cursor moved, the API says the task
+changed, the thing it opens appeared — since these are smoke tests, not tests
+of the feature behind the key.
+
+`test/coverage.test.js` parses the bindings out of `src/todoist-shortcuts.js`
+and fails when a key is neither in a table, nor listed in `COVERED_ELSEWHERE`
+(it has a test of its own), nor in `EXCLUDED` with a reason.  So adding a
+shortcut means adding a test.  It runs no browser, so it is instant.
+
+A shortcut Todoist has broken gets `broken: 'how it fails'` in its table
+entry, which runs it as a todo: the suite stays green, and the list of what is
+broken lives in one place rather than in a red test run everyone learns to
+ignore.  Remove the flag when fixing it.
+
+Two traps worth remembering.  Puppeteer's `keyboard.press('O')` sends the
+character without the shift modifier, which is not what a `shift+o` binding
+matches — `pressBinding` holds modifiers down instead.  And a timeout on the
+`describe` cancels the tests which haven't run yet, turning one slow failure
+into a page of them, so the timeout is per test.
+
 This suite hits the live service with a real account, so it is a local suite,
 not something to run in CI.
 
