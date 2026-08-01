@@ -1,5 +1,10 @@
 ![todoist-shortcuts logo](src/icon128.png)
 
+[![open issues](https://img.shields.io/github/issues/mgsloan/todoist-shortcuts.svg)](https://github.com/mgsloan/todoist-shortcuts/issues?q=is%3Aissue+is%3Aopen)
+[![closed issues](https://img.shields.io/github/issues-closed/mgsloan/todoist-shortcuts.svg?color=blue)](https://github.com/mgsloan/todoist-shortcuts/issues?q=is%3Aissue+is%3Aclosed)
+[![open pull requests](https://img.shields.io/github/issues-pr/mgsloan/todoist-shortcuts.svg)](https://github.com/mgsloan/todoist-shortcuts/pulls?q=is%3Apr+is%3Aopen)
+[![closed pull requests](https://img.shields.io/github/issues-pr-closed/mgsloan/todoist-shortcuts.svg?color=blue)](https://github.com/mgsloan/todoist-shortcuts/pulls?q=is%3Apr+is%3Aclosed)
+
 **todoist-shortcuts** is a browser extension or greasemonkey script which adds a
 bunch of keyboard shortcuts to [Todoist](https://todoist.com). Along with this
 repository, it is also available from the following places:
