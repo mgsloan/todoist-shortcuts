@@ -3,74 +3,34 @@
 ## Version 206
 
 * Adds `shift+v` for switching a view between the list, board and
-  calendar layouts, matching Todoist's own shortcut. Todoist's version
-  of it never ran, since todoist-shortcuts takes over key handling, so
-  the view options menu is used instead. Layouts which the account's
-  plan doesn't include - the calendar layout is for Todoist Pro and
-  Business customers - are skipped rather than cycled into. Implements
+  calendar layouts, matching Todoist's own shortcut. Implements
   [#288][].
 
-* Fixes the cursor disappearing after adding a task with `a` /
-  `shift+a`. Restoring the cursor once the editor closes used the
-  editor's position, but was passed `true` in place of that position,
-  and looking a task up by `true` finds nothing. The cursor now ends up
-  on the task that was just added.
-
-* Fixes the task editor no longer being scrolled into view when adding
-  a task, and the fallback for when the editor doesn't open at all
-  never running. Todoist renamed the element these looked for.
-
-* Fixes scheduling for next month (`t m`), which did nothing at all.
-  Todoist's scheduler no longer has a "next month" button - it only has
-  today, tomorrow, next week and next weekend - so the same day of the
-  next month is now picked from the calendar, the way `t w` already
-  worked. Months without the day in question, such as the 31st of
-  February, use the last day of the month instead.
-
-* Fixes the schedule shortcuts (`t` followed by `c` / `t` / `w` / `n`
-  / …) intermittently doing nothing, and typing their letter into the
-  scheduler's date field instead. Opening the scheduler focuses that
-  field, and Todoist focuses it again if it is blurred while the
-  scheduler is still opening, so it is now kept blurred until the
-  scheduler settles. Fixes [#205][].
-
-* Fixes sidebar navigation (`` ` `` / ``shift+` ``) doing nothing at all
-  for users with no favorites. The favorites panel doesn't exist when
-  there is nothing favorited, and looking for it threw before anything
-  was clicked.
-
-* Sidebar navigation now continues from the project being viewed,
-  rather than starting over from the top of the sidebar. Which item is
-  the current one was determined by counting Todoist's obfuscated class
-  names, which no longer identifies projects. It is now determined by
-  comparing the item's link with the address being viewed.
-
-* Sidebar navigation no longer bounces off a favorited project's other
-  entry. Such a project is listed both in favorites and in projects, so
-  moving off of one of them used to resume from the other. Fixes
-  [#232][] and [#239][].
-
 * Fixes setting priority with `1` / `2` / `3` / `4` on the task at the
-  cursor. It used to open the task editor, set the priority there, and
-  click save, but the save button is no longer where it was looked for,
-  so the task was left in the editor waiting for `enter` to be pressed.
-  Priority is now set from the task's contextual menu, which applies it
-  directly and needs no save. Fixes [#284][].
+  cursor, which left the change unsaved. Fixes [#284][].
 
 * Fixes setting priority in task view (`i`) needing the number key
-  pressed twice. The priority menu was looked for immediately after the
-  click that opens it, before it existed, so the first press only
-  opened the menu. Now it waits for the menu to appear.
+  pressed twice, and makes it more reliable for multiple selected
+  tasks.
 
-* Setting priority on multiple selected tasks likewise waits for the
-  priority menu to appear rather than assuming it is already there.
+* Fixes sidebar navigation (`` ` `` / ``shift+` ``) doing nothing for
+  users with no favorites.
 
-* Fixes automatic scrolling of the cursored task into view. Todoist
-  moved scrolling off of `#content` and onto a `div` nested within it,
-  so the scrolling code was a no-op and the cursor could end up off
-  screen. Scrolling is now left to the browser, which knows which
-  elements scroll without being told. Thanks to contribution from
-  [@kory-smith][] in [#287][]!
+* Sidebar navigation now continues from the project being viewed rather
+  than starting over from the top, and no longer bounces off a
+  favorited project's second entry. Fixes [#232][] and [#239][].
+
+* Fixes the schedule shortcuts (`t` followed by `c` / `t` / `w` / `n`
+  / …) intermittently doing nothing. Fixes [#205][].
+
+* Fixes scheduling for next month (`t m`), which did nothing.
+
+* Fixes the cursor disappearing after adding a task with `a` /
+  `shift+a`, and the task editor not being scrolled into view.
+
+* Fixes the cursored task not being scrolled into view, which could
+  leave it off screen. Thanks to contribution from [@kory-smith][] in
+  [#287][]!
 
 * Tasks scrolled into view are no longer hidden behind Todoist's
   sticky view header or sticky section headers.
@@ -84,37 +44,19 @@
   the screen.
 
 * Fixes indent (`shift+l` / `shift+right`) and dedent (`shift+h` /
-  `shift+left`), which did nothing. They dragged the task purely
-  horizontally, which never activates Todoist's drag handling, so now
-  the drag is activated with a vertical nudge first. This is the
-  remaining half of [#248][]. Thanks to contribution from [@msmouse][]
-  in [#294][]!
+  `shift+left`), which did nothing. This is the remaining half of
+  [#248][]. Thanks to contribution from [@msmouse][] in [#294][]!
 
-* The cursor no longer moves to the following task after indenting or
-  dedenting. Todoist applies a drop asynchronously, and the task's
-  element is briefly absent while the list re-renders, which looked
-  like the task had been deleted. Now the cursor is updated once the
-  task list stops changing.
-
-* The cursor highlight is no longer stale after indenting or dedenting.
-  It is a CSS rule keyed on the task's indent level, and used to be
-  regenerated before Todoist had applied the new indent. It is now
-  regenerated along with the cursor, once the task list stops changing.
-
-* Moving tasks (`shift+j` / `shift+k`) now also waits for the task list
-  to stop changing before updating the cursor. This mostly looked right
-  before, since there the cursor is meant to follow the task.
+* The cursor and its highlight no longer go stale after indenting,
+  dedenting or moving tasks (`shift+j` / `shift+k`).
 
 * Fixes the readme having the indent and dedent rows swapped. Thanks to
   contribution from [@msmouse][] in [#294][]!
 
 * Fixes the label dialog (`y` / `@`), scheduler (`t`), and move to
-  project prompt (`v`) opening and immediately closing again. Todoist's
-  popovers now open from `pointerdown` rather than `click`, so the
-  synthetic clicks behind these shortcuts never reached the handler
-  that opens them. Simulated clicks now dispatch the pointer events a
-  real click comes with. Fixes [#282][] and [#285][]. Thanks to
-  contribution from [@anandman][] in [#290][]!
+  project prompt (`v`) opening and immediately closing again. Fixes
+  [#282][] and [#285][]. Thanks to contribution from [@anandman][] in
+  [#290][]!
 
 [#205]: https://github.com/mgsloan/todoist-shortcuts/issues/205
 [#288]: https://github.com/mgsloan/todoist-shortcuts/issues/288
