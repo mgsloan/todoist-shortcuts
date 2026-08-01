@@ -45,6 +45,9 @@ async function launch(options) {
   if (opts.extension !== false) {
     await chrome.installExtension(SRC_DIR);
   }
+  // So that tests can read what the copying shortcuts put on the clipboard.
+  await chrome.defaultBrowserContext().overridePermissions(
+      'https://app.todoist.com', ['clipboard-read', 'clipboard-write']);
   return chrome;
 }
 

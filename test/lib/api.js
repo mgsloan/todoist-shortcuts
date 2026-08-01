@@ -108,6 +108,31 @@ async function waitForPriority(id, expected, timeoutMs = 15000) {
   }
 }
 
+// Polls until the function returns something truthy, so that tests don't race
+// changes made in the browser reaching the server.
+async function waitFor(what, fn, timeoutMs = 15000) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  for (;;) {
+    last = await fn();
+    if (last) return last;
+    if (Date.now() > deadline) {
+      throw new Error('Timed out waiting for ' + what);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+}
+
+// Completed tasks are still readable, so this is how to tell.  Deleted ones
+// are readable too - see contentsOfProject for spotting those.
+async function isChecked(id) {
+  return Boolean((await getTask(id)).checked);
+}
+
+async function contentsOfProject(projectId) {
+  return (await getTasks(projectId)).map((task) => task.content);
+}
+
 // Converts a UI priority level ("1" is urgent) to the API's inverted
 // numbering.  todoist-shortcuts calls this direction invertPriorityLevel.
 function priorityOfLevel(level) {
@@ -117,6 +142,7 @@ function priorityOfLevel(level) {
 }
 
 module.exports = {
+  contentsOfProject,
   createProject,
   createTask,
   deleteProject,
@@ -124,7 +150,9 @@ module.exports = {
   getTask,
   getTasks,
   getUser,
+  isChecked,
   priorityOfLevel,
   request,
+  waitFor,
   waitForPriority,
 };
