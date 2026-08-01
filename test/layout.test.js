@@ -94,10 +94,10 @@ describe('switching layout', {timeout: TIMEOUT}, () => {
     // would swallow the next press rather than switching layout again.
     await open('menu');
     await switchLayout();
-    assert.equal(
-        await page.$$eval(
-            'input[type="radio"][id="LIST"]', (els) => els.length),
-        0,
-        'the view options menu should have been closed again');
+    // The menu is closed after the layout has switched, so this waits rather
+    // than checking the instant the layout changes.
+    await page.waitForFunction(
+        () => !document.querySelector('input[type="radio"][id="LIST"]'),
+        {timeout: 15000});
   });
 });
