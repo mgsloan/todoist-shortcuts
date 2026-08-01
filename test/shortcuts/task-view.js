@@ -156,7 +156,6 @@ module.exports = [
     keymap: 'task_view',
     keys: ['e', '#'],
     what: 'asks to delete the task',
-    broken: 'No confirmation appears; the menu item it looks for is gone.',
     setUp: onAlpha,
     check: async (t) => await t.page.waitForFunction(
         () => [...document.querySelectorAll('[role="dialog"]')].some(

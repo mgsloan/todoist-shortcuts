@@ -56,7 +56,6 @@ module.exports = [
     keymap: 'default',
     keys: ['>'],
     what: 'opens the deadline picker',
-    broken: 'Opens the task editor rather than the deadline picker.',
     setUp: onAlpha,
     check: opensSomethingSaying(/deadline/),
   },
@@ -97,9 +96,14 @@ module.exports = [
   {
     keymap: 'default',
     keys: ['ctrl+k'],
+    // Todoist has folded its command menu into search.
     what: 'opens Todoist\'s command menu',
-    broken: 'Looks for a command menu button which Todoist no longer has.',
-    check: opensSomethingSaying(/search|command/),
+    check: async (t) => await t.page.waitForFunction(() => {
+      const active = document.activeElement;
+      return Boolean(active && (active.tagName === 'INPUT' ||
+          active.getAttribute('role') === 'combobox' ||
+          active.isContentEditable));
+    }, {timeout: 15000}),
   },
   {
     keymap: 'default',
@@ -117,13 +121,21 @@ module.exports = [
     keys: ['m'],
     what: 'toggles the sidebar',
     // The container keeps its width when collapsed, so this goes by what the
-    // toggle button says about it.
+    // toggle button says about it. Todoist remembers whether the sidebar is
+    // open, so this compares against how it started rather than expecting it
+    // to start open.
+    setUp: async (t) => {
+      t.wasExpanded = await t.page.evaluate(() => {
+        const button = document.querySelector('button[aria-controls=sidebar]');
+        return button && button.getAttribute('aria-expanded');
+      });
+    },
     check: async (t) => await t.page.waitForFunction(
-        () => {
+        (was) => {
           const button = document.querySelector(
               'button[aria-controls=sidebar]');
-          return button && button.getAttribute('aria-expanded') === 'false';
-        }, {timeout: 15000}),
+          return button && button.getAttribute('aria-expanded') !== was;
+        }, {timeout: 15000}, t.wasExpanded),
   },
   {
     keymap: 'default',

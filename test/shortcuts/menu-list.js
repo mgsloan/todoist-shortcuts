@@ -62,7 +62,6 @@ module.exports = [
     keymap: 'menu_list',
     keys: ['enter'],
     what: 'selects the focused menu item',
-    broken: 'Does not select the item, though space does.',
     setUp: focusAnItem,
     settle: 2000,
     check: async (t) => assert.equal(

@@ -116,8 +116,6 @@ module.exports = [
     keymap: 'schedule',
     keys: ['alt+t'],
     what: 'focuses the time input',
-    broken: 'Works from the task list, but not once the scheduler is open: ' +
-        'the date field keeps focus, so the key is typed into it.',
     setUp: openScheduler,
     check: async (t) => await t.page.waitForFunction(() => {
       const active = document.activeElement;
@@ -170,7 +168,6 @@ module.exports = [
     keymap: 'schedule',
     keys: ['l', 'right'],
     what: 'expands sub-tasks and reopens the scheduler',
-    broken: 'Collapsing works from the scheduler but expanding does not.',
     seed: seedSubTask,
     setUp: async (t) => {
       await openScheduler(t);

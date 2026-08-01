@@ -436,6 +436,9 @@
   // when the task is scheduled. Only works for the cursor, not for the
   // selection.
   async function scheduleText() {
+    // Typing a date is the one case where the scheduler's input should keep
+    // focus, so stop blurring it.
+    stopKeepingSchedulerInputBlurred();
     const scheduler = findScheduler();
     if (scheduler) {
       withAll(scheduler, 'input', all, (el) => el.focus() );
@@ -452,38 +455,39 @@
   }
 
   async function scheduleTime() {
+    // Typing a time needs focus in the scheduler, so stop blurring it before
+    // opening the time panel rather than after.
+    stopKeepingSchedulerInputBlurred();
     if (!findScheduler()) {
       scheduleText();
     }
     // Waiting for the scheduler rather than guessing at how long it takes to
     // open, which is longer than it used to be.
     const scheduler = await retryWithDelay('finding scheduler', findScheduler);
-    // Todoist used to mark the "Time" button with aria-controls and no longer
-    // does, leaving its text as the only way to tell it apart.
-    const timeButton =
-        getUnique(scheduler, 'button[aria-controls]') ||
-        getUnique(scheduler, 'button', matchingText('Time'));
-    if (!timeButton) {
-      warn('Couldn\'t find the scheduler\'s time button.');
-      return;
+    // The time button toggles, so pressing this while the time is already
+    // showing would hide it again.
+    if (!findTimeInput()) {
+      // Todoist used to mark the "Time" button with aria-controls and no
+      // longer does, leaving its text as the only way to tell it apart.
+      const timeButton =
+          getUnique(scheduler, 'button[aria-controls]') ||
+          getUnique(scheduler, 'button', matchingText('Time'));
+      if (!timeButton) {
+        warn('Couldn\'t find the scheduler\'s time button.');
+        return;
+      }
+      click(timeButton);
     }
-    click(timeButton);
     await focusTimeInput();
   }
 
   async function openDeadline() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      clickTaskEdit(mutateCursor);
-      await clickAllRetrying(document, '[aria-label="Set deadline"]');
-      // Todoist seems to put back the focus, so try a few times to blur.
-      await blurSchedulerInput();
-      sleep(20);
-      await blurSchedulerInput();
-      sleep(50);
-      await blurSchedulerInput();
-      sleep(100);
-      await blurSchedulerInput();
+      // Via the task's contextual menu: the editor no longer has a control
+      // for this.
+      await clickTaskMenu(
+          mutateCursor, 'task-overflow-menu-deadline', false);
     }
   }
 
@@ -1501,10 +1505,11 @@
     const button = getUnique(document, COMMAND_MENU_SELECTOR);
     if (button) {
       click(button);
-    } else {
-      withId('help_btn', click);
-      clickUnique(document, COMMAND_MENU_SELECTOR);
+      return;
     }
+    // Todoist has dropped the dedicated button, and folded the command menu
+    // into search.
+    clickUnique(document, 'nav *[aria-label=Search]');
   }
 
   const TASK_VIEW_SELECTOR = 'div[data-testid="task-details-modal"]';
@@ -1604,8 +1609,10 @@
   }
 
   async function taskViewDelete() {
-    withTaskViewMoreMenu((menu) => {
-      clickUnique(menu, 'kbd', matchingText('Delete'));
+    await withTaskViewMoreMenu((menu) => {
+      // Not by the kbd showing its shortcut: several items have one, and this
+      // item's says the modifier rather than the key.
+      clickUnique(menu, '[role="menuitem"]', startsWithText('Delete'));
     });
   }
 
@@ -1617,28 +1624,34 @@
 
   // eslint-disable-next-line no-unused-vars
   async function taskViewActivity() {
-    withTaskViewMoreMenu((menu) => {
+    await withTaskViewMoreMenu((menu) => {
       clickUnique(menu, 'div', matchingText('View task activity'));
     });
   }
 
-  function withTaskViewMoreMenu(f) {
-    withUnique(document, TASK_VIEW_SELECTOR, all, (taskView) => {
-      let overflowMenu = getTaskViewMoreMenu();
-      if (!overflowMenu) {
-        clickUniqueRetrying(taskView, 'button[aria-label="More actions"]');
-        overflowMenu = getTaskViewMoreMenu();
-      }
-      if (overflowMenu) {
-        f(overflowMenu);
-      } else {
-        warn('Couldn\'t find overflow menu.');
-      }
-    });
+  async function withTaskViewMoreMenu(f) {
+    const taskView = getUnique(document, TASK_VIEW_SELECTOR);
+    if (!taskView) {
+      warn('Not opening the task view menu, as the task view isn\'t open.');
+      return;
+    }
+    if (!getTaskViewMoreMenu()) {
+      // Awaited: the menu is not there until the click which opens it has
+      // been through Todoist's handler.
+      await clickUniqueRetrying(
+          taskView, 'button[aria-label="More actions"]');
+    }
+    const overflowMenu = await retryWithDelay(
+        'finding the task view menu', getTaskViewMoreMenu).catch(() => null);
+    if (overflowMenu) {
+      await f(overflowMenu);
+    } else {
+      warn('Couldn\'t find overflow menu.');
+    }
   }
 
   function getTaskViewMoreMenu() {
-    return getUniqueRetrying(
+    return getUnique(
         document, 'div.reactist_menulist[aria-label="More actions"]');
   }
 
@@ -1687,7 +1700,9 @@
   }
 
   async function selectMenuListItem() {
-    withCurrentFocusedMenuListItem(click);
+    // The element's own click method rather than the synthetic click, which
+    // the menu ignores.
+    withCurrentFocusedMenuListItem((item) => item.click());
   }
 
   function notifyBulkActionsRemoved() {
@@ -3031,32 +3046,41 @@
     }
   }
 
-  // How long to keep the scheduler's input blurred after opening the
-  // scheduler.
-  const SCHEDULER_SETTLE_DELAY = 500;
-
   // Cancels the current keepSchedulerInputBlurred, if any. MUTABLE.
   let cancelSchedulerBlur = null;
 
   // Todoist focuses the scheduler's text input when the scheduler opens, and
-  // focuses it again if it is blurred while the scheduler is still opening.
-  // While it has focus, the schedule shortcuts are typed into it rather than
-  // run, so keep blurring it until the scheduler has settled.
+  // focuses it again whenever it is blurred. While it has focus the schedule
+  // shortcuts are typed into it rather than run, so keep blurring it for as
+  // long as the scheduler is open.
+  //
+  // Clicking into the field is how to type a date instead, so a click there
+  // gives up and lets it keep focus. So does `shift+t`, via focusTimeInput
+  // and scheduleText.
   function keepSchedulerInputBlurred() {
     stopKeepingSchedulerInputBlurred();
     const blurSchedulerFocus = (ev) => {
+      if (!findScheduler()) {
+        stopKeepingSchedulerInputBlurred();
+        return;
+      }
       const el = ev.target;
       if (el && el.blur && findParent(el, matchingClass('scheduler'))) {
         el.blur();
       }
     };
+    const giveUpIfClicked = (ev) => {
+      if (ev.isTrusted && findParent(ev.target, matchingClass('scheduler'))) {
+        stopKeepingSchedulerInputBlurred();
+      }
+    };
     document.addEventListener('focusin', blurSchedulerFocus, {capture: true});
-    const timeout = setTimeout(
-        stopKeepingSchedulerInputBlurred, SCHEDULER_SETTLE_DELAY);
+    document.addEventListener('pointerdown', giveUpIfClicked, {capture: true});
     cancelSchedulerBlur = () => {
-      clearTimeout(timeout);
       document.removeEventListener(
           'focusin', blurSchedulerFocus, {capture: true});
+      document.removeEventListener(
+          'pointerdown', giveUpIfClicked, {capture: true});
     };
   }
 
@@ -3067,19 +3091,21 @@
     }
   }
 
+  // Todoist used to give the time input an id and now generates one, leaving
+  // its label as the way to find it.
+  function findTimeInput() {
+    return getById('scheduler-timepicker-input-element') ||
+        getUnique(document, '.scheduler input[aria-label="Start time"]');
+  }
+
   async function focusTimeInput() {
     // Otherwise the time input is blurred right back again when the scheduler
     // was only just opened.
     stopKeepingSchedulerInputBlurred();
     enterDeferLastBinding();
     try {
-      const timepicker = await retryWithDelay(
-          'finding time input',
-          // Todoist used to give this an id and now generates one, leaving
-          // its label as the way to find it.
-          () => getById('scheduler-timepicker-input-element') ||
-              getUnique(document, '.scheduler input[aria-label="Start time"]'),
-      );
+      const timepicker = await retryWithDelay('finding time input',
+          findTimeInput);
       timepicker.focus();
     } finally {
       exitDeferLastBinding();
@@ -4624,6 +4650,7 @@
     click(await getUniqueRetrying(parent, query, predicate, fuel, delay));
   }
 
+  // eslint-disable-next-line no-unused-vars
   async function clickAllRetrying(
       parent, query, predicate, fuel=100, delay=10) {
     const elements =
@@ -4846,6 +4873,11 @@
 
   function matchingText(text) {
     return (el) => el.innerText === text;
+  }
+
+  // For menu items which have their keyboard shortcut appended to their text.
+  function startsWithText(text) {
+    return (el) => el.innerText.startsWith(text);
   }
 
   function matchingAction(action) {
@@ -5328,7 +5360,8 @@
   function getCurrentFocusedMenuListItem() {
     const item = document.activeElement;
     const parent = item.parentElement;
-    if (parent && parent.classList.contains('item_menu_list')) {
+    if (parent && (parent.classList.contains('item_menu_list') ||
+                   parent.classList.contains('reactist_menulist'))) {
       return item;
     }
     return null;
