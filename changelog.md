@@ -2,6 +2,14 @@
 
 ## Version 206
 
+* Adds `shift+v` for switching a view between the list, board and
+  calendar layouts, matching Todoist's own shortcut. Todoist's version
+  of it never ran, since todoist-shortcuts takes over key handling, so
+  the view options menu is used instead. Layouts which the account's
+  plan doesn't include - the calendar layout is for Todoist Pro and
+  Business customers - are skipped rather than cycled into. Implements
+  [#288][].
+
 * Fixes the cursor disappearing after adding a task with `a` /
   `shift+a`. Restoring the cursor once the editor closes used the
   editor's position, but was passed `true` in place of that position,
@@ -109,6 +117,7 @@
   contribution from [@anandman][] in [#290][]!
 
 [#205]: https://github.com/mgsloan/todoist-shortcuts/issues/205
+[#288]: https://github.com/mgsloan/todoist-shortcuts/issues/288
 [#232]: https://github.com/mgsloan/todoist-shortcuts/issues/232
 [#239]: https://github.com/mgsloan/todoist-shortcuts/issues/239
 [#248]: https://github.com/mgsloan/todoist-shortcuts/issues/248

@@ -102,6 +102,7 @@
     ['ctrl+c', copyCursorOrSelectedAsMarkdown],
     ['ctrl+shift+/', openRandomTask],
     ['w', openMoreActionsMenu],
+    ['shift+v', nextLayout],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
@@ -1011,6 +1012,64 @@
     clickAll(document, '[aria-label="Close modal"]');
     // Close todoist-shortcuts' modals
     clickAll(document, '.ts-modal-close');
+  }
+
+  // The ids Todoist gives the layout radio buttons in the view options menu.
+  // In the order Todoist's own shift+v shortcut cycles through them.
+  const LAYOUTS = ['LIST', 'BOARD', 'CALENDAR'];
+
+  // Switches to the next layout, like Todoist's own shift+v. Since
+  // todoist-shortcuts takes over Todoist's key handling, its shortcut never
+  // runs, so the view options menu is used instead.
+  //
+  // Note that the calendar layout is only offered to Todoist Pro and Business
+  // customers, and that not every view has every layout, so this cycles
+  // through whichever ones are on offer.
+  async function nextLayout() {
+    if (!isViewOptionsOpen()) {
+      clickViewOptions();
+    }
+    try {
+      // Waiting for the first layout rather than for the menu itself, since
+      // the menu has no distinguishing attributes of its own.
+      await getUniqueRetrying(document, layoutQuery(LAYOUTS[0]));
+      const layouts = LAYOUTS
+          .map((layout) => getUnique(document, layoutQuery(layout)))
+          .filter((radio) =>
+            radio && !radio.disabled && isLayoutOffered(radio));
+      if (layouts.length < 2) {
+        info('Not switching layout, as this view offers no other layout.');
+        return;
+      }
+      const current = layouts.findIndex((radio) => radio.checked);
+      click(layouts[(current + 1) % layouts.length]);
+    } finally {
+      // The menu stays up after picking a layout, and would otherwise be
+      // toggled shut by the next press rather than switching layout again.
+      if (isViewOptionsOpen()) {
+        clickViewOptions();
+      }
+    }
+  }
+
+  // Layouts which the account's plan doesn't include are still listed, marked
+  // with an upgrade icon. Clicking one offers an upgrade instead of switching,
+  // and the offer then swallows further keypresses, so they are skipped.
+  function isLayoutOffered(radio) {
+    const label = findParent(radio, (el) => el.tagName === 'LABEL');
+    return !label || !getFirst(label, '[data-icon-name="upgrade-icon"]');
+  }
+
+  function isViewOptionsOpen() {
+    return getUnique(document, layoutQuery(LAYOUTS[0])) !== null;
+  }
+
+  function clickViewOptions() {
+    clickUnique(document, 'button[aria-label="View Options Menu"]');
+  }
+
+  function layoutQuery(layout) {
+    return 'input[type="radio"][id="' + layout + '"]';
   }
 
   async function openMoreActionsMenu() {

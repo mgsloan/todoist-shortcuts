@@ -244,7 +244,7 @@ Listed here for completeness:
 | `+`               | open assignee dialog                                                      |
 | `e`               | archive                                                                   |
 | `#`               | delete                                                                    |
-| `shift+c`         | clicks [toggl-button (time tracking integration extension)][toggl-button] |
+| `shift+c`         | clicks [toggl-button (time tracking integration extension)][toggl] |
 
 ## Menus
 
@@ -252,6 +252,7 @@ Listed here for completeness:
 |------------------------|--------------------------------------------------------|
 | `w`                    | open 'more actions' menu for current view              |
 | `shift+p`              | open left nav menu for current project                 |
+| `shift+v`              | switch to the next layout (list / board / calendar)    |
 
 Once a menu is open, the following shortcuts can be used to interact with it:
 
