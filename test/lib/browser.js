@@ -163,16 +163,45 @@ async function press(page, key) {
   await new Promise((resolve) => setTimeout(resolve, 250));
 }
 
+// Presses a key with shift held.  Note that this is not the same as pressing
+// the shifted character: press(page, 'O') arrives without the shift modifier,
+// which is what the bindings match on.
+async function pressShift(page, key) {
+  await page.keyboard.down('Shift');
+  await page.keyboard.press(key);
+  await page.keyboard.up('Shift');
+  await new Promise((resolve) => setTimeout(resolve, 250));
+}
+
+// Collects the warnings and errors the extension logs, which is how it reports
+// not finding something it expected in Todoist's DOM.  Returns an array which
+// fills up as the page runs.
+function collectComplaints(page) {
+  const complaints = [];
+  page.on('console', (message) => {
+    const type = message.type();
+    const text = message.text().split('\n')[0].trim();
+    // Puppeteer reports console.warn as 'warn', not 'warning'.
+    if ((type === 'warn' || type === 'warning' || type === 'error') &&
+        text.includes('todoist-shortcuts')) {
+      complaints.push(text);
+    }
+  });
+  return complaints;
+}
+
 module.exports = {
   APP_URL,
   PROFILE_DIR,
   accountOfPage,
   assertSameAccountAs,
+  collectComplaints,
   cursorContent,
   launch,
   selectedContents,
   openApp,
   press,
+  pressShift,
   putCursorOn,
   waitForExtension,
   waitForTasks,

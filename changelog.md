@@ -2,6 +2,16 @@
 
 ## Version 206
 
+* Fixes the cursor disappearing after adding a task with `a` /
+  `shift+a`. Restoring the cursor once the editor closes used the
+  editor's position, but was passed `true` in place of that position,
+  and looking a task up by `true` finds nothing. The cursor now ends up
+  on the task that was just added.
+
+* Fixes the task editor no longer being scrolled into view when adding
+  a task, and the fallback for when the editor doesn't open at all
+  never running. Todoist renamed the element these looked for.
+
 * Fixes scheduling for next month (`t m`), which did nothing at all.
   Todoist's scheduler no longer has a "next month" button - it only has
   today, tomorrow, next week and next weekend - so the same day of the

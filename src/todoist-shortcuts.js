@@ -907,10 +907,24 @@
     }
   }
 
+  // The li which holds the editor for adding or editing a task inline. This is
+  // also how getTasks recognizes it, when including editors.
+  const TASK_EDITOR_SELECTOR = 'li.manager';
+
+  function findTaskEditor() {
+    return getUnique(document, TASK_EDITOR_SELECTOR);
+  }
+
+  // Note that the editor is waited for: this gets called right after clicking
+  // something that opens it, before it has rendered.
   async function scrollTaskEditorIntoView() {
-    withUnique(document, '.task_editor', all, (editor) => {
+    const editor = await retryWithDelay(
+        'finding task editor', findTaskEditor).catch(() => null);
+    if (editor) {
       verticalScrollIntoView(editor, 'nearest', false);
-    });
+    } else {
+      debug('no task editor to scroll into view.');
+    }
   }
 
   // Add a task above / below cursor. Unfortunately these options do not exist
@@ -1869,7 +1883,9 @@
             tasks.findIndex((task) => task.classList.contains('manager'));
       debug('there is an active editor, with index', managerIndex);
       if (managerIndex > 0) {
-        storeImplicitEditingContext(tasks[managerIndex - 1], true);
+        // The index is the same in the list without editors, since the editor
+        // follows the task being stored.
+        storeImplicitEditingContext(tasks[managerIndex - 1], managerIndex - 1);
       } else if (managerIndex < 0) {
         error('There seems to be a task editor, but then couldn\'t find it.');
       }
@@ -1949,7 +1965,10 @@
             }
           }
         } else {
-          warn('expected to find task that was being edited.');
+          // Todoist replaces the task's element when the edit is saved, so it
+          // can be absent while the list re-renders. Falling back on the
+          // index below lands in the same place.
+          debug('task that preceded the editor is gone, using its index.');
         }
       } else if (lastCursorType === TYPE_EXPLICIT_EDITING) {
         const task =
@@ -3036,7 +3055,10 @@
           closeContextMenus();
         }
       });
-      const editor = await getUniqueRetrying(document, '.task_editor');
+      // Retrying rather than getUniqueRetrying, so that not finding the editor
+      // falls back on adding to the section instead of throwing.
+      const editor = await retryWithDelay(
+          'finding task editor', findTaskEditor).catch(() => null);
       if (editor) {
         scrollTaskEditorIntoView();
       } else {
