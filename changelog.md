@@ -1,5 +1,10 @@
 # todoist-shortcuts changelog
 
+## Version 207
+
+* Fixes moving the cursor while the scheduler is open (`^`, `$`, `{`,
+  `}`, `h`, `l` and the arrow keys), which did nothing at all.
+
 ## Version 206
 
 * Adds `shift+v` for switching a view between the list, board and

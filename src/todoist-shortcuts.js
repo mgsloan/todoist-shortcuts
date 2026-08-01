@@ -272,7 +272,10 @@
   // Take multiple actions (functions that take no arguments), and run them in
   // sequence.
   // eslint-disable-next-line no-unused-vars
-  async function sequence(actions) {
+  // Note that this is not itself async: it returns the action to run, and an
+  // async function would return a promise of one, which is not something that
+  // can be bound to a key.
+  function sequence(actions) {
     return async () => {
       for (let i = 0; i < actions.length; i++) {
         await actions[i]();
