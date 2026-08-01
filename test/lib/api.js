@@ -28,15 +28,28 @@ function getToken() {
   return cachedToken;
 }
 
+// Todoist hands out the odd 502 or 429, which would otherwise fail a test
+// which has nothing wrong with it.
+const RETRIED_STATUSES = [429, 500, 502, 503, 504];
+const RETRIES = 4;
+
 async function request(method, endpoint, body) {
-  const response = await fetch(BASE + endpoint, {
-    method: method,
-    headers: {
-      'Authorization': 'Bearer ' + getToken(),
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response = null;
+  for (let attempt = 0; ; attempt++) {
+    response = await fetch(BASE + endpoint, {
+      method: method,
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+        'Content-Type': 'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (response.ok || attempt >= RETRIES ||
+        !RETRIED_STATUSES.includes(response.status)) {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
   if (!response.ok) {
     throw new Error(
         method + ' ' + endpoint + ' failed: ' + response.status + ' ' +
