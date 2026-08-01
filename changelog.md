@@ -5,6 +5,20 @@
 * Fixes moving the cursor while the scheduler is open (`^`, `$`, `{`,
   `}`, `h`, `l` and the arrow keys), which did nothing at all.
 
+* Fixes every schedule shortcut after the first doing nothing, so that
+  the scheduler can be used for more than one thing at a time.
+
+* Fixes the deadline shortcut (`>`), which opened the task editor
+  instead.
+
+* Fixes the command menu shortcut (`ctrl+k`).
+
+* Fixes deleting a task from the task view (`e` / `#`).
+
+* Fixes `enter` not choosing the highlighted item in a menu.
+
+* Fixes `alt+t` hiding the time again when it was already showing.
+
 ## Version 206
 
 * Adds `shift+v` for switching a view between the list, board and
