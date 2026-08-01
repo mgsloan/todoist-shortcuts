@@ -4,6 +4,14 @@ const assert = require('node:assert');
 
 const TASK_VIEW = 'div[data-testid="task-details-modal"]';
 
+// Scheduling from the task view clicks the task's due date button, which is
+// only present once the task has a date.
+const DATED = [
+  {content: 'alpha', due_string: 'today'},
+  {content: 'beta'},
+  {content: 'gamma'},
+];
+
 const openTaskView = async (t, content) => {
   await t.browser.putCursorOn(t.page, content || 'alpha');
   await t.press('i');
@@ -108,7 +116,8 @@ module.exports = [
     keymap: 'task_view',
     keys: ['t'],
     what: 'opens the scheduler',
-    broken: 'The scheduler never opens from the task view.',
+    // On a task with a due date: the button it clicks is only there then.
+    tasks: DATED,
     setUp: onAlpha,
     check: async (t) => await t.page.waitForSelector(
         '.scheduler', {timeout: 15000}),
@@ -117,18 +126,10 @@ module.exports = [
     keymap: 'task_view',
     keys: ['shift+t'],
     what: 'opens the scheduler ready to type',
-    broken: 'The scheduler never opens from the task view.',
+    tasks: DATED,
     setUp: onAlpha,
     check: async (t) => await t.page.waitForSelector(
         '.scheduler', {timeout: 15000}),
-  },
-  {
-    keymap: 'task_view',
-    keys: ['+'],
-    what: 'opens the assignee picker',
-    broken: 'Does nothing at all - the assignee picker never opens.',
-    setUp: onAlpha,
-    check: opensAPopup,
   },
   {
     keymap: 'task_view',

@@ -54,14 +54,6 @@ module.exports = [
   },
   {
     keymap: 'default',
-    keys: ['+'],
-    what: 'opens the assignee picker',
-    broken: 'Does nothing at all - the assignee picker never opens.',
-    setUp: onAlpha,
-    check: opensSomethingSaying(/assign|no one/),
-  },
-  {
-    keymap: 'default',
     keys: ['>'],
     what: 'opens the deadline picker',
     broken: 'Opens the task editor rather than the deadline picker.',
@@ -123,14 +115,15 @@ module.exports = [
   {
     keymap: 'default',
     keys: ['m'],
-    what: 'toggles the sidebar away',
-    broken: 'Does nothing - the sidebar stays where it is.',
-    check: async (t) => await t.page.waitForFunction(() => {
-      const sidebar = document.querySelector(
-          '[data-testid="app-sidebar-container"]');
-      return !sidebar || sidebar.offsetParent === null ||
-          sidebar.getBoundingClientRect().width < 10;
-    }, {timeout: 15000}),
+    what: 'toggles the sidebar',
+    // The container keeps its width when collapsed, so this goes by what the
+    // toggle button says about it.
+    check: async (t) => await t.page.waitForFunction(
+        () => {
+          const button = document.querySelector(
+              'button[aria-controls=sidebar]');
+          return button && button.getAttribute('aria-expanded') === 'false';
+        }, {timeout: 15000}),
   },
   {
     keymap: 'default',
@@ -185,7 +178,11 @@ module.exports = [
     keys: ['alt+t'],
     what: 'opens the scheduler ready to type a time',
     setUp: onAlpha,
-    check: opens('#scheduler-timepicker-input-element'),
+    check: async (t) => await t.page.waitForFunction(() => {
+      const active = document.activeElement;
+      return Boolean(active && active.getAttribute('aria-label') ===
+          'Start time');
+    }, {timeout: 15000}),
   },
   {
     keymap: 'default',

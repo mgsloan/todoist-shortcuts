@@ -72,6 +72,10 @@ const EXCLUDED = {
     'Asks Todoist to sync, which has no outcome to assert.',
   'default:!':
     'Opens Todoist\'s notifications, which a fresh test account has none of.',
+  'default:+':
+    'Assigning tasks needs a shared project, which is Todoist Pro only.',
+  'task_view:+':
+    'Assigning tasks needs a shared project, which is Todoist Pro only.',
 };
 
 module.exports = {COVERED_ELSEWHERE, EXCLUDED, TABLES};

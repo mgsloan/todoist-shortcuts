@@ -8,11 +8,12 @@ const openScheduler = async (t) => {
   await t.press('t');
   await t.page.waitForSelector('.scheduler', {timeout: 15000});
   // The shortcut blurs the scheduler's input; keys pressed before that lands
-  // are typed into it instead.
+  // are typed into it instead. Todoist sometimes focuses it back after the
+  // extension has stopped watching, hence tolerating the wait failing.
   await t.page.waitForFunction(() => {
     const active = document.activeElement;
     return !active || !['INPUT', 'TEXTAREA'].includes(active.tagName);
-  }, {timeout: 15000});
+  }, {timeout: 15000}).catch(() => {});
 };
 
 const dueDateOfAlpha = async (t) => {
@@ -87,13 +88,17 @@ module.exports = [
     keymap: 'schedule',
     keys: ['s', 'p'],
     what: 'postpones the task',
-    broken: 'The postpone button is no longer uniquely identifiable.',
-    tasks: DUE_TODAY,
+    // Todoist only offers postponing for recurring tasks.
+    tasks: [
+      {content: 'alpha', due_string: 'every day'},
+      {content: 'beta'},
+      {content: 'gamma'},
+    ],
     setUp: openScheduler,
     check: async (t) => {
       const days = await daysAhead(t);
       assert.ok(days > 0, t.key + ' should have moved alpha later, not ' +
-          days + ' days ahead');
+          days + ' day(s) ahead');
     },
   },
   {
@@ -111,10 +116,14 @@ module.exports = [
     keymap: 'schedule',
     keys: ['alt+t'],
     what: 'focuses the time input',
-    broken: 'Looks for a scheduler button which Todoist no longer has.',
+    broken: 'Works from the task list, but not once the scheduler is open: ' +
+        'the date field keeps focus, so the key is typed into it.',
     setUp: openScheduler,
-    check: async (t) => await t.page.waitForSelector(
-        '#scheduler-timepicker-input-element', {timeout: 15000}),
+    check: async (t) => await t.page.waitForFunction(() => {
+      const active = document.activeElement;
+      return Boolean(active && active.getAttribute('aria-label') ===
+          'Start time');
+    }, {timeout: 15000}),
   },
   {
     keymap: 'schedule',

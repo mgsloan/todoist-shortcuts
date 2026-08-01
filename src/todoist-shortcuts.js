@@ -455,23 +455,20 @@
     if (!findScheduler()) {
       scheduleText();
     }
-    setTimeout(() => {
-      // TODO: less fragile way to find the "Time" button than relying
-      // on no other buttons having this attribute.
-      const success = withUnique(
-          document,
-          '.scheduler button[aria-controls]',
-          all,
-          (button) => {
-            click(button);
-            return true;
-          });
-      // Fallback on english text matching if the above doesn't work.
-      if (!success) {
-        clickUnique(findScheduler(), 'button', matchingText('Time'));
-      }
-      focusTimeInput();
-    }, 50);
+    // Waiting for the scheduler rather than guessing at how long it takes to
+    // open, which is longer than it used to be.
+    const scheduler = await retryWithDelay('finding scheduler', findScheduler);
+    // Todoist used to mark the "Time" button with aria-controls and no longer
+    // does, leaving its text as the only way to tell it apart.
+    const timeButton =
+        getUnique(scheduler, 'button[aria-controls]') ||
+        getUnique(scheduler, 'button', matchingText('Time'));
+    if (!timeButton) {
+      warn('Couldn\'t find the scheduler\'s time button.');
+      return;
+    }
+    click(timeButton);
+    await focusTimeInput();
   }
 
   async function openDeadline() {
@@ -547,19 +544,6 @@
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   }
 
-  // Clicks 'postpone' in scheduler.
-  async function schedulePostpone() {
-    withScheduler(
-        'schedulePostpone',
-        (scheduler) => {
-          clickUnique(
-              scheduler,
-              'button',
-              matchingAttr('data-track',
-                  'scheduler|date_shortcut_postpone'));
-        });
-  }
-
   // Clicks date on scheduler 1-9 days in the future
   function schedulePlusN(n) {
     return async () => {
@@ -577,6 +561,20 @@
         name,
         (scheduler) => {
           clickUnique(scheduler, 'button', matchingAttr('aria-label', label));
+        });
+  }
+
+  // Clicks 'postpone' in the scheduler, which Todoist only offers for
+  // recurring tasks.
+  async function schedulePostpone() {
+    withScheduler(
+        'schedulePostpone',
+        (scheduler) => {
+          clickUnique(
+              scheduler,
+              'button',
+              matchingAttr('data-track',
+                  'scheduler|date_shortcut_postpone'));
         });
   }
 
@@ -3077,7 +3075,10 @@
     try {
       const timepicker = await retryWithDelay(
           'finding time input',
-          () => getById('scheduler-timepicker-input-element'),
+          // Todoist used to give this an id and now generates one, leaving
+          // its label as the way to find it.
+          () => getById('scheduler-timepicker-input-element') ||
+              getUnique(document, '.scheduler input[aria-label="Start time"]'),
       );
       timepicker.focus();
     } finally {
