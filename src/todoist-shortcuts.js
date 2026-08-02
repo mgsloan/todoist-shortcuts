@@ -345,64 +345,60 @@
   }
 
   // Move the cursor to first / last task.
+  //
+  // Note that "last" means the last task Todoist has rendered.  Every view is
+  // a virtual list now, so in a long one - the "Upcoming" view in particular,
+  // which keeps appending days as it is scrolled - there can be more below.
   async function cursorFirst() {
-    disabledWithLazyLoading('Cursoring first task', () => {
-      setCursorToFirstTask('scroll');
-    });
+    setCursorToFirstTask('scroll');
   }
   async function cursorLast() {
-    disabledWithLazyLoading('Cursoring last task', () => {
-      setCursorToLastTask('scroll');
-    });
+    setCursorToLastTask('scroll');
   }
 
   async function cursorUpSection() {
-    disabledWithLazyLoading('Moving cursor up a section', () => {
-      const cursor = requireCursor();
-      let section = getSection(cursor);
-      section = findParent(section, matchingTag('li')) || section;
-      let firstTask = getFirstTaskIn(section);
-      if (firstTask && !sameElement(cursor)(firstTask)) {
-        // Not on first task, so move the cursor.
+    const cursor = requireCursor();
+    let section = getSection(cursor);
+    section = findParent(section, matchingTag('li')) || section;
+    let firstTask = getFirstTaskIn(section);
+    if (firstTask && !sameElement(cursor)(firstTask)) {
+      // Not on first task, so move the cursor.
+      setCursor(firstTask, 'scroll');
+      return;
+    }
+    // If already on the first task of this section, then select
+    // first task of prior populated section, if any exists.
+    section = section.previousSibling;
+    for (; section; section = section.previousSibling) {
+      firstTask = getFirstTaskIn(section);
+      if (firstTask) {
         setCursor(firstTask, 'scroll');
-      } else {
-        // If already on the first task of this section, then select
-        // first task of prior populated section, if any exists.
-        section = section.previousSibling;
-        for (; section; section = section.previousSibling) {
-          firstTask = getFirstTaskIn(section);
-          if (firstTask) {
-            setCursor(firstTask, 'scroll');
-            return;
-          }
-        }
+        return;
       }
-    });
+    }
   }
 
   async function cursorDownSection() {
-    disabledWithLazyLoading('Moving cursor down a section', () => {
-      const cursor = requireCursor();
-      let startSection = getSection(cursor);
-      startSection =
-        findParent(startSection, matchingTag('li')) || startSection;
-      let section = startSection.nextSibling;
-      for (; section; section = section.nextSibling) {
-        debug('section = ', section);
-        const firstTask = getFirstTaskIn(section);
-        if (firstTask) {
-          setCursor(firstTask, 'scroll');
-          return;
-        }
+    const cursor = requireCursor();
+    let startSection = getSection(cursor);
+    startSection =
+      findParent(startSection, matchingTag('li')) || startSection;
+    let section = startSection.nextSibling;
+    for (; section; section = section.nextSibling) {
+      debug('section = ', section);
+      const firstTask = getFirstTaskIn(section);
+      if (firstTask) {
+        setCursor(firstTask, 'scroll');
+        return;
       }
-      // If execution has reached this point, then we must already be
-      // on the last section.
-      const lastTask = getLastTaskInSection(startSection);
-      warn('Already on last section. lastTask =', lastTask);
-      if (lastTask) {
-        setCursor(lastTask, 'scroll');
-      }
-    });
+    }
+    // If execution has reached this point, then we must already be
+    // on the last section.
+    const lastTask = getLastTaskInSection(startSection);
+    warn('Already on last section. lastTask =', lastTask);
+    if (lastTask) {
+      setCursor(lastTask, 'scroll');
+    }
   }
 
   // Edit the task under the cursor.
@@ -5510,16 +5506,6 @@
 
   function isUpcomingView() {
     return getUnique(document, '.upcoming_view') !== null;
-  }
-
-  function disabledWithLazyLoading(actionName, f) {
-    if (isUpcomingView()) {
-      warn(actionName, ' disabled in upcoming view, ',
-          'as it doesn\'t work properly due to lazy loading.');
-      return;
-    } else {
-      f();
-    }
   }
 
   /*****************************************************************************

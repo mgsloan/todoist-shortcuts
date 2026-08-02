@@ -2,6 +2,10 @@
 
 ## Version 208
 
+* Makes `^`, `$`, `{` and `}` move the cursor in the "Upcoming" view,
+  where they used to do nothing at all. `$` goes to the last task
+  Todoist has loaded, which in a long view is not the last one.
+
 * Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put
   the scheduler or the move-to-project dialog up for each task in turn,
   from the cursor down. They had been removed for not working.
