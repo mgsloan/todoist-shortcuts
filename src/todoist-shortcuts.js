@@ -1123,16 +1123,17 @@
 
   async function openMoreActionsMenu() {
     withUnique(document, 'header[aria-label^="Header:"]', all, (header) => {
-      for (const button of selectAll(header, 'button')) {
-        // If it contains 3 svg circles, it's the more menu
-        // button. Sad that there is no other identifying
-        // characteristic in the dom.
-        if (selectAll(button, 'circle').length == 3) {
-          click(button);
-          return;
-        }
+      // The one button in the header which opens a menu, rather than the
+      // three circles in its icon which this used to count.  Its label is
+      // translated, and the "Display" button beside it opens a dialog rather
+      // than a menu, so it doesn't match.
+      const button = getUnique(header, 'button[aria-haspopup=menu]');
+      if (!button) {
+        // "Today" and "Upcoming" have no such menu.
+        warn('This view has no "more actions" menu.');
+        return;
       }
-      throw new Error('Failed to find more actions menu');
+      click(button);
     });
   }
 
@@ -2660,19 +2661,6 @@
     });
   }
 
-  // For some reason todoist clears the selections even after applying things
-  // like priority changes. This restores the selections.
-  //
-  // eslint-disable-next-line no-unused-vars
-  async function withRestoredSelections(f) {
-    const oldSelections = getSelectedTaskKeys();
-    try {
-      f();
-    } finally {
-      await setSelections(oldSelections);
-    }
-  }
-
   function openMoreMenu() {
     clickUnique(
         document,
@@ -2769,33 +2757,6 @@
       f(scheduler);
     } else {
       warn('Not performing action', name, 'because scheduler is not open');
-    }
-  }
-
-  // Simulate a key press with todoist's global handlers.
-  // eslint-disable-next-line no-unused-vars
-  function todoistShortcut(options0) {
-    const options = typeof options0 === 'string' ? {key: options0} : options0;
-    let ev = new Event('keydown');
-    for (const o in options) {
-      ev[o] = options[o];
-    }
-    if (window.originalTodoistKeydown) {
-      window.originalTodoistKeydown.apply(document, [ev]);
-    }
-    ev = new Event('keyup');
-    for (o in options) {
-      ev[o] = options[o];
-    }
-    if (window.originalTodoistKeyup) {
-      window.originalTodoistKeyup.apply(document, [ev]);
-    }
-    ev = new Event('keypress');
-    for (o in options) {
-      ev[o] = options[o];
-    }
-    if (window.originalTodoistKeypress) {
-      window.originalTodoistKeypress.apply(document, [ev]);
     }
   }
 
@@ -3791,18 +3752,6 @@
       return getTaskId(task) + ' ' + getIndentClass(task);
     } else if (viewMode === 'project') {
       return getTaskId(task);
-    } else {
-      error('Unexpected viewMode:', viewMode);
-      return null;
-    }
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  function makeTaskKey(id, indent) {
-    if (viewMode === 'agenda') {
-      return id + ' ' + indent;
-    } else if (viewMode === 'project') {
-      return id;
     } else {
       error('Unexpected viewMode:', viewMode);
       return null;
