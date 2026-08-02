@@ -140,4 +140,39 @@ describe('sidebar navigation', {timeout: TIMEOUT}, () => {
         back.startsWith('/app/project/'),
         'expected to stay in the project list, but went to ' + back);
   });
+
+  it('reopens the sidebar for a shortcut which needs it', async () => {
+    // Whether the sidebar is collapsed used to be read with
+    // `computedStyleMap`, which Firefox does not have, so there it always
+    // answered "open" and shortcuts which need it did nothing.
+    const project = await addProject('collapsed', false);
+    await open('project/' + project.id);
+    await setSidebarExpanded(false);
+    await browser.pressShift(page, 'p');
+    await page.waitForFunction(
+        () => {
+          const button = document.querySelector(
+              'button[aria-controls=sidebar]');
+          return button && button.getAttribute('aria-expanded') === 'true';
+        },
+        {timeout: 15000});
+  });
+
+  // Collapses or expands the sidebar with `m`, if it isn't already.
+  const setSidebarExpanded = async (wanted) => {
+    const expanded = () => page.evaluate(() => {
+      const button = document.querySelector('button[aria-controls=sidebar]');
+      return button && button.getAttribute('aria-expanded') === 'true';
+    });
+    if (await expanded() === wanted) return;
+    await browser.press(page, 'm');
+    await page.waitForFunction(
+        (want) => {
+          const button = document.querySelector(
+              'button[aria-controls=sidebar]');
+          return button &&
+              (button.getAttribute('aria-expanded') === 'true') === want;
+        },
+        {timeout: 15000}, wanted);
+  };
 });

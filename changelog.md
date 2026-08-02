@@ -2,6 +2,10 @@
 
 ## Version 208
 
+* Fixes the shortcuts which need the sidebar open (`g`, `shift+p`,
+  `` ` ``) doing nothing on Firefox, where the extension could not tell
+  that the sidebar was collapsed.
+
 * Makes `^`, `$`, `{` and `}` move the cursor in the "Upcoming" view,
   where they used to do nothing at all. `$` goes to the last task
   Todoist has loaded, which in a long view is not the last one.

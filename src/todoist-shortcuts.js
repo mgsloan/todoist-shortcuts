@@ -1416,15 +1416,19 @@
   }
 
   function leftNavIsHidden() {
+    // What the toggle button says, which is Todoist's own answer to the
+    // question rather than something inferred from the layout.
+    const toggle = getUnique(document, 'button[aria-controls=sidebar]');
+    const expanded = toggle && toggle.getAttribute('aria-expanded');
+    if (expanded) {
+      return expanded === 'false';
+    }
+    // Failing that, the sidebar is slid out of view by a negative margin.
+    // Note that this reads it with 'getComputedStyle': 'computedStyleMap' is
+    // Chrome-only, and used to make this always answer "shown" on Firefox.
     const appSidebar = getUnique(document, '.app-sidebar-container');
     if (appSidebar) {
-      // TODO: Fix this on firefox - always fails.
-      try {
-        return appSidebar.computedStyleMap().get('margin-left').value != 0;
-      } catch (e) {
-        warn('Failed to check if left nav is open:', e);
-        return false;
-      }
+      return parseFloat(getComputedStyle(appSidebar).marginLeft) !== 0;
     }
     warn('Couldn\'t figure out if left nav is open or not.');
     return false;
