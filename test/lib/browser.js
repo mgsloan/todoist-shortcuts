@@ -11,6 +11,8 @@ const os = require('os');
 const path = require('path');
 const puppeteer = require('puppeteer-core');
 
+const {readAnnouncement} = require('./announcement');
+
 const SRC_DIR = path.join(__dirname, '..', '..', 'src');
 
 const PROFILE_DIR = process.env.TS_TEST_PROFILE ||
@@ -56,11 +58,27 @@ async function launch(options) {
 // Note that each of these makes a new page rather than navigating an existing
 // one: Todoist's router turns a same-tab navigation into a same-document one,
 // which never fires the lifecycle events puppeteer waits for.
-async function openApp(browser, where) {
+//
+// Pass `{announcement: 'show'}` to let the one-time notice appear; by default
+// the page starts out having already seen it, since otherwise the first run
+// against a fresh profile would have it replace whatever note a test is
+// looking at.
+async function openApp(browser, where, options) {
   const page = await browser.newPage();
   // An unsaved editor can otherwise leave a beforeunload dialog blocking
   // everything.
   page.on('dialog', (dialog) => dialog.accept());
+  if (!options || options.announcement !== 'show') {
+    const {seenKey, id} = readAnnouncement();
+    await page.evaluateOnNewDocument((key, value) => {
+      try {
+        window.localStorage.setItem(key, value);
+      } catch (e) {
+        // Nothing to do about storage being unavailable; the notice showing
+        // is a smaller problem than failing to open the page.
+      }
+    }, seenKey, id);
+  }
   await page.goto(
       APP_URL + (where || 'today'), {waitUntil: 'domcontentloaded'});
   if (page.url().includes('/auth/')) {

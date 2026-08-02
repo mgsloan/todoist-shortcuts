@@ -256,6 +256,21 @@
 
   const TODOIST_SHORTCUTS_GITHUB = 'https://github.com/mgsloan/todoist-shortcuts';
 
+  // A notice shown once, the first time this browser loads Todoist after
+  // updating.  To announce something else later, write the new text and give
+  // it a new id - the old id sitting in local storage is what stops a notice
+  // coming back, so reusing one means nobody who has seen it sees the new
+  // one.  Set the text to null to announce nothing.
+  const ANNOUNCEMENT_SEEN_KEY = 'todoist_shortcuts_announcement_seen';
+  const ANNOUNCEMENT_ID = 'shortcuts-working-again-208';
+  const ANNOUNCEMENT_DELAY = 3000;
+  const ANNOUNCEMENT_TEXT =
+        'todoist-shortcuts is now actively maintained again! ' +
+        'Sorry it was in a semi-broken state for a while. ' +
+        'A lot of shortcuts are working again, among them ' +
+        'bulk reschedule (* t), bulk move (* v), the project ' +
+        'menu (shift+p), scheduling, deadlines and the task view.';
+
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
   const todoistRootDiv = document.getElementById('todoist_app');
@@ -3570,6 +3585,41 @@
         'uncheck "Experimental features"');
   }
 
+  // Shows the announcement, if this browser hasn't been shown it already.
+  //
+  // Local storage is what remembers it, so it is once per browser rather than
+  // once per account or per install.  Reading and writing it are both allowed
+  // to fail - private windows and blocked storage throw - in which case the
+  // announcement is skipped rather than shown over and over.
+  function showAnnouncementOnce() {
+    if (!ANNOUNCEMENT_TEXT) {
+      return;
+    }
+    let seen = null;
+    try {
+      seen = window.localStorage.getItem(ANNOUNCEMENT_SEEN_KEY);
+    } catch (e) {
+      warn('Couldn\'t tell whether the announcement has been shown:', e);
+      return;
+    }
+    if (seen === ANNOUNCEMENT_ID) {
+      return;
+    }
+    try {
+      window.localStorage.setItem(ANNOUNCEMENT_SEEN_KEY, ANNOUNCEMENT_ID);
+    } catch (e) {
+      warn('Couldn\'t remember showing the announcement, so not showing it:',
+          e);
+      return;
+    }
+    const changelog = element('a', null, text('changelog'));
+    changelog.setAttribute(
+        'href', TODOIST_SHORTCUTS_GITHUB + '/blob/master/changelog.md');
+    changelog.setAttribute('target', '_blank');
+    notifyUser(
+        span(null, text(ANNOUNCEMENT_TEXT + ' '), changelog, text('.')));
+  }
+
   // Fall back to a bundled close icon when Todoist doesn't expose its SVG map.
   function getCloseIconHtml() {
     if (window.svgs && window.svgs['sm1/close_small.svg']) {
@@ -5870,6 +5920,11 @@
     onDisable(() => {
       window.removeEventListener('focus', handleWindowFocus);
     });
+
+    // After a moment, so that the notice isn't put up into a page which is
+    // still settling and then scrolled away from.
+    const announcement = setTimeout(showAnnouncementOnce, ANNOUNCEMENT_DELAY);
+    onDisable(() => clearTimeout(announcement));
 
     initializing = false;
   }
