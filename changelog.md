@@ -1,5 +1,10 @@
 # todoist-shortcuts changelog
 
+## Version 208
+
+* Brings back `shift+p`, which opens the menu for the current project
+  in the left nav. It had been disabled for being broken.
+
 ## Version 207
 
 * Fixes moving the cursor while the scheduler is open (`^`, `$`, `{`,

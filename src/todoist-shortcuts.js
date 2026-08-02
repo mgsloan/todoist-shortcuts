@@ -78,9 +78,8 @@
     ['shift+c', toggleTimer],
 
     // Projects
-    //
-    // Disabled as it's broken
-    // ['shift+p', openCurrentProjectLeftNavMenu],
+
+    ['shift+p', openCurrentProjectLeftNavMenu],
 
     // Bulk reschedule / move modes were removed
     ['* t', notifyBulkActionsRemoved],
@@ -214,6 +213,10 @@
   // some case there might not be a concise labeling. This sets the limit on key
   // sequence length for things based on prefixes.
   const MAX_NAVIGATE_PREFIX = 2;
+
+  // How long to leave a menu alone after it opens, before undoing the hover
+  // which was needed to get at the button that opens it.
+  const MENU_SETTLE_DELAY = 250;
 
   const TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   const TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
@@ -960,7 +963,7 @@
   async function openAssign() {
     const mutateCursor = getCursorToMutate();
     if (mutateCursor) {
-      await withTaskHovered(mutateCursor, () => {
+      await withHovered(mutateCursor, () => {
         const assignButton =
               getUnique(mutateCursor, '.task_list_item__person_picker');
         if (assignButton) {
@@ -1092,43 +1095,54 @@
     });
   }
 
-  // TODO: Fix this
-  // eslint-disable-next-line no-unused-vars
+  // A project is linked to both as '/app/project/<id>' and as the slugged
+  // '/app/project/<name>-<id>', so paths are compared by the id they end in.
+  // Ids never contain a '-', project names often do.
+  function projectIdOfPath(path) {
+    return path.split('/').pop().split('-').pop();
+  }
+
   async function openCurrentProjectLeftNavMenu() {
     if (leftNavIsHidden()) {
       toggleLeftNav();
     }
-    const currentPath = document.location.pathname;
+    const currentId = projectIdOfPath(document.location.pathname);
     const currentProject = getUnique(
         document, '#left-menu-projects-panel li', (project) => {
           const link = getUnique(project, 'a');
           // If a project doesn't have an anchor tag, it's hidden and
           // we want to skip it.
-          return link !== null && link.href.endsWith(currentPath);
+          return link !== null &&
+            projectIdOfPath(new URL(link.href).pathname) === currentId;
         });
     if (!currentProject) {
-      throw new Error('Could not find current project.');
+      warn('Not opening the project menu, as the current view is not one of ' +
+           'the projects in the left nav.');
+      return;
     }
-    const projectButtons = selectAll(currentProject, 'button');
-    let moreProjectActionsButton = null;
-    switch (projectButtons.length) {
-      case 1:
-        moreProjectActionsButton = projectButtons[0];
-        break;
-      case 2:
-        // If a project has two buttons, the first is the "toggle
-        // collapse" button and the second is the "more actions"
-        // button.
-        moreProjectActionsButton = projectButtons[1];
-        break;
-      case 0:
-        throw new Error(
-            'Project element has no buttons (expected "more actions" button.');
-      default:
-        throw new Error(
-            'Project element has more than two buttons, which is unexpected.');
+    // The row's other button toggles its sub-projects, and which comes first
+    // varies, so the menu button is picked out by opening a popup.  Its label
+    // would be translated, its classes are generated.
+    const moreProjectActionsButton = getUnique(
+        currentProject, 'button[aria-haspopup=menu]');
+    if (!moreProjectActionsButton) {
+      warn('Couldn\'t find the project\'s "more actions" button.');
+      return;
     }
-    click(moreProjectActionsButton);
+    await withHovered(currentProject, async () => {
+      click(moreProjectActionsButton);
+      // The menu belongs to the button, which the row only renders while it
+      // is hovered, so ending the hover too early unmounts the button and
+      // takes the menu with it.  Waiting for the menu - the element the
+      // button's 'aria-controls' names - is not enough on its own: Todoist
+      // needs a moment after that before the open menu is what keeps the
+      // button rendered.
+      await retryWithDelay('waiting for the project menu to open', () => {
+        const id = moreProjectActionsButton.getAttribute('aria-controls');
+        return id && getById(id);
+      });
+      await sleep(MENU_SETTLE_DELAY);
+    });
     setTimeout(updateKeymap, 10);
   }
 
@@ -2418,7 +2432,7 @@
   }
 
   async function withTaskMenuOpenImpl(task, f) {
-    await withTaskHovered(task, async () => {
+    await withHovered(task, async () => {
       const query = 'button[data-action-hint="task-overflow-menu"]';
       const openMenu = await getUniqueRetrying(task, query);
       click(openMenu);
@@ -3006,23 +3020,25 @@
   }
 
   async function clickTaskSchedule(task) {
-    await withTaskHovered(task, async () => {
+    await withHovered(task, async () => {
       await clickUniqueRetrying(task, '[data-action-hint="task-scheduler"]');
     });
   }
 
-  async function withTaskHovered(task, f) {
+  // Task rows and left nav rows only render their buttons while hovered, so
+  // anything which clicks one has to pretend the mouse is over the row.
+  async function withHovered(el, f) {
     const eventOptions = {
       bubbles: true,
       cancelable: true,
       view: window,
       button: 0,
     };
-    task.dispatchEvent(new MouseEvent('mouseover', eventOptions));
+    el.dispatchEvent(new MouseEvent('mouseover', eventOptions));
     try {
       await f();
     } finally {
-      task.dispatchEvent(new MouseEvent('mouseout', eventOptions));
+      el.dispatchEvent(new MouseEvent('mouseout', eventOptions));
     }
   }
 

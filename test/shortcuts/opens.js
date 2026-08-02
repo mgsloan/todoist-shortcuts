@@ -89,6 +89,15 @@ module.exports = [
   },
   {
     keymap: 'default',
+    keys: ['shift+p'],
+    what: 'opens the current project\'s menu in the left nav',
+    // The menu is only kept open while the row it belongs to stays hovered,
+    // so this waits long enough to catch it being taken away again.
+    settle: 2000,
+    check: opensSomethingSaying(/add project above/),
+  },
+  {
+    keymap: 'default',
     keys: ['?'],
     what: 'opens the shortcuts help',
     check: opens('.todoist_shortcuts_help'),
