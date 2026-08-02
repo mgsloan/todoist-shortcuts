@@ -3539,13 +3539,6 @@
         menu, '[data-action-hint="task-actions-priority-' + level + '"]');
   }
 
-  // eslint-disable-next-line no-unused-vars
-  function notifyRecommendOldUi(msg) {
-    notifyUser(msg +
-        ' You may be able to fix this via Settings -> Advanced -> ' +
-        'uncheck "Experimental features"');
-  }
-
   // Shows the announcement, if this browser hasn't been shown it already.
   //
   // Local storage is what remembers it, so it is once per browser rather than
@@ -4968,16 +4961,6 @@
     click(await getUniqueRetrying(parent, query, predicate, fuel, delay));
   }
 
-  // eslint-disable-next-line no-unused-vars
-  async function clickAllRetrying(
-      parent, query, predicate, fuel=100, delay=10) {
-    const elements =
-      await selectAllRetrying(parent, query, predicate, fuel, delay);
-    for (const element of elements) {
-      click(element);
-    }
-  }
-
   // Generic retry with delay between retries - returns a Promise.  The first
   // `instantFuel` attempts are only a turn of the event loop apart, so that
   // something Todoist has already rendered is picked up without a wait; after
@@ -5212,33 +5195,9 @@
   }
 
   // Returns predicate which returns 'true' if the element has the
-  // specified class suffix.
-  //
-  // eslint-disable-next-line no-unused-vars
-  function matchingClassSuffix(suffix) {
-    return (el) => {
-      for (let i = 0; i < el.classList.length; i++) {
-        const cl = el.classList.item(i);
-        if (cl.endsWith(suffix)) {
-          return true;
-        }
-      }
-      return false;
-    };
-  }
-
-  // Returns predicate which returns 'true' if the element has the
   // specified tag.
   function matchingTag(tag) {
     return (el) => el.tagName.toLowerCase() === tag;
-  }
-
-  // Returns predicate which returns 'true' if the element has the
-  // specified id.
-  //
-  // eslint-disable-next-line no-unused-vars
-  function matchingId(id) {
-    return (el) => el.id === id;
   }
 
   // Returns predicate which returns 'true' if the element has the
