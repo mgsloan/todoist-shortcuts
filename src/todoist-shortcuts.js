@@ -4931,22 +4931,6 @@
     return parent.querySelectorAll(query);
   }
 
-  async function selectAllRetrying(
-      parent, query, predicate, fuel=100, delay=10) {
-    return await retryWithDelay(
-        'finding descendants matching ' + query,
-        () => {
-          const results = selectAll(parent, query, predicate);
-          if (results.length === 0) {
-            return null;
-          } else {
-            return results;
-          }
-        },
-        fuel,
-        delay);
-  }
-
   async function getUniqueRetrying(
       parent, query, predicate, fuel=100, delay=10) {
     return await retryWithDelay(
