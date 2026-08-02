@@ -3857,16 +3857,6 @@
     }
   }
 
-  // eslint-disable-next-line no-unused-vars
-  function withTaskByKey(key, f) {
-    const task = getTaskByKey(key, f);
-    if (task) {
-      f(task);
-    } else {
-      warn('Couldn\'t find task key', key);
-    }
-  }
-
   function getTaskByKey(key) {
     const arr = key.split(' ');
     if (viewMode === 'project') {
