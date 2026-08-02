@@ -2,11 +2,16 @@
 
 ## Version 208
 
-* Undo (`u`, `z`, `ctrl+z`) now says why nothing happened when there is
-  no "Undo" popup to press, instead of failing silently.
+* Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put
+  the scheduler or the move-to-project dialog up for each task in turn,
+  from the cursor down. They had been removed for not working.
 
-* Fixes `f` and `/` doing nothing outside the english interface, where
-  the extension was looking for a button labelled "Search".
+* Brings back `shift+p`, which opens the menu for the current project
+  in the left nav. It had been disabled for being broken.
+
+* Makes `^`, `$`, `{` and `}` move the cursor in the "Upcoming" view,
+  where they used to do nothing at all. `$` goes to the last task
+  Todoist has loaded, which in a long view is not the last one.
 
 * Fixes `ctrl+s`, which threw an error instead of syncing. Todoist
   moved "Sync" into the account menu.
@@ -15,16 +20,11 @@
   `` ` ``) doing nothing on Firefox, where the extension could not tell
   that the sidebar was collapsed.
 
-* Makes `^`, `$`, `{` and `}` move the cursor in the "Upcoming" view,
-  where they used to do nothing at all. `$` goes to the last task
-  Todoist has loaded, which in a long view is not the last one.
+* Fixes `f` and `/` doing nothing outside the english interface, where
+  the extension was looking for a button labelled "Search".
 
-* Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put
-  the scheduler or the move-to-project dialog up for each task in turn,
-  from the cursor down. They had been removed for not working.
-
-* Brings back `shift+p`, which opens the menu for the current project
-  in the left nav. It had been disabled for being broken.
+* Undo (`u`, `z`, `ctrl+z`) now says why nothing happened when there is
+  no "Undo" popup to press, instead of failing silently.
 
 ## Version 207
 
