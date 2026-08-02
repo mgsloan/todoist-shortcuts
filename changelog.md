@@ -2,6 +2,9 @@
 
 ## Version 208
 
+* Undo (`u`, `z`, `ctrl+z`) now says why nothing happened when there is
+  no "Undo" popup to press, instead of failing silently.
+
 * Fixes `f` and `/` doing nothing outside the english interface, where
   the extension was looking for a button labelled "Search".
 

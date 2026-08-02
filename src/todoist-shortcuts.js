@@ -1381,24 +1381,31 @@
     menuItems[index].click();
   }
 
+  // Todoist only offers undo on the popup it puts up after a change, so this
+  // can only undo what that popup is still there for.
   async function undo() {
     // Triggering keypress appears to be broken.
     // todoistShortcut({key: 'z'});
-    withUnique(document, '[role=alert]', all, (alertContainer) => {
-      const foundByText = getUnique(
-          alertContainer, 'button', (el) => el.innerText === 'Undo');
-      if (foundByText) {
-        click(foundByText);
+    //
+    // The most recent popup, since an older one can still be on its way out.
+    const alertContainer = getLast(document, '[role=alert]');
+    if (alertContainer) {
+      const undoButton =
+            getUnique(alertContainer, 'button',
+                (el) => el.innerText === 'Undo') ||
+            // Failing that - the label is translated - the popup's other
+            // button is the close cross, which is the one with an icon.
+            getUnique(alertContainer, 'button',
+                (el) => el.querySelector('svg') === null);
+      if (undoButton) {
+        click(undoButton);
         return;
       }
-      const foundByLackOfSvg = getUnique(
-          alertContainer, 'button', (el) => el.querySelector('svg') == null);
-      if (foundByLackOfSvg) {
-        click(foundByLackOfSvg);
-        return;
-      }
-      notifyUser('Didn\'t find undo button, undo only works popup is visible.');
-    });
+    }
+    // Previously this said nothing at all when there was no popup, which is
+    // the case it was describing.
+    notifyUser('Nothing to undo. Undo only works while Todoist\'s "Undo" ' +
+               'popup is still showing.');
   }
 
   async function openNotifications() {
