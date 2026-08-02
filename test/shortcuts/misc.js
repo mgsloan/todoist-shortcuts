@@ -1,4 +1,4 @@
-// Undo, clipboard copying, and the notices for removed features.
+// Undo, clipboard copying, and the bulk modes.
 
 const assert = require('node:assert');
 
@@ -57,10 +57,36 @@ module.exports = [
   },
   {
     keymap: 'default',
-    keys: ['* t', '* v'],
-    what: 'says that bulk actions were removed',
+    keys: ['* t'],
+    // What makes it bulk mode rather than `t` is moving on to the next task
+    // once a date is picked, so that is what this checks.
+    what: 'schedules each task in turn from the cursor down',
     setUp: onAlpha,
-    check: async (t) => await t.page.waitForSelector(
-        '.ts-note', {timeout: 15000}),
+    check: async (t) => {
+      await t.page.waitForSelector('.scheduler', {timeout: 15000});
+      await t.press('c');
+      await t.browser.waitForCursorOn(t.page, 'beta');
+      await t.page.waitForSelector('.scheduler', {timeout: 15000});
+      assert.ok(
+          (await t.api.getTask(t.fixture.id('alpha'))).due,
+          'expected the first task to have been scheduled');
+    },
+    tearDown: async (t) => await t.press('escape'),
+  },
+  {
+    keymap: 'default',
+    keys: ['* v'],
+    // Cursor movement needing alt is what tells bulk move apart from `v`:
+    // the picker keeps focus in its search input, so the unmodified keys
+    // belong to it.
+    what: 'moves each task in turn from the cursor down',
+    setUp: onAlpha,
+    check: async (t) => {
+      await t.page.waitForSelector('.popper', {timeout: 15000});
+      await t.press('alt+j');
+      await t.browser.waitForCursorOn(t.page, 'beta');
+      await t.page.waitForSelector('.popper', {timeout: 15000});
+    },
+    tearDown: async (t) => await t.press('escape'),
   },
 ];

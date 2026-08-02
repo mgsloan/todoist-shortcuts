@@ -132,6 +132,19 @@ async function cursorContent(page) {
   return await page.evaluate(CURSOR_CONTENT_JS + '()');
 }
 
+// Waits for the cursor to land on the task with the given content.
+async function waitForCursorOn(page, content, timeout = 15000) {
+  try {
+    await page.waitForFunction(
+        '(' + CURSOR_CONTENT_JS + '()) === ' + JSON.stringify(content),
+        {timeout: timeout});
+  } catch (e) {
+    throw new Error(
+        'The cursor never reached ' + JSON.stringify(content) + '; it is on ' +
+        JSON.stringify(await cursorContent(page)));
+  }
+}
+
 async function selectedContents(page) {
   return await page.$$eval(
       '.task_list_item',
@@ -206,6 +219,7 @@ module.exports = {
   press,
   pressShift,
   putCursorOn,
+  waitForCursorOn,
   waitForExtension,
   waitForTasks,
 };

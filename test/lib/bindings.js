@@ -14,9 +14,15 @@ const SOURCE = path.join(
 // Which array of bindings ends up in which keymap.  The cursor bindings are
 // concatenated into the default keymap, and are also wrapped into the schedule
 // keymap by a loop over them, so they appear in both.
+//
+// The bulk keymaps are left out: they are the schedule keys over again, with
+// the date ones also moving on to the next task, so a test per key spelling
+// would be the schedule tests a second time.  What is covered instead is the
+// two keys which enter the modes, in the misc table.
 const ARRAYS = [
   {array: 'CURSOR_BINDINGS', keymaps: ['default', 'schedule']},
   {array: 'KEY_BINDINGS', keymaps: ['default']},
+  {array: 'SCHEDULE_DATE_BINDINGS', keymaps: ['schedule']},
   {array: 'SCHEDULE_BINDINGS', keymaps: ['schedule']},
   {array: 'TASK_VIEW_BINDINGS', keymaps: ['task_view']},
   {array: 'MENU_LIST_BINDINGS', keymaps: ['menu_list']},

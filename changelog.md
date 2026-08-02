@@ -2,6 +2,10 @@
 
 ## Version 208
 
+* Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put
+  the scheduler or the move-to-project dialog up for each task in turn,
+  from the cursor down. They had been removed for not working.
+
 * Brings back `shift+p`, which opens the menu for the current project
   in the left nav. It had been disabled for being broken.
 

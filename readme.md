@@ -208,6 +208,35 @@ The "Smart Scheduler" is opened by pressing `s` when scheduling
 multiple items. Currently there are only two keybindings for the smart
 scheduler: `enter` to apply the choices, and `escape` to cancel.
 
+## Bulk reschedule mode
+
+| keys           | action                               |
+|----------------|--------------------------------------|
+| `*` then `t`   | enter bulk reschedule mode           |
+| `v` or `alt+v` | switch to bulk move mode (see below) |
+| `escape`       | exit bulk reschedule mode            |
+
+Once bulk reschedule mode is entered, it will bring up the reschedule
+dialog for the task under the cursor, and then for each task after it,
+until there are no more.  This is how to give a run of tasks different
+dates; scheduling a selection gives them all the same one.  All of the
+normal scheduling and cursor navigation keys can be used while in this
+mode.
+
+## Bulk move mode
+
+| keys         | action                                     |
+|--------------|--------------------------------------------|
+| `*` then `v` | enter bulk move mode                       |
+| `alt+t`      | switch to bulk reschedule mode (see above) |
+| `escape`     | exit bulk move mode                        |
+
+Once bulk move mode is entered, it will bring up the move-to-project
+dialog for the task under the cursor, and then for each task after it,
+until there are no more. By holding down `alt`, you can use the normal
+cursor navigation keys in this mode - the unmodified keys go to the
+dialog's search field, so that a project can be typed.
+
 ## Task view
 
 NOTE: Some shortcuts may only work in the english translation, as the

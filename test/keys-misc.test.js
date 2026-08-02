@@ -3,4 +3,4 @@
 const {runShortcutTable} = require('./lib/shortcut-runner');
 const table = require('./shortcuts/misc');
 
-runShortcutTable('undo, clipboard and notice shortcuts', table);
+runShortcutTable('undo, clipboard and bulk mode shortcuts', table);

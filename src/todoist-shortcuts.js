@@ -81,9 +81,9 @@
 
     ['shift+p', openCurrentProjectLeftNavMenu],
 
-    // Bulk reschedule / move modes were removed
-    ['* t', notifyBulkActionsRemoved],
-    ['* v', notifyBulkActionsRemoved],
+    // Bulk reschedule / move modes
+    ['* t', bulkSchedule],
+    ['* v', bulkMove],
 
     // Other
 
@@ -117,8 +117,10 @@
     ]);
   }
 
-  // Scheduling keybindings (used when scheduler is open)
-  const SCHEDULE_BINDINGS = [].concat(SCHEDULE_CURSOR_BINDINGS, [
+  // The keys which settle on a date.  Kept apart from the rest of the
+  // scheduling keys because they are the ones bulk schedule mode moves on to
+  // the next task after.
+  const SCHEDULE_DATE_BINDINGS = [
     ['c', scheduleToday],
     ['t', schedulePlusN(1)],
     ['w', scheduleNextWeek],
@@ -136,15 +138,38 @@
     ['7', schedulePlusN(7)],
     ['8', schedulePlusN(8)],
     ['9', schedulePlusN(9)],
-    ['alt+t', scheduleTime],
-    ['shift+t', scheduleText],
-    ['escape', closeContextMenus],
-    // See #256 for why this is no longer needed
-    // ['fallback', schedulerFallback],
-    // See #252 for why these are disabled.
-    [['j', 'k', 'up', 'down'], noop],
-  ]);
+  ];
+
+  // Scheduling keybindings (used when scheduler is open)
+  const SCHEDULE_BINDINGS = [].concat(
+      SCHEDULE_CURSOR_BINDINGS, SCHEDULE_DATE_BINDINGS, [
+        ['alt+t', scheduleTime],
+        ['shift+t', scheduleText],
+        ['escape', closeContextMenus],
+        // See #256 for why this is no longer needed
+        // ['fallback', schedulerFallback],
+        // See #252 for why these are disabled.
+        [['j', 'k', 'up', 'down'], noop],
+      ]);
   const SCHEDULE_KEYMAP = 'schedule';
+
+  // Bulk schedule mode keybindings.  The date keys are rebound to also move
+  // on to the next task, since Todoist leaves the scheduler open after a date
+  // is clicked in its calendar; mousetrap takes the later binding for a key.
+  // Escape isn't here because leaving the mode has to happen before the
+  // scheduler closes - see 'bulkModeKeyHandler'.
+  const BULK_SCHEDULE_BINDINGS = [].concat(
+      SCHEDULE_BINDINGS,
+      SCHEDULE_DATE_BINDINGS.map(
+          (binding) => [binding[0], sequence([binding[1], nextBulkTask])]),
+      [[['v', 'alt+v'], switchToBulkMove]]);
+  const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
+
+  // Bulk move keybindings.  These can't be handled by mousetrap, because the
+  // project picker keeps focus in its search input, and mousetrap ignores
+  // events from inputs.  See 'handleBulkMoveKey'.
+  const BULK_MOVE_BINDINGS = [];
+  const BULK_MOVE_KEYMAP = 'bulk_move';
 
   const TASK_VIEW_BINDINGS = [
     ['enter', taskViewEdit],
@@ -183,7 +208,9 @@
   const MENU_LIST_KEYMAP = 'menu_list';
 
   // Keycode constants
+  const LEFT_ARROW_KEYCODE = 37;
   const UP_ARROW_KEYCODE = 38;
+  const RIGHT_ARROW_KEYCODE = 39;
   const DOWN_ARROW_KEYCODE = 40;
   const BACKSPACE_KEYCODE = 8;
   const ENTER_KEYCODE = 13;
@@ -1719,13 +1746,196 @@
     withCurrentFocusedMenuListItem((item) => item.click());
   }
 
-  function notifyBulkActionsRemoved() {
-    notifyUser('Bulk move (* v) and bulk reschedule (* t) shortcuts were ' +
-               'removed as they had stopped working and were not ' +
-               'straightforward to fix.');
+  async function noop() {}
+
+  /*****************************************************************************
+   * Bulk schedule / bulk move
+   *
+   * Both walk the task list from the cursor downwards, putting one dialog up
+   * per task and moving on to the next when it closes.  That is what makes
+   * them different from scheduling or moving a selection, which gives every
+   * task the same date or project.
+   */
+
+  const BULK_SCHEDULE = {
+    keymap: BULK_SCHEDULE_KEYMAP,
+    isOpen: checkSchedulerOpen,
+    open: async (task) => {
+      await clickTaskSchedule(task);
+      await blurSchedulerInput();
+    },
+  };
+
+  const BULK_MOVE = {
+    keymap: BULK_MOVE_KEYMAP,
+    isOpen: checkMoveToProjectOpen,
+    open: async (task) => await clickTaskMenu(
+        task, 'task-overflow-menu-move-to-project', true),
+  };
+
+  // MUTABLE. The bulk mode which is running, or null when none is.
+  let bulkMode = null;
+
+  // MUTABLE. The task bulk mode moves on to when the dialog closes.  It is
+  // worked out while the dialog is open, because the task being dealt with
+  // often leaves the list once it has been dealt with - rescheduling out of
+  // the "Today" view, say - and then there is nothing left to look after.
+  let nextBulkTaskKey = null;
+
+  // MUTABLE. Whether the dialog for the current task has been seen open.  The
+  // dialog not being up yet is otherwise indistinguishable from the user
+  // having finished with it.
+  let bulkDialogSeenOpen = false;
+
+  async function bulkSchedule() {
+    await startBulk(BULK_SCHEDULE);
   }
 
-  async function noop() {}
+  async function bulkMove() {
+    await startBulk(BULK_MOVE);
+  }
+
+  async function switchToBulkMove() {
+    await exitBulk();
+    await bulkMove();
+  }
+
+  async function switchToBulkSchedule() {
+    await exitBulk();
+    await bulkSchedule();
+  }
+
+  async function startBulk(mode) {
+    const cursor = requireCursor();
+    await deselectAllTasks();
+    bulkMode = mode;
+    nextBulkTaskKey = null;
+    bulkDialogSeenOpen = false;
+    updateKeymap();
+    await mode.open(cursor);
+  }
+
+  async function exitBulk() {
+    // Cleared before the dialog is closed, so that closing it doesn't look
+    // like the user finishing with a task and move on to the next one.
+    bulkMode = null;
+    nextBulkTaskKey = null;
+    bulkDialogSeenOpen = false;
+    updateKeymap();
+    await closeContextMenus();
+  }
+
+  // Moves bulk mode on to the task after the one just dealt with.  Bound to
+  // the date keys, since Todoist leaves the scheduler open after one.
+  async function nextBulkTask() {
+    if (bulkMode) {
+      await oneBulkStep();
+    }
+  }
+
+  async function oneBulkStep() {
+    const mode = bulkMode;
+    const task = nextBulkTaskKey ? getTaskByKey(nextBulkTaskKey) : null;
+    // Cleared first, so that closing the dialog below - and everything else
+    // which happens before the next one is up - isn't taken for the user
+    // finishing with a task.
+    bulkDialogSeenOpen = false;
+    if (!task) {
+      if (nextBulkTaskKey) {
+        warn('Leaving bulk mode, as it couldn\'t find', nextBulkTaskKey);
+      } else {
+        debug('Leaving bulk mode, as there is no task after the last one.');
+      }
+      await exitBulk();
+      return;
+    }
+    if (mode.isOpen()) {
+      await closeContextMenus();
+    }
+    setCursor(task, 'scroll');
+    await mode.open(task);
+  }
+
+  // Called on every DOM mutation: a dialog which closes on its own is the
+  // user finishing with a task, and is one of the two ways bulk mode
+  // advances.  Closing a dialog from this script always clears
+  // 'bulkDialogSeenOpen' first, so it never counts.
+  function handleBulkModeMutation() {
+    if (!bulkMode) {
+      return;
+    }
+    if (bulkMode.isOpen()) {
+      bulkDialogSeenOpen = true;
+      // Where the walk goes next is read back from the cursor each time, so
+      // that moving the cursor while the dialog is open takes it along.
+      const cursor = getCursor();
+      const next = cursor ?
+        getNextCursorableTask(getTasks(), getTaskKey(cursor)) : null;
+      nextBulkTaskKey = next ? getTaskKey(next) : null;
+    } else if (bulkDialogSeenOpen) {
+      oneBulkStep();
+    }
+  }
+
+  // Bulk move's keys, which mousetrap never sees: the project picker keeps
+  // focus in its search input so that a project can be typed, and mousetrap
+  // ignores key events from inputs.  Cursor movement therefore needs alt held
+  // down, to leave the unmodified keys for the search.
+  function handleBulkMoveKey(ev) {
+    if (ev.type !== 'keydown' || !ev.altKey || ev.ctrlKey || ev.metaKey) {
+      return true;
+    }
+    if (ev.key === 't') {
+      switchToBulkSchedule();
+      return false;
+    }
+    const cursorMotion = bulkMoveCursorMotion(ev);
+    if (!cursorMotion) {
+      return true;
+    }
+    bulkMoveCursorTo(cursorMotion);
+    return false;
+  }
+
+  function bulkMoveCursorMotion(ev) {
+    switch (ev.key) {
+      case 'j': return cursorDown;
+      case 'k': return cursorUp;
+      case 'h': return cursorLeft;
+      case 'l': return cursorRight;
+      case '^': return cursorFirst;
+      case '$': return cursorLast;
+      case '{': return cursorUpSection;
+      case '}': return cursorDownSection;
+    }
+    switch (ev.keyCode) {
+      case DOWN_ARROW_KEYCODE: return cursorDown;
+      case UP_ARROW_KEYCODE: return cursorUp;
+      case LEFT_ARROW_KEYCODE: return cursorLeft;
+      case RIGHT_ARROW_KEYCODE: return cursorRight;
+    }
+    return null;
+  }
+
+  // Moves the cursor and puts the picker up on the task it lands on.  The
+  // picker has to be closed first, and that close must not be taken for the
+  // user having finished with the task, hence the flag.
+  async function bulkMoveCursorTo(motion) {
+    bulkDialogSeenOpen = false;
+    await closeContextMenus();
+    await motion();
+    const cursor = getCursor();
+    if (cursor) {
+      await BULK_MOVE.open(cursor);
+    }
+  }
+
+  // The project picker has no class or testid of its own any more, so it is
+  // found by the combobox Todoist puts in it.
+  function checkMoveToProjectOpen() {
+    return getUnique(document, '.popper', hasChild(
+        'input[role=combobox][aria-controls^="dropdown-select-"]')) !== null;
+  }
 
   /*****************************************************************************
    * Utilities for manipulating the UI
@@ -2253,6 +2463,9 @@
       if (!initializing) {
         updateViewMode();
       }
+      // Before the filtering below, since a dialog closing is bulk mode's cue
+      // to move on and must not be missed.
+      handleBulkModeMutation();
       if (dragInProgress) {
         debug('ignoring mutations since drag is in progress:', mutations);
         return;
@@ -2296,6 +2509,10 @@
       }
       if (getCurrentFocusedMenuListItem()) {
         switchKeymap(MENU_LIST_KEYMAP);
+        return;
+      }
+      if (bulkMode) {
+        switchKeymap(bulkMode.keymap);
         return;
       }
       if (checkSchedulerOpen()) {
@@ -3043,6 +3260,11 @@
   }
 
   async function blurSchedulerInput() {
+    // A keeper left over from a scheduler which has just been closed and
+    // reopened - as bulk schedule mode does - blurs the new scheduler's input
+    // the moment it is focused, so waiting for that focus below would wait
+    // forever.  One is installed again at the end.
+    stopKeepingSchedulerInputBlurred();
     enterDeferLastBinding();
     await sleep(IS_SAFARI ? 20 : 0);
     try {
@@ -3622,8 +3844,6 @@
   }
 
   // Gets the next task the cursor can be moved to, after the specified task.
-  //
-  // eslint-disable-next-line no-unused-vars
   function getNextCursorableTask(tasks, currentKey) {
     for (let i = 0; i < tasks.length; i++) {
       if (getTaskKey(tasks[i]) === currentKey) {
@@ -5454,6 +5674,22 @@
     return true;
   }
 
+  // Escape is handled here rather than as a keybinding because leaving bulk
+  // mode has to happen before the dialog closes: a dialog closing while bulk
+  // mode is running is what moves it on to the next task.
+  function bulkModeKeyHandler(ev) {
+    if (ev.keyCode === ESCAPE_KEYCODE) {
+      if (ev.type === 'keydown') {
+        exitBulk();
+      }
+      return false;
+    }
+    if (bulkMode === BULK_MOVE) {
+      return handleBulkMoveKey(ev);
+    }
+    return mousetrap.handleKeyEvent(ev);
+  }
+
   function keydownHandler(ev) {
     debug('keydownHandler', ev);
     // In debug mode f12 enters debugger.
@@ -5463,6 +5699,9 @@
     }
     if (todoistModalIsOpen()) {
       return modalKeyHandler(ev);
+    }
+    if (bulkMode) {
+      return bulkModeKeyHandler(ev);
     }
     if (ev.keyCode === ESCAPE_KEYCODE && ev.type === 'keydown') {
       // Workaround for #217
@@ -5529,6 +5768,8 @@
     // Register key bindings with mousetrap.
     registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
     registerKeybindings(SCHEDULE_KEYMAP, SCHEDULE_BINDINGS);
+    registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
+    registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
     registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
     registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
     registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
