@@ -1441,8 +1441,16 @@
   }
 
   async function focusSearch() {
-    // TODO: does it work in other UI languages?
-    clickUnique(document, 'nav *[aria-label=Search]');
+    // Search is the one entry in the sidebar's top menu which is a button
+    // rather than a link, the rest being views to navigate to.  Its label is
+    // translated, so matching that only worked in english.
+    const search = getUnique(document, '#top-menu button') ||
+          getUnique(document, 'nav *[aria-label=Search]');
+    if (!search) {
+      warn('Couldn\'t find the search button.');
+      return;
+    }
+    click(search);
   }
 
   // Open help documentation.

@@ -2,6 +2,9 @@
 
 ## Version 208
 
+* Fixes `f` and `/` doing nothing outside the english interface, where
+  the extension was looking for a button labelled "Search".
+
 * Fixes `ctrl+s`, which threw an error instead of syncing. Todoist
   moved "Sync" into the account menu.
 
