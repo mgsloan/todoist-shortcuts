@@ -1817,6 +1817,19 @@
   // the "Today" view, say - and then there is nothing left to look after.
   let nextBulkTaskKey = null;
 
+  // MUTABLE. The task bulk mode is on, which is how it notices that the
+  // cursor has been moved to another one.  Not just "wherever the cursor is":
+  // a list which sorts itself moves the task under the cursor around, and
+  // where the walk goes next should not move with it.
+  let bulkTaskKey = null;
+
+  // MUTABLE. The ids of the tasks bulk mode has already put a dialog up for.
+  // A list which sorts itself - the "Upcoming" view, or a project sorted by
+  // date - moves a task as soon as it is rescheduled, and it can land further
+  // down, back in front of the walk.  Those are skipped rather than done
+  // twice.
+  let visitedBulkTaskIds = new Set();
+
   // MUTABLE. Whether the dialog for the current task has been seen open.  The
   // dialog not being up yet is otherwise indistinguishable from the user
   // having finished with it.
@@ -1845,6 +1858,8 @@
     await deselectAllTasks();
     bulkMode = mode;
     nextBulkTaskKey = null;
+    bulkTaskKey = null;
+    visitedBulkTaskIds = new Set();
     bulkDialogSeenOpen = false;
     updateKeymap();
     await mode.open(cursor);
@@ -1855,6 +1870,8 @@
     // like the user finishing with a task and move on to the next one.
     bulkMode = null;
     nextBulkTaskKey = null;
+    bulkTaskKey = null;
+    visitedBulkTaskIds = new Set();
     bulkDialogSeenOpen = false;
     updateKeymap();
     await closeContextMenus();
@@ -1870,17 +1887,12 @@
 
   async function oneBulkStep() {
     const mode = bulkMode;
-    const task = nextBulkTaskKey ? getTaskByKey(nextBulkTaskKey) : null;
     // Cleared first, so that closing the dialog below - and everything else
     // which happens before the next one is up - isn't taken for the user
     // finishing with a task.
     bulkDialogSeenOpen = false;
+    const task = nextUnvisitedBulkTask();
     if (!task) {
-      if (nextBulkTaskKey) {
-        warn('Leaving bulk mode, as it couldn\'t find', nextBulkTaskKey);
-      } else {
-        debug('Leaving bulk mode, as there is no task after the last one.');
-      }
       await exitBulk();
       return;
     }
@@ -1889,6 +1901,32 @@
     }
     setCursor(task, 'scroll');
     await mode.open(task);
+  }
+
+  // The task to deal with next, or null when the walk is over.
+  //
+  // This starts from the one lined up while the last dialog was open, and
+  // then skips anything already dealt with, which is how a task that the list
+  // has re-sorted down into the walk's path is not done a second time.
+  function nextUnvisitedBulkTask() {
+    if (!nextBulkTaskKey) {
+      debug('Leaving bulk mode, as there is no task after the last one.');
+      return null;
+    }
+    const tasks = getTasks();
+    const from = tasks.findIndex(
+        (task) => getTaskKey(task) === nextBulkTaskKey);
+    if (from < 0) {
+      warn('Leaving bulk mode, as it couldn\'t find', nextBulkTaskKey);
+      return null;
+    }
+    for (let i = from; i < tasks.length; i++) {
+      if (!visitedBulkTaskIds.has(getTaskId(tasks[i]))) {
+        return tasks[i];
+      }
+    }
+    debug('Leaving bulk mode, as everything below has been dealt with.');
+    return null;
   }
 
   // Called on every DOM mutation: a dialog which closes on its own is the
@@ -1901,12 +1939,22 @@
     }
     if (bulkMode.isOpen()) {
       bulkDialogSeenOpen = true;
-      // Where the walk goes next is read back from the cursor each time, so
-      // that moving the cursor while the dialog is open takes it along.
+      // Where the walk goes next is read back from the cursor, so that moving
+      // the cursor while the dialog is open takes the walk along.  Only when
+      // the cursor is on a different task, though: a list which sorts itself
+      // moves the task under the cursor as soon as it is rescheduled, and the
+      // tasks it moves past are still ahead of the walk, not behind it.
       const cursor = getCursor();
-      const next = cursor ?
-        getNextCursorableTask(getTasks(), getTaskKey(cursor)) : null;
-      nextBulkTaskKey = next ? getTaskKey(next) : null;
+      const key = cursor ? getTaskKey(cursor) : null;
+      if (key && key !== bulkTaskKey) {
+        bulkTaskKey = key;
+        // A dialog being up for a task is what counts as having dealt with
+        // it, which covers the cursor being moved onto one as well as the
+        // walk arriving at it.
+        visitedBulkTaskIds.add(getTaskId(cursor));
+        const next = getNextCursorableTask(getTasks(), key);
+        nextBulkTaskKey = next ? getTaskKey(next) : null;
+      }
     } else if (bulkDialogSeenOpen) {
       oneBulkStep();
     }
