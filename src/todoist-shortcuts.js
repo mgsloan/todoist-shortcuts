@@ -1527,19 +1527,36 @@
     });
   }
 
+  // Clicks "Sync" in the account menu, which is where Todoist keeps it now.
   async function sync() {
-    let lastSynced = getById('last_synced');
-    if (!lastSynced) {
-      withId('help_btn', click);
-      lastSynced = getById('last_synced');
+    if (leftNavIsHidden()) {
+      toggleLeftNav();
     }
-    const priorElement = lastSynced.previousElementSibling;
-    const tag = priorElement.tagName.toLowerCase();
-    if (tag !== 'button') {
-      error('Expected element to be sync button, but instead it is ' + tag);
+    // The account menu is opened by the only button in the sidebar's nav
+    // which shows the account's avatar.  Its label is translated.
+    const accountMenuButton = getUnique(
+        document,
+        '.app-sidebar-container nav button[aria-haspopup=menu]',
+        hasChild('img'));
+    if (!accountMenuButton) {
+      warn('Couldn\'t find the account menu button, so not syncing.');
       return;
     }
-    click(priorElement);
+    click(accountMenuButton);
+    // Todoist annotates the sync item with when it last synced, which is a
+    // better hold on it than its translated label.
+    let syncItem = null;
+    try {
+      syncItem = await retryWithDelay(
+          'finding the sync menu item',
+          () => getUnique(
+              document, '[role=menuitem][aria-describedby=last-sync-info]'));
+    } catch (e) {
+      warn('Couldn\'t find "Sync" in the account menu:', e);
+      await closeContextMenus();
+      return;
+    }
+    click(syncItem);
   }
 
   const COMMAND_MENU_SELECTOR =

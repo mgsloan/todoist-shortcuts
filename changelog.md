@@ -2,6 +2,9 @@
 
 ## Version 208
 
+* Fixes `ctrl+s`, which threw an error instead of syncing. Todoist
+  moved "Sync" into the account menu.
+
 * Fixes the shortcuts which need the sidebar open (`g`, `shift+p`,
   `` ` ``) doing nothing on Firefox, where the extension could not tell
   that the sidebar was collapsed.

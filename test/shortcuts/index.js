@@ -68,8 +68,6 @@ const EXCLUDED = {
     'Clicks the separate toggl-button extension, which is not installed.',
   'task_view:shift+c':
     'Clicks the separate toggl-button extension, which is not installed.',
-  'default:ctrl+s':
-    'Asks Todoist to sync, which has no outcome to assert.',
   'default:!':
     'Opens Todoist\'s notifications, which a fresh test account has none of.',
   'default:+':

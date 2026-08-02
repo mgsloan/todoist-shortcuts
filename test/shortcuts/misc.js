@@ -57,6 +57,20 @@ module.exports = [
   },
   {
     keymap: 'default',
+    keys: ['ctrl+s'],
+    what: 'asks Todoist to sync',
+    // Sync lives in the account menu, so the menu being open with its sync
+    // item saying it has just synced is the whole of what the key does.  The
+    // item is not in the page at all until the menu is opened.
+    check: async (t) => await t.page.waitForFunction(
+        () => {
+          const info = document.getElementById('last-sync-info');
+          return Boolean(info) && info.textContent === 'Just now';
+        },
+        {timeout: 15000}),
+  },
+  {
+    keymap: 'default',
     keys: ['* t'],
     // What makes it bulk mode rather than `t` is moving on to the next task
     // once a date is picked, so that is what this checks.
