@@ -149,7 +149,6 @@ module.exports = [
     keymap: 'default',
     keys: ['G'],
     what: 'goes to the project of the task at the cursor',
-    broken: 'Does not navigate anywhere.',
     where: 'today',
     seed: async ({api, fixture}) => await api.createTask({
       content: 'today-task',

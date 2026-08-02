@@ -31,6 +31,14 @@ const MODIFIERS = {
   'meta': 'Meta',
 };
 
+// A binding spelled as a bare capital letter, like 'G', is the character
+// which shift produces, so shift has to be down for it.  Mousetrap lowercases
+// the character of a keypress that arrives without the shift modifier, so a
+// bare press of 'G' runs whatever 'g' is bound to instead.
+function isShiftedLetter(key) {
+  return key.length === 1 && key !== key.toLowerCase();
+}
+
 // Presses a key written the way the keybindings are, like 'shift+o', 'alt+up'
 // or the two key sequence '* a'.
 //
@@ -44,6 +52,9 @@ async function pressBinding(page, binding) {
     // '+' means the key itself is '+'.
     const key = parts.pop() || '+';
     const modifiers = parts.map((name) => MODIFIERS[name]).filter(Boolean);
+    if (isShiftedLetter(key) && !modifiers.includes(MODIFIERS['shift'])) {
+      modifiers.push(MODIFIERS['shift']);
+    }
     for (const modifier of modifiers) {
       await page.keyboard.down(modifier);
     }
