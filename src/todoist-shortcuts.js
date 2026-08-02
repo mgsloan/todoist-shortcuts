@@ -4660,10 +4660,13 @@
     }
   }
 
-  // Generic retry with delay between retries - returns a Promise
+  // Generic retry with delay between retries - returns a Promise.  The first
+  // `instantFuel` attempts are only a turn of the event loop apart, so that
+  // something Todoist has already rendered is picked up without a wait; after
+  // those, `fuel` attempts are `delay` apart.
   async function retryWithDelay(
       taskName, task, fuel = 100, delay = 10, instantFuel = 10) {
-    while (instantFuel > 0 && fuel > 0) {
+    while (fuel > 0) {
       const result = task();
       if (result) {
         return result;
