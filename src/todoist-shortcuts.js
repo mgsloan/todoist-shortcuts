@@ -148,7 +148,10 @@
         ['escape', closeContextMenus],
         // See #256 for why this is no longer needed
         // ['fallback', schedulerFallback],
-        // See #252 for why these are disabled.
+        // Bound to nothing at all, rather than to moving the cursor, so
+        // that they don't reschedule a different task from the one the
+        // scheduler was opened for.  See #252.  Todoist's calendar has no
+        // use for them either - it does not navigate by arrow key.
         [['j', 'k', 'up', 'down'], noop],
       ]);
   const SCHEDULE_KEYMAP = 'schedule';

@@ -144,7 +144,9 @@ module.exports = [
   {
     keymap: 'schedule',
     keys: ['j', 'down', 'k', 'up'],
-    what: 'does nothing, so that the calendar keeps them',
+    // Moving the cursor would reschedule a task other than the one the
+    // scheduler was opened for.
+    what: 'does nothing rather than moving the cursor',
     setUp: openScheduler,
     check: async (t) => {
       assert.equal(
