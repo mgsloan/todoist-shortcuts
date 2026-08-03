@@ -3779,20 +3779,15 @@
   }
   */
 
+  // Todoist used to put an 'indent_<n>' class on a task and now only has the
+  // attribute, but the class name is still the shape the rest of this works
+  // in - see 'stripIndentClass' - so it is built from the attribute.
   function getIndentClass(task) {
-    // TODO: can probably just use data-item-indent now, seems to
-    // always be available.
-    const indentClass = findUnique(isIndentClass, task.classList);
-    if (indentClass) {
-      return indentClass;
-    } else {
-      const indentAttribute = task.attributes['data-item-indent'];
-      if (indentAttribute) {
-        return 'indent_' + indentAttribute.value;
-      } else {
-        return null;
-      }
+    const indentAttribute = task.attributes['data-item-indent'];
+    if (indentAttribute) {
+      return 'indent_' + indentAttribute.value;
     }
+    return null;
   }
 
   function getIndentLevel(task) {
@@ -3802,10 +3797,6 @@
     } else {
       return 1;
     }
-  }
-
-  function isIndentClass(cls) {
-    return cls.startsWith('indent_');
   }
 
   function stripIndentClass(cls) {
