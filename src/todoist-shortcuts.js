@@ -4581,16 +4581,13 @@
 
   // Remove old tips if any still exist.
   function removeOldTips() {
-    // FIXME: I can't quite explain this, but for some reason, querying the
-    // list that matches the class name doesn't quite work.  So instead find
-    // and remove until they are all gone.
-    let toDelete = [];
-    do {
-      for (const el of toDelete) {
-        el.parentElement.removeChild(el);
-      }
-      toDelete = document.getElementsByClassName(TODOIST_SHORTCUTS_TIP);
-    } while (toDelete.length > 0);
+    // Copied into an array first: 'getElementsByClassName' hands back a live
+    // list, and removing from that while iterating it skips every other
+    // element.  That is what this used to loop until it had worked around.
+    const tips = [...document.getElementsByClassName(TODOIST_SHORTCUTS_TIP)];
+    for (const tip of tips) {
+      tip.remove();
+    }
   }
 
   /*****************************************************************************
