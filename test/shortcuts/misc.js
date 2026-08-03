@@ -23,16 +23,25 @@ module.exports = [
     what: 'undoes the last change',
     setUp: async (t) => {
       await onAlpha(t);
-      // Undo works on Todoist's undo toast, so there has to be something to
-      // undo and the toast has to still be up.
       await t.press('d');
-      await t.api.waitFor(
-          'alpha to be completed',
-          async () => (await t.api.getTask(t.fixture.id('alpha'))).checked);
+      // Undo works on Todoist's popup, which is only up for a few seconds,
+      // so what this waits for is the task leaving the list.  Waiting for
+      // the API to catch up instead - which it usually does in about a
+      // second, but not always - could outlast the popup and leave the
+      // shortcut with nothing to press.
+      await t.page.waitForFunction(
+          () => ![...document.querySelectorAll('.task_content')]
+              .some((el) => el.textContent === 'alpha'),
+          {timeout: 15000});
     },
+    // Checked through the API rather than by the task reappearing, since the
+    // point is that the change was saved.  The longer wait is because that
+    // round trip is usually under a second but is occasionally much slower,
+    // and this is the one check with no second chance - the popup is gone.
     check: async (t) => await t.api.waitFor(
         'alpha to come back',
-        async () => !(await t.api.getTask(t.fixture.id('alpha'))).checked),
+        async () => !(await t.api.getTask(t.fixture.id('alpha'))).checked,
+        45000),
   },
   {
     keymap: 'default',
