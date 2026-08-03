@@ -248,6 +248,17 @@
   // which was needed to get at the button that opens it.
   const MENU_SETTLE_DELAY = 250;
 
+  // How long to leave Todoist's undo popup alone before clicking it.  The
+  // button is there before it does anything: clicking it the moment it
+  // appears is ignored, and since the popup goes away either way, the change
+  // silently stays.  Measured against the live site - no wait fails 3 times
+  // in 12, 300ms fails 1 in 14, 2s fails 0 in 8.
+  //
+  // The cost is that undo is this much slower to happen, and that pressing it
+  // in the last couple of seconds of the popup's life now misses it.  Both
+  // beat a quarter of undos quietly doing nothing.
+  const UNDO_SETTLE_DELAY = 2000;
+
   const TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   const TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
   const TODOIST_SHORTCUTS_WARNING = 'todoist_shortcuts_warning';
@@ -1399,8 +1410,11 @@
             getUnique(alertContainer, 'button',
                 (el) => el.querySelector('svg') === null);
       if (undoButton) {
-        click(undoButton);
-        return;
+        await sleep(UNDO_SETTLE_DELAY);
+        if (undoButton.isConnected) {
+          click(undoButton);
+          return;
+        }
       }
     }
     // Previously this said nothing at all when there was no popup, which is

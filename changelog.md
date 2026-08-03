@@ -23,8 +23,13 @@
 * Fixes `f` and `/` doing nothing outside the english interface, where
   the extension was looking for a button labelled "Search".
 
-* Undo (`u`, `z`, `ctrl+z`) now says why nothing happened when there is
-  no "Undo" popup to press, instead of failing silently.
+* Fixes undo (`u`, `z`, `ctrl+z`) doing nothing about a quarter of the
+  time when pressed right after the change it should undo. It now waits
+  a couple of seconds for Todoist's "Undo" popup to be ready, so undo
+  is slower to happen but happens.
+
+* Undo also says why nothing happened when there is no "Undo" popup to
+  press, instead of failing silently.
 
 ## Version 207
 
