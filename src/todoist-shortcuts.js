@@ -892,13 +892,6 @@
 
   // Selects all tasks, even those hidden by collapsing.
   async function selectAllTasks() {
-    /* Old definition before hacks to fix Todoist behavioral regressions (#281)
-    const allTasks = getTasks('include-collapsed');
-    for (let i = 0; i < allTasks.length; i++) {
-      setTimeout(() => selectTask(allTasks[i]));
-    }
-    */
-
     const selections = {};
     for (const task of getTasks('include-collapsed')) {
       selections[getTaskKey(task)] = true;
@@ -908,14 +901,6 @@
 
   // Selects all overdue tasks.
   async function selectAllOverdue() {
-    /* Old definition before hacks to fix Todoist behavioral regressions (#281)
-    for (const task of getTasks()) {
-      if (getUnique(task, '.date_overdue')) {
-        setTimeout(() => selectTask(task));
-      }
-    }
-    */
-
     const selections = {};
     for (const task of getTasks()) {
       if (getUnique(task, '.date_overdue')) {
@@ -2104,21 +2089,6 @@
         controlClickTask(task);
       }
     }
-
-    /* Old definition before hacks to fix Todoist behavioral regressions (#281)
-
-    const allTasks = getTasks('include-collapsed');
-    for (const task of allTasks) {
-      const key = getTaskKey(task);
-      setTimeout(() => {
-        if (selections[key]) {
-          selectTask(task);
-        } else {
-          deselectTask(task);
-        }
-      });
-    }
-    */
   }
 
   function getSelectedTasksOrCursor() {
