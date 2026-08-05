@@ -5479,17 +5479,36 @@
   // frequently re-creates elements.
   function updateCursorStyle() {
     const selecter = getKeySelecter(lastCursorId, lastCursorIndent);
-    // Drawn as an inset shadow rather than as a border, because a shadow
-    // takes up no space.  A border did, and had to be paid for with a
-    // negative margin - along with one margin per indent level, to put back
-    // the indent the negative margin had eaten.  The two never quite
+    // Drawn as a pseudo-element rather than as a border, because one which is
+    // positioned takes up no space.  A border did, and had to be paid for
+    // with a negative margin - along with one margin per indent level, to put
+    // back the indent the negative margin had eaten.  The two never quite
     // cancelled out: the browser snaps a border to whole device pixels but
     // not the margin, so on a screen scaled by 1.25 the border came out
     // 1.6px wide against a margin of -2px, and the task under the cursor sat
     // a fraction of a pixel to the left of where it sat without it.
+    //
+    // It is the whole of the marker rather than a shadow on the task because
+    // the task's body reaches out past the left of the task and is itself
+    // positioned, so its background - grey, when the task is selected - lands
+    // on top of anything the task paints.  A positioned pseudo-element with a
+    // z-index paints over the body instead of under it.
     cursorStyle.textContent = [
       selecter + ' {',
-      '  box-shadow: inset 2px 0 0 0 #4073d6;',
+      // So that the marker below is positioned against the task.  The body
+      // inside it is already positioned, so this takes nothing else with it.
+      '  position: relative;',
+      '}',
+      selecter + '::before {',
+      '  content: "";',
+      '  position: absolute;',
+      '  left: 0;',
+      '  top: 0;',
+      '  bottom: 0;',
+      '  width: 2px;',
+      '  background: #4073d6;',
+      '  z-index: 1;',
+      '  pointer-events: none;',
       '}',
     ].join('\n');
   }

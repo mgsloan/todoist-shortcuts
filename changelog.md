@@ -9,6 +9,9 @@
 * Stops the task under the cursor sitting a fraction of a pixel to the
   left of where it sits without it.
 
+* Shows the cursor on a selected task, where it was hidden behind the
+  selection's grey background.
+
 ## Version 208
 
 * Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put

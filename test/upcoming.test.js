@@ -20,7 +20,8 @@ const TIMEOUT = 180000;
 const CURSOR_POSITION = `(() => {
   const tasks = [...document.querySelectorAll('.task_list_item')];
   const index = tasks.findIndex(
-      (task) => getComputedStyle(task).boxShadow.includes('rgb(64, 115, 214)'));
+      (task) => getComputedStyle(task, '::before').backgroundColor ===
+          'rgb(64, 115, 214)');
   return {index: index, count: tasks.length};
 })`;
 

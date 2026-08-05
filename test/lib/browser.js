@@ -130,16 +130,17 @@ async function waitForTasks(page) {
       CURSOR_CONTENT_JS + '() !== null', {timeout: 30000});
 }
 
-// todoist-shortcuts marks the cursor by generating CSS which draws an inset
-// shadow down the left of the task with the cursor's id, rather than by adding
-// a class, so this looks for that shadow.  It is matched by its colour, since
-// Todoist puts shadows of its own on tasks.  Returns the text of the task at
-// the cursor, or null.
-const CURSOR_SHADOW = 'rgb(64, 115, 214)';
+// todoist-shortcuts marks the cursor by generating CSS which draws a bar down
+// the left of the task with the cursor's id in a ::before, rather than by
+// adding a class, so this looks for that bar.  It is found by its colour, which
+// is the one thing about it that is the extension's own.  Returns the text of
+// the task at the cursor, or null.
+const CURSOR_COLOUR = 'rgb(64, 115, 214)';
 const CURSOR_CONTENT_JS = `(() => {
   const tasks = [...document.querySelectorAll('.task_list_item')];
   const cursor = tasks.find(
-      (task) => getComputedStyle(task).boxShadow.includes('${CURSOR_SHADOW}'));
+      (task) => getComputedStyle(task, '::before').backgroundColor ===
+          '${CURSOR_COLOUR}');
   const content = cursor && cursor.querySelector('.task_content');
   return content ? content.textContent : null;
 })`;
