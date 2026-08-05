@@ -6,6 +6,9 @@
   (`* t`). `j` and `k` did nothing there, and `h` and `l` moved the
   cursor but also skipped a task.
 
+* Stops the task under the cursor sitting a fraction of a pixel to the
+  left of where it sits without it.
+
 ## Version 208
 
 * Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put

@@ -5479,26 +5479,17 @@
   // frequently re-creates elements.
   function updateCursorStyle() {
     const selecter = getKeySelecter(lastCursorId, lastCursorIndent);
+    // Drawn as an inset shadow rather than as a border, because a shadow
+    // takes up no space.  A border did, and had to be paid for with a
+    // negative margin - along with one margin per indent level, to put back
+    // the indent the negative margin had eaten.  The two never quite
+    // cancelled out: the browser snaps a border to whole device pixels but
+    // not the margin, so on a screen scaled by 1.25 the border came out
+    // 1.6px wide against a margin of -2px, and the task under the cursor sat
+    // a fraction of a pixel to the left of where it sat without it.
     cursorStyle.textContent = [
       selecter + ' {',
-      '  border-left: 2px solid #4073d6;',
-      '  margin-left: -2px;',
-      '}',
-      // Oh man, I can't believe I'm doing this...
-      selecter + '[data-item-indent="2"] {',
-      '  margin-left: 26px;',
-      '}',
-      selecter + '[data-item-indent="3"] {',
-      '  margin-left: 54px;',
-      '}',
-      selecter + '[data-item-indent="4"] {',
-      '  margin-left: 82px;',
-      '}',
-      selecter + '[data-item-indent="5"] {',
-      '  margin-left: 110px;',
-      '}',
-      selecter + ' .sel_checkbox_td {',
-      '  padding-left: 2px;',
+      '  box-shadow: inset 2px 0 0 0 #4073d6;',
       '}',
     ].join('\n');
   }

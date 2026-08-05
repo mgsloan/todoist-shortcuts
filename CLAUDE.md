@@ -132,7 +132,8 @@ npm run test:clean   # delete "ts-test " projects left by interrupted runs
   which is the point: several of the bugs this suite guards against are cases
   where the UI accepted a change that was never saved.
 * The cursor has no marker class — it is drawn by generated CSS keyed on the
-  task id — so `cursorContent` finds it by its border colour.
+  task id — so `cursorContent` finds it by the colour of the inset shadow that
+  draws it.
 
 ### Per-shortcut tests
 

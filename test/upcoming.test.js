@@ -19,11 +19,8 @@ const TIMEOUT = 180000;
 // else the account has due.
 const CURSOR_POSITION = `(() => {
   const tasks = [...document.querySelectorAll('.task_list_item')];
-  const index = tasks.findIndex((task) => {
-    const style = getComputedStyle(task);
-    return style.borderLeftColor === 'rgb(64, 115, 214)' &&
-        parseFloat(style.borderLeftWidth) > 1;
-  });
+  const index = tasks.findIndex(
+      (task) => getComputedStyle(task).boxShadow.includes('rgb(64, 115, 214)'));
   return {index: index, count: tasks.length};
 })`;
 
