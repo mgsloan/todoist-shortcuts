@@ -84,3 +84,95 @@ describe('bulk reschedule on a sorted list', {timeout: TIMEOUT}, () => {
     }
   });
 });
+
+// The cursor keys used to be no use in bulk reschedule mode: 'j' and 'k' were
+// bound to nothing at all, inherited from plain scheduling where they must not
+// reschedule a task other than the one the scheduler was opened for, and 'h'
+// and 'l' closed the scheduler in a way the mode took for the user having
+// finished with the task, so it moved on a task of its own accord as well.
+describe('cursor keys in bulk reschedule mode', {timeout: TIMEOUT}, () => {
+  let chrome = null;
+  let page = null;
+  let fixture = null;
+  // The subtask is made here rather than by the fixture, which has no way to
+  // say that one task is under another, so its id is kept alongside.
+  let childId = null;
+
+  // Where the walk is: the scheduler is up for the task under the cursor.
+  async function schedulingNow() {
+    await page.waitForSelector('.scheduler', {timeout: 15000});
+    return await browser.cursorContent(page);
+  }
+
+  // Whether the task is in the list at all, which is how collapsing shows up.
+  async function showing(content) {
+    return await page.$$eval(
+        '.task_content',
+        (els, wanted) => els.some((el) => el.textContent === wanted),
+        content);
+  }
+
+  before(async () => {
+    const user = await api.getUser();
+    chrome = await browser.launch();
+    const first = await browser.openApp(chrome);
+    await browser.assertSameAccountAs(first, user);
+    await first.close();
+    await fixtures.destroyStale();
+    // A subtask, so that 'h' and 'l' - which collapse and expand - have
+    // something to work on.
+    fixture = await fixtures.create('bulk-cursor', ['cur-parent', 'cur-last']);
+    childId = (await api.createTask({
+      content: 'cur-child',
+      project_id: fixture.project.id,
+      parent_id: fixture.id('cur-parent'),
+    })).id;
+    page = await browser.openApp(chrome, 'project/' + fixture.project.id);
+    await page.bringToFront();
+    await browser.waitForTasks(page);
+  });
+
+  after(async () => {
+    if (page) await page.close();
+    await fixtures.destroy(fixture);
+    if (chrome) await chrome.close();
+  });
+
+  it('takes the walk along with the cursor', async () => {
+    await browser.putCursorOn(page, 'cur-parent');
+    await pressBinding(page, '* t');
+    assert.equal(await schedulingNow(), 'cur-parent');
+
+    await pressBinding(page, 'j');
+    assert.equal(await schedulingNow(), 'cur-child', 'j should go down one');
+
+    await pressBinding(page, 'k');
+    assert.equal(await schedulingNow(), 'cur-parent', 'k should go back up');
+
+    // 'h' on a task with its subtasks showing collapses it and leaves the
+    // cursor where it is, and 'l' expands it again.  Where 'l' then leaves
+    // the cursor is not checked, only that the walk is still going: it steps
+    // down as well, and does that before the subtasks are back, so it lands
+    // past them rather than on the first of them.
+    await pressBinding(page, 'h');
+    assert.equal(await schedulingNow(), 'cur-parent', 'h should collapse');
+    assert.ok(!(await showing('cur-child')), 'h should hide the subtask');
+    await pressBinding(page, 'l');
+    await page.waitForSelector('.scheduler', {timeout: 15000});
+    assert.ok(await showing('cur-child'), 'l should bring the subtask back');
+
+    await pressBinding(page, 'escape');
+    // Moving about is not scheduling: the walk stops on each task it passes,
+    // and only a date key gives it one.
+    const ids = {
+      'cur-parent': fixture.id('cur-parent'),
+      'cur-child': childId,
+      'cur-last': fixture.id('cur-last'),
+    };
+    for (const [content, id] of Object.entries(ids)) {
+      assert.ok(
+          !(await api.getTask(id)).due,
+          content + ' was scheduled by moving the cursor over it');
+    }
+  });
+});

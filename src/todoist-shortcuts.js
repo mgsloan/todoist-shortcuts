@@ -159,12 +159,21 @@
   // Bulk schedule mode keybindings.  The date keys are rebound to also move
   // on to the next task, since Todoist leaves the scheduler open after a date
   // is clicked in its calendar; mousetrap takes the later binding for a key.
+  //
+  // The cursor keys are rebound as well.  The schedule keymap's versions are
+  // no use here: they close the scheduler in a way bulk mode takes for the
+  // user having finished with a task, and 'j' and 'k' are disabled there so
+  // that they can't reschedule a task other than the one the scheduler was
+  // opened for - which in this mode is the whole point.
+  //
   // Escape isn't here because leaving the mode has to happen before the
   // scheduler closes - see 'bulkModeKeyHandler'.
   const BULK_SCHEDULE_BINDINGS = [].concat(
       SCHEDULE_BINDINGS,
       SCHEDULE_DATE_BINDINGS.map(
           (binding) => [binding[0], sequence([binding[1], nextBulkTask])]),
+      CURSOR_BINDINGS.map(
+          (binding) => [binding[0], () => bulkCursorTo(binding[1])]),
       [[['v', 'alt+v'], switchToBulkMove]]);
   const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
@@ -1975,6 +1984,24 @@
     }
   }
 
+  // Moves the cursor and puts the dialog up on the task it lands on, which is
+  // how the walk is steered: it carries on from wherever the cursor is left.
+  // The dialog has to be closed first, and that close must not be taken for
+  // the user having finished with the task, hence the flag.
+  async function bulkCursorTo(motion) {
+    const mode = bulkMode;
+    if (!mode) {
+      return;
+    }
+    bulkDialogSeenOpen = false;
+    await closeContextMenus();
+    await motion();
+    const cursor = getCursor();
+    if (cursor) {
+      await mode.open(cursor);
+    }
+  }
+
   // Bulk move's keys, which mousetrap never sees: the project picker keeps
   // focus in its search input so that a project can be typed, and mousetrap
   // ignores key events from inputs.  Cursor movement therefore needs alt held
@@ -1991,7 +2018,7 @@
     if (!cursorMotion) {
       return true;
     }
-    bulkMoveCursorTo(cursorMotion);
+    bulkCursorTo(cursorMotion);
     return false;
   }
 
@@ -2013,19 +2040,6 @@
       case RIGHT_ARROW_KEYCODE: return cursorRight;
     }
     return null;
-  }
-
-  // Moves the cursor and puts the picker up on the task it lands on.  The
-  // picker has to be closed first, and that close must not be taken for the
-  // user having finished with the task, hence the flag.
-  async function bulkMoveCursorTo(motion) {
-    bulkDialogSeenOpen = false;
-    await closeContextMenus();
-    await motion();
-    const cursor = getCursor();
-    if (cursor) {
-      await BULK_MOVE.open(cursor);
-    }
   }
 
   // The project picker has no class or testid of its own any more, so it is

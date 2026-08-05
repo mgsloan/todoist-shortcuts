@@ -1,5 +1,11 @@
 # todoist-shortcuts changelog
 
+## Version 209
+
+* Makes `j`, `k`, `h` and `l` move the cursor in bulk reschedule mode
+  (`* t`). `j` and `k` did nothing there, and `h` and `l` moved the
+  cursor but also skipped a task.
+
 ## Version 208
 
 * Brings back bulk reschedule (`* t`) and bulk move (`* v`), which put
