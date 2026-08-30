@@ -140,9 +140,17 @@
     ['9', schedulePlusN(9)],
   ];
 
+  // Todoist closes the scheduler itself after some of these - today, next
+  // weekend, no date - but leaves it up after a day is clicked in its
+  // calendar, and after postpone.  Closing it either way makes settling on a
+  // date behave the same whichever key was used, and leaves the keyboard
+  // where the mouse would: back at the task list.
+  const CLOSING_DATE_BINDINGS = SCHEDULE_DATE_BINDINGS.map(
+      (binding) => [binding[0], sequence([binding[1], closeContextMenus])]);
+
   // Scheduling keybindings (used when scheduler is open)
   const SCHEDULE_BINDINGS = [].concat(
-      SCHEDULE_CURSOR_BINDINGS, SCHEDULE_DATE_BINDINGS, [
+      SCHEDULE_CURSOR_BINDINGS, CLOSING_DATE_BINDINGS, [
         ['alt+t', scheduleTime],
         ['shift+t', scheduleText],
         ['escape', closeContextMenus],
@@ -156,25 +164,36 @@
       ]);
   const SCHEDULE_KEYMAP = 'schedule';
 
-  // Bulk schedule mode keybindings.  The date keys are rebound to also move
-  // on to the next task, since Todoist leaves the scheduler open after a date
-  // is clicked in its calendar; mousetrap takes the later binding for a key.
+  // Bulk schedule mode keybindings.  The date keys need nothing added to
+  // them: they close the scheduler, which is already this mode's cue to move
+  // on to the next task.
   //
-  // The cursor keys are rebound as well.  The schedule keymap's versions are
+  // The cursor keys are rebound.  Mousetrap takes the later binding for a
+  // key.  The schedule keymap's versions are
   // no use here: they close the scheduler in a way bulk mode takes for the
   // user having finished with a task, and 'j' and 'k' are disabled there so
   // that they can't reschedule a task other than the one the scheduler was
   // opened for - which in this mode is the whole point.
   //
+  // 'd', 'e' and 'z' keep the meanings they have in the default keymap -
+  // complete, delete and undo - because a walk down a list of tasks is as
+  // good a place to get rid of one, or to take back the last thing done, as
+  // to give it a date.  They are also bound with alt, so that the same keys
+  // work in bulk move mode, where the unmodified ones are typed into the
+  // project search.
+  //
   // Escape isn't here because leaving the mode has to happen before the
   // scheduler closes - see 'bulkModeKeyHandler'.
   const BULK_SCHEDULE_BINDINGS = [].concat(
       SCHEDULE_BINDINGS,
-      SCHEDULE_DATE_BINDINGS.map(
-          (binding) => [binding[0], sequence([binding[1], nextBulkTask])]),
       CURSOR_BINDINGS.map(
           (binding) => [binding[0], () => bulkCursorTo(binding[1])]),
-      [[['v', 'alt+v'], switchToBulkMove]]);
+      [
+        [['v', 'alt+v'], switchToBulkMove],
+        [['d', 'alt+d'], bulkDone],
+        [['e', 'alt+e', '#'], bulkDelete],
+        [['z', 'alt+z'], bulkUndo],
+      ]);
   const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
   // Bulk move keybindings.  These can't be handled by mousetrap, because the
@@ -267,6 +286,18 @@
   // in the last couple of seconds of the popup's life now misses it.  Both
   // beat a quarter of undos quietly doing nothing.
   const UNDO_SETTLE_DELAY = 2000;
+
+  // How long to wait for Todoist's delete confirmation to be answered while a
+  // bulk mode is running, and how often to look.  It is waiting on a person,
+  // hence the length; after this the walk gives up and the mode is left.
+  const BULK_CONFIRM_TIMEOUT = 60000;
+  const BULK_CONFIRM_POLL = 100;
+
+  // How long to wait for a deleted task to leave the list.  Which button was
+  // pressed can't be seen, so the walk reads it from whether the task went
+  // away, and it does not go away the instant the modal closes.
+  const BULK_DELETED_TIMEOUT = 2000;
+  const BULK_DELETED_POLL = 20;
 
   const TODOIST_SHORTCUTS_TIP = 'todoist_shortcuts_tip';
   const TODOIST_SHORTCUTS_TIP_TYPED = 'todoist_shortcuts_tip_typed';
@@ -540,6 +571,10 @@
         warn('Couldn\'t find the scheduler\'s time button.');
         return;
       }
+      // Clicking it the moment the scheduler turns up opens a time panel
+      // which is still inert, and nothing can be focused in an inert one -
+      // Todoist then folds it away again, leaving the scheduler as it was.
+      await sleep(MENU_SETTLE_DELAY);
       click(timeButton);
     }
     await focusTimeInput();
@@ -1901,14 +1936,6 @@
     await closeContextMenus();
   }
 
-  // Moves bulk mode on to the task after the one just dealt with.  Bound to
-  // the date keys, since Todoist leaves the scheduler open after one.
-  async function nextBulkTask() {
-    if (bulkMode) {
-      await oneBulkStep();
-    }
-  }
-
   async function oneBulkStep() {
     const mode = bulkMode;
     // Cleared first, so that closing the dialog below - and everything else
@@ -2002,6 +2029,118 @@
     }
   }
 
+  // Deals with the task the dialog is up for by completing it, rather than by
+  // giving it a date or a project, and moves the walk on.  This applies to
+  // the task under the cursor whatever WHAT_CURSOR_APPLIES_TO says: the walk
+  // is on one task at a time and deselects everything when it starts, so
+  // there is no selection for it to mean anything else.
+  async function bulkDone() {
+    const cursor = await startBulkTaskAction();
+    if (!cursor) {
+      return;
+    }
+    clickTaskDone(cursor);
+    await oneBulkStep();
+  }
+
+  // Deals with the task the dialog is up for by deleting it.  Todoist asks
+  // before deleting, so unlike the other keys this waits for an answer:
+  // cancelling puts the dialog back up for the task, rather than moving the
+  // walk past one which is still there.
+  async function bulkDelete() {
+    const mode = bulkMode;
+    const cursor = await startBulkTaskAction();
+    if (!cursor) {
+      return;
+    }
+    const key = getTaskKey(cursor);
+    await clickTaskMenu(cursor, 'task-overflow-menu-delete', false);
+    const deleted = await waitForBulkDelete(key);
+    if (bulkMode !== mode) {
+      return;
+    }
+    if (deleted) {
+      await oneBulkStep();
+      return;
+    }
+    const task = getTaskByKey(key);
+    if (task) {
+      await mode.open(task);
+    } else {
+      await exitBulk();
+    }
+  }
+
+  // Undoes the last change and stays where it is, rather than moving the walk
+  // on: what was undone is usually the task before this one, and the walk has
+  // not finished with this one yet.  Todoist's undo popup is outside the
+  // dialog, and clicking it would close the dialog anyway, so the dialog is
+  // put out of the way first and back up afterwards.
+  async function bulkUndo() {
+    const mode = bulkMode;
+    const cursor = await startBulkTaskAction();
+    if (!cursor) {
+      return;
+    }
+    const key = getTaskKey(cursor);
+    await undo();
+    if (bulkMode !== mode) {
+      return;
+    }
+    const task = getTaskByKey(key);
+    if (task) {
+      await mode.open(task);
+    } else {
+      // Undoing took the task away - it was moved back to another project,
+      // say - so there is nothing here to come back to.
+      await oneBulkStep();
+    }
+  }
+
+  // Waits out the delete confirmation, and reports whether the task went.
+  // Which button was pressed can't be seen, so it is read from the task
+  // leaving the list.
+  async function waitForBulkDelete(key) {
+    try {
+      await retryWithDelay(
+          'finding the delete confirmation', getConfirmationButtons);
+      await retryWithDelay(
+          'waiting for the delete confirmation to be answered',
+          () => !getConfirmationButtons(),
+          BULK_CONFIRM_TIMEOUT / BULK_CONFIRM_POLL, BULK_CONFIRM_POLL);
+    } catch (e) {
+      warn('Bulk delete gave up on the confirmation:', e);
+      return false;
+    }
+    try {
+      return await retryWithDelay(
+          'waiting for the task to be deleted', () => !getTaskByKey(key),
+          BULK_DELETED_TIMEOUT / BULK_DELETED_POLL, BULK_DELETED_POLL);
+    } catch (e) {
+      // Still there, so the deletion was cancelled.
+      return false;
+    }
+  }
+
+  // Shared start of the keys which deal with a task themselves: the dialog is
+  // closed so that a menu can be opened on the task, and that close must not
+  // be taken for the user having finished with it, hence the flag.  Returns
+  // the task to act on, or null when there is none, which leaves the mode
+  // rather than sitting there with no dialog up.
+  async function startBulkTaskAction() {
+    if (!bulkMode) {
+      return null;
+    }
+    bulkDialogSeenOpen = false;
+    await closeContextMenus();
+    const cursor = getCursor();
+    if (!cursor) {
+      await exitBulk();
+      return null;
+    }
+    return cursor;
+  }
+
   // Bulk move's keys, which mousetrap never sees: the project picker keeps
   // focus in its search input so that a project can be typed, and mousetrap
   // ignores key events from inputs.  Cursor movement therefore needs alt held
@@ -2010,8 +2149,9 @@
     if (ev.type !== 'keydown' || !ev.altKey || ev.ctrlKey || ev.metaKey) {
       return true;
     }
-    if (ev.key === 't') {
-      switchToBulkSchedule();
+    const action = bulkMoveAction(ev);
+    if (action) {
+      action();
       return false;
     }
     const cursorMotion = bulkMoveCursorMotion(ev);
@@ -2020,6 +2160,16 @@
     }
     bulkCursorTo(cursorMotion);
     return false;
+  }
+
+  function bulkMoveAction(ev) {
+    switch (ev.key) {
+      case 't': return switchToBulkSchedule;
+      case 'd': return bulkDone;
+      case 'e': return bulkDelete;
+      case 'z': return bulkUndo;
+    }
+    return null;
   }
 
   function bulkMoveCursorMotion(ev) {
@@ -2715,6 +2865,11 @@
     await withTaskMenuOpen(task, shouldScroll, async () => {
       const element = await getUniqueRetrying(
           document, '[data-action-hint="' + action + '"]');
+      // The item being in the DOM is not enough: clicking it the moment it
+      // turns up is half ignored - the menu closes, and what the item is
+      // supposed to open never appears.  Reminders and move-to-project were
+      // failing this way about two times in three.
+      await sleep(MENU_SETTLE_DELAY);
       click(element);
     });
   }
@@ -3335,8 +3490,12 @@
           },
       );
       focusedEl.blur();
-      keepSchedulerInputBlurred();
+    } catch (e) {
+      // Not a reason to skip the keeper below: Todoist can focus the input
+      // later than this waits, and then there would be nothing to blur it.
+      warn('Gave up waiting for the scheduler to focus its input:', e);
     } finally {
+      keepSchedulerInputBlurred();
       exitDeferLastBinding();
     }
   }
@@ -5202,6 +5361,7 @@
   }
 
   // Given multiple predicates, uses || to combine them.
+  // eslint-disable-next-line no-unused-vars
   function or(...predicates) {
     return (x) => {
       let result = false;
@@ -5328,7 +5488,9 @@
     '.' + TODOIST_SHORTCUTS_TIP + ' {',
     '  position: absolute;',
     '  margin-top: 4px;',
-    '  margin-left: -18px;',
+    // Over the row's own icon, rather than out in the margin to the left of
+    // it, where they sat half off the edge of the sidebar.
+    '  margin-left: 0;',
     '  padding: 2px;',
     '  border-radius: 5px;',
     '  width: 22px;',
@@ -5582,6 +5744,10 @@
     const result = new Event('keypress');
     result.key = ev.key;
     result.keyCode = ev.keyCode;
+    // Mousetrap reads the character of a keypress out of 'which'.  Without it
+    // every held-back key matched nothing and was quietly dropped, which made
+    // holding them back no better than losing them.
+    result.which = ev.which || ev.keyCode;
     result.shiftKey = ev.shiftKey;
     result.altKey = ev.altKey;
     result.ctrlKey = ev.ctrlKey;
@@ -5608,6 +5774,10 @@
   }
 
   function todoistModalIsOpen() {
+    if (getConfirmationButtons()) {
+      return true;
+    }
+
     const modal =
           document.getElementsByClassName('reactist_modal_box').item(0);
     if (modal && !matchingClass('detail_modal')(modal)) {
@@ -5634,39 +5804,49 @@
 
   let sawEscapeDown = false;
 
-  function modalKeyHandler(ev) {
-    const modalPredicate =
-          not(or(matchingClass('quick_add'), matchingClass('detail_modal')));
-    const uniqueModal =
-          getUnique(document, '.reactist_modal_box', modalPredicate);
-    if (uniqueModal) {
-      // Special handling for the modal that appears when confirming
-      // task discard (esc after q), and for the deletion confirmation
-      // modal.
-      let cancelButton = null;
-      let acceptButton = null;
-      withAll(uniqueModal, '.ist_button', all, (el) => {
-        if (el.innerText === 'Cancel') {
-          cancelButton = el;
-        } else if (el.innerText === 'Discard task' ||
-                   el.innerText === 'Delete') {
-          acceptButton = el;
+  // The buttons of the modal Todoist puts up to confirm deleting a task, or
+  // discarding one being added.  The modal has no class or testid of its own
+  // - its class names are generated - so it is told from Todoist's other
+  // dialogs by having both of these buttons in it.
+  function getConfirmationButtons() {
+    const dialogs = selectAll(document, '[role="dialog"]');
+    for (let i = 0; i < dialogs.length; i++) {
+      let cancel = null;
+      let accept = null;
+      withAll(dialogs[i], 'button', all, (button) => {
+        const text = button.textContent;
+        if (text === 'Cancel') {
+          cancel = button;
+        } else if (text === 'Discard task' || text === 'Delete') {
+          accept = button;
         }
       });
-      if (cancelButton && acceptButton) {
-        if (ev.keyCode === ESCAPE_KEYCODE) {
-          if (ev.type === 'keydown') {
-            sawEscapeDown = true;
-            return false;
-          } else if (ev.type === 'keyup' && sawEscapeDown) {
-            click(cancelButton);
-            return false;
-          }
-        } else if (ev.keyCode === ENTER_KEYCODE) {
-          if (ev.type === 'keyup') {
-            click(acceptButton);
-            return false;
-          }
+      if (cancel && accept) {
+        return {cancel: cancel, accept: accept};
+      }
+    }
+    return null;
+  }
+
+  // Enter accepts the confirmation and escape cancels it.  Todoist's own key
+  // handling is switched off - see 'overwriteKeyHandlers' - and the modal
+  // doesn't take the focus, so without this there is no way to answer it
+  // except with the mouse.
+  function modalKeyHandler(ev) {
+    const buttons = getConfirmationButtons();
+    if (buttons) {
+      if (ev.keyCode === ESCAPE_KEYCODE) {
+        if (ev.type === 'keydown') {
+          sawEscapeDown = true;
+          return false;
+        } else if (ev.type === 'keyup' && sawEscapeDown) {
+          click(buttons.cancel);
+          return false;
+        }
+      } else if (ev.keyCode === ENTER_KEYCODE) {
+        if (ev.type === 'keyup') {
+          click(buttons.accept);
+          return false;
         }
       }
     } else {
@@ -5687,6 +5867,15 @@
     }
     if (bulkMode === BULK_MOVE) {
       return handleBulkMoveKey(ev);
+    }
+    if (deferLastKeyDownEnabled) {
+      // Each time the walk opens the scheduler, Todoist puts the focus in its
+      // input for a moment before this script blurs it, and mousetrap ignores
+      // keys typed into an input.  Everywhere else that window is covered by
+      // holding the key back until it has passed; bulk mode used to go
+      // straight to mousetrap, so a key pressed just then did nothing at all.
+      lastDeferredEvent = ev;
+      return false;
     }
     return mousetrap.handleKeyEvent(ev);
   }

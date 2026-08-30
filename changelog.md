@@ -2,6 +2,31 @@
 
 ## Version 209
 
+* Adds `d`, `e` and `z` to bulk reschedule mode (`* t`) and bulk move
+  mode (`* v`): `d` and `e` complete or delete the task the dialog is up
+  for and move on to the next one, and `z` undoes the last change and
+  stays put. In bulk move mode they need `alt` held, like the cursor
+  keys there.
+
+* Fixes `v` (move to project) and `shift+r` (reminders), which usually
+  did nothing at all, `alt+t` (schedule a time), which about a third of
+  the time left the scheduler as it found it, and entering bulk move
+  mode (`* v`), which slid a task or two down the list before stopping.
+
+* Closes the scheduler once a date has been picked, whichever key
+  picked it. `1` to `9`, `w`, `m`, `s` and `p` used to leave it sitting
+  open over the list.
+
+* Fixes keys pressed in the moment a shortcut is opening something,
+  which were swallowed instead of run. In the bulk modes this could
+  leave `d`, `e` or a date key looking dead.
+
+* Moves the `g` navigation hints over each row's icon, where they used
+  to sit half off the left edge of the sidebar.
+
+* Makes `enter` and `escape` answer Todoist's "Delete task?" question
+  again, and stops the other keys reaching the task list behind it.
+
 * Makes `j`, `k`, `h` and `l` move the cursor in bulk reschedule mode
   (`* t`). `j` and `k` did nothing there, and `h` and `l` moved the
   cursor but also skipped a task.

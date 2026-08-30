@@ -43,6 +43,24 @@ const schedulesInDays = (expected) => async (t) => assert.equal(
 const schedulerIsOpen = (t) => t.page.evaluate(
     () => Boolean(document.querySelector('.scheduler')));
 
+// Settling on a date puts the scheduler away, whichever key did it.  Todoist
+// closes it for some of them and leaves it up for others, so this is the
+// extension's doing and worth checking on every one of them.
+const closesScheduler = async (t) => {
+  try {
+    await t.page.waitForFunction(
+        () => !document.querySelector('.scheduler'), {timeout: 15000});
+  } catch (e) {
+    throw new Error(t.key + ' left the scheduler open');
+  }
+};
+
+// Checks what the key did to the task, and that it closed the scheduler.
+const andCloses = (check) => async (t) => {
+  await check(t);
+  await closesScheduler(t);
+};
+
 const cursorMovedTo = (expected) => async (t) => assert.equal(
     await t.browser.cursorContent(t.page), expected,
     t.key + ' should have moved the cursor to ' + expected);
@@ -61,7 +79,7 @@ for (let day = 1; day <= 9; day++) {
     keys: [String(day)],
     what: 'schedules ' + day + ' day(s) ahead',
     setUp: openScheduler,
-    check: schedulesInDays(day),
+    check: andCloses(schedulesInDays(day)),
   });
 }
 
@@ -71,7 +89,7 @@ module.exports = [
     keys: ['c', '0'],
     what: 'schedules today',
     setUp: openScheduler,
-    check: schedulesInDays(0),
+    check: andCloses(schedulesInDays(0)),
   },
   ...plusDays,
   {
@@ -79,10 +97,10 @@ module.exports = [
     keys: ['w'],
     what: 'schedules next week',
     setUp: openScheduler,
-    check: async (t) => {
+    check: andCloses(async (t) => {
       const days = await daysAhead(t);
       assert.ok(days > 0 && days <= 8, t.key + ' scheduled ' + days + ' ahead');
-    },
+    }),
   },
   {
     keymap: 'schedule',
@@ -95,11 +113,11 @@ module.exports = [
       {content: 'gamma'},
     ],
     setUp: openScheduler,
-    check: async (t) => {
+    check: andCloses(async (t) => {
       const days = await daysAhead(t);
       assert.ok(days > 0, t.key + ' should have moved alpha later, not ' +
           days + ' day(s) ahead');
-    },
+    }),
   },
   {
     keymap: 'schedule',
@@ -107,10 +125,10 @@ module.exports = [
     what: 'removes the due date',
     tasks: DUE_TODAY,
     setUp: openScheduler,
-    check: async (t) => await t.api.waitFor(
+    check: andCloses(async (t) => await t.api.waitFor(
         'alpha to lose its due date',
         async () => (await dueDateOfAlpha(t)) === undefined ||
-            (await dueDateOfAlpha(t)) === null),
+            (await dueDateOfAlpha(t)) === null)),
   },
   {
     keymap: 'schedule',

@@ -204,6 +204,9 @@ When scheduling is opened via `t`, the following keybindings will apply:
 | `alt+t`                 | open time of day scheduler                |
 | `escape`                | exit scheduling                           |
 
+Any of the keys which settle on a date closes the scheduler once it has
+been applied, so the keyboard ends up back at the task list.
+
 The "Smart Scheduler" is opened by pressing `s` when scheduling
 multiple items. Currently there are only two keybindings for the smart
 scheduler: `enter` to apply the choices, and `escape` to cancel.
@@ -214,6 +217,9 @@ scheduler: `enter` to apply the choices, and `escape` to cancel.
 |----------------|--------------------------------------|
 | `*` then `t`   | enter bulk reschedule mode           |
 | `v` or `alt+v` | switch to bulk move mode (see below) |
+| `d` or `alt+d` | complete the task, and move on       |
+| `e` or `alt+e` | delete the task, and move on         |
+| `z` or `alt+z` | undo the last change, and stay put   |
 | `escape`       | exit bulk reschedule mode            |
 
 Once bulk reschedule mode is entered, it will bring up the reschedule
@@ -223,19 +229,29 @@ dates; scheduling a selection gives them all the same one.  All of the
 normal scheduling and cursor navigation keys can be used while in this
 mode.
 
+`d`, `e` and `z` are there because a walk down a list of tasks is as
+good a place to get rid of one, or to take back the last thing done, as
+to give it a date.  Deleting asks first, as it does elsewhere;
+cancelling leaves the walk on the task.  Undoing leaves the walk where
+it is, since what it undoes is usually the task before this one.
+
 ## Bulk move mode
 
 | keys         | action                                     |
 |--------------|--------------------------------------------|
 | `*` then `v` | enter bulk move mode                       |
 | `alt+t`      | switch to bulk reschedule mode (see above) |
+| `alt+d`      | complete the task, and move on             |
+| `alt+e`      | delete the task, and move on               |
+| `alt+z`      | undo the last change, and stay put         |
 | `escape`     | exit bulk move mode                        |
 
 Once bulk move mode is entered, it will bring up the move-to-project
 dialog for the task under the cursor, and then for each task after it,
 until there are no more. By holding down `alt`, you can use the normal
 cursor navigation keys in this mode - the unmodified keys go to the
-dialog's search field, so that a project can be typed.
+dialog's search field, so that a project can be typed.  That is also
+why completing, deleting and undoing need `alt` here.
 
 ## Task view
 
