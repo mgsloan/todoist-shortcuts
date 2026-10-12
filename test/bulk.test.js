@@ -175,6 +175,44 @@ describe('cursor keys in bulk reschedule mode', {timeout: TIMEOUT}, () => {
           content + ' was scheduled by moving the cursor over it');
     }
   });
+
+  it('keeps one scheduler open when j is pressed rapidly', async () => {
+    await browser.putCursorOn(page, 'cur-parent');
+    await pressBinding(page, '* t');
+    assert.equal(await schedulingNow(), 'cur-parent');
+
+    await page.evaluate(() => {
+      window.bulkSchedulerPeak = document.querySelectorAll('.scheduler').length;
+      window.bulkSchedulerObserver = new MutationObserver(() => {
+        window.bulkSchedulerPeak = Math.max(
+            window.bulkSchedulerPeak,
+            document.querySelectorAll('.scheduler').length);
+      });
+      window.bulkSchedulerObserver.observe(document, {
+        childList: true, subtree: true,
+      });
+    });
+    try {
+      // pressBinding waits between keys, which hides the overlapping opens.
+      for (let i = 0; i < 12; i++) {
+        await page.keyboard.press('j');
+      }
+      await browser.waitForCursorOn(page, 'cur-last');
+      await page.waitForSelector('.scheduler', {timeout: 15000});
+      await sleep(1500);
+      assert.equal(await browser.cursorContent(page), 'cur-last');
+      assert.equal(await page.evaluate(() => window.bulkSchedulerPeak), 1,
+          'rapid cursor movement opened multiple schedulers');
+      assert.equal(await page.$$eval('.scheduler', (els) => els.length), 1);
+    } finally {
+      await page.evaluate(() => {
+        window.bulkSchedulerObserver.disconnect();
+        delete window.bulkSchedulerObserver;
+        delete window.bulkSchedulerPeak;
+      });
+      await pressBinding(page, 'escape');
+    }
+  });
 });
 
 // 'd' and 'e' deal with a task without giving it a date: the walk down the

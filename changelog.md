@@ -2,6 +2,9 @@
 
 ## Version 209
 
+* Fixes rapid `j` presses in bulk reschedule mode (`* t`) opening
+  multiple schedulers.
+
 * Adds `d`, `e` and `z` to bulk reschedule mode (`* t`) and bulk move
   mode (`* v`): `d` and `e` complete or delete the task the dialog is up
   for and move on to the next one, and `z` undoes the last change and

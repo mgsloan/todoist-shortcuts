@@ -1894,6 +1894,11 @@
   // having finished with it.
   let bulkDialogSeenOpen = false;
 
+  // MUTABLE. Cursor moves wait for the previous dialog to finish opening.
+  // A fresh queue per bulk session also cancels moves left over after escape
+  // or switching modes.
+  let bulkCursorQueue = null;
+
   async function bulkSchedule() {
     await startBulk(BULK_SCHEDULE);
   }
@@ -1920,6 +1925,7 @@
     bulkTaskKey = null;
     visitedBulkTaskIds = new Set();
     bulkDialogSeenOpen = false;
+    bulkCursorQueue = {tail: Promise.resolve()};
     updateKeymap();
     await mode.open(cursor);
   }
@@ -1932,6 +1938,7 @@
     bulkTaskKey = null;
     visitedBulkTaskIds = new Set();
     bulkDialogSeenOpen = false;
+    bulkCursorQueue = null;
     updateKeymap();
     await closeContextMenus();
   }
@@ -2017,16 +2024,32 @@
   // the user having finished with the task, hence the flag.
   async function bulkCursorTo(motion) {
     const mode = bulkMode;
-    if (!mode) {
+    const queue = bulkCursorQueue;
+    if (!mode || !queue) {
       return;
     }
-    bulkDialogSeenOpen = false;
-    await closeContextMenus();
-    await motion();
-    const cursor = getCursor();
-    if (cursor) {
-      await mode.open(cursor);
-    }
+    const step = queue.tail.then(async () => {
+      if (bulkCursorQueue !== queue) {
+        return;
+      }
+      bulkDialogSeenOpen = false;
+      await closeContextMenus();
+      if (bulkCursorQueue !== queue) {
+        return;
+      }
+      await motion();
+      if (bulkCursorQueue !== queue) {
+        return;
+      }
+      const cursor = getCursor();
+      if (cursor) {
+        await mode.open(cursor);
+      }
+    });
+    // A failed move must not prevent later cursor keys from working.  The
+    // caller still receives the failure from this step.
+    queue.tail = step.catch(noop);
+    await step;
   }
 
   // Deals with the task the dialog is up for by completing it, rather than by
