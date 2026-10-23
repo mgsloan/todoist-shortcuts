@@ -1,6 +1,6 @@
 # todoist-shortcuts changelog
 
-## Version 209
+## Version 210
 
 * Fixes priority keys (`1` to `4` and `0`) doing nothing when multiple
   tasks are selected.
@@ -10,6 +10,8 @@
   dedents one level at a time instead of sometimes skipping a level.
 
 * Fixes bulk move (`* v`) stopping after the first task in Inbox.
+
+## Version 209
 
 * Fixes rapid `j` presses in bulk reschedule mode (`* t`) opening
   multiple schedulers.
