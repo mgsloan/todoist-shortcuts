@@ -73,18 +73,23 @@ describe('setting priority', {timeout: TIMEOUT}, () => {
     await openFixture('selection', [
       {content: 'alpha', priority: NONE},
       {content: 'beta', priority: NONE},
+      {content: 'gamma', priority: NONE},
     ]);
     await browser.putCursorOn(page, 'alpha');
     await browser.press(page, 'x');
     await browser.press(page, 'j');
     await browser.press(page, 'x');
-    await browser.press(page, '2');
-    for (const content of ['alpha', 'beta']) {
+    for (const key of ['2', '4', '1', '0', '3']) {
+      await browser.press(page, key);
+      const expected = api.priorityOfLevel(key === '0' ? '4' : key);
+      for (const content of ['alpha', 'beta']) {
+        assert.equal(
+            await api.waitForPriority(fixture.id(content), expected),
+            expected, content + ' should respond to priority key ' + key);
+      }
       assert.equal(
-          await api.waitForPriority(
-              fixture.id(content), api.priorityOfLevel('2')),
-          api.priorityOfLevel('2'),
-          content + ' should have been given priority 2');
+          (await api.getTask(fixture.id('gamma'))).priority, NONE,
+          'an unselected task should keep its priority');
     }
   });
 

@@ -73,7 +73,8 @@ module.exports = [
     setUp: onAlpha,
     // The picker's text is in a portal with nothing to match on, so this
     // settles for the popup it opens in.
-    check: opens('[data-testid="popper__overlay"], .popper'),
+    check: opens('[data-testid="popper__overlay"], .popper, ' +
+        '[data-popover-popup]'),
   },
   {
     keymap: 'default',

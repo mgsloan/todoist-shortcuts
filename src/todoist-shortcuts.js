@@ -771,11 +771,26 @@
             'task-overflow-menu-priority-' + level,
             false);
       } else {
-        await clickUniqueRetrying(
-            document,
+        const toolbar = await getUniqueRetrying(
+            document, '.multi_select_toolbar');
+        const picker = getUnique(toolbar,
             'button[data-action-hint="multi-select-toolbar-priority-picker"]');
-        const menu = await getUniqueRetrying(document, '.priority_picker');
-        await clickPriorityMenu(menu, level);
+        if (picker) {
+          click(picker);
+          const menu = await getUniqueRetrying(document, '.priority_picker');
+          await clickPriorityMenu(menu, level);
+        } else {
+          // The newer toolbar puts the priority choices in "More actions".
+          await clickUniqueRetrying(
+              toolbar, 'button',
+              matchingAction('multi-select-toolbar-overflow-menu-trigger'));
+          const actionHint =
+              'multi-select-toolbar-overflow-menu-priority-' + level;
+          const item = await getUniqueRetrying(
+              document, '[data-action-hint="' + actionHint + '"]');
+          await sleep(MENU_SETTLE_DELAY);
+          click(item);
+        }
       }
     };
   }
@@ -3255,7 +3270,11 @@
             // nudges vertically to activate the drag, then sweeps horizontally
             // to change indent without a net vertical move (so no reorder).
             if (typeof result.indentDelta === 'number') {
-              await animateIndentDrag(el, x, y, result.indentDelta);
+              // The handle is outside the row. Dropping there misses the row
+              // after its indent changes, so keep both ends inside its body.
+              const startX = sourceTask.getBoundingClientRect().left +
+                  Math.abs(result.indentDelta) + 1;
+              await animateIndentDrag(el, startX, y, result.indentDelta);
               dragDone(sourceTask);
               return;
             }
@@ -3296,6 +3315,9 @@
     if (typeof PointerEvent === 'function') {
       el.dispatchEvent(new PointerEvent(type, Object.assign({}, params, {
         pointerId: 1,
+        // Todoist's drag sensor ignores non-primary pointers.
+        pointerType: 'mouse',
+        isPrimary: true,
       })));
     }
   }

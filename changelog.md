@@ -2,6 +2,13 @@
 
 ## Version 209
 
+* Fixes priority keys (`1` to `4` and `0`) doing nothing when multiple
+  tasks are selected.
+
+* Fixes moving tasks with `shift+j` / `shift+k` and indenting with
+  `shift+l`, including their arrow-key alternatives. `shift+h` now
+  dedents one level at a time instead of sometimes skipping a level.
+
 * Fixes bulk move (`* v`) stopping after the first task in Inbox.
 
 * Fixes rapid `j` presses in bulk reschedule mode (`* t`) opening

@@ -40,7 +40,8 @@ const showsTask = (content) => async (t) => {
 
 // Most of these open something inside the task view, which lands in a popup.
 const opensAPopup = async (t) => await t.page.waitForSelector(
-    '[data-testid="popper__overlay"], .popper, [role="dialog"] [role="menu"]',
+    '[data-testid="popper__overlay"], .popper, [data-popover-popup], ' +
+        '[role="dialog"] [role="menu"]',
     {timeout: 15000});
 
 const editorIsFocused = async (t) => await t.page.waitForFunction(
