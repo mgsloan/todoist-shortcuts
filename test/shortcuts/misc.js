@@ -105,10 +105,12 @@ module.exports = [
     what: 'moves each task in turn from the cursor down',
     setUp: onAlpha,
     check: async (t) => {
-      await t.page.waitForSelector('.popper', {timeout: 15000});
+      await t.page.waitForSelector(
+          '.popper, [data-popover-popup]', {timeout: 15000});
       await t.press('alt+j');
       await t.browser.waitForCursorOn(t.page, 'beta');
-      await t.page.waitForSelector('.popper', {timeout: 15000});
+      await t.page.waitForSelector(
+          '.popper, [data-popover-popup]', {timeout: 15000});
     },
     tearDown: async (t) => await t.press('escape'),
   },

@@ -232,7 +232,8 @@ describe('completing and deleting in the bulk modes', {
 
   // The two dialogs the walk puts up, as page functions.
   const SCHEDULER = () => Boolean(document.querySelector('.scheduler'));
-  const PROJECT_PICKER = () => [...document.querySelectorAll('.popper')].some(
+  const PROJECT_PICKER = () => [...document.querySelectorAll(
+      '.popper, [data-popover-popup]')].some(
       (popper) => popper.querySelector(
           'input[role=combobox][aria-controls^="dropdown-select-"]'));
 
@@ -378,7 +379,8 @@ describe('entering bulk move mode', {timeout: TIMEOUT}, () => {
       await browser.putCursorOn(page, 'bm-a');
       await pressBinding(page, '* v');
       await page.waitForFunction(
-          () => [...document.querySelectorAll('.popper')].some(
+          () => [...document.querySelectorAll(
+              '.popper, [data-popover-popup]')].some(
               (popper) => popper.querySelector(
                   'input[role=combobox][aria-controls^="dropdown-select-"]')),
           {timeout: 15000});
@@ -395,6 +397,97 @@ describe('entering bulk move mode', {timeout: TIMEOUT}, () => {
     assert.deepEqual(
         await api.contentsOfProject(fixture.project.id),
         ['bm-a', 'bm-b', 'bm-c', 'bm-d']);
+  });
+});
+
+// Moving a task out of Inbox removes it from this view. Check both that the
+// walk continues with the newer project picker and that every move reaches
+// the server.
+describe('bulk move from Inbox', {timeout: TIMEOUT}, () => {
+  let chrome = null;
+  let page = null;
+  let fixture = null;
+
+  const PICKER_INPUT =
+      'input[role=combobox][aria-controls^="dropdown-select-"]';
+  const contents = ['bmi-a', 'bmi-b', 'bmi-c'];
+
+  async function pickerOn(content) {
+    await browser.waitForCursorOn(page, content);
+    await page.waitForSelector(PICKER_INPUT, {visible: true, timeout: 15000});
+    await page.waitForFunction(
+        (query) => document.querySelector(query) === document.activeElement,
+        {timeout: 15000}, PICKER_INPUT);
+  }
+
+  before(async () => {
+    const user = await api.getUser();
+    chrome = await browser.launch();
+    const first = await browser.openApp(chrome);
+    await browser.assertSameAccountAs(first, user);
+    await first.close();
+    await fixtures.destroyStale();
+    fixture = await fixtures.create('bulk-inbox', []);
+    for (const content of contents) {
+      // Omitting project_id creates the task in Inbox.
+      fixture.tasks[content] = await api.createTask({content: content});
+    }
+    page = await browser.openApp(chrome, 'inbox');
+    await page.bringToFront();
+    await browser.waitForTasks(page);
+  });
+
+  after(async () => {
+    if (page) await page.close();
+    if (fixture) {
+      // Inbox cannot be deleted as a fixture project can. Remove only the
+      // tasks created here, wherever the test managed to move them.
+      for (const task of Object.values(fixture.tasks)) {
+        await api.request('DELETE', '/tasks/' + task.id);
+      }
+    }
+    await fixtures.destroy(fixture);
+    if (chrome) await chrome.close();
+  });
+
+  it('moves each task and supports cursor movement and Escape', async () => {
+    await browser.putCursorOn(page, contents[0]);
+    await pressBinding(page, '* v');
+    await pickerOn(contents[0]);
+
+    await pressBinding(page, 'alt+j');
+    await pickerOn(contents[1]);
+    await pressBinding(page, 'alt+k');
+    await pickerOn(contents[0]);
+    await pressBinding(page, 'escape');
+    await page.waitForSelector(PICKER_INPUT, {hidden: true, timeout: 15000});
+    for (const content of contents) {
+      assert.equal(
+          (await api.getTask(fixture.id(content))).project_id,
+          fixture.tasks[content].project_id,
+          'cursor movement and Escape should not move a task');
+    }
+
+    await pressBinding(page, '* v');
+    for (const content of contents) {
+      await pickerOn(content);
+      await page.type(PICKER_INPUT, fixture.project.name);
+      await page.waitForFunction(
+          (query, name) => {
+            const input = document.querySelector(query);
+            const option = input && document.getElementById(
+                input.getAttribute('aria-activedescendant'));
+            return option && option.textContent.includes(name);
+          },
+          {timeout: 15000}, PICKER_INPUT, fixture.project.name);
+      await pressBinding(page, 'enter');
+      await api.waitFor(content + ' to move out of Inbox', async () =>
+        (await api.getTask(fixture.id(content))).project_id ===
+          fixture.project.id);
+    }
+    await page.waitForSelector(PICKER_INPUT, {hidden: true, timeout: 15000});
+    assert.deepEqual(
+        await api.contentsOfProject(fixture.project.id), contents);
   });
 });
 

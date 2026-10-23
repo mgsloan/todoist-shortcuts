@@ -2215,10 +2215,10 @@
     return null;
   }
 
-  // The project picker has no class or testid of its own any more, so it is
-  // found by the combobox Todoist puts in it.
+  // The project picker can use an older popper or a newer popover. Both
+  // contain the same project-search combobox.
   function checkMoveToProjectOpen() {
-    return getUnique(document, '.popper', hasChild(
+    return getUnique(document, '.popper, [data-popover-popup]', hasChild(
         'input[role=combobox][aria-controls^="dropdown-select-"]')) !== null;
   }
 

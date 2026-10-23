@@ -2,6 +2,8 @@
 
 ## Version 209
 
+* Fixes bulk move (`* v`) stopping after the first task in Inbox.
+
 * Fixes rapid `j` presses in bulk reschedule mode (`* t`) opening
   multiple schedulers.
 
