@@ -6,6 +6,7 @@
 // delete tasks.
 
 const browser = require('./lib/browser');
+const {getConfig} = require('./lib/targets');
 
 async function main() {
   const chrome = await browser.launch();
@@ -18,7 +19,7 @@ async function main() {
       {polling: 1000, timeout: 0});
   const account = await browser.accountOfPage(page);
   console.log('Logged in as ' + account.email + ' (id ' + account.id + ').');
-  console.log('Make sure etc/test-token holds this account\'s API token.');
+  console.log('Put this account\'s API token in ' + getConfig().tokenFile);
   await chrome.close();
 }
 

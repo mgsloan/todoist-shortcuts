@@ -40,7 +40,8 @@ describe('cursor keys in the upcoming view', {timeout: TIMEOUT}, () => {
     // Two days' worth, so that the view has more than one section whichever
     // way the account's own tasks fall.
     fixture = await fixtures.create('upcoming', []);
-    for (const [content, due] of [['up-today', 'today'],
+    for (const [content, due] of [['up-today-a', 'today'],
+      ['up-today-b', 'today'],
       ['up-tomorrow', 'tomorrow']]) {
       await api.createTask({
         content: content, project_id: fixture.project.id, due_string: due,

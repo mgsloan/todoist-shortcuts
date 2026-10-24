@@ -7,6 +7,7 @@ const {after, afterEach, before, describe, it} = require('node:test');
 const api = require('./api');
 const browser = require('./browser');
 const fixtures = require('./fixtures');
+const {getConfig} = require('./targets');
 
 const TIMEOUT = 120000;
 
@@ -110,7 +111,9 @@ function runShortcutTable(title, table) {
         // been fixed yet. The test still runs, but a failure is expected, so
         // the suite stays green and the list of them stays visible.
         const options = {timeout: TIMEOUT};
-        if (entry.broken) options.todo = entry.broken;
+        const broken = typeof entry.broken === 'string' ? entry.broken :
+          entry.broken?.[getConfig().target];
+        if (broken) options.todo = broken;
         it(name, options, async () => {
           fixture = await fixtures.create(
               fixtureName(entry, key),

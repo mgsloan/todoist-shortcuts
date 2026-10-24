@@ -20,7 +20,8 @@ const focusedItem = (t) => t.page.evaluate((selector) => {
   return item ? (item.textContent || '').trim().slice(0, 30) : null;
 }, MENU);
 
-const menuIsOpen = async (t) => Boolean(await t.page.$(MENU));
+const menuCloses = async (t) => await t.page.waitForSelector(
+    MENU, {hidden: true, timeout: 15000});
 
 const focusAnItem = async (t) => {
   await openMenu(t);
@@ -55,8 +56,7 @@ module.exports = [
     what: 'selects the focused menu item',
     setUp: focusAnItem,
     settle: 2000,
-    check: async (t) => assert.equal(
-        await menuIsOpen(t), false, 'the menu should have closed'),
+    check: menuCloses,
   },
   {
     keymap: 'menu_list',
@@ -64,7 +64,6 @@ module.exports = [
     what: 'selects the focused menu item',
     setUp: focusAnItem,
     settle: 2000,
-    check: async (t) => assert.equal(
-        await menuIsOpen(t), false, 'the menu should have closed'),
+    check: menuCloses,
   },
 ];

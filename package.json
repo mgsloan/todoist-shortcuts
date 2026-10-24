@@ -1,8 +1,12 @@
 {
   "scripts": {
-    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\"",
-    "test:login": "node test/login.js",
-    "test:clean": "node test/clean.js"
+    "test": "node test/run.js",
+    "test:stable": "node test/run.js --target stable",
+    "test:experimental": "node test/run.js --target experimental",
+    "test:check": "node test/run.js --check",
+    "test:login": "node test/run.js --login",
+    "test:clean": "node test/run.js --clean",
+    "test:export-session": "node test/run.js --export-session"
   },
   "devDependencies": {
     "eslint": "^8.32.0",

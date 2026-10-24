@@ -29,8 +29,13 @@ describe('sidebar navigation', {timeout: TIMEOUT}, () => {
   const open = async (where) => {
     if (page) await page.close();
     page = await browser.openApp(chrome, where);
+    // New accounts show onboarding cards which shrink the sidebar's scroll
+    // area. Keep all three fixture rows in view so Todoist mounts them.
+    await page.setViewport({width: 1400, height: 1200});
     await page.bringToFront();
     await page.waitForSelector('#top-menu li a', {timeout: 30000});
+    // Hidden sidebars do not mount all the virtualized project rows either.
+    await setSidebarExpanded(true);
     const project = /^project\/(.+)$/.exec(where || '');
     if (project) {
       // Projects made moments ago are not in the sidebar immediately, and
@@ -127,6 +132,7 @@ describe('sidebar navigation', {timeout: TIMEOUT}, () => {
     // panel. Moving off of the projects entry used to resume from the
     // favorites entry instead, which sent you back up out of the project
     // list - the loop reported in #232.
+    await addProject('previous', false);
     const favorite = await addProject('aaa', true);
     const plain = await addProject('bbb', false);
     await open('project/' + plain.id);

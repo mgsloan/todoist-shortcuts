@@ -8,3 +8,5 @@ node_modules
 /etc/notes.md
 /etc/monitor.js
 /etc/test-token
+/etc/test-token-experimental
+/etc/test-session-*.json

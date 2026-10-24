@@ -33,7 +33,7 @@ describe('the one-time announcement', {timeout: TIMEOUT}, () => {
     if (page) await page.close();
     page = await browser.openApp(chrome, 'today', {announcement: 'show'});
     await page.bringToFront();
-    await browser.waitForTasks(page);
+    await page.waitForSelector('#content');
     await new Promise((resolve) => setTimeout(resolve, SETTLE));
   };
 

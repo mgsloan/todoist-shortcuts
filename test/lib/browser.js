@@ -7,16 +7,15 @@
 // account in once with `npm run test:login`; the session persists in the
 // profile directory.
 
-const os = require('os');
 const path = require('path');
 const puppeteer = require('puppeteer-core');
 
 const {readAnnouncement} = require('./announcement');
+const {getConfig, readSession} = require('./targets');
 
 const SRC_DIR = path.join(__dirname, '..', '..', 'src');
 
-const PROFILE_DIR = process.env.TS_TEST_PROFILE ||
-      path.join(os.homedir(), '.cache', 'todoist-shortcuts-test-profile');
+const PROFILE_DIR = getConfig().profile;
 
 const CHROME = process.env.TS_TEST_CHROME || '/opt/google/chrome/chrome';
 
@@ -24,6 +23,7 @@ const APP_URL = 'https://app.todoist.com/app/';
 
 async function launch(options) {
   const opts = options || {};
+  const session = readSession();
   const chrome = await puppeteer.launch({
     executablePath: CHROME,
     userDataDir: PROFILE_DIR,
@@ -50,6 +50,14 @@ async function launch(options) {
   // So that tests can read what the copying shortcuts put on the clipboard.
   await chrome.defaultBrowserContext().overridePermissions(
       'https://app.todoist.com', ['clipboard-read', 'clipboard-write']);
+  if (session) {
+    try {
+      await chrome.defaultBrowserContext().setCookie(...session.cookies);
+    } catch (e) {
+      await chrome.close();
+      throw new Error('Could not restore the test session. Export it again.');
+    }
+  }
   return chrome;
 }
 
@@ -65,6 +73,16 @@ async function launch(options) {
 // looking at.
 async function openApp(browser, where, options) {
   const page = await browser.newPage();
+  const session = readSession();
+  if (session) {
+    await page.evaluateOnNewDocument((entries) => {
+      if (location.origin === 'https://app.todoist.com') {
+        for (const [key, value] of Object.entries(entries)) {
+          localStorage.setItem(key, value);
+        }
+      }
+    }, session.localStorage);
+  }
   // An unsaved editor can otherwise leave a beforeunload dialog blocking
   // everything.
   page.on('dialog', (dialog) => dialog.accept());

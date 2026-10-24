@@ -11,6 +11,8 @@ const {after, before, describe, it} = require('node:test');
 const api = require('./lib/api');
 const browser = require('./lib/browser');
 const fixtures = require('./lib/fixtures');
+const {UNDO} = require('./lib/known-failures');
+const {getConfig} = require('./lib/targets');
 const {pressBinding, sleep} = require('./lib/shortcut-runner');
 
 const TIMEOUT = 240000;
@@ -520,7 +522,9 @@ describe('undoing in bulk reschedule mode', {timeout: TIMEOUT}, () => {
     if (chrome) await chrome.close();
   });
 
-  it('takes back the last change and stays where it is', async () => {
+  it('takes back the last change and stays where it is', {
+    todo: UNDO[getConfig().target],
+  }, async () => {
     await browser.putCursorOn(page, 'bz-a');
     await pressBinding(page, '* t');
     await page.waitForSelector('.scheduler', {timeout: 15000});

@@ -3,28 +3,15 @@
 // bugs this suite exists to catch are cases where the UI appears to accept a
 // change that never gets saved.
 
-const fs = require('fs');
-const path = require('path');
+const {readToken} = require('./targets');
 
 const BASE = 'https://api.todoist.com/api/v1';
-const TOKEN_FILE = path.join(__dirname, '..', '..', 'etc', 'test-token');
 
 let cachedToken = null;
 
 function getToken() {
   if (cachedToken) return cachedToken;
-  cachedToken = process.env.TODOIST_TEST_TOKEN;
-  if (!cachedToken) {
-    try {
-      cachedToken = fs.readFileSync(TOKEN_FILE, 'utf8').trim();
-    } catch (e) {
-      throw new Error(
-          'No API token. Put the *test* account\'s token in ' + TOKEN_FILE +
-          ' (Todoist Settings -> Integrations -> Developer), or set ' +
-          'TODOIST_TEST_TOKEN.');
-    }
-  }
-  if (!cachedToken) throw new Error('Empty API token in ' + TOKEN_FILE);
+  cachedToken = readToken();
   return cachedToken;
 }
 

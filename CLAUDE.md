@@ -56,7 +56,7 @@ commit that bumps `src/manifest.json`.
 
 ## Local Chrome setup
 
-Two Chrome profiles are relevant on this machine:
+The regular Chrome profiles on this machine include:
 
 * **Default** — mgsloan's personal Todoist account.  The Web Store build
   (`dehmghpdcahlffompjagejmgbcfahndp`) is installed but *disabled*; `src/` is
@@ -76,6 +76,10 @@ Two Chrome profiles are relevant on this machine:
   claude.ai, has `src/` loaded unpacked via chrome://extensions → Developer
   mode → Load unpacked, and is logged into a throwaway Todoist account
   (`mgsloan+tsdev@gmail.com`).
+
+* **todoist-shortcuts-dev-experimental** — the experimental sandbox,
+  `mgsloan+todoist+shortcuts+experimental@gmail.com`, in `Profile 2`.
+  Automated tests use separate profiles under `~/.cache`, described below.
 
 ### Dev loop
 
@@ -109,20 +113,28 @@ tab where the extension is already active — you'll get double keybindings.
 
 ## Automated tests
 
-`test/` holds an integration suite that drives a real browser against a real
-(throwaway) Todoist account.  There is no way to test this extension without
+`test/` holds an integration suite that drives real browsers against two
+throwaway Todoist accounts. There is no way to test this extension without
 one: it exists to poke at Todoist's DOM, so a mocked DOM would only test the
 mock.
 
 ```
-npm run test:login   # once: log the test account into the test profile
-npm test             # node --test test/
-npm run test:clean   # delete "ts-test " projects left by interrupted runs
+npm run test:login -- --target stable
+npm run test:login -- --target experimental
+npm run test:check   # verify both identities and experimental settings
+npm test            # full suite on both accounts concurrently
+npm run test:clean  # delete leftover "ts-test " projects on both accounts
 ```
 
 * `test/lib/browser.js` launches Chrome (puppeteer-core, system Chrome) against
   its own user data directory — `~/.cache/todoist-shortcuts-test-profile`, or
-  `TS_TEST_PROFILE`.  Set `TS_TEST_HEADLESS=1` to hide it.
+  `TS_TEST_PROFILE`. Set `TS_TEST_HEADLESS=1` to hide it. The experimental
+  target uses `~/.cache/todoist-shortcuts-experimental-test-profile` instead.
+  `npm test` starts both targets together; files within a target stay sequential.
+* `test/preflight.js` checks browser/API identity and Experimental features
+  (off for stable, on for experimental) before fixtures can be created.
+  `test/run.js` also rejects duplicate accounts or shared profile paths.
+  Use `npm run test:stable` / `npm run test:experimental` for one target.
 * Chrome ignores `--load-extension` now, so the extension is installed with
   `browser.installExtension()` (CDP `Extensions.loadUnpacked`), which needs
   `--enable-unsafe-extension-debugging` and `pipe: true`.
@@ -150,9 +162,11 @@ and fails when a key is neither in a table, nor listed in `COVERED_ELSEWHERE`
 shortcut means adding a test.  It runs no browser, so it is instant.
 
 A shortcut Todoist has broken gets `broken: 'how it fails'` in its table
-entry, which runs it as a todo: the suite stays green, and the list of what is
-broken lives in one place rather than in a red test run everyone learns to
-ignore.  Remove the flag when fixing it.
+entry, which runs it as a todo. For failures confined to one interface, use
+`broken: {experimental: 'how it fails'}` (or `stable`) so the other interface
+remains a strict check. Shared reasons live in `test/lib/known-failures.js`.
+TODO tests still execute, and unexpected failures still fail the run.
+Remove the flag when fixing it.
 
 Two traps worth remembering.  Puppeteer's `keyboard.press('O')` sends the
 character without the shift modifier, which is not what a `shift+o` binding
@@ -160,14 +174,15 @@ matches — `pressBinding` holds modifiers down instead.  And a timeout on the
 `describe` cancels the tests which haven't run yet, turning one slow failure
 into a page of them, so the timeout is per test.
 
-This suite hits the live service with a real account, so it is a local suite,
-not something to run in CI.
+The daily Actions workflow runs both targets in parallel using separate
+session secrets. See `development.md` for exporting and refreshing sessions.
+Do not overlap a local run with CI on the same account: fixture cleanup can
+delete another run's data. CI concurrency groups only coordinate CI jobs.
 
 ## Account safety
 
 Automating Todoist means creating, editing and deleting real tasks.  Only ever
-do that against the sandbox account — the test profile, or the
-**todoist-shortcuts-dev** Chrome profile.
+do that against the two sandbox accounts and their dedicated test profiles.
 
 Before any action that could mutate data (keystrokes, clicks on menu items,
 drags), confirm which account the tab is logged in as:
@@ -176,9 +191,11 @@ drags), confirm which account the tab is logged in as:
 JSON.parse(localStorage.getItem('auth_identity')).email
 ```
 
-The sandbox account is `mgsloan+todoist+shortcuts@gmail.com`; anything else is
-a real account.  `browser.assertSameAccountAs` does this check for the test
-suite, comparing against the account the API token belongs to.
+The stable sandbox is `mgsloan+todoist+shortcuts@gmail.com`; the experimental
+sandbox is `mgsloan+todoist+shortcuts+experimental@gmail.com`. Its regular
+Chrome profile is **todoist-shortcuts-dev-experimental** (`Profile 2`).
+Anything else is a real account. `browser.assertSameAccountAs` compares the
+browser identity with the API token's owner before the test suite mutates data.
 
 Read-only probing (opening menus, reading the DOM, navigating) is safe
 anywhere, but blind keystrokes are not: unfocused typing gets interpreted as
@@ -187,7 +204,10 @@ after confirming focus landed in it.
 
 ### API token
 
-The sandbox account's REST API token lives in `etc/test-token` (gitignored).
+The stable sandbox's API token lives in `etc/test-token`; the experimental
+token is in `etc/test-token-experimental` (both gitignored). Session exports
+in `etc/test-session-*.json` are also credentials; never print, commit,
+cache or upload them as artifacts. Use Actions secrets for CI.
 Use it to seed and verify test data instead of doing it through the UI:
 
 ```

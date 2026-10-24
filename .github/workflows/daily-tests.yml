@@ -1,0 +1,45 @@
+name: Daily Todoist compatibility
+
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Todoist ${{ matrix.target }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - target: stable
+            session_secret: TODOIST_STABLE_TEST_SESSION
+          - target: experimental
+            session_secret: TODOIST_EXPERIMENTAL_TEST_SESSION
+    concurrency:
+      group: todoist-tests-${{ matrix.target }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: ./eslint.sh
+      - name: Run full suite
+        env:
+          TS_TEST_TARGET: ${{ matrix.target }}
+          TS_TEST_HEADLESS: '1'
+          TS_TEST_CHROME: /usr/bin/google-chrome
+          TODOIST_TEST_SESSION: ${{ secrets[matrix.session_secret] }}
+        run: node test/run.js --target "$TS_TEST_TARGET"

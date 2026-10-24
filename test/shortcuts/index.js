@@ -7,6 +7,7 @@
 //     keymap: 'default',
 //     keys: ['j', 'down'],   // one test is generated per key
 //     what: 'moves the cursor down',
+//     broken: {experimental: 'upstream failure'}, // optional TODO reason
 //     tasks: ['alpha', 'beta'],   // fixture contents, optional
 //     setUp: async (t) => {},     // optional, runs before the key is pressed
 //     check: async (t) => {},     // asserts the key did something
