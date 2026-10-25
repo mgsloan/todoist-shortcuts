@@ -69,6 +69,20 @@ function assertDistinctTargets(accounts) {
   }
 }
 
+function accountTimezone(user) {
+  const timezone = user.tz_info?.timezone;
+  if (typeof timezone !== 'string' || !timezone) {
+    throw new Error('Todoist did not provide the test account timezone.');
+  }
+  try {
+    new Intl.DateTimeFormat('en', {timeZone: timezone}).format(0);
+  } catch (e) {
+    throw new Error('Todoist provided an invalid test account timezone.');
+  }
+  return timezone;
+}
+
 module.exports = {
-  TARGETS, assertDistinctTargets, getConfig, readSession, readToken,
+  TARGETS, accountTimezone, assertDistinctTargets, getConfig, readSession,
+  readToken,
 };

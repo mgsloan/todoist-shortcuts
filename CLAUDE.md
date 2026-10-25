@@ -133,6 +133,8 @@ npm run test:clean  # delete leftover "ts-test " projects on both accounts
   `npm test` starts both targets together; files within a target stay sequential.
 * `test/preflight.js` checks browser/API identity and Experimental features
   (off for stable, on for experimental) before fixtures can be created.
+  The runner uses the account's timezone for both Node and Chrome so relative
+  API fixture dates agree with the browser on UTC CI hosts.
   `test/run.js` also rejects duplicate accounts or shared profile paths.
   Use `npm run test:stable` / `npm run test:experimental` for one target.
 * Chrome ignores `--load-extension` now, so the extension is installed with
@@ -164,7 +166,7 @@ shortcut means adding a test.  It runs no browser, so it is instant.
 A shortcut Todoist has broken gets `broken: 'how it fails'` in its table
 entry, which runs it as a todo. For failures confined to one interface, use
 `broken: {experimental: 'how it fails'}` (or `stable`) so the other interface
-remains a strict check. Shared reasons live in `test/lib/known-failures.js`.
+remains a strict check. Keep the reason beside the affected test.
 TODO tests still execute, and unexpected failures still fail the run.
 Remove the flag when fixing it.
 

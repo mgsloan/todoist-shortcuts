@@ -73,6 +73,10 @@ async function launch(options) {
 // looking at.
 async function openApp(browser, where, options) {
   const page = await browser.newPage();
+  // Match the account used for API fixtures, including on UTC CI runners.
+  if (process.env.TS_TEST_TIMEZONE) {
+    await page.emulateTimezone(process.env.TS_TEST_TIMEZONE);
+  }
   const session = readSession();
   if (session) {
     await page.evaluateOnNewDocument((entries) => {

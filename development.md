@@ -75,12 +75,14 @@ data: their browser and API identities must match, their experimental
 settings must be correct, and the accounts and profile directories must
 be distinct. One suite failing does not cancel the other suite.
 
+The runner sets Node and Chrome to each account's Todoist timezone. This
+keeps API fixtures such as "today" and "every day" aligned with the browser
+calendar even when the CI host uses UTC and has crossed midnight first.
+
 Confirmed upstream Todoist failures can be marked as TODO for the affected
-target. They still execute in both suites. Currently the experimental
-interface has no Undo popup, and native Ctrl+Z also fails with the extension
-disabled (verified 2026-10-23). Its four undo checks are TODOs; stable undo
-remains a strict check. Reasons live in `test/lib/known-failures.js`.
-New, unrecognized failures still fail CI.
+target. They still execute in both suites. Keep the reason beside the test
+and remove the flag when upstream behavior recovers. New, unrecognized
+failures still fail CI.
 
 ```
 npm run test:login -- --target stable

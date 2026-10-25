@@ -5,10 +5,19 @@ const os = require('os');
 const path = require('path');
 const {describe, it} = require('node:test');
 const {
-  assertDistinctTargets, getConfig, readSession, readToken,
+  accountTimezone, assertDistinctTargets, getConfig, readSession, readToken,
 } = require('./lib/targets');
 
 describe('test account configuration', () => {
+  it('requires a valid account timezone instead of the runner default', () => {
+    assert.equal(accountTimezone({tz_info: {timezone: 'America/Denver'}}),
+        'America/Denver');
+    assert.equal(accountTimezone({tz_info: {timezone: 'UTC'}}), 'UTC');
+    assert.throws(() => accountTimezone({}), /account timezone/);
+    assert.throws(() => accountTimezone({tz_info: {timezone: 'typo'}}),
+        /invalid/);
+  });
+
   it('isolates both profiles and credentials', () => {
     const stable = getConfig({TS_TEST_TARGET: 'stable'});
     const experimental = getConfig({TS_TEST_TARGET: 'experimental'});

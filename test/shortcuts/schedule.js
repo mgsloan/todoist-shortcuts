@@ -114,9 +114,9 @@ module.exports = [
     ],
     setUp: openScheduler,
     check: andCloses(async (t) => {
-      const days = await daysAhead(t);
-      assert.ok(days > 0, t.key + ' should have moved alpha later, not ' +
-          days + ' day(s) ahead');
+      const original = t.fixture.tasks.alpha.due.date;
+      await t.api.waitFor(t.key + ' to postpone alpha beyond ' + original,
+          async () => (await dueDateOfAlpha(t)) > original);
     }),
   },
   {

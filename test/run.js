@@ -9,11 +9,13 @@ const ROOT = path.join(__dirname, '..');
 // MUTABLE. Forward interruptions to every running preflight or test process.
 const children = new Set();
 
-function child(target, args, capture = false) {
+function child(target, args, options = {}) {
+  const {capture, timezone} = options;
   return new Promise((resolve, reject) => {
     const proc = spawn(process.execPath, args, {
       cwd: ROOT,
-      env: {...process.env, TS_TEST_TARGET: target},
+      env: {...process.env, TS_TEST_TARGET: target,
+        ...(timezone ? {TZ: timezone, TS_TEST_TIMEZONE: timezone} : {})},
       stdio: ['inherit', 'pipe', 'pipe'],
     });
     children.add(proc);
@@ -56,18 +58,20 @@ async function main() {
     mode === '--export-session' ? ['test/export-session.js'] :
       ['--test', '--test-concurrency=1', ...testArgs(args)];
   const checks = await Promise.all(targets.map(async (target) => {
-    const result = await child(target, ['test/preflight.js'], true);
+    const result = await child(target, ['test/preflight.js'], {capture: true});
     if (result.code !== 0) throw new Error(target + ' preflight failed.');
     return JSON.parse(result.output);
   }));
   assertDistinctTargets(checks);
   for (const check of checks) {
     console.log('[' + check.target + '] Verified ' + check.email +
-        ', experimental features ' + (check.experimental ? 'on' : 'off'));
+        ', experimental features ' + (check.experimental ? 'on' : 'off') +
+        ', timezone ' + check.timezone);
   }
   if (mode === '--check') return;
   const results = await Promise.all(targets.map(async (target) => {
-    const result = await child(target, command);
+    const {timezone} = checks.find((check) => check.target === target);
+    const result = await child(target, command, {timezone});
     console.log('[' + target + '] ' + (result.code === 0 ? 'PASS' : 'FAIL'));
     return result;
   }));

@@ -1,7 +1,6 @@
 // Undo, clipboard copying, and the bulk modes.
 
 const assert = require('node:assert');
-const {UNDO} = require('../lib/known-failures');
 
 const onAlpha = async (t) => await t.browser.putCursorOn(t.page, 'alpha');
 
@@ -22,7 +21,6 @@ module.exports = [
     keymap: 'default',
     keys: ['u', 'z', 'ctrl+z'],
     what: 'undoes the last change',
-    broken: UNDO,
     setUp: async (t) => {
       await onAlpha(t);
       await t.press('d');
@@ -92,9 +90,8 @@ module.exports = [
       await t.press('c');
       await t.browser.waitForCursorOn(t.page, 'beta');
       await t.page.waitForSelector('.scheduler', {timeout: 15000});
-      assert.ok(
-          (await t.api.getTask(t.fixture.id('alpha'))).due,
-          'expected the first task to have been scheduled');
+      await t.api.waitFor('the first task to have been scheduled', async () =>
+        (await t.api.getTask(t.fixture.id('alpha'))).due);
     },
     tearDown: async (t) => await t.press('escape'),
   },
