@@ -1,16 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
   const MOUSE_BEHAVIOR = 'mouse-behavior';
   const CURSOR_MOVEMENT = 'cursor-movement';
+  const SELECTION_PREFIX = 'selection-prefix';
 
   const mouseBehaviorOptionEls =
         document.querySelectorAll('input[name="mouse-behavior"]');
   const cursorMovementOptionEls =
         document.querySelectorAll('input[name="cursor-movement"]');
   const statusEl = document.getElementById('status');
+  const selectionPrefixEl = document.getElementById(SELECTION_PREFIX);
+  // MUTABLE. Retain options not represented by controls on this page.
+  let savedOptions = {};
   let clearStatusTimeout = null;
 
   function save() {
-    const options = {};
+    const options = Object.assign({}, savedOptions);
+    options[SELECTION_PREFIX] = selectionPrefixEl.value;
     for (const radioButton of mouseBehaviorOptionEls) {
       if (radioButton.checked) {
         options[MOUSE_BEHAVIOR] = radioButton.id;
@@ -35,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initialize(options) {
+    savedOptions = options;
+    selectionPrefixEl.value = options[SELECTION_PREFIX];
+    selectionPrefixEl.addEventListener('change', save);
+
     const mouseBehavior = options[MOUSE_BEHAVIOR];
     let foundMouseBehaviorOption = false;
     for (const radioButton of mouseBehaviorOptionEls) {

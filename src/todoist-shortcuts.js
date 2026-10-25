@@ -364,6 +364,12 @@
     return result;
   }
 
+  function getSelectionPrefixOption() {
+    const result = options['selection-prefix'];
+    // Also validate here for hosts that inject options without common.js.
+    return ['*', ',', ';'].includes(result) ? result : '*';
+  }
+
   /*****************************************************************************
    * Action combiners
    */
@@ -1587,7 +1593,16 @@
     const iframe = element('iframe');
     iframe.setAttribute('src', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5jkiI07g9XoeORQrOQUlAwY4uqJkBDkm-zMUK4WuaFvca0BJ0wPKEM5dw6RgKtcSN33PsZPKiN4G4/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false');
     iframe.setAttribute('scrolling', 'no');
-    const container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, iframe);
+    const prefix = getSelectionPrefixOption();
+    const prefixHelp = element('p', '', text(
+        'Selection and bulk shortcuts use the prefix "' + prefix + '". ' +
+        'For example: ' + prefix + ' a (select all), ' +
+        prefix + ' n (deselect all), ' + prefix + ' t (bulk reschedule), ' +
+        prefix + ' v (bulk move). Press the two keys in sequence. ' +
+        'In the guide below, replace the default "*" prefix with "' +
+        prefix + '".'));
+    const container = div(
+        TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, prefixHelp, iframe);
     const modal = createModal(div('', header, container));
     modal.classList.add(TODOIST_SHORTCUTS_HELP);
     modal.style.display = 'none';
@@ -5758,10 +5773,16 @@
   }
 
   function registerKeybindings(keymap, binds) {
+    const prefix = getSelectionPrefixOption();
     for (let i = 0; i < binds.length; i++) {
       if (binds[i].length === 2) {
+        // Keep the default spellings in the tables and resolve all aliases
+        // here, after options have loaded. Modified keys like ctrl+, stay put.
+        const keys = [].concat(binds[i][0]).map(
+            (key) => key.replace(/^\* /, prefix + ' '));
+        const binding = [keys, binds[i][1]];
         // eslint-disable-next-line no-undefined
-        mousetrap.bind(binds[i][0], callBinding(binds[i]), undefined, keymap);
+        mousetrap.bind(keys, callBinding(binding), undefined, keymap);
       } else {
         error('Improper binding entry at index', i, 'value is', binds[i]);
       }
