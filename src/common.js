@@ -48,6 +48,10 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
       if (!(CURSOR_MOVEMENT in options)) {
         options[CURSOR_MOVEMENT] = FOLLOWS_TASK_WITHIN_SECTION;
       }
+      if (!['*', ',', ';'].includes(options['selection-prefix'])) {
+        options['selection-prefix'] = '*';
+        changed = true;
+      }
 
       // Save if canonicalization changed the options
       if (changed) {

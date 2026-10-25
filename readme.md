@@ -326,10 +326,23 @@ tasks](https://github.com/mgsloan/todoist-shortcuts/issues/23)
 
 # How to customize keyboard shortcuts
 
-Ideally, there would be a UI for customizing keyboard shortcuts. However, it
-seems like this would take a substantial amount of development effort
-(PR contributions appreciated!). For now, you can do the following to customize
-the keyboard shortcuts in Chrome:
+The extension's options page has a **Selection and bulk shortcut prefix** setting.
+If `*` is awkward on your keyboard, choose comma (`,`) or semicolon (`;`).
+This changes every `*` sequence: for example, comma makes `* a` become `, a`,
+`* n` become `, n`, `* t` become `, t`, and `* v` become `, v`. It also applies
+to the priority-selection and collapse/expand shortcuts, including arrow-key
+alternatives. Press the prefix and then the next key, rather than together.
+The existing `x` shortcut and modified keys such as `ctrl+,` are unchanged.
+
+Reload your Todoist tabs after changing the setting. The choice is saved with
+other extension options and does not require a local copy of the extension,
+so you keep receiving automatic updates. The documentation and printable guide
+use the default `*` prefix; substitute your chosen prefix when reading them.
+The in-app help (`?`) shows your active prefix and examples.
+
+General remapping is not yet available in the options page
+(see [issue #99](https://github.com/mgsloan/todoist-shortcuts/issues/99)).
+To customize other shortcuts, you can still edit a local copy in Chrome:
 
 1. Clone this repository (run `git clone https://github.com/mgsloan/todoist-shortcuts`)
 

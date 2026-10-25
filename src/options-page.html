@@ -14,7 +14,8 @@
     </p>
     <p>
       For simplicity, todoist-shortcuts currently has few options.
-      At some point in the future, direct customization of keybindings without
+      The selection and bulk prefix can be changed below. More general
+      customization of keybindings without
       <a href="https://github.com/mgsloan/todoist-shortcuts#how-to-customize-keyboard-shortcuts">
         modifying the source code directly
       </a>
@@ -25,6 +26,21 @@
       if you would find this useful.
     </p>
     <h2>Settings</h2>
+    <p>
+      <label for="selection-prefix"><b>Selection and bulk shortcut prefix:</b></label>
+      <select id="selection-prefix" aria-describedby="selection-prefix-description">
+        <option value="*">* (default)</option>
+        <option value=",">, (comma)</option>
+        <option value=";">; (semicolon)</option>
+      </select>
+    </p>
+    <p id="selection-prefix-description">
+      Replaces the first key in all <code>*</code> sequences, including
+      selection, collapse/expand, bulk reschedule and bulk move.
+      For example, choosing comma changes <code>* a</code> to <code>, a</code>.
+      Press the prefix and then the next key; do not hold them together.
+      The shortcut guide shows the default <code>*</code> prefix.
+    </p>
     <p>
       Mouse hover behavior:
     </p>

@@ -1,5 +1,13 @@
 # todoist-shortcuts changelog
 
+## Unreleased
+
+* Adds an option to use comma (`,`) or semicolon (`;`) instead of `*` for
+  selection, collapse/expand and bulk shortcuts, for keyboards where `*` is
+  awkward to type. The default is unchanged. Addresses part of [#99][].
+
+[#99]: https://github.com/mgsloan/todoist-shortcuts/issues/99
+
 ## Version 210
 
 * Fixes priority keys (`1` to `4` and `0`) doing nothing when multiple
