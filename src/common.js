@@ -14,12 +14,23 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
 
   try {
     chrome.storage.sync.get({options: '{}'}, (storedValues) => {
+      const failure = chrome.runtime && chrome.runtime.lastError;
+      if (failure || !storedValues) {
+        handleError(new Error(failure ? failure.message :
+          'Storage did not return options.'));
+        return;
+      }
       const serializedOptions = storedValues['options'];
       let options = {};
       if (serializedOptions) {
         try {
           options = JSON.parse(serializedOptions);
+          if (options === null || typeof options !== 'object' ||
+              Array.isArray(options)) {
+            throw new Error('Saved options must be an object.');
+          }
         } catch (e) {
+          options = {};
           handleError(e);
         }
       }
@@ -47,6 +58,12 @@ function todoistShortcutsLoadOptions(handleOptions, handleError) {
       }
       if (!(CURSOR_MOVEMENT in options)) {
         options[CURSOR_MOVEMENT] = FOLLOWS_TASK_WITHIN_SECTION;
+      }
+
+      if (!options.keybindings || typeof options.keybindings !== 'object' ||
+          Array.isArray(options.keybindings)) {
+        options.keybindings = {};
+        changed = true;
       }
 
       // Save if canonicalization changed the options

@@ -12,14 +12,22 @@
 
   // Cursor navigation.
   const CURSOR_BINDINGS = [
-    [['j', 'down'], cursorDown],
-    [['k', 'up'], cursorUp],
-    [['h', 'left'], cursorLeft],
-    [['l', 'right'], cursorRight],
-    ['^', cursorFirst],
-    ['$', cursorLast],
-    ['{', cursorUpSection],
-    ['}', cursorDownSection],
+    [['j', 'down'], cursorDown,
+      'cursor-down', 'Move cursor down'],
+    [['k', 'up'], cursorUp,
+      'cursor-up', 'Move cursor up'],
+    [['h', 'left'], cursorLeft,
+      'cursor-left', 'Move cursor left'],
+    [['l', 'right'], cursorRight,
+      'cursor-right', 'Move cursor right'],
+    ['^', cursorFirst,
+      'cursor-first', 'Move to first task'],
+    ['$', cursorLast,
+      'cursor-last', 'Move to last task'],
+    ['{', cursorUpSection,
+      'cursor-up-section', 'Move to previous section'],
+    ['}', cursorDownSection,
+      'cursor-down-section', 'Move to next section'],
   ];
 
   // Here's where the keybindings get specified. Of course, feel free to modify
@@ -27,81 +35,141 @@
   const KEY_BINDINGS = [].concat(CURSOR_BINDINGS, [
 
     // Navigation
-    ['g', navigate],
-    ['G', navigateToTask],
-    ['`', nextLeftMenuItem],
-    ['shift+`', prevLeftMenuItem],
+    ['g', navigate,
+      'navigate', 'Navigate to a view'],
+    ['G', navigateToTask,
+      'navigate-to-task', 'Navigate to a task'],
+    ['`', nextLeftMenuItem,
+      'next-left-menu-item', 'Next sidebar view'],
+    ['shift+`', prevLeftMenuItem,
+      'prev-left-menu-item', 'Previous sidebar view'],
 
     // Manipulation of tasks at cursor
-    ['enter', edit],
-    ['shift+enter', followLink],
-    ['shift+o', addAbove],
-    ['o', addBelow],
-    ['a', addTaskBottom],
-    ['shift+a', addTaskTop],
-    ['i', openTaskView],
-    ['c', openComments],
-    ['shift+r', openReminders],
-    ['+', openAssign],
-    ['>', openDeadline],
-    [['shift+j', 'shift+down', 'alt+down'], moveDown],
-    [['shift+k', 'shift+up', 'alt+up'], moveUp],
-    [['shift+h', 'shift+left'], moveOut],
-    [['shift+l', 'shift+right'], moveIn],
+    ['enter', edit,
+      'edit', 'Edit task'],
+    ['shift+enter', followLink,
+      'follow-link', 'Follow task link'],
+    ['shift+o', addAbove,
+      'add-above', 'Add task above'],
+    ['o', addBelow,
+      'add-below', 'Add task below'],
+    ['a', addTaskBottom,
+      'add-task-bottom', 'Add task at bottom'],
+    ['shift+a', addTaskTop,
+      'add-task-top', 'Add task at top'],
+    ['i', openTaskView,
+      'open-task-view', 'Open task details'],
+    ['c', openComments,
+      'open-comments', 'Open comments'],
+    ['shift+r', openReminders,
+      'open-reminders', 'Open reminders'],
+    ['+', openAssign,
+      'open-assign', 'Assign task'],
+    ['>', openDeadline,
+      'open-deadline', 'Set deadline'],
+    [['shift+j', 'shift+down', 'alt+down'], moveDown,
+      'move-down', 'Move task down'],
+    [['shift+k', 'shift+up', 'alt+up'], moveUp,
+      'move-up', 'Move task up'],
+    [['shift+h', 'shift+left'], moveOut,
+      'move-out', 'Outdent task'],
+    [['shift+l', 'shift+right'], moveIn,
+      'move-in', 'Indent task'],
 
     // Selection
-    ['x', toggleSelect],
-    ['* a', selectAllTasks],
-    ['* n', deselectAllTasks],
-    ['* o', selectAllOverdue],
-    ['* s', selectSection],
-    ['* 1', selectPriority('1')],
-    ['* 2', selectPriority('2')],
-    ['* 3', selectPriority('3')],
-    [['* 4', '* 0'], selectPriority('4')],
-    [['* h', '* left'], collapseAll],
-    [['* l', '* right'], expandAll],
+    ['x', toggleSelect,
+      'toggle-select', 'Toggle task selection'],
+    ['* a', selectAllTasks,
+      'select-all', 'Select all tasks'],
+    ['* n', deselectAllTasks,
+      'deselect-all', 'Deselect all tasks'],
+    ['* o', selectAllOverdue,
+      'select-overdue', 'Select overdue tasks'],
+    ['* s', selectSection,
+      'select-section', 'Select current section'],
+    ['* 1', selectPriority('1'),
+      'select-priority-1', 'Select priority 1 tasks'],
+    ['* 2', selectPriority('2'),
+      'select-priority-2', 'Select priority 2 tasks'],
+    ['* 3', selectPriority('3'),
+      'select-priority-3', 'Select priority 3 tasks'],
+    [['* 4', '* 0'], selectPriority('4'),
+      'select-priority-4', 'Select priority 4 tasks'],
+    [['* h', '* left'], collapseAll,
+      'collapse-all', 'Collapse all subtasks'],
+    [['* l', '* right'], expandAll,
+      'expand-all', 'Expand all subtasks'],
 
     // Manipulation of selected tasks
-    ['t', schedule],
-    ['shift+t', scheduleText],
-    ['alt+t', scheduleTime],
-    ['d', done],
-    [['e', '#'], deleteTasks],
-    ['&', duplicateTasks],
-    ['v', moveToProject],
-    [['y', '@'], openLabelMenu],
-    ['1', setPriority('4')],
-    ['2', setPriority('3')],
-    ['3', setPriority('2')],
-    [['4', '0'], setPriority('1')],
-    ['shift+c', toggleTimer],
+    ['t', schedule,
+      'schedule', 'Open scheduler'],
+    ['shift+t', scheduleText,
+      'schedule-text', 'Schedule using text'],
+    ['alt+t', scheduleTime,
+      'schedule-time', 'Set task time'],
+    ['d', done,
+      'done', 'Complete tasks'],
+    [['e', '#'], deleteTasks,
+      'delete-tasks', 'Delete tasks'],
+    ['&', duplicateTasks,
+      'duplicate-tasks', 'Duplicate tasks'],
+    ['v', moveToProject,
+      'move-to-project', 'Move tasks to a project'],
+    [['y', '@'], openLabelMenu,
+      'open-label-menu', 'Set labels'],
+    ['1', setPriority('4'),
+      'set-priority-1', 'Set priority 1'],
+    ['2', setPriority('3'),
+      'set-priority-2', 'Set priority 2'],
+    ['3', setPriority('2'),
+      'set-priority-3', 'Set priority 3'],
+    [['4', '0'], setPriority('1'),
+      'set-priority-4', 'Set priority 4'],
+    ['shift+c', toggleTimer,
+      'toggle-timer', 'Toggle timer'],
 
     // Projects
 
-    ['shift+p', openCurrentProjectLeftNavMenu],
+    ['shift+p', openCurrentProjectLeftNavMenu,
+      'open-current-project-left-nav-menu', 'Open project menu'],
 
     // Bulk reschedule / move modes
-    ['* t', bulkSchedule],
-    ['* v', bulkMove],
+    ['* t', bulkSchedule,
+      'bulk-schedule', 'Start bulk reschedule'],
+    ['* v', bulkMove,
+      'bulk-move', 'Start bulk move'],
 
     // Other
 
-    [['u', 'z', 'ctrl+z'], undo],
+    [['u', 'z', 'ctrl+z'], undo,
+      'undo', 'Undo'],
 
-    ['q', quickAdd],
-    ['m', toggleLeftNav],
-    [['f', '/'], focusSearch],
-    ['!', openNotifications],
-    ['?', openHelpModal],
-    ['ctrl+s', sync],
-    ['ctrl+k', openCommandMenu],
-    ['ctrl+shift+,', copyCursorOrSelectedUrls],
-    ['ctrl+,', copyCursorOrSelectedTitles],
-    ['ctrl+c', copyCursorOrSelectedAsMarkdown],
-    ['ctrl+shift+/', openRandomTask],
-    ['w', openMoreActionsMenu],
-    ['shift+v', nextLayout],
+    ['q', quickAdd,
+      'quick-add', 'Quick add task'],
+    ['m', toggleLeftNav,
+      'toggle-left-nav', 'Toggle sidebar'],
+    [['f', '/'], focusSearch,
+      'focus-search', 'Search'],
+    ['!', openNotifications,
+      'open-notifications', 'Open notifications'],
+    ['?', openHelpModal,
+      'help', 'Open help'],
+    ['ctrl+s', sync,
+      'sync', 'Sync Todoist'],
+    ['ctrl+k', openCommandMenu,
+      'open-command-menu', 'Open command menu'],
+    ['ctrl+shift+,', copyCursorOrSelectedUrls,
+      'copy-cursor-or-selected-urls', 'Copy task URLs'],
+    ['ctrl+,', copyCursorOrSelectedTitles,
+      'copy-cursor-or-selected-titles', 'Copy task titles'],
+    ['ctrl+c', copyCursorOrSelectedAsMarkdown,
+      'copy-cursor-or-selected-as-markdown', 'Copy tasks as Markdown'],
+    ['ctrl+shift+/', openRandomTask,
+      'open-random-task', 'Open random task'],
+    ['w', openMoreActionsMenu,
+      'open-more-actions-menu', 'Open more actions'],
+    ['shift+v', nextLayout,
+      'next-layout', 'Next layout'],
 
     // See https://github.com/mgsloan/todoist-shortcuts/issues/30
     // [???, importFromTemplate],
@@ -114,6 +182,7 @@
     SCHEDULE_CURSOR_BINDINGS.push([
       binding[0],
       sequence([closeContextMenus, binding[1], schedule]),
+      ...binding.slice(2),
     ]);
   }
 
@@ -121,23 +190,40 @@
   // scheduling keys because they are the ones bulk schedule mode moves on to
   // the next task after.
   const SCHEDULE_DATE_BINDINGS = [
-    ['c', scheduleToday],
-    ['t', schedulePlusN(1)],
-    ['w', scheduleNextWeek],
-    ['n', scheduleNextWeekend],
-    ['m', scheduleNextMonth],
-    [['s', 'p'], schedulePostpone],
-    ['r', unschedule],
-    ['0', scheduleToday],
-    ['1', schedulePlusN(1)],
-    ['2', schedulePlusN(2)],
-    ['3', schedulePlusN(3)],
-    ['4', schedulePlusN(4)],
-    ['5', schedulePlusN(5)],
-    ['6', schedulePlusN(6)],
-    ['7', schedulePlusN(7)],
-    ['8', schedulePlusN(8)],
-    ['9', schedulePlusN(9)],
+    ['c', scheduleToday,
+      'schedule-today', 'Schedule for today'],
+    ['t', schedulePlusN(1),
+      'schedule-plus-1', 'Schedule for tomorrow'],
+    ['w', scheduleNextWeek,
+      'schedule-next-week', 'Schedule for next week'],
+    ['n', scheduleNextWeekend,
+      'schedule-next-weekend', 'Schedule for next weekend'],
+    ['m', scheduleNextMonth,
+      'schedule-next-month', 'Schedule for next month'],
+    [['s', 'p'], schedulePostpone,
+      'schedule-postpone', 'Postpone task'],
+    ['r', unschedule,
+      'unschedule', 'Remove due date'],
+    ['0', scheduleToday,
+      'schedule-today', 'Schedule for today'],
+    ['1', schedulePlusN(1),
+      'schedule-plus-1', 'Schedule for tomorrow'],
+    ['2', schedulePlusN(2),
+      'schedule-plus-2', 'Schedule 2 days from today'],
+    ['3', schedulePlusN(3),
+      'schedule-plus-3', 'Schedule 3 days from today'],
+    ['4', schedulePlusN(4),
+      'schedule-plus-4', 'Schedule 4 days from today'],
+    ['5', schedulePlusN(5),
+      'schedule-plus-5', 'Schedule 5 days from today'],
+    ['6', schedulePlusN(6),
+      'schedule-plus-6', 'Schedule 6 days from today'],
+    ['7', schedulePlusN(7),
+      'schedule-plus-7', 'Schedule 7 days from today'],
+    ['8', schedulePlusN(8),
+      'schedule-plus-8', 'Schedule 8 days from today'],
+    ['9', schedulePlusN(9),
+      'schedule-plus-9', 'Schedule 9 days from today'],
   ];
 
   // Todoist closes the scheduler itself after some of these - today, next
@@ -146,21 +232,28 @@
   // date behave the same whichever key was used, and leaves the keyboard
   // where the mouse would: back at the task list.
   const CLOSING_DATE_BINDINGS = SCHEDULE_DATE_BINDINGS.map(
-      (binding) => [binding[0], sequence([binding[1], closeContextMenus])]);
+      (binding) => [
+        binding[0], sequence([binding[1], closeContextMenus]),
+        ...binding.slice(2),
+      ]);
 
   // Scheduling keybindings (used when scheduler is open)
   const SCHEDULE_BINDINGS = [].concat(
       SCHEDULE_CURSOR_BINDINGS, CLOSING_DATE_BINDINGS, [
-        ['alt+t', scheduleTime],
-        ['shift+t', scheduleText],
-        ['escape', closeContextMenus],
+        ['alt+t', scheduleTime,
+          'schedule-time', 'Set task time'],
+        ['shift+t', scheduleText,
+          'schedule-text', 'Schedule using text'],
+        ['escape', closeContextMenus,
+          'close-context-menus', 'Close scheduler', false],
         // See #256 for why this is no longer needed
         // ['fallback', schedulerFallback],
         // Bound to nothing at all, rather than to moving the cursor, so
         // that they don't reschedule a different task from the one the
         // scheduler was opened for.  See #252.  Todoist's calendar has no
         // use for them either - it does not navigate by arrow key.
-        [['j', 'k', 'up', 'down'], noop],
+        [['j', 'k', 'up', 'down'], noop,
+          'keep-scheduled-task', 'Keep the scheduled task fixed', false],
       ]);
   const SCHEDULE_KEYMAP = 'schedule';
 
@@ -187,12 +280,18 @@
   const BULK_SCHEDULE_BINDINGS = [].concat(
       SCHEDULE_BINDINGS,
       CURSOR_BINDINGS.map(
-          (binding) => [binding[0], () => bulkCursorTo(binding[1])]),
+          (binding) => [
+            binding[0], () => bulkCursorTo(binding[1]), ...binding.slice(2),
+          ]),
       [
-        [['v', 'alt+v'], switchToBulkMove],
-        [['d', 'alt+d'], bulkDone],
-        [['e', 'alt+e', '#'], bulkDelete],
-        [['z', 'alt+z'], bulkUndo],
+        [['v', 'alt+v'], switchToBulkMove,
+          'switch-to-bulk-move', 'Switch to bulk move'],
+        [['d', 'alt+d'], bulkDone,
+          'bulk-done', 'Complete current bulk task'],
+        [['e', 'alt+e', '#'], bulkDelete,
+          'bulk-delete', 'Delete current bulk task'],
+        [['z', 'alt+z'], bulkUndo,
+          'bulk-undo', 'Undo last bulk change'],
       ]);
   const BULK_SCHEDULE_KEYMAP = 'bulk_schedule';
 
@@ -203,38 +302,61 @@
   const BULK_MOVE_KEYMAP = 'bulk_move';
 
   const TASK_VIEW_BINDINGS = [
-    ['enter', taskViewEdit],
-    ['d', taskViewDone],
-    [['i', 'escape'], taskViewClose],
-    ['h', taskViewParent],
-    ['j', taskViewNext],
-    ['k', taskViewPrevious],
-    ['c', taskViewComments],
+    ['enter', taskViewEdit,
+      'task-view-edit', 'Edit task'],
+    ['d', taskViewDone,
+      'task-view-done', 'Complete task'],
+    ['i', taskViewClose, 'close-task-view', 'Close task details'],
+    ['escape', taskViewClose, 'dismiss-task-view', 'Close task details', false],
+    ['h', taskViewParent,
+      'task-view-parent', 'Open parent task'],
+    ['j', taskViewNext,
+      'task-view-next', 'Next task'],
+    ['k', taskViewPrevious,
+      'task-view-previous', 'Previous task'],
+    ['c', taskViewComments,
+      'task-view-comments', 'Open comments'],
     // TODO(#94): proper bindings for o / O.
-    [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask],
-    ['t', taskViewSchedule],
-    ['shift+t', taskViewScheduleText],
-    ['+', taskViewOpenAssign],
-    ['v', taskViewMoveToProject],
-    [['y', '@'], taskViewLabel],
-    ['1', taskViewSetPriority('1')],
-    ['2', taskViewSetPriority('2')],
-    ['3', taskViewSetPriority('3')],
-    [['4', '0'], taskViewSetPriority('4')],
-    ['shift+r', taskViewOpenReminders],
-    [['e', '#'], taskViewDelete],
-    ['shift+c', taskViewToggleTimer],
+    [['q', 'a', 'A', 'o', 'O'], taskViewAddSubtask,
+      'task-view-add-subtask', 'Add subtask'],
+    ['t', taskViewSchedule,
+      'task-view-schedule', 'Open scheduler'],
+    ['shift+t', taskViewScheduleText,
+      'task-view-schedule-text', 'Schedule using text'],
+    ['+', taskViewOpenAssign,
+      'task-view-open-assign', 'Assign task'],
+    ['v', taskViewMoveToProject,
+      'task-view-move-to-project', 'Move task to a project'],
+    [['y', '@'], taskViewLabel,
+      'task-view-label', 'Set labels'],
+    ['1', taskViewSetPriority('1'),
+      'set-priority-1', 'Set priority 1'],
+    ['2', taskViewSetPriority('2'),
+      'set-priority-2', 'Set priority 2'],
+    ['3', taskViewSetPriority('3'),
+      'set-priority-3', 'Set priority 3'],
+    [['4', '0'], taskViewSetPriority('4'),
+      'set-priority-4', 'Set priority 4'],
+    ['shift+r', taskViewOpenReminders,
+      'task-view-open-reminders', 'Open reminders'],
+    [['e', '#'], taskViewDelete,
+      'delete-task', 'Delete task'],
+    ['shift+c', taskViewToggleTimer,
+      'task-view-toggle-timer', 'Toggle timer'],
     ['ctrl+shift+/', async () => {
       await taskViewClose();
       await openRandomTask();
-    }],
+    }, 'open-random-task', 'Open random task'],
   ];
   const TASK_VIEW_KEYMAP = 'task_view';
 
   const MENU_LIST_BINDINGS = [
-    [['j', 'down', 'tab'], nextMenuListItem],
-    [['k', 'up', 'shift+tab'], prevMenuListItem],
-    [['enter', 'space'], selectMenuListItem],
+    [['j', 'down', 'tab'], nextMenuListItem,
+      'menu-next', 'Next menu item'],
+    [['k', 'up', 'shift+tab'], prevMenuListItem,
+      'menu-previous', 'Previous menu item'],
+    [['enter', 'space'], selectMenuListItem,
+      'menu-select', 'Choose menu item'],
   ];
   const MENU_LIST_KEYMAP = 'menu_list';
 
@@ -248,7 +370,9 @@
   const ESCAPE_KEYCODE = 27;
 
   // Navigation mode uses its own key handler.
-  const NAVIGATE_BINDINGS = [['fallback', handleNavigateKey]];
+  const NAVIGATE_BINDINGS = [
+    ['fallback', handleNavigateKey, 'navigate-items', 'Navigation keys', false],
+  ];
   const NAVIGATE_KEYMAP = 'navigate';
 
   // Keymap used when there is a floating window.
@@ -322,10 +446,24 @@
         'bulk reschedule (* t), bulk move (* v), the project ' +
         'menu (shift+p), scheduling, deadlines and the task view.';
 
+  const keybindings = createKeybindingRegistry([
+    [DEFAULT_KEYMAP, 'Task list', KEY_BINDINGS],
+    [SCHEDULE_KEYMAP, 'Schedule', SCHEDULE_BINDINGS],
+    [BULK_SCHEDULE_KEYMAP, 'Bulk reschedule', BULK_SCHEDULE_BINDINGS],
+    [BULK_MOVE_KEYMAP, 'Bulk move', BULK_MOVE_BINDINGS],
+    [NAVIGATE_KEYMAP, 'Navigation hints', NAVIGATE_BINDINGS],
+    [POPUP_KEYMAP, 'Popup', POPUP_BINDINGS],
+    [TASK_VIEW_KEYMAP, 'Task details', TASK_VIEW_BINDINGS],
+    [MENU_LIST_KEYMAP, 'Menu navigation', MENU_LIST_BINDINGS],
+  ]);
+  // The options page loads this script solely for this catalog/resolver.
+  // No Todoist observers, styles or event handlers run outside the app.
+  window.TodoistShortcutsKeybindings = keybindings;
+
   // This user script will get run on iframes and other todoist pages. Should
   // skip running anything if #todoist_app doesn't exist.
   const todoistRootDiv = document.getElementById('todoist_app');
-  if (!todoistRootDiv) throw new Error('no div with id "todoist_app"');
+  if (!todoistRootDiv) return;
 
   // Set on initialization to mousetrap instance.
   let mousetrap = null;
@@ -334,7 +472,193 @@
    * Options
    */
 
+  // Descriptors are shared by the options page and runtime. IDs are explicit
+  // rather than inferred from function names (several callbacks are factories).
+  function createKeybindingRegistry(modes) {
+    const defaults = modes.map(([id, title, bindings]) => {
+      const byKey = new Map();
+      for (const binding of bindings) {
+        for (const key of [].concat(binding[0])) byKey.set(key, binding);
+      }
+      const byAction = new Map();
+      for (const binding of bindings) {
+        const keys = [].concat(binding[0]).filter(
+            (key) => byKey.get(key) === binding);
+        if (!keys.length) continue;
+        const actionId = binding[2];
+        if (!actionId || !binding[3]) {
+          throw new Error('Missing binding metadata');
+        }
+        if (!byAction.has(actionId)) {
+          byAction.set(actionId, {
+            id: actionId, label: binding[3], action: binding[1], keys: [],
+            fixed: binding[4] === false,
+          });
+        }
+        const entry = byAction.get(actionId);
+        entry.keys.push(...keys);
+        // Later definitions are intentional in bulk mode. Keep their callback
+        // as well as their keys, preserving the bulk-mode behavior.
+        entry.action = binding[1];
+      }
+      return {id, title, bindings: [...byAction.values()]};
+    });
+
+    const aliases = new Map([
+      ['control', 'ctrl'], ['option', 'alt'], ['command', 'meta'],
+      ['cmd', 'meta'], ['esc', 'escape'], ['return', 'enter'],
+      ['arrowleft', 'left'], ['arrowright', 'right'],
+      ['arrowup', 'up'], ['arrowdown', 'down'], ['plus', '+'],
+      ['insert', 'ins'],
+      ['mod', /Mac|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'],
+    ]);
+    const modifiers = ['ctrl', 'alt', 'shift', 'meta'];
+    const namedKeys = new Set([
+      'backspace', 'tab', 'enter', 'capslock', 'escape', 'space',
+      'pageup', 'pagedown', 'end', 'home', 'left', 'up', 'right', 'down',
+      'ins', 'del', 'delete',
+    ]);
+
+    // Match the vendored Mousetrap fork's US keydown shift map. Bare glyphs
+    // remain character bindings, so those retain layout-aware keypresses.
+    const shiftedKeys = new Map([
+      ['~', '`'], ['!', '1'], ['@', '2'], ['#', '3'], ['$', '4'],
+      ['%', '5'], ['^', '6'], ['&', '7'], ['*', '8'], ['(', '9'],
+      [')', '0'], ['_', '-'], ['+', '='], [':', ';'], ['"', '\''],
+      ['<', ','], ['>', '.'], ['?', '/'], ['|', '\\'],
+    ]);
+
+    function normalize(sequence) {
+      if (typeof sequence !== 'string' || !sequence.trim()) {
+        throw new Error('Each shortcut must be a nonempty string.');
+      }
+      return sequence.trim().split(/\s+/).map((step) => {
+        const parts = step === '+' ? ['plus'] :
+          step.replace(/\+\+$/, '+plus').split('+');
+        const token = parts.pop();
+        let key = aliases.get(token.toLowerCase()) || token;
+        if (key.length > 1) key = key.toLowerCase();
+        const mods = parts.map((part) =>
+          aliases.get(part.toLowerCase()) || part.toLowerCase());
+        if (new Set(mods).size !== mods.length ||
+            mods.some((mod) => !modifiers.includes(mod))) {
+          throw new Error('Invalid modifiers in "' + step + '".');
+        }
+        if (key === 'delete') key = 'del';
+        if (modifiers.includes(key) ||
+            !(key.length === 1 || namedKeys.has(key) ||
+              /^f([1-9]|1[0-9])$/.test(key))) {
+          throw new Error('Unrecognized key "' + key + '".');
+        }
+        if (key.length === 1 && key !== key.toLowerCase()) {
+          key = key.toLowerCase();
+          if (!mods.includes('shift')) mods.push('shift');
+        }
+        if (mods.length && shiftedKeys.has(key)) {
+          key = shiftedKeys.get(key);
+          if (!mods.includes('shift')) mods.push('shift');
+        }
+        return modifiers.filter((mod) => mods.includes(mod))
+            .concat(key).join('+');
+      }).join(' ');
+    }
+
+    // Conservatively detect the US keydown equivalent of a bare glyph too:
+    // e.g. Shift+3 can shadow the existing '#' keypress binding.
+    function eventIdentity(sequence) {
+      return normalize(sequence).split(' ').map((step) =>
+        shiftedKeys.has(step) ? 'shift+' + shiftedKeys.get(step) : step)
+          .join(' ');
+    }
+
+    function isRecord(value) {
+      return value !== null && typeof value === 'object' &&
+        !Array.isArray(value);
+    }
+
+    function resolve(overrides, settings) {
+      const errors = [];
+      const opts = settings || {};
+      const prefix = ['*', ',', ';'].includes(opts['selection-prefix']) ?
+        opts['selection-prefix'] : '*';
+      const base = defaults.map((mode) => ({
+        id: mode.id, title: mode.title,
+        bindings: mode.bindings.map((binding) => Object.assign({}, binding, {
+          keys: binding.keys.map((key) => key.replace(/^\* /, prefix + ' ')),
+        })),
+      }));
+      if (typeof overrides === 'undefined') overrides = {};
+      if (!isRecord(overrides)) {
+        return {keymaps: base, errors: ['Saved shortcuts must be an object.']};
+      }
+      const resolved = base.map((mode) => {
+        const hasChanges =
+          Object.prototype.hasOwnProperty.call(overrides, mode.id);
+        const changes = hasChanges ? overrides[mode.id] : {};
+        if (!isRecord(changes)) {
+          errors.push(mode.title + ': shortcuts must be an object.');
+          return mode;
+        }
+        const bindings = mode.bindings.map((binding) => {
+          if (!Object.prototype.hasOwnProperty.call(changes, binding.id)) {
+            return binding;
+          }
+          const keys = changes[binding.id];
+          if (binding.fixed || !Array.isArray(keys)) {
+            errors.push(mode.title + ' / ' + binding.label + ': ' +
+                (binding.fixed ? 'these controls are fixed.' :
+                  'shortcuts must be an array.'));
+            return binding;
+          }
+          try {
+            const normalized = keys.map(normalize);
+            if (normalized.some((key) => key.split(' ').some(
+                (step) => step.split('+').includes('escape')))) {
+              throw new Error('Escape is reserved for dismissing dialogs.');
+            }
+            return Object.assign({}, binding, {keys: normalized});
+          } catch (e) {
+            errors.push(mode.title + ' / ' + binding.label + ': ' + e.message);
+            return binding;
+          }
+        });
+        const seen = [];
+        for (const binding of bindings) {
+          for (const key of binding.keys) {
+            if (key === 'fallback') continue;
+            const normalized = eventIdentity(key);
+            for (const previous of seen) {
+              if (normalized === previous.key ||
+                  normalized.startsWith(previous.key + ' ') ||
+                  previous.key.startsWith(normalized + ' ')) {
+                errors.push(mode.title + ': "' + key + '" for ' +
+                    binding.label +
+                    ' conflicts with ' + previous.label + '.');
+              }
+            }
+            seen.push({key: normalized, label: binding.label});
+          }
+        }
+        return {id: mode.id, title: mode.title, bindings};
+      });
+      // Reject the whole configuration, never silently apply only some edits.
+      // Unknown mode/action IDs are deliberately ignored for version rollback.
+      return {keymaps: errors.length ? base : resolved, errors};
+    }
+
+    return {
+      normalize, resolve,
+      catalog: (settings) => resolve({}, settings).keymaps.map((mode) => ({
+        id: mode.id, title: mode.title,
+        bindings: mode.bindings.map(({id, label, keys, fixed}) =>
+          ({id, label, keys, fixed})),
+      })),
+    };
+  }
+
   let options = {};
+  // MUTABLE. Rebuilt only during initialization, including script reloads.
+  let activeKeybindings = null;
 
   function loadOptions() {
     try {
@@ -1544,6 +1868,30 @@
     modal.style.display = 'inline-block';
   }
 
+  // Render effective bindings from the same resolved registry used to bind
+  // keys, including disabled actions. The printable guide shows defaults.
+  function createActiveBindingsHelp() {
+    const container = div('ts-active-bindings');
+    for (const mode of activeKeybindings) {
+      if (!mode.bindings.some((binding) => !binding.fixed)) continue;
+      const section = element('details');
+      section.open = mode.id === DEFAULT_KEYMAP;
+      section.appendChild(element('summary', '', text(mode.title)));
+      const list = element('dl');
+      for (const binding of mode.bindings) {
+        list.appendChild(element('dt', '', text(binding.label)));
+        list.appendChild(element('dd', '', text(
+            binding.keys.length ? binding.keys.join(' or ') : 'Disabled')));
+      }
+      section.appendChild(list);
+      container.appendChild(section);
+    }
+    container.appendChild(element('p', '', text(
+        'Escape and navigation/picker/dialog controls remain fixed. ' +
+        'The printable guide below shows default bindings.')));
+    return container;
+  }
+
   // Create DOM nodes for help documentation.
   function createHelpModal() {
     // Create new help modal.
@@ -1587,8 +1935,9 @@
     const iframe = element('iframe');
     iframe.setAttribute('src', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5jkiI07g9XoeORQrOQUlAwY4uqJkBDkm-zMUK4WuaFvca0BJ0wPKEM5dw6RgKtcSN33PsZPKiN4G4/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false');
     iframe.setAttribute('scrolling', 'no');
-    const container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, linksList, iframe);
-    const modal = createModal(div('', header, container));
+    const container = div(TODOIST_SHORTCUTS_HELP_CONTAINER, iframe);
+    const modal = createModal(div('', header, linksList,
+        createActiveBindingsHelp(), container));
     modal.classList.add(TODOIST_SHORTCUTS_HELP);
     modal.style.display = 'none';
   }
@@ -5660,6 +6009,21 @@
     '  line-height: 150%;',
     '}',
     '',
+    '.ts-active-bindings {',
+    '  text-align: left;',
+    '}',
+    '.ts-active-bindings summary {',
+    '  cursor: pointer;',
+    '  font-weight: bold;',
+    '}',
+    '.ts-active-bindings dt {',
+    '  font-weight: bold;',
+    '}',
+    '.ts-active-bindings dd {',
+    '  margin-bottom: 0.5em;',
+    '  font-family: monospace;',
+    '}',
+    '',
     // Fix background of active item obscuring cursor
     '',
     '.task_list_item--keyboard_shortcuts_active .task_list_item__body {',
@@ -5757,14 +6121,13 @@
     };
   }
 
-  function registerKeybindings(keymap, binds) {
-    for (let i = 0; i < binds.length; i++) {
-      if (binds[i].length === 2) {
-        // eslint-disable-next-line no-undefined
-        mousetrap.bind(binds[i][0], callBinding(binds[i]), undefined, keymap);
-      } else {
-        error('Improper binding entry at index', i, 'value is', binds[i]);
-      }
+  function registerKeybindings(keymap) {
+    const mode = activeKeybindings.find((entry) => entry.id === keymap);
+    for (const binding of mode.bindings) {
+      if (!binding.keys.length) continue;
+      // eslint-disable-next-line no-undefined
+      mousetrap.bind(binding.keys, callBinding([binding.keys, binding.action]),
+          undefined, keymap);
     }
   }
 
@@ -5982,6 +6345,11 @@
 
   function initialize() {
     loadOptions();
+    const resolved = keybindings.resolve(options.keybindings, options);
+    if (resolved.errors.length) {
+      warn('Ignoring invalid shortcut configuration:', resolved.errors);
+    }
+    activeKeybindings = resolved.keymaps;
     handlePageChange();
     updateViewMode();
 
@@ -6001,14 +6369,14 @@
     overwriteKeyHandlers();
 
     // Register key bindings with mousetrap.
-    registerKeybindings(DEFAULT_KEYMAP, KEY_BINDINGS);
-    registerKeybindings(SCHEDULE_KEYMAP, SCHEDULE_BINDINGS);
-    registerKeybindings(BULK_SCHEDULE_KEYMAP, BULK_SCHEDULE_BINDINGS);
-    registerKeybindings(BULK_MOVE_KEYMAP, BULK_MOVE_BINDINGS);
-    registerKeybindings(NAVIGATE_KEYMAP, NAVIGATE_BINDINGS);
-    registerKeybindings(POPUP_KEYMAP, POPUP_BINDINGS);
-    registerKeybindings(TASK_VIEW_KEYMAP, TASK_VIEW_BINDINGS);
-    registerKeybindings(MENU_LIST_KEYMAP, MENU_LIST_BINDINGS);
+    registerKeybindings(DEFAULT_KEYMAP);
+    registerKeybindings(SCHEDULE_KEYMAP);
+    registerKeybindings(BULK_SCHEDULE_KEYMAP);
+    registerKeybindings(BULK_MOVE_KEYMAP);
+    registerKeybindings(NAVIGATE_KEYMAP);
+    registerKeybindings(POPUP_KEYMAP);
+    registerKeybindings(TASK_VIEW_KEYMAP);
+    registerKeybindings(MENU_LIST_KEYMAP);
 
     // Update the keymap.  Necessary now that the side panel can start
     // out visible.

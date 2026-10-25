@@ -11,3 +11,43 @@ body {
 .option {
   margin-left: 2em;
 }
+
+#keybindings-editor details {
+  margin: 1em 0;
+}
+
+#keybindings-editor summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.binding-row {
+  border-bottom: 1px solid #aaa;
+  padding: 0.75em 0;
+}
+
+.binding-row label {
+  display: block;
+  font-weight: bold;
+}
+
+.binding-row textarea {
+  display: block;
+  width: 95%;
+  max-width: 24em;
+  margin: 0.4em 0;
+  font: inherit;
+}
+
+#keybindings-errors {
+  color: #b00020;
+  white-space: pre-wrap;
+}
+
+.keybindings-toolbar {
+  position: sticky;
+  top: 0;
+  background: Canvas;
+  padding: 0.1em 0;
+  z-index: 1;
+}

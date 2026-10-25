@@ -1,5 +1,14 @@
 # todoist-shortcuts changelog
 
+## Unreleased
+
+* Adds a shortcut editor with per-mode keybindings, multiple alternatives,
+  disabled actions, reset controls and conflict checks. The help window shows
+  your active shortcuts. Escape and specialized picker/navigation controls
+  remain fixed. Related to [#99][].
+
+[#99]: https://github.com/mgsloan/todoist-shortcuts/issues/99
+
 ## Version 210
 
 * Fixes priority keys (`1` to `4` and `0`) doing nothing when multiple

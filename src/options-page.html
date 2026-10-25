@@ -5,6 +5,7 @@
     <title>todoist-shortcuts Configuration</title>
     <link rel="stylesheet" href="options-page.css">
     <script src="common.js"></script>
+    <script src="todoist-shortcuts.js"></script>
     <script src="options-page.js"></script>
   </head>
   <body>
@@ -13,16 +14,8 @@
       <b>⚠️Todoist tabs will need to be reloaded to apply changes. ⚠</b>
     </p>
     <p>
-      For simplicity, todoist-shortcuts currently has few options.
-      At some point in the future, direct customization of keybindings without
-      <a href="https://github.com/mgsloan/todoist-shortcuts#how-to-customize-keyboard-shortcuts">
-        modifying the source code directly
-      </a>
-      might be implemented. Feel free to comment on
-      <a href="https://github.com/mgsloan/todoist-shortcuts/issues/99">
-        issue #99
-      </a>
-      if you would find this useful.
+      Customize shortcuts below without editing the extension. Keys are grouped
+      by the mode in which they apply. You can keep receiving automatic updates.
     </p>
     <h2>Settings</h2>
     <p>
@@ -68,6 +61,32 @@
       </label>
     </p>
     -->
-    <p id="status"></p>
+    <p id="status" role="status"></p>
+    <h2>Keyboard shortcuts</h2>
+    <p id="keybindings-description">
+      Enter one shortcut per line. Use spaces between keys in a sequence
+      (for example <code>; n</code>) and <code>+</code> for held modifiers
+      (for example <code>ctrl+e</code>). Leave a field empty to disable an action.
+      Reset edits the form; use Save shortcuts to apply your changes.
+    </p>
+    <p>
+      Escape and the specialized navigation hints, bulk-move picker and dialog
+      confirmation controls remain fixed. Browser and operating-system shortcuts
+      can also take precedence over extension shortcuts.
+    </p>
+    <form id="keybindings-form" aria-describedby="keybindings-description">
+      <div class="keybindings-toolbar">
+        <p>
+          <button id="save-keybindings" type="submit">Save shortcuts</button>
+          <button id="reset-keybindings" type="button">Reset all shortcuts</button>
+        </p>
+        <div id="keybindings-errors" role="alert"></div>
+        <p id="keybindings-status" role="status"></p>
+      </div>
+      <div id="keybindings-editor"></div>
+      <p>
+        <button type="submit">Save shortcuts</button>
+      </p>
+    </form>
   </body>
 </html>
