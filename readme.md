@@ -326,10 +326,49 @@ tasks](https://github.com/mgsloan/todoist-shortcuts/issues/23)
 
 # How to customize keyboard shortcuts
 
-Ideally, there would be a UI for customizing keyboard shortcuts. However, it
-seems like this would take a substantial amount of development effort
-(PR contributions appreciated!). For now, you can do the following to customize
-the keyboard shortcuts in Chrome:
+Open the extension's **Options** page to customize shortcuts without editing
+source files. Shortcuts are grouped by mode: Task list, Schedule, Bulk reschedule,
+Task details and Menu navigation. The same key may have a different action in
+each mode.
+
+Each action has one shortcut per line. Use spaces for sequences (`; n`) and `+`
+for held modifiers (`ctrl+e`, `alt+j`, `shift+enter`). `meta` or `cmd` means Command
+on macOS; `mod` chooses Command on macOS and Control elsewhere. Comma is a key,
+so use separate lines, not commas, to separate alternatives. Empty fields disable
+actions. **Reset** restores one action in the form; **Reset all shortcuts**
+restores the whole form. Neither takes effect until **Save shortcuts** is used.
+Reload Todoist tabs after saving. Mouse/cursor preferences continue to autosave.
+
+The editor checks the complete mode for duplicate shortcuts and ambiguous
+sequences (for example, binding both `g` and `g x`). To reuse another action's
+key, remove or change that action's binding in the same save. Browser and OS
+shortcuts may still take precedence. Modified symbol shortcuts follow the
+keyboard library's US layout mapping; unmodified character sequences keep their
+existing layout behavior. Escape, the scheduler's disabled vertical
+cursor keys, navigation hints, the bulk-move picker's controls, and dialog
+confirmation keys remain fixed. These specialized handlers also keep their
+existing behavior in text inputs. Other shortcuts continue to ignore text inputs.
+
+The in-app help (`?`, unless remapped) lists your active shortcuts, including
+disabled actions. The printable guide below it still shows defaults. Choices are
+saved using extension sync storage; unsupported action IDs from newer versions
+are retained but ignored, and invalid configurations fall back to defaults.
+Keeping the normal extension installed means you still receive automatic updates.
+
+For embedding hosts, the optional `keybindings` settings object contains per-mode,
+per-action arrays, for example:
+
+```json
+{"keybindings": {"default": {"deselect-all": ["; n"], "done": []}}}
+```
+
+Stable action IDs live next to callbacks in `src/todoist-shortcuts.js`. If a
+`selection-prefix` option is present (as in the separate prefix proposal), defaults
+are expanded first, followed by explicit per-action overrides. Explicit overrides
+therefore keep the exact keys chosen for that action.
+
+To make changes beyond the editor's supported actions, you can still edit a
+local copy in Chrome:
 
 1. Clone this repository (run `git clone https://github.com/mgsloan/todoist-shortcuts`)
 
