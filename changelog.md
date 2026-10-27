@@ -1,5 +1,7 @@
 # todoist-shortcuts changelog
 
+* Fixes scheduling for the weekend (`t n`) doing nothing during the week.
+
 ## Version 210
 
 * Fixes priority keys (`1` to `4` and `0`) doing nothing when multiple

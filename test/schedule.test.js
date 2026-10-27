@@ -67,7 +67,7 @@ describe('scheduling', {timeout: TIMEOUT}, () => {
   });
 
   // Opens a task, then presses `t` followed by the given key.
-  const schedule = async (name, key) => {
+  const schedule = async (name, key, prepareScheduler) => {
     fixture = await fixtures.create(name, [{content: 'alpha'}]);
     page = await browser.openApp(chrome, 'project/' + fixture.project.id);
     await page.bringToFront();
@@ -81,8 +81,12 @@ describe('scheduling', {timeout: TIMEOUT}, () => {
       return Boolean(document.querySelector('.scheduler')) &&
           (!active || !['INPUT', 'TEXTAREA'].includes(active.tagName));
     }, {timeout: 30000});
+    if (prepareScheduler) await prepareScheduler();
     await browser.press(page, key);
-    return await waitForDue(fixture.id('alpha'));
+    const due = await waitForDue(fixture.id('alpha'));
+    await page.waitForFunction(() => !document.querySelector('.scheduler'),
+        {timeout: 15000});
+    return due;
   };
 
   it('schedules for tomorrow with `t t`', async () => {
@@ -102,13 +106,35 @@ describe('scheduling', {timeout: TIMEOUT}, () => {
         pad(expected.getMonth() + 1) + '-' + pad(expected.getDate()));
   });
 
-  it('schedules for the next weekend with `t n`', async () => {
-    const due = await schedule('weekend', 'n');
+  const assertWeekend = (due) => {
     const day = new Date(due + 'T00:00:00').getDay();
     assert.equal(day, 6, 'expected a Saturday, got ' + due);
-    // Todoist counts the coming weekend as this one, so from a Friday the
-    // next weekend is over a week away.
     const days = daysBetween(today, due);
     assert.ok(days > 0 && days <= 14, 'expected within a fortnight: ' + due);
+  };
+
+  it('schedules for the next weekend with `t n`', async () => {
+    assertWeekend(await schedule('weekend', 'n'));
   });
+
+  for (const variant of ['thisweekend', 'nextweekend']) {
+    it('schedules with `t n` when the button uses ' + variant, async () => {
+      const due = await schedule('weekend-' + variant, 'n', async () => {
+        // Exercise both weekday-dependent identifiers on the live button.
+        // Its analytics attribute does not change which date Todoist saves.
+        await page.$$eval('.scheduler button[data-track]', (buttons, name) => {
+          const weekend = buttons.filter((button) => [
+            'scheduler|date_shortcut_thisweekend',
+            'scheduler|date_shortcut_nextweekend',
+          ].includes(button.getAttribute('data-track')));
+          if (weekend.length !== 1) {
+            throw new Error('Expected exactly one weekend button');
+          }
+          weekend[0].setAttribute('data-track',
+              'scheduler|date_shortcut_' + name);
+        }, variant);
+      });
+      assertWeekend(due);
+    });
+  }
 });

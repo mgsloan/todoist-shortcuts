@@ -613,16 +613,16 @@
     }
   }
 
-  // Click 'next weekend' in schedule. Only does anything if schedule is open.
+  // Todoist calls the weekend shortcut 'this weekend' during the week and
+  // 'next weekend' on the weekend. Only does anything if schedule is open.
   async function scheduleNextWeekend() {
     withScheduler(
         'scheduleNextWeekend',
         (scheduler) => {
           clickUnique(
               scheduler,
-              'button',
-              matchingAttr('data-track',
-                  'scheduler|date_shortcut_nextweekend'));
+              'button[data-track="scheduler|date_shortcut_thisweekend"], ' +
+              'button[data-track="scheduler|date_shortcut_nextweekend"]');
         });
   }
 
