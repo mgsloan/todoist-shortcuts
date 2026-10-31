@@ -614,15 +614,23 @@
   }
 
   // Todoist calls the weekend shortcut 'this weekend' during the week and
-  // 'next weekend' on the weekend. Only does anything if schedule is open.
+  // 'next weekend' on the weekend, and sometimes omits it altogether.
+  // Only does anything if schedule is open.
   async function scheduleNextWeekend() {
     withScheduler(
         'scheduleNextWeekend',
         (scheduler) => {
-          clickUnique(
+          const button = getUnique(
               scheduler,
               'button[data-track="scheduler|date_shortcut_thisweekend"], ' +
               'button[data-track="scheduler|date_shortcut_nextweekend"]');
+          if (button) {
+            click(button);
+          } else {
+            const date = new Date();
+            date.setDate(date.getDate() + ((6 - date.getDay() + 7) % 7 || 7));
+            clickSchedulerDate('scheduleNextWeekend', date);
+          }
         });
   }
 
@@ -1090,9 +1098,13 @@
   // closing context menus.  Also clicks 'Cancel' on any task adding.
   async function closeContextMenus() {
     for (let i = 0; i < 100; i++) {
-      const popperOverlay = getLast(document, '.popper__overlay');
+      const popperOverlay = getLast(
+          document, '.popper__overlay, [data-popover-backdrop]');
       if (popperOverlay) {
         click(popperOverlay);
+        // Popovers remove their backdrop asynchronously. Let the close land
+        // before looking for another one, including in bulk schedule mode.
+        await sleep(0);
       } else {
         break;
       }

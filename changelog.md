@@ -1,6 +1,12 @@
 # todoist-shortcuts changelog
 
-* Fixes scheduling for the weekend (`t n`) doing nothing during the week.
+## Version 211
+
+* Fixes scheduling for the weekend (`t n`) doing nothing when Todoist
+  doesn't offer a weekend suggestion.
+
+* Fixes closing the scheduler with `escape` or after choosing a date,
+  and moving between tasks in bulk reschedule mode (`* t`).
 
 ## Version 210
 

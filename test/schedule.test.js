@@ -117,20 +117,43 @@ describe('scheduling', {timeout: TIMEOUT}, () => {
     assertWeekend(await schedule('weekend', 'n'));
   });
 
+  it('schedules with `t n` without a weekend suggestion', async () => {
+    const due = await schedule('weekend-calendar', 'n', async () => {
+      await page.$$eval('.scheduler button[data-track]', (buttons) => {
+        for (const button of buttons) {
+          if (/date_shortcut_(this|next)weekend$/.test(
+              button.getAttribute('data-track'))) {
+            button.removeAttribute('data-track');
+          }
+        }
+      });
+    });
+    assertWeekend(due);
+  });
+
   for (const variant of ['thisweekend', 'nextweekend']) {
     it('schedules with `t n` when the button uses ' + variant, async () => {
       const due = await schedule('weekend-' + variant, 'n', async () => {
-        // Exercise both weekday-dependent identifiers on the live button.
+        // Exercise both identifiers on a live button. When Todoist omits the
+        // suggestion (e.g. on Fridays), use the next Saturday's calendar day.
         // Its analytics attribute does not change which date Todoist saves.
-        await page.$$eval('.scheduler button[data-track]', (buttons, name) => {
+        await page.$$eval('.scheduler button', (buttons, name) => {
           const weekend = buttons.filter((button) => [
             'scheduler|date_shortcut_thisweekend',
             'scheduler|date_shortcut_nextweekend',
           ].includes(button.getAttribute('data-track')));
-          if (weekend.length !== 1) {
-            throw new Error('Expected exactly one weekend button');
+          if (weekend.length > 1) {
+            throw new Error('Expected at most one weekend button');
           }
-          weekend[0].setAttribute('data-track',
+          const date = new Date();
+          date.setDate(date.getDate() + ((6 - date.getDay() + 7) % 7 || 7));
+          const pad = (n) => String(n).padStart(2, '0');
+          const label = date.getFullYear() + '-' + pad(date.getMonth() + 1) +
+              '-' + pad(date.getDate());
+          const button = weekend[0] || buttons.find(
+              (button) => button.getAttribute('aria-label') === label);
+          if (!button) throw new Error('Expected the next Saturday button');
+          button.setAttribute('data-track',
               'scheduler|date_shortcut_' + name);
         }, variant);
       });
