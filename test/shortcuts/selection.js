@@ -105,9 +105,14 @@ module.exports = [
     keys: ['* h', '* left'],
     what: 'collapses every task with sub-tasks',
     seed: seedSubTask,
-    setUp: onAlpha,
-    check: async (t) => assert.equal(
-        await taskCount(t), 3, 'expected the sub-task to be hidden'),
+    setUp: async (t) => {
+      await onAlpha(t);
+      await waitForTaskCount(t, 4);
+    },
+    check: async (t) => {
+      await waitForTaskCount(t, 3);
+      assert.equal(await taskCount(t), 3, 'expected the sub-task to be hidden');
+    },
   },
   {
     keymap: 'default',
@@ -116,11 +121,14 @@ module.exports = [
     seed: seedSubTask,
     setUp: async (t) => {
       await onAlpha(t);
+      await waitForTaskCount(t, 4);
       await t.press('* h');
-      await t.sleep(500);
+      await waitForTaskCount(t, 3);
     },
-    check: async (t) => assert.equal(
-        await taskCount(t), 4, 'expected the sub-task to be shown'),
+    check: async (t) => {
+      await waitForTaskCount(t, 4);
+      assert.equal(await taskCount(t), 4, 'expected the sub-task to be shown');
+    },
   },
 ];
 
@@ -130,6 +138,12 @@ async function onP4(t) {
 
 const taskCount = (t) => t.page.$$eval(
     '.task_list_item', (tasks) => tasks.length);
+
+async function waitForTaskCount(t, count) {
+  await t.page.waitForFunction((expected) =>
+    document.querySelectorAll('.task_list_item').length === expected,
+  {timeout: 15000}, count);
+}
 
 async function seedSubTask({api, fixture}) {
   await api.createTask({

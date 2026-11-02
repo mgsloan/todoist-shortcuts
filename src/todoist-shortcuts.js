@@ -957,10 +957,10 @@
 
   // Collapses or expands all tasks.
   async function collapseAll() {
-    repeatedlyClickArrows('.down');
+    await toggleAllTasks('.down');
   }
   async function expandAll() {
-    repeatedlyClickArrows('.right');
+    await toggleAllTasks('.right');
   }
 
   // Clears all selections.
@@ -2881,32 +2881,23 @@
     return getUnique(task, '.down');
   }
 
-  // Click elements within the content which match the specified query.
-  // Persistently clicks until the class can no longer be found. Used to
-  // collapse / expand all items.
-  function repeatedlyClickArrows(query) {
-    withViewContent((content) => {
-      let i = 0;
-      let clickedSomething = false;
-      const doClick = (el) => {
-        click(el);
-        clickedSomething = true;
-      };
-      let inner = null;
-      inner = () => {
-        clickedSomething = false;
-        withAll(content, query, all, doClick);
-        if (!clickedSomething) {
-          return;
-        }
-        if (i < 5) {
-          i++;
-          setTimeout(inner);
-        } else {
-          warn('Iteratively clicked arrows but they didn\'t all toggle');
-        }
-      };
-      inner();
+  // Toggle each parent once, waiting for Todoist to update before finding
+  // the next one. Clicking again while its arrow is unchanged can undo the
+  // first click. Work backwards so collapsing a parent doesn't hide children
+  // which still need collapsing; expanding reveals new children to visit.
+  async function toggleAllTasks(query) {
+    await withViewContent(async (content) => {
+      while (content.isConnected) {
+        const task = getTasks().reverse().find((t) => getUnique(t, query));
+        if (!task) return;
+        const key = getTaskKey(task);
+        await toggleCollapse(task);
+        await retryWithDelay('waiting for task to toggle', () => {
+          // Todoist can replace the row while rendering the change.
+          const current = getTaskByKey(key);
+          return !current || !getUnique(current, query);
+        }, 100, 20);
+      }
     });
   }
 

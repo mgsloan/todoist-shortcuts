@@ -201,12 +201,17 @@ async function selectedContents(page) {
 // the task view instead.  Starting from the top matters because changing a
 // task's priority can reorder the list.
 async function putCursorOn(page, content) {
-  await waitForTasks(page);
-  await press(page, '^');
-  const count = await page.$$eval('.task_list_item', (els) => els.length);
-  for (let i = 0; i <= count; i++) {
-    if (await cursorContent(page) === content) return;
-    await press(page, 'j');
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline) {
+    await waitForTasks(page);
+    await press(page, '^');
+    const count = await page.$$eval('.task_list_item', (els) => els.length);
+    for (let i = 0; i <= count; i++) {
+      if (await cursorContent(page) === content) return;
+      await press(page, 'j');
+    }
+    // Todoist sometimes reloads the page while the first fixture is being
+    // opened. Wait for the list and cursor to return, then search again.
   }
   throw new Error('Never found a task with content ' + JSON.stringify(content));
 }

@@ -1,5 +1,8 @@
 # todoist-shortcuts changelog
 
+* Fixes expanding and collapsing all sub-tasks (`* l` / `* h` and their
+  arrow-key alternatives) sometimes toggling tasks back to their old state.
+
 ## Version 211
 
 * Fixes scheduling for the weekend (`t n`) doing nothing when Todoist
