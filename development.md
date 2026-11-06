@@ -84,6 +84,12 @@ target. They still execute in both suites. Keep the reason beside the test
 and remove the flag when upstream behavior recovers. New, unrecognized
 failures still fail CI.
 
+Shortcut-table failures print the Node and browser versions, extension
+warnings, and task-detail button and focus state in the test log. Task-view
+shortcuts also capture that state before pressing the key, so a failure can
+distinguish a missing or disabled navigation button from a click that had no
+effect. These diagnostics exclude cookies, storage, input values and raw HTML.
+
 ```
 npm run test:login -- --target stable
 npm run test:login -- --target experimental

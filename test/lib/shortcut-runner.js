@@ -8,6 +8,7 @@ const api = require('./api');
 const browser = require('./browser');
 const fixtures = require('./fixtures');
 const {getConfig} = require('./targets');
+const {reportShortcutFailure, taskViewState} = require('./diagnostics');
 
 const TIMEOUT = 120000;
 
@@ -114,7 +115,7 @@ function runShortcutTable(title, table) {
         const broken = typeof entry.broken === 'string' ? entry.broken :
           entry.broken?.[getConfig().target];
         if (broken) options.todo = broken;
-        it(name, options, async () => {
+        it(name, options, async (test) => {
           fixture = await fixtures.create(
               fixtureName(entry, key),
               (entry.tasks || DEFAULT_TASKS).map(toTaskFields));
@@ -132,10 +133,22 @@ function runShortcutTable(title, table) {
             press: (binding) => pressBinding(page, binding),
             sleep,
           };
-          if (entry.setUp) await entry.setUp(context);
-          await pressBinding(page, key);
-          await sleep(entry.settle || 1000);
-          await entry.check(context);
+          let before = null;
+          let phase = 'setup';
+          try {
+            if (entry.setUp) await entry.setUp(context);
+            if (entry.keymap === 'task_view') {
+              before = await taskViewState(page);
+            }
+            phase = 'shortcut';
+            await pressBinding(page, key);
+            await sleep(entry.settle || 1000);
+            phase = 'check';
+            await entry.check(context);
+          } catch (error) {
+            await reportShortcutFailure(test, context, before, phase);
+            throw error;
+          }
         });
       }
     }
