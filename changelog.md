@@ -1,5 +1,7 @@
 # todoist-shortcuts changelog
 
+## Version 212
+
 * Fixes expanding and collapsing all sub-tasks (`* l` / `* h` and their
   arrow-key alternatives) sometimes toggling tasks back to their old state.
 
