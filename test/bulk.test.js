@@ -183,6 +183,12 @@ describe('cursor keys in bulk reschedule mode', {timeout: TIMEOUT}, () => {
 
     await page.evaluate(() => {
       window.bulkSchedulerPeak = document.querySelectorAll('.scheduler').length;
+      window.bulkSchedulerReady = null;
+      window.bulkSchedulerBlur = (event) => {
+        const scheduler = event.target.closest('.scheduler');
+        if (scheduler) window.bulkSchedulerReady = scheduler;
+      };
+      document.addEventListener('focusout', window.bulkSchedulerBlur, true);
       window.bulkSchedulerObserver = new MutationObserver(() => {
         window.bulkSchedulerPeak = Math.max(
             window.bulkSchedulerPeak,
@@ -198,8 +204,13 @@ describe('cursor keys in bulk reschedule mode', {timeout: TIMEOUT}, () => {
         await page.keyboard.press('j');
       }
       await browser.waitForCursorOn(page, 'cur-last');
-      await page.waitForSelector('.scheduler', {timeout: 15000});
-      await sleep(1500);
+      // Opening the last scheduler finishes by blurring its input. Further
+      // queued j presses now leave that scheduler open at the boundary.
+      await page.waitForFunction(() => {
+        const scheduler = document.querySelector('.scheduler');
+        return scheduler && scheduler === window.bulkSchedulerReady &&
+          !scheduler.contains(document.activeElement);
+      }, {timeout: 15000});
       assert.equal(await browser.cursorContent(page), 'cur-last');
       assert.equal(await page.evaluate(() => window.bulkSchedulerPeak), 1,
           'rapid cursor movement opened multiple schedulers');
@@ -207,10 +218,37 @@ describe('cursor keys in bulk reschedule mode', {timeout: TIMEOUT}, () => {
     } finally {
       await page.evaluate(() => {
         window.bulkSchedulerObserver.disconnect();
+        document.removeEventListener(
+            'focusout', window.bulkSchedulerBlur, true);
         delete window.bulkSchedulerObserver;
         delete window.bulkSchedulerPeak;
+        delete window.bulkSchedulerReady;
+        delete window.bulkSchedulerBlur;
       });
       await pressBinding(page, 'escape');
+    }
+  });
+
+  it('keeps the same scheduler at either end of the list', async () => {
+    for (const [content, keys] of [
+      ['cur-parent', ['k', 'up', '^']],
+      ['cur-last', ['j', 'down', '$']],
+    ]) {
+      await browser.putCursorOn(page, content);
+      await pressBinding(page, '* t');
+      assert.equal(await schedulingNow(), content);
+      const scheduler = await page.$('.scheduler');
+      try {
+        for (const key of keys) {
+          await pressBinding(page, key);
+          assert.ok(await scheduler.evaluate((el) => el.isConnected),
+              key + ' replaced the scheduler at the list boundary');
+          assert.equal(await browser.cursorContent(page), content);
+        }
+      } finally {
+        await scheduler.dispose();
+        await pressBinding(page, 'escape');
+      }
     }
   });
 });
@@ -397,6 +435,30 @@ describe('entering bulk move mode', {timeout: TIMEOUT}, () => {
     assert.deepEqual(
         await api.contentsOfProject(fixture.project.id),
         ['bm-a', 'bm-b', 'bm-c', 'bm-d']);
+  });
+
+  it('keeps the same project picker at either end of the list', async () => {
+    for (const [content, keys] of [
+      ['bm-a', ['alt+k', 'alt+up']],
+      ['bm-d', ['alt+j', 'alt+down']],
+    ]) {
+      await browser.putCursorOn(page, content);
+      await pressBinding(page, '* v');
+      const input = await page.waitForSelector(
+          'input[role=combobox][aria-controls^="dropdown-select-"]',
+          {visible: true, timeout: 15000});
+      try {
+        for (const key of keys) {
+          await pressBinding(page, key);
+          assert.ok(await input.evaluate((el) => el.isConnected),
+              key + ' replaced the project picker at the list boundary');
+          assert.equal(await browser.cursorContent(page), content);
+        }
+      } finally {
+        await input.dispose();
+        await pressBinding(page, 'escape');
+      }
+    }
   });
 });
 

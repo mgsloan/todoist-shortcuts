@@ -3,6 +3,9 @@
 * Fixes expanding and collapsing all sub-tasks (`* l` / `* h` and their
   arrow-key alternatives) sometimes toggling tasks back to their old state.
 
+* Keeps the scheduler and project picker open when cursor keys reach the
+  start or end of the list in bulk reschedule (`* t`) and bulk move (`* v`).
+
 ## Version 211
 
 * Fixes scheduling for the weekend (`t n`) doing nothing when Todoist

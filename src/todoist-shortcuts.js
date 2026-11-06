@@ -2059,6 +2059,13 @@
       if (bulkCursorQueue !== queue) {
         return;
       }
+      // Extra cursor keys at the end of a list should leave its dialog up.
+      // Still run the motion: Upcoming uses boundary keys to scroll in more
+      // tasks. Check inside the queue, after earlier moves have finished.
+      if (mode.isOpen() && bulkCursorAtBoundary(motion)) {
+        await motion();
+        return;
+      }
       bulkDialogSeenOpen = false;
       await closeContextMenus();
       if (bulkCursorQueue !== queue) {
@@ -2077,6 +2084,18 @@
     // caller still receives the failure from this step.
     queue.tail = step.catch(noop);
     await step;
+  }
+
+  function bulkCursorAtBoundary(motion) {
+    const first = motion === cursorUp || motion === cursorFirst;
+    const last = motion === cursorDown || motion === cursorLast;
+    if (!first && !last) {
+      return false;
+    }
+    const cursor = getCursor();
+    const tasks = getTasks();
+    const boundary = tasks[first ? 0 : tasks.length - 1];
+    return cursor && boundary && getTaskKey(cursor) === getTaskKey(boundary);
   }
 
   // Deals with the task the dialog is up for by completing it, rather than by
